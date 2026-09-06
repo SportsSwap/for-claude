@@ -23,19 +23,24 @@ function nav(s, active) {
 
 // Slide title plus the one-line analytical takeaway ("action title").
 function head(s, title, takeaway, opts = {}) {
+  let fs = opts.size || 25;
+  if (!opts.size) { if (title.length > 66) fs = 20; else if (title.length > 54) fs = 22; }
   s.addText(title, {
     x: C.M, y: opts.navless ? 0.30 : 0.50, w: 12.4, h: 0.52, isTextBox: true, margin: 0,
-    fontFace: C.H, fontSize: opts.size || 25, bold: true, color: C.INK, valign: "middle",
+    fontFace: C.H, fontSize: fs, bold: true, color: C.INK, valign: "middle",
   });
+  const by = (opts.navless ? 0.30 : 0.50) + 0.56;
   if (takeaway) {
-    s.addShape("rect", {
-      x: C.M, y: (opts.navless ? 0.30 : 0.50) + 0.56, w: 12.44, h: 0.46, fill: { color: C.MIST },
-    });
+    const bh = takeaway.length > 108 ? 0.56 : 0.44;
+    s.addShape("rect", { x: C.M, y: by, w: 12.44, h: bh, fill: { color: C.MIST } });
     s.addText(takeaway, {
-      x: C.M + 0.16, y: (opts.navless ? 0.30 : 0.50) + 0.56, w: 12.12, h: 0.46, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 12.5, bold: true, color: C.INK2, valign: "middle",
+      x: C.M + 0.16, y: by, w: 12.12, h: bh, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 12, bold: true, color: C.INK2, valign: "middle",
+      lineSpacingMultiple: 1.0,
     });
+    return by + bh + 0.16;
   }
+  return by + 0.10;
 }
 
 function foot(s, source, page) {
