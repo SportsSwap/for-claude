@@ -198,3 +198,69 @@ function appx(pres, tag, title, takeaway, page) {
 }
 
 module.exports = { C, SECTIONS, bg, nav, head, foot, stat, card, para, table, divider, appx };
+
+// ---- appendix helpers -------------------------------------------------
+const T = require('./model_tables.json');
+
+// Render a financial statement straight from the model export.
+// rows: [[label, key, fmt, opts]] where fmt is 'n' | 'n1' | 'pct' | 'x' | 'cur2'
+function statement(s, x, y, rows, opts = {}) {
+  const yrs = T.years, n = yrs.length;
+  const lw = opts.labelW || 3.05;
+  const cw = opts.colW || ((12.44 - lw) / n);
+  const rh = opts.rowH || 0.245;
+  // header
+  s.addShape("rect", { x, y, w: lw, h: 0.28, fill: { color: C.INK } });
+  s.addText(opts.title || "A$m", { x: x + 0.07, y, w: lw - 0.14, h: 0.28, isTextBox: true, margin: 0,
+    fontFace: C.B, fontSize: 8.2, bold: true, color: C.WHITE, valign: "middle" });
+  yrs.forEach((yr, i) => {
+    s.addShape("rect", { x: x + lw + i * cw, y, w: cw, h: 0.28, fill: { color: C.INK } });
+    s.addText(yr, { x: x + lw + i * cw, y, w: cw, h: 0.28, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 7.6, bold: true, color: yr.endsWith("A") ? "9FD8CE" : C.WHITE,
+      align: "center", valign: "middle" });
+  });
+  rows.forEach((r, ri) => {
+    const [label, key, fmt, o = {}] = r;
+    const ry = y + 0.28 + ri * rh;
+    const src = T[o.src || opts.src];
+    const vals = (src && src[key]) || [];
+    const fillc = o.hi ? C.SPOD_L : (ri % 2 ? C.MIST2 : C.PAPER);
+    s.addShape("rect", { x, y: ry, w: lw, h: rh, fill: { color: fillc }, line: { color: C.RULE, width: 0.4 } });
+    s.addText((o.ind ? "    " : "") + label, { x: x + 0.07, y: ry, w: lw - 0.14, h: rh, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 7.8, bold: !!o.b, color: o.b ? C.INK : C.TXT, valign: "middle" });
+    yrs.forEach((yr, i) => {
+      const v = vals[i];
+      let t = "";
+      if (typeof v === "number") {
+        if (fmt === "pct") t = (v * 100).toFixed(1) + "%";
+        else if (fmt === "cur2") t = v.toFixed(2);
+        else if (fmt === "n1") t = v.toFixed(1);
+        else if (fmt === "x") t = v.toFixed(3);
+        else t = Math.round(v).toLocaleString("en-US");
+        if (typeof v === "number" && v < 0 && fmt !== "pct")
+          t = "(" + t.replace("-", "") + ")";
+      }
+      s.addShape("rect", { x: x + lw + i * cw, y: ry, w: cw, h: rh, fill: { color: fillc }, line: { color: C.RULE, width: 0.4 } });
+      s.addText(t, { x: x + lw + i * cw, y: ry, w: cw - 0.05, h: rh, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 7.6, bold: !!o.b,
+        color: (typeof v === "number" && v < 0) ? C.CRIMSON : (o.b ? C.INK : C.TXT),
+        align: "right", valign: "middle" });
+    });
+  });
+  return y + 0.28 + rows.length * rh;
+}
+
+// Appendix page furniture: tag, title, takeaway, footer, page number.
+function apage(pres, tag, title, takeaway) {
+  const s = pres.addSlide();
+  bg(s, false);
+  s.addText("APPENDIX   |   " + tag.toUpperCase(), { x: C.M, y: 0.16, w: 12.4, h: 0.24,
+    isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8, bold: true, color: C.SPOD,
+    charSpacing: 1.4, valign: "middle" });
+  const cy = head(s, title, takeaway, { size: title.length > 62 ? 18 : 20 });
+  return { s, cy };
+}
+
+module.exports.statement = statement;
+module.exports.apage = apage;
+module.exports.T = T;
