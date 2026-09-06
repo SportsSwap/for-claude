@@ -70,7 +70,7 @@ module.exports = function (pres, ctx) {
     ], { rowH: 0.44, size: 8.8, boldFirstCol: true, headH: 0.01,
          rowFill: [null,null,C.OCHRE_L,C.CRIM_L,C.CRIM_L,C.SPOD_L] });
     para(s, C.M, cy + 2.78, 6.10, 1.72, "The honest framing",
-      "Using saline, non-potable groundwater rather than competing for community fresh water is a genuine avoided-conflict advantage " +
+      "Using saline, non-potable groundwater rather than competing for community fresh water is an avoided-conflict advantage " +
       "for a Pilbara hard-rock miner. But it is largely a geological given, not a distinctive strategic decision by PLS.\n\n" +
       "We therefore describe it as a risk PLS does not have rather than an advantage PLS created. Framing a favourable accident of " +
       "geology as a shared-value achievement is exactly the move this case asks entrants to be sceptical about, and we would rather " +
@@ -91,7 +91,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy, 6.10, 2.30, "Tailings: not disclosed",
       "We could not establish whether Pilgangoora uses filtered or dry-stack tailings or a conventional wet storage facility, nor its " +
       "conformance status with the Global Industry Standard on Tailings Management.\n\n" +
-      "Filtered tailings would be a genuine differentiator and several competing lithium operations promote it. PLS may well use it. " +
+      "Filtered tailings would be a differentiator and several competing lithium operations promote it. PLS may well use it. " +
       "But an undisclosed practice cannot be underwritten, and we would rather record an unpriced risk than assert a strength we cannot " +
       "evidence.\n\n" +
       "This matters because P2000 roughly doubles throughput, and therefore roughly doubles tailings volumes, on an asset whose tailings " +
@@ -111,7 +111,7 @@ module.exports = function (pres, ctx) {
       "For an investor that has two consequences. First, no Pilbara miner - PLS included - can claim biodiversity risk is mitigated by " +
       "pointing at the fund, and any deck that does so has not looked. Second, it is a live regulatory risk: a scheme found inadequate " +
       "tends to be repriced, and the operator with the most hectares to clear has the most exposure. P2000 clears more hectares. " +
-      "We have listed it as an engagement ask rather than a valuation adjustment, because the timing and magnitude are genuinely unknowable.",
+      "We have listed it as an engagement ask rather than a valuation adjustment, because we cannot date it or size it.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.4 });
    }, "Sources: ABC News, 'Pilbara mining offset scheme leaves threatened species short-changed, review finds', 21 October 2024; Western Australian Department of Biodiversity, Conservation and Attractions; a Northern Quoll Management Plan prepared for Pilbara Minerals by Animal Plant Mineral Pty Ltd.");
 
@@ -136,7 +136,7 @@ module.exports = function (pres, ctx) {
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.2 });
     para(s, C.M, cy + 2.22, 12.44, 1.86, "The circularity we had to confront, stated plainly",
       "There is a tension in our own argument, and we would rather set it out than have it found. We claim social licence protects the " +
-      "P2000 schedule. We also report that the offsets regime underpinning environmental approvals in the region has been independently " +
+      "P2000 schedule. We also report that the offsets regime behind environmental approvals in the region has been independently " +
       "judged inadequate, and that we could not verify PLS's Indigenous engagement metrics.\n\n" +
       "The resolution is that these are different approvals with different failure modes. Heritage approval turns on relationships with " +
       "Traditional Owners and on process; environmental offsets turn on a state scheme's pricing. PLS can be strong on the first and " +
@@ -233,7 +233,7 @@ module.exports = function (pres, ctx) {
        "A strategy that depends on management goodwill does not survive a change of management. Weighted scorecard metrics do.",
        "Makes the shared-value strategy durable beyond the current team"],
       ["5", "Get ahead of the Pilbara offsets problem", C.OCHRE,
-       "The regional scheme has been independently found underfunded. The operator that funds genuine landscape conservation before the scheme is repriced buys both goodwill and regulatory optionality.",
+       "The regional scheme has been independently found underfunded. The operator that funds real landscape conservation before the scheme is repriced buys both goodwill and regulatory optionality.",
        "Converts a sector-wide liability into a differentiator"],
     ];
     asks.forEach((a, i) => {

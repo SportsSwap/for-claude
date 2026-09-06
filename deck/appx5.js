@@ -21,7 +21,7 @@ module.exports = function (pres, ctx) {
     table(s, C.M, cy, [{ t: "Barrier", w: 2.75 }, { t: "Strength", w: 1.45, align: "center" },
       { t: "Assessment", w: 8.24 }], [
       ["Capital requirements", { t: "High", c: C.SPOD, b: true }, "P2000 alone is about A$1.2bn. Benchmark estimates the industry needs more than US$116bn by 2030. Few developers can fund a build through a price trough."],
-      ["Orebody access", { t: "High", c: C.SPOD, b: true }, "A 446Mt resource at 1.28% Li2O is not a decision a competitor can make. Geology is the one genuinely cornered input."],
+      ["Orebody access", { t: "High", c: C.SPOD, b: true }, "A 446Mt resource at 1.28% Li2O is not a decision a competitor can make. Geology is the one input a competitor cannot buy."],
       ["Permitting and heritage", { t: "Medium-High", c: C.SPOD, b: true }, "Post-Juukan Gorge, Western Australian heritage approvals are slower and more scrutinised. This favours incumbents with existing agreements."],
       ["Processing know-how", { t: "Medium", c: C.OCHRE, b: true }, "Flotation and ore sorting are licensable. TOMRA will sell a sorter to anyone. This is not proprietary."],
       ["Offtake relationships", { t: "Low-Medium", c: C.OCHRE, b: true }, "Contracts are priced at prevailing market and re-tendered. Relationships help; they do not lock customers in."],
@@ -45,7 +45,7 @@ module.exports = function (pres, ctx) {
         "446Mt at 1.28% Li2O, one of the largest hard-rock resources globally",
         "A$2.29bn of cash and net cash of A$1.46bn after a full downturn",
         "Three expansions delivered through the trough; dividend reinstated",
-        "The only genuine non-China downstream route among the six: Calix plus POSCO",
+        "The only non-China downstream route among the six: Calix plus POSCO",
       ]],
       ["Weaknesses", C.CRIMSON, C.CRIM_L, [
         "One orebody, one commodity, one jurisdiction",
@@ -117,7 +117,7 @@ module.exports = function (pres, ctx) {
       { t: "Why we did not pick it for THIS mandate", w: 6.19 }], [
       ["BHP Group", "Scale, diversification, US$32.9bn of underlying EBITDA, a 4.3% yield and the strongest balance sheet in the sector.", "Its ESG programme is Scope 1 and 2 abatement on iron ore and coal. That is a cost of staying in business. Nothing about it creates a new market, which is what the brief asks us to find."],
       ["Rio Tinto", "The most direct lithium exposure among the majors after acquiring Arcadium for US$6.7bn, plus Rincon in Argentina.", "It bought lithium at the top of the cycle with US$14.1bn of net debt. The lithium exposure is real but diluted to a fraction of group earnings, so a lithium thesis expressed through Rio is mostly an iron ore position."],
-      ["Fortescue", "A genuine decarbonisation ambition in green hydrogen and an attractive yield.", "The green energy business sits beside the iron ore business rather than inside it. That is adjacency, not shared value: solving a societal problem in a separate division does not change the competitive position of the core."],
+      ["Fortescue", "A serious decarbonisation ambition in green hydrogen and an attractive yield.", "The green energy business sits beside the iron ore business rather than inside it. That is adjacency, not shared value: solving a societal problem in a separate division does not change the competitive position of the core."],
       ["South32", "Real transition-metal exposure in aluminium and base metals, net cash, and a consensus Buy.", "The closest runner-up. But its ESG work is still fundamentally licence-to-operate spending on existing assets, and its commodity mix does not put carbon intensity on the revenue line."],
       ["Mineral Resources", "The other lithium pure-play route on the list, with a 44% revenue increase and EBITDA up 183% in FY26.", "Lithium is diluted by mining services and iron ore, gearing is roughly US$4.3bn at 1.7x EBITDA, and the group has carried governance controversies. Constrained optionality is the opposite of what a counter-cyclical thesis needs."],
     ], { rowH: 0.78, size: 8.5, boldFirstCol: true });
@@ -168,7 +168,7 @@ module.exports = function (pres, ctx) {
       "reduction in power emissions intensity by 2027 is achievable through the gas conversion already installed plus the planned solar " +
       "and storage. That is a plan with equipment attached, which is more than most net-zero commitments in this sector have.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9 });
-    para(s, C.M + 6.34, cy + 3.72, 6.10, 1.44, "And why the gaps genuinely matter here",
+    para(s, C.M + 6.34, cy + 3.72, 6.10, 1.44, "And why the gaps matter here",
       "Our level-one thesis is that PLS can sell a declarable low-carbon tonne. A company that does not publish emissions intensity per " +
       "tonne of concentrate, has no verified product carbon footprint and discloses no Scope 3 cannot presently make that declaration. " +
       "The gap is not cosmetic - it is the difference between the thesis being true and being aspirational, which is precisely why we " +

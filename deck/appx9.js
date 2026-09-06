@@ -30,7 +30,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy + 4.30, 12.44, 0.86, null,
       "The first four are the ones that decide this position. Everything below them is manageable within a normal holding period. If a judge asks which single line would make us wrong, it is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$4.98 and the recommendation with it.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.2 });
-   }, "Source: team assessment. Inherent and residual ratings are ours. Indicators are chosen because they are publicly observable at a known frequency, not because they are comprehensive.");
+   }, "Source: team assessment. Inherent and residual ratings are ours. Indicators are chosen because they are publicly observable at a known frequency, not because they are exhaustive.");
 
   pgF("Short interest: the part of the re-rating that cannot repeat",
       "PLS went from the most shorted stock on the ASX to roughly the fortieth in eighteen months. That buyer has now finished buying.",

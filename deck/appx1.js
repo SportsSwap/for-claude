@@ -94,7 +94,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy + 4.06, 12.44, 1.02, "What happens if conversion disappoints",
       "At 60% conversion the mineable base falls to 267.6Mt, remaining life drops to about 11.4 years, and our target falls by roughly " +
       "A$0.40 per share. At 90% it rises to 401.4Mt and about 20.8 years, adding roughly A$0.30. The Ore Reserve has not been restated " +
-      "since August 2023, so the next reserve statement is a genuine catalyst in both directions. We have flagged it in the risk register " +
+      "since August 2023, so the next reserve statement moves the valuation in either direction. We have flagged it in the risk register " +
       "rather than assuming the 2025 resource upgrade converts automatically.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.2 });
     fin(s, "Sources: PLS resource and reserve statements; FY26 results; team valuation model, Assumptions sheet. Mass pull and mine life are computed live in the workbook, not typed.");

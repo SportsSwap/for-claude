@@ -108,7 +108,7 @@ module.exports = function (pres, ctx) {
     card(s, C.M + 4.21, cy, 4.02, 2.30, "Zimbabwe closed the door early", [
       "All raw mineral and concentrate exports were banned from 25 February 2026.",
       "The market had expected concentrate exports to stay legal until January 2027, so this arrived nearly a year early.",
-      "Two unrelated, sovereign-driven disruptions inside twelve months is a more robust supply argument than either alone.",
+      "Two unrelated, sovereign-driven disruptions inside twelve months is a stronger supply argument than either alone.",
     ], { num: 2, size: 8.8, titleColor: C.INK });
     card(s, C.M + 8.42, cy, 4.02, 2.30, "Storage became a demand pillar of its own", [
       "Battery storage installations grew about 51% in 2025, on top of 26% growth in electric-vehicle battery demand.",
@@ -122,7 +122,7 @@ module.exports = function (pres, ctx) {
       "demand and by datacentre buildout, and it grew fast enough in 2026 to keep global lithium demand rising 17-30% through the " +
       "US policy reversal rather than in spite of it.", { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.4 });
     para(s, C.M + 6.28, cy + 2.48, 6.16, 1.68, "And what it takes to supply it",
-      "Benchmark Mineral Intelligence puts the greenfield incentive price - the level at which genuinely new supply gets funded - " +
+      "Benchmark Mineral Intelligence puts the greenfield incentive price - the level at which new supply gets funded - " +
       "sustainably above US$20,000-25,000/t LCE, and estimates that more than 300 new projects are needed by 2035. Our base case " +
       "long-run price of about US$1,750/t realised sits below the level that incentive analysis implies. If Benchmark is right, we are " +
       "being too cautious, not too aggressive.", { size: 9.4, titleColor: C.INK });

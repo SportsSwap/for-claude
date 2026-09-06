@@ -104,7 +104,7 @@ module.exports = function (pres, ctx) {
    }, "Sources: industry installation data via Benchmark Mineral Intelligence and Rho Motion; China Automotive Battery Innovation Alliance production data reported for May 2026.");
 
   // ---------------------------------------------------------------- B10 market balance
-  pgB("Market balance: the forecasters genuinely disagree",
+  pgB("Market balance: the forecasters do not agree",
       "Presented as found rather than smoothed into a house view, because the disagreement is itself the most useful thing on this page.",
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Year", w: 1.15, align: "center" }, { t: "Forecaster", w: 2.85 },
@@ -147,7 +147,7 @@ module.exports = function (pres, ctx) {
       "as structurally independent of vehicle policy becomes partly substitutable, and our long-run price of about US$1,750/t realised is " +
       "too high. Our terminal value is an annuity over sixteen years, so roughly half our enterprise value sits in a period where this risk " +
       "is live.\n\n" +
-      "That is a genuine vulnerability and we would rather state it than have a judge find it. The mitigant is that it is a slow risk with " +
+      "That is a vulnerability and we would rather state it than have a judge find it. The mitigant is that it is a slow risk with " +
       "visible tells - sodium-ion cell cost per kWh and announced storage orders - rather than a sudden one.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
    }, "Sources: Benchmark Mineral Intelligence; BloombergNEF; IEA. Timelines are the team's read of published roadmaps and are inherently uncertain.");
@@ -187,10 +187,10 @@ module.exports = function (pres, ctx) {
     const powers = [
       ["Scale economies", "PARTIAL", C.OCHRE, "446Mt at 1.28% Li2O and 17.5% mass pull give real fixed-cost dilution. But scale in mining is replicable by anyone with a comparable orebody."],
       ["Network economies", "NO", C.CRIMSON, "Spodumene has no network effect. A tonne is worth the same to the tenth customer as the first."],
-      ["Counter-positioning", "PARTIAL", C.OCHRE, "Electric calcination is a business model Chinese converters cannot easily copy without stranding fossil-fired kilns. That is the closest thing here to genuine counter-positioning."],
+      ["Counter-positioning", "PARTIAL", C.OCHRE, "Electric calcination is a business model Chinese converters cannot easily copy without stranding fossil-fired kilns. That is the closest thing here to counter-positioning."],
       ["Switching costs", "NO", C.CRIMSON, "Offtakes are priced at prevailing market. Customers can and do switch suppliers between cargoes."],
       ["Branding", "NO", C.CRIMSON, "There is no brand premium on concentrate. Provenance is a specification, not a brand."],
-      ["Cornered resource", "PARTIAL", C.SPOD, "The orebody itself is genuinely cornered: 446Mt at that grade in a stable jurisdiction cannot be replicated by a competitor's decision."],
+      ["Cornered resource", "PARTIAL", C.SPOD, "The orebody itself is cornered: 446Mt at that grade in a stable jurisdiction cannot be replicated by a competitor's decision."],
       ["Process power", "NO", C.CRIMSON, "Ore sorting and flotation are available to any operator with the capital. We say this on the ore-sorting slide too."],
     ];
     powers.forEach((p, i) => {

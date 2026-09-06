@@ -86,7 +86,7 @@ module.exports = function build(pres, ctx) {
       ["BHP Group", "Iron ore, copper, coal", "Scope 1 and 2 abatement on long-life bulk assets. Spend protects a licence to operate.", { t: "Defensive", c: C.MUTE }, "n/a", "US$8.7bn"],
       ["Rio Tinto", "Iron ore, aluminium, lithium", "Same, plus a lithium arm bought at the top of the cycle for US$6.7bn.", { t: "Defensive", c: C.MUTE }, "7.8x", "US$14.1bn"],
       ["Fortescue", "Iron ore, green energy", "Green hydrogen ambition sits beside the iron ore business rather than inside it.", { t: "Adjacent", c: C.MUTE }, "5.6x", "US$0.9bn"],
-      ["South32", "Alumina, base metals", "Genuine transition-metal exposure, but ESG is still a cost of operating.", { t: "Defensive", c: C.MUTE }, "8.5x", "net cash"],
+      ["South32", "Alumina, base metals", "Real transition-metal exposure, but ESG is still a cost of operating.", { t: "Defensive", c: C.MUTE }, "8.5x", "net cash"],
       ["Mineral Resources", "Lithium, iron ore, services", "Lithium exposure diluted by services and iron ore, and constrained by gearing.", { t: "Diluted", c: C.OCHRE }, "7.8x", "US$4.3bn"],
       [{ t: "PLS Group", b: true, c: C.SPOD }, { t: "Lithium, pure play", c: C.SPOD }, { t: "The product IS the transition, and the carbon intensity of the tonne decides which market will take it.", c: C.INK }, { t: "Offensive", c: C.SPOD, b: true }, { t: "26.8x", c: C.INK }, { t: "net cash", c: C.SPOD }],
     ];
