@@ -38,6 +38,7 @@ module.exports = function build(pres, ctx) {
   // ---------------------------------------------------------------- 1. EXEC SUMMARY
   {
     const s = pres.addSlide(); bg(s); nav(s, "Summary");
+    s.addNotes("OPEN HERE. 45 seconds, no more.\n\n\"We are recommending PLS Group, a buy, twelve-month target six dollars twelve against a last close of five forty-eight. That is 11.7% of price plus a 1.7% yield, so a 13.4% total return against a benchmark that returned 5.90%.\"\n\nThen the line that matters: \"Of the sixty-four cents of upside we see, forty-three cents comes from ESG-linked operating decisions the market is not paying for. That is two thirds. This is not a lithium price bet with an ESG slide attached.\"\n\nDo NOT walk the six boxes. They are there for the reader, not the listener. Move to slide 2.");
     const cy = head(s, "Executive summary",
       "Two thirds of the upside we see is the shared-value position the market has not priced. That is the entire recommendation.");
     const bx = [
@@ -74,6 +75,7 @@ module.exports = function build(pres, ctx) {
   // ---------------------------------------------------------------- 2. WHY PLS NOT THE OTHER FIVE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Summary");
+    s.addNotes("60 seconds. This slide pre-empts the first question every judge has: why not BHP.\n\nThe argument: four of the six use ESG to defend cash flows they already have. That is competent risk management and it is not shared value. Only PLS sits in a market where the environmental outcome is why the customer exists.\n\nSay the caveat out loud before they raise it: PLS is also the riskiest of the six. One commodity, one asset, a price that moved by a factor of three in two years. Naming it first takes the weapon away.");
     const cy = head(s, "Why PLS, and not the other five",
       "For four of the six, ESG spend defends an existing cash flow. For PLS the societal need is the demand, and carbon intensity decides market access.");
     const cols = [

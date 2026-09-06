@@ -18,19 +18,19 @@ module.exports = function (pres, ctx) {
     stat(s, C.M + 3.15, cy, 2.90, "55%", "IRR at PFS", "On the same pre-feasibility basis.", { color: C.SPOD });
     stat(s, C.M + 6.30, cy, 2.90, "~A$1.2bn", "Estimated capital", "For a new flotation plant alongside the existing Pilgangoora facilities.", { color: C.INK });
     stat(s, C.M + 9.45, cy, 2.99, "1.9 Mtpa", "Average over 10 years", "At about 5.2% grade, taking total capacity above 2.0Mtpa.", { color: C.INK });
-    table(s, C.M, cy + 1.62, [{ t: "Milestone", w: 3.05 }, { t: "Status", w: 2.10, align: "center" }, { t: "Detail", w: 7.29 }], [
+    table(s, C.M, cy + 1.52, [{ t: "Milestone", w: 3.05 }, { t: "Status", w: 2.10, align: "center" }, { t: "Detail", w: 7.29 }], [
       ["Pre-feasibility study", "Complete, Jun 2024", "A$2.6bn incremental NPV, 55% IRR, about A$1.2bn capital, 1.9Mtpa average over the first ten years."],
       ["Pre-FID capital approved", { t: "Approved, Jun 2026", c: C.SPOD, b: true }, "About A$175m for early engineering, long-lead procurement, site preparation and study advancement, explicitly to preserve optionality."],
       ["Definitive feasibility study", { t: "Due Dec-qtr 2026", c: C.OCHRE, b: true }, "Originally flagged for the December 2025 quarter and since moved out a year. Inside our investment horizon."],
       ["Final investment decision", { t: "Not taken", c: C.CRIMSON, b: true }, "Expected late 2026, conditional on study outcomes, funding capacity and market conditions."],
       ["First ore", "Guided mid-2029", "Equivalent to FY30 on PLS's June year end. Our base case assumes 250kt in FY30 ramping to 885kt by FY33."],
       ["Underground option", "Under study", "An underground mining option is being assessed to further improve project economics."],
-    ], { rowH: 0.44, size: 8.8, boldFirstCol: true });
-    para(s, C.M, cy + 4.62, 12.44, 1.04, "How we treat it, and why we do not simply take the A$2.6bn",
-      "The A$2.6bn is a pre-feasibility number produced in June 2024, before the price collapse and recovery. We do not add it to our " +
-      "valuation. Instead we model the production profile it implies inside the DCF, which means it is exposed to our own price deck " +
-      "and our own cost assumptions rather than the company's. In the risked sum-of-the-parts we carry P2000 at 70% of the A$2.6bn, " +
-      "reflecting a study that is due but not delivered and a board that has committed A$175m but not the remaining A$1.0bn.",
+    ], { rowH: 0.38, size: 8.8, boldFirstCol: true });
+    para(s, C.M, cy + 4.10, 12.44, 1.06, "How we treat it, and why we do not simply take the A$2.6bn",
+      "The A$2.6bn is a pre-feasibility number from June 2024, struck before the price collapse and recovery. We do not add it to our " +
+      "valuation. We model the production profile it implies inside the DCF, so it is exposed to our price deck and our cost " +
+      "assumptions rather than the company's. In the risked sum-of-the-parts we carry P2000 at 70%: a study that is due but not " +
+      "delivered, and a board that has committed A$175m but not the remaining A$1.0bn.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.2 });
    }, "Sources: PLS P2000 pre-feasibility study announcement, 21 June 2024; PLS pre-FID capital approval, June 2026; FY27 guidance. PFS-level economics carry the usual accuracy range and are superseded by a definitive study.");
 
@@ -45,14 +45,14 @@ module.exports = function (pres, ctx) {
       ["Jul 2026", { t: "Restarted", c: C.SPOD, b: true }, "Just after the FY26 year end. Steady state targeted within the first four months of FY27."],
       ["FY27", "Guidance 1,030-1,100kt", "A 17-25% volume step-up, with unit costs guided A$575-625/t because Ngungaju tonnes cost more than the Pilgan average."],
     ], { rowH: 0.50, size: 8.8, boldFirstCol: true });
-    para(s, C.M, cy + 3.00, 6.10, 1.72, "Why this matters more than the tonnes",
+    para(s, C.M, cy + 2.96, 6.10, 2.06, "Why this matters more than the tonnes",
       "Idling capacity is easy to announce and hard to do: it means writing off fixed costs, standing down a workforce and telling " +
       "customers no. PLS did it, held the balance sheet through the trough, bought Latin Resources in scrip at the bottom, and " +
       "restarted when the price justified it.\n\n" +
       "That is the behaviour the cost-curve slide predicts. A producer at the low end of the curve gets to choose when to supply. " +
       "A producer at the high end has the choice made for it.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.2 });
-    para(s, C.M + 6.34, cy + 3.00, 6.10, 1.72, "The cost consequence we do not hide",
+    para(s, C.M + 6.34, cy + 2.96, 6.10, 2.06, "The cost consequence we do not hide",
       "Restarting Ngungaju raises the average unit cost. FY27 guidance of A$575-625/t is above the A$569/t achieved in FY26, and the " +
       "company attributes the step-up to the Ngungaju mix.\n\n" +
       "Our base case uses A$600/t for FY27, the guidance midpoint, falling to A$565/t by the 2030s as P2000 volume dilutes fixed costs. " +

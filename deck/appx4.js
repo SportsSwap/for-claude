@@ -142,7 +142,7 @@ module.exports = function (pres, ctx) {
       ["Lithium iron phosphate shift", "Cheaper cathode chemistry using less nickel and cobalt but similar lithium.", { t: "Already happening", c: C.SPOD }, "Neutral to positive for spodumene: it shifts demand toward carbonate, which spodumene feeds."],
       ["Thrifting and design", "Less lithium per kWh through cell and pack engineering.", { t: "Continuous", c: C.MUTE }, "Real but incremental, and historically outrun by volume growth."],
     ], { rowH: 0.62, size: 8.5, boldFirstCol: true, rowFill: [C.OCHRE_L, null, null, C.SPOD_L, null] });
-    para(s, C.M, cy + 3.42, 12.44, 1.46, "Where this bites our numbers",
+    para(s, C.M, cy + 3.40, 12.44, 1.74, "Where this bites our numbers",
       "Sodium-ion is the one we would watch. If it takes a meaningful share of stationary storage before 2030, the demand leg we described " +
       "as structurally independent of vehicle policy becomes partly substitutable, and our long-run price of about US$1,750/t realised is " +
       "too high. Our terminal value is an annuity over sixteen years, so roughly half our enterprise value sits in a period where this risk " +

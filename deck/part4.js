@@ -15,6 +15,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 12. DCF
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
+    s.addNotes("60 seconds. This is the slide that separates you from teams that ran a standard DCF.\n\n\"Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out. On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year, so about sixteen years remain. We value the terminal period as a sixteen-year annuity.\"\n\nThe number that lands: \"That single choice is worth nine billion dollars. A perpetuity would have given us 18.9 billion of terminal value on an asset that runs out.\"\n\nIf challenged on whether the life is pre or post-expansion: it is POST. We divide remaining ore by the FY36 rate, which already includes P2000. Doubling throughput halves the life and the model captures that.");
     const cy = head(s, "A finite orebody gets an annuity, not a perpetuity",
       "That single choice is worth A$9.0bn of terminal value. It is the difference between valuing a mine and valuing a company that never runs out of rock.");
     // left column: the cost of capital build
@@ -76,6 +77,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 13. RANGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
+    s.addNotes("60 seconds. Lead with the bear case, not the base case. It builds credibility.\n\n\"Our bear case is two dollars twenty-six. That assumes prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade, all at once. Even then it is 19% above the one ninety-one the market actually printed in the last trough, when PLS had a billion less cash and was loss-making.\"\n\nThen admit the weakness: reward to risk is 1.07x. Say it plainly. \"This is not a lopsided bet and we will not present it as one. What justifies the position is the expected return against the mandate.\"\n\nClose on the grid: we need prices not to FALL by a fifth. We do not need them to rise.");
     const cy = head(s, "The range, and what has to be true",
       "Base A$6.50, bear A$2.26, bull A$8.93. The bear sits 19% above the price the market actually paid at the bottom of the last cycle.");
     // football field
@@ -157,6 +159,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 14. RISKS
   {
     const s = pres.addSlide(); bg(s); nav(s, "Risks");
+    s.addNotes("45 seconds. Do not read twelve rows. Take the top two.\n\n\"The risk that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about four ninety-eight and we are wrong. We have not hedged that language.\"\n\nThen the short-interest point, which most teams will miss entirely: \"PLS went from the most shorted stock on the ASX at 20% of shares to about 6.8%. A material part of the tripling was covering, and that buyer cannot come back. Our target rests on FY27 earnings and the growth option, not on another squeeze.\"");
     const cy = head(s, "What would break this, and what would tell us first",
       "Every risk below has a named early-warning indicator, because a risk you cannot observe is not one you can manage.");
     const cols = [{ t: "Risk", w: 2.75 }, { t: "Why it bites", w: 3.85 }, { t: "Mitigant", w: 3.10 },
@@ -191,6 +194,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 15. RECOMMENDATION
   {
     const s = pres.addSlide(); bg(s, true);
+    s.addNotes("45 seconds. Close hard and stop talking.\n\n\"Buy. Six dollars twelve, 11.7% upside, 13.4% total return against a 5.90% benchmark. The fund needs two points of outperformance and this gives seven and a half.\"\n\n\"Two thirds of that upside is shared value the market is not paying for. And a further thirty-two cents of low-carbon downstream value sits outside the target entirely, so nothing in this recommendation depends on it.\"\n\nName the nearest catalyst: first lithium phosphate from the mid-stream plant lands THIS QUARTER, and the P2000 study lands in the December quarter. Both are inside the horizon.\n\nThen stop. Let them ask.");
     s.addText("Recommendation", { x: C.M, y: 0.34, w: 8, h: 0.62, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 30, bold: true, color: C.WHITE, valign: "middle" });
     s.addShape("rect", { x: C.M, y: 1.10, w: 3.55, h: 2.20, fill: { color: C.SPOD } });

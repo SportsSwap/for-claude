@@ -13,6 +13,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 3. COMPANY OVERVIEW
   {
     const s = pres.addSlide(); bg(s); nav(s, "Company");
+    s.addNotes("45 seconds. Do not read the four statistics.\n\nSay: \"Record volumes, a 59% margin, and costs DOWN 9% while volumes rose 17%. That combination through the worst lithium downturn in a decade is the whole reason we are here.\"\n\nThen point at the green box: the June quarter realised 2,107 dollars a tonne against a full-year average of 1,488. PLS exited FY26 earning about 40% more per tonne than it averaged across it, and FY27 annualises that.");
     const cy = head(s, "PLS came out of the downturn stronger than it went in",
       "Record volumes, a 59% margin, A$2.29bn of cash and a reinstated dividend - achieved while the lithium price was still recovering.");
     const st = [
@@ -66,6 +67,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 4. THE CYCLE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Industry");
+    s.addNotes("60 seconds. This is the credibility slide. Judges expect a lithium bull to hand-wave the price.\n\nSay: \"Prices tripled off the trough and then fell 270 dollars a tonne in a single week in August as Bald Hill, Finniss and Jianxiawo restarted. We are not going to pretend that did not happen.\"\n\nPoint at Wood Mackenzie in the table: \"That is the credible dissenter, and we carry their view as our bear case rather than ignoring it.\" Then the punch: our base case assumes prices 11% below spot and 19% below the June quarter.");
     const cy = head(s, "The cycle has turned, but it is a saw-tooth, not a straight line",
       "Prices tripled off the 2025 trough and then fell hard in August as idled mines restarted. Credible forecasters disagree about what happens next, and we say so.");
     para(s, C.M, cy, 6.05, 1.36, "What has happened",
@@ -98,6 +100,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 5. WHAT CHANGED
   {
     const s = pres.addSlide(); bg(s); nav(s, "Industry");
+    s.addNotes("45 seconds. Lead with box three, not box one.\n\n\"Every team in this competition will tell you lithium demand grows with electric vehicles. That argument depends on one policy variable and that variable just turned hostile in the United States. Grid storage did not. It grew 51% in 2025 and went from 23% to 31% of lithium demand, pulled by datacentre power.\"\n\nBoxes one and two are the supply side: China removed its own largest mine twice, Zimbabwe banned concentrate exports a year early. Two unrelated sovereign disruptions in twelve months.");
     const cy = head(s, "Two sovereign supply shocks and a second demand pillar",
       "Whatever the next quarterly price print does, the shape of this market changed in 2026 - and none of it depends on electric vehicle subsidies.");
     card(s, C.M, cy, 4.02, 2.30, "China removed its own largest mine, twice", [
@@ -132,6 +135,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 6. COST CURVE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Industry");
+    s.addNotes("45 seconds. The mechanism slide. Slow down here.\n\n\"At our bear-case price, the top decile of world supply is under water and PLS still earns about 720 dollars a tonne of cash margin. That is what swing supply means: the marginal tonne leaves before the low-cost tonne does.\"\n\nIf you have time, the brine point is the one that surprises people: Argentine brine all-in cost is now 7,223 dollars a tonne LCE, at or above much of the hard-rock curve. The old brine-beats-rock shorthand is out of date.");
     const cy = head(s, "Pilgangoora earns cash at prices that shut a quarter of world supply",
       "This is why swing tonnes come off before PLS's do, and why the balance sheet compounds through a downturn instead of surviving it.");
     s.addChart(pres.ChartType.bar, [{

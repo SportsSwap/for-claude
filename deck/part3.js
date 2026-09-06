@@ -14,6 +14,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 7. FRAMEWORK
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
+    s.addNotes("60 seconds. This is the intellectual spine of the pitch. Do not rush it.\n\n\"Porter and Kramer describe three levels. Almost every mining ESG story lives at level two: cut cost and cut emissions together. That is real, and every competent operator gets there, so it is not an advantage.\"\n\nThen: \"Level one is where advantage is created, and among these six companies PLS is the only one operating there.\"\n\nRead the bottom band aloud. It is the argument the next slide proves.");
     const cy = head(s, "Three levels of shared value, and where mining actually sits",
       "Cutting cost while cutting emissions is real, but it is the middle level and every competent operator gets there. The first level is where advantage is created.");
     const lv = [
@@ -51,6 +52,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 8. LEVEL 1
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
+    s.addNotes("75 seconds. The most important slide in the deck. Walk the four boxes left to right as a chain.\n\nElectric calcination removes the emissions from the most energy-intensive step, which is what makes a low footprint DECLARABLE rather than merely claimed. Declarable matters because the EU Battery Regulation requires a carbon footprint declaration and a battery passport from 2027, and US rules restrict China-linked chains.\n\nLand it: \"A tonne that cannot be declared cannot be sold into the highest-value chains at any price.\"\n\nThen the discipline: we still carry all of this at zero in the target. Say that before they ask.");
     const cy = head(s, "Carbon intensity is becoming a condition of sale",
       "A tonne that cannot be declared cannot be sold into the highest-value chains at any price. PLS is building tonnes that can be.");
     const chain = [
@@ -88,6 +90,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 9. LEVEL 2
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
+    s.addNotes("45 seconds. This slide is deliberately self-critical and that is the point.\n\n\"These two levers are worth about 48 dollars a tonne. They are also things a good operator would do without an ESG label, and we would rather say so than be caught pretending otherwise.\"\n\nShow the arithmetic if asked: FY26 costs fell 58 dollars a tonne, volumes rose 17%, so roughly half is fixed-cost dilution and we attribute the other half to ore sorting. That is our estimate, not a disclosure, and it says so on the slide.");
     const cy = head(s, "Productivity: real money, honestly labelled",
       "These two levers are worth about A$48/t. They are also things a good operator would do without an ESG label, and we would rather say so than be caught pretending otherwise.");
     para(s, C.M, cy, 6.05, 2.30, "Lever 1  |  Sensor-based ore sorting",
@@ -125,6 +128,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 10. CRITICAL EYE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
+    s.addNotes("60 seconds. Judges reward a critical eye. This is where you earn it.\n\nDo not apologise. Say: \"We went looking for holes in PLS's shared-value story and we found six. The net-zero target is a DECADE, not a year. There is no Scope 3. There is no emissions intensity per tonne, which means nobody can verify the carbon advantage we are underwriting.\"\n\nThen the offsets finding, which is the strongest thing in our ESG work: the Pilbara scheme every miner points to was independently found underfunded. No Pilbara miner can claim biodiversity risk is mitigated by pointing at it.\n\nClose on the three engagement asks. A long-only holder is a participant, not a spectator.");
     const cy = head(s, "What we found when we went looking for the gaps",
       "The case asks for a critical eye. Here is where PLS's shared-value story is thinner than its reporting suggests, and what we would put to management.");
     const cols = [{ t: "What we looked for", w: 2.55 }, { t: "What we found", w: 5.05 },
@@ -160,6 +164,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 11. VALUE BRIDGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
+    s.addNotes("60 seconds. Expect the double-counting question here. Answer it before it is asked.\n\n\"Nothing on this page is added to the DCF. Ore sorting and the power strategy are already inside the 569 dollar cost base the model discounts. Adding them again would count the same cash flow twice.\"\n\nThen the reframe: \"Against the six dollar twelve target, forty-three cents is 4.6%, a rounding adjustment. Against the sixty-four cents of UPSIDE, it is 67%. The upside is the right denominator, because the upside is the recommendation.\"\n\nThe dashed box on the right is the part we refused to bank.");
     const cy = head(s, "The bridge is an attribution, not an addition",
       "Nothing here is added to the DCF. These levers are already inside the A$569/t cost base the model discounts. The question is how much of the value depends on them.");
     // bridge visual
