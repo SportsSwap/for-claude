@@ -173,6 +173,7 @@ contents = [
  ("Precedents",           "Lithium M&A precedent transaction multiples"),
  ("Football Field",       "Valuation range by methodology and weighted target price"),
  ("ESG Value Bridge",     "Shared-value levers converted to A$/share of the target"),
+ ("Downstream Option",    "The low-carbon downstream prize, sized and risked, held outside the target"),
  ("Returns",              "IRR, MoM and TSR against the S&P/ASX 200 benchmark"),
  ("Sources",              "Provenance register for every input"),
 ]
@@ -1053,10 +1054,16 @@ eb.cell(r,4, f"='{SEN}'!$C${B['Value per share (A$)']}").number_format = CUR2; e
 eb.cell(r,2,"Shared value as a share of the target price").font = F(9, True)
 eb.cell(r,4, f"=D{ESG_TOT}/D{r-1}").number_format = PCT; eb.cell(r,4).font = F(10, True, BLACK_F); r += 2
 
+eb.cell(r,2,"THIS IS AN ATTRIBUTION, NOT AN ADDITION.").font = F(11, True, RED)
+r += 1
 for t in [
- "How to read this. The levers below the line are already inside the base case: they are embedded in the",
- "A$569/t FY26 cost base and in the P2000 schedule the model assumes. The bridge does not add them on top of",
- "the valuation - it isolates how much of the existing valuation depends on ESG-linked operating decisions.",
+ "Nothing on this sheet is added to the DCF. The ore-sorting and power benefits are already inside the",
+ "A$569/t FY26 unit cost and the A$575-625/t FY27 guidance that the model discounts, and the P2000 schedule",
+ "is already in the production profile. Adding them again would double-count the same cash flow once through",
+ "FCFF and once through narrative. What the bridge does is decompose the valuation we have already struck and",
+ "ask: how much of it exists because of ESG-linked operating decisions? The answer is A$0.43 per share - which",
+ "is 4.6% of the A$6.12 target, but 67% of the A$0.64 of upside between the last close and that target.",
+ "",
  "",
  "Two levers are deliberately carried at nil. The Calix mid-stream plant is real and opened in June 2026, but",
  "first production is only guided for the September 2026 quarter, so we do not capitalise a margin we have not",
@@ -1206,7 +1213,9 @@ METHODS = [
  ("Precedent transactions", f"='{SEN}'!$C${SE_RES['base']['Value per share (A$)']}", f"='{PTN}'!$E${PTV}", 0.00,
   "Reference only. Transaction EV/EBITDA could not be sourced on a consistent basis, and applying a "
   "premium to our own DCF would be circular"),
- ("Broker consensus", 4.50, 5.70, 0.00, "Vendor consensus range, Aug-Sep 2026 - reference only"),
+ ("Broker target range (individual analysts)", 2.50, 6.83, 0.00,
+  "Full individual spread across 17-20 analysts, Aug-Sep 2026. Vendor averages cluster A$4.50-5.70; "
+  "our A$6.12 sits inside the individual range, below the most bullish. Reference only"),
  ("52-week trading range", P.WK52_LOW, P.WK52_HIGH, 0.00, "Where the market has actually traded - reference only"),
 ]
 for nm, lo, hi, w, basis in METHODS:
@@ -1279,8 +1288,131 @@ RRR = r
 r = kv(rt, r, "Reward-to-risk ratio", f"=IFERROR(ABS(C{r-1}/C{r-2}),0)", '0.00"x"', bold=True, color=BLACK_F, vcol=3,
        note="Upside to bull divided by downside to bear")
 r += 1
+r = section(rt, r, "Stress test: does the bear case clear the price the market actually printed?", span=4)
+r = kv(rt, r, "52-week low, actually traded (A$)", P.WK52_LOW, CUR2, vcol=3,
+       note="Reached when spodumene was at its trough")
+LOWX2 = r-1
+r = kv(rt, r, "Our bear case (A$)", f"=C{BRR}", CUR2, color=BLACK_F, vcol=3)
+r = kv(rt, r, "Bear case premium to the traded low", f"=C{r-1}/C{LOWX2}-1", PCT, bold=True, color=BLACK_F, vcol=3)
+r += 1
+for t in ["At the A$1.91 low the company held A$974m of cash and was loss-making. It now holds A$2,290m and earned",
+          "A$526m. Our bear case assumes prices revert to the marginal cost, P2000 is never sanctioned, Colina never",
+          "proceeds and volumes stay flat for a decade - all at once. Reaching the old low from here would take",
+          "conditions materially worse than the trough the market has already lived through."]:
+    rt.cell(r,2,t).font = F(8, False, GREY, True); r += 1
+r += 1
 srcnote(rt, r, "A long-only fund benchmarked to the ASX 200 needs positions where the asymmetry, not just the point estimate, is favourable.")
 RTN = "Returns"
+
+# ==================================================================
+# 12b. DOWNSTREAM OPTION  (Porter & Kramer level 1 - reconceiving markets)
+# ==================================================================
+do = newsheet("Downstream Option", TEAL, widths={"B":34,"C":13,"D":13,"E":13,"F":11,"G":12,"H":54}, freeze=None)
+title(do, "The low-carbon downstream option",
+      "Sized deliberately OUTSIDE the target price. This is where the shared value actually is.")
+r = 6
+for t in [
+ "Why this sits outside the target. None of the three levers below is earning yet: the mid-stream plant",
+ "produces its first lithium phosphate in the September 2026 quarter, the POSCO joint venture is still ramping,",
+ "and we found no verified carbon-linked premium in any disclosed PLS contract. We size them here so the reader",
+ "can see the prize, and we keep them out of the A$6.12 target so the recommendation does not depend on them.",
+]:
+    do.cell(r,2,t).font = F(9, False, GREY, True); r += 1
+r += 1
+
+for j,h in enumerate(["Lever","Volume","Unit margin","EBITDA A$m","Multiple","NPV A$m","Basis"]):
+    c = do.cell(r,2+j,h); c.font = F(9, True, WHITE); c.fill = fill(NAVY)
+r += 1
+D0 = r
+# --- 1. mid-stream lithium phosphate
+do.cell(r,2,"Mid-stream lithium phosphate").font = F(9, True, TEAL)
+do.cell(r,3, 400.0).number_format = NUM_A; do.cell(r,3).font = F(9, False, BLUE_IN)
+do.cell(r,4, 480.0).number_format = CUR;   do.cell(r,4).font = F(9, False, BLUE_IN)
+do.cell(r,5, f"=C{r}*D{r}/1000").number_format = CUR; do.cell(r,5).font = F(9, False, BLACK_F)
+do.cell(r,6, 8.0).number_format = MULT;    do.cell(r,6).font = F(9, False, BLUE_IN)
+do.cell(r,7, f"=E{r}*F{r}").number_format = CUR; do.cell(r,7).font = F(9, True, BLACK_F)
+do.cell(r,8,"kt of concentrate calcined in-house (20% of a 2Mtpa base), at the conversion margin "
+            "retained rather than ceded to a third-party converter").font = F(8, False, GREY)
+do.cell(r,8).alignment = Alignment(wrap_text=True, vertical="top"); do.row_dimensions[r].height = 34; r += 1
+# --- 2. POSCO JV
+do.cell(r,2,"POSCO JV equity earnings").font = F(9, True, TEAL)
+do.cell(r,3, 43.0).number_format = NUM_A1; do.cell(r,3).font = F(9, False, BLUE_IN)
+do.cell(r,4, 4200.0).number_format = CUR;  do.cell(r,4).font = F(9, False, BLUE_IN)
+POSCO_PC = r
+do.cell(r,5, f"=C{r}*D{r}/1000*0.18").number_format = CUR; do.cell(r,5).font = F(9, False, BLACK_F)
+do.cell(r,6, 8.0).number_format = MULT;    do.cell(r,6).font = F(9, False, BLUE_IN)
+do.cell(r,7, f"=E{r}*F{r}").number_format = CUR; do.cell(r,7).font = F(9, True, BLACK_F)
+do.cell(r,8,"ktpa lithium hydroxide at Gwangyang, A$/t conversion margin, PLS share 18%. "
+            "PLS holds an option to lift that stake to 30%.").font = F(8, False, GREY)
+do.cell(r,8).alignment = Alignment(wrap_text=True, vertical="top"); do.row_dimensions[r].height = 34; r += 1
+# --- 3. qualification premium
+do.cell(r,2,"Low-carbon qualification premium").font = F(9, True, TEAL)
+do.cell(r,3, 1000.0).number_format = NUM_A; do.cell(r,3).font = F(9, False, BLUE_IN)
+do.cell(r,4, 75.0).number_format = CUR;     do.cell(r,4).font = F(9, False, BLUE_IN)
+do.cell(r,5, f"=C{r}*D{r}/1000").number_format = CUR; do.cell(r,5).font = F(9, False, BLACK_F)
+do.cell(r,6, 8.0).number_format = MULT;     do.cell(r,6).font = F(9, False, BLUE_IN)
+do.cell(r,7, f"=E{r}*F{r}").number_format = CUR; do.cell(r,7).font = F(9, True, BLACK_F)
+do.cell(r,8,"kt of qualified volume at an A$/t premium. Illustrative only: no verified carbon-linked "
+            "premium exists in PLS's disclosed contracts today.").font = F(8, False, GREY)
+do.cell(r,8).alignment = Alignment(wrap_text=True, vertical="top"); do.row_dimensions[r].height = 34; r += 1
+D1 = r-1
+do.cell(r,2,"Unrisked total").font = F(10, True, NAVY)
+do.cell(r,5, f"=SUM(E{D0}:E{D1})").number_format = CUR; do.cell(r,5).font = F(10, True, BLACK_F)
+UNRISK = r
+do.cell(r,7, f"=SUM(G{D0}:G{D1})").number_format = CUR; do.cell(r,7).font = F(10, True, BLACK_F); r += 2
+
+r = section(do, r, "Risking and per-share value", span=6)
+for j,h in enumerate(["Lever","NPV A$m","Probability","Risked A$m","A$/share"]):
+    c = do.cell(r,2+j,h); c.font = F(9, True, WHITE); c.fill = fill(NAVY)
+r += 1
+R0 = r
+RISKS = [("Mid-stream lithium phosphate", D0,   0.45, "Plant is built and commissioned; first product due Sep-qtr 2026. Scale-up beyond the demonstration unit is not funded."),
+         ("POSCO JV equity earnings",     D0+1, 0.70, "Both trains built; Train 2 ramping. Lowest execution risk of the three."),
+         ("Low-carbon qualification premium", D0+2, 0.25, "Directionally supported by EU and US policy, but unproven in PLS's contracts. Priced sceptically.")]
+for nm, src, pr, basis in RISKS:
+    do.cell(r,2,nm).font = F(9, True)
+    do.cell(r,3, f"=G{src}").number_format = CUR; do.cell(r,3).font = F(9, False, BLACK_F)
+    do.cell(r,4, pr).number_format = PCT; do.cell(r,4).font = F(9, False, BLUE_IN)
+    do.cell(r,5, f"=C{r}*D{r}").number_format = CUR; do.cell(r,5).font = F(9, False, BLACK_F)
+    do.cell(r,6, f"=E{r}/{REF['shares']}").number_format = CUR2; do.cell(r,6).font = F(9, True, BLACK_F)
+    do.cell(r,7, basis).font = F(8, False, GREY)
+    do.cell(r,7).alignment = Alignment(wrap_text=True, vertical="top"); do.row_dimensions[r].height = 30
+    r += 1
+R1 = r-1
+DO_TOT = r
+do.cell(r,2,"Risked downstream option").font = F(11, True, NAVY)
+do.cell(r,5, f"=SUM(E{R0}:E{R1})").number_format = CUR; do.cell(r,5).font = F(11, True, BLACK_F)
+DO_PS = r
+do.cell(r,6, f"=SUM(F{R0}:F{R1})").number_format = CUR2; do.cell(r,6).font = F(12, True, BLACK_F)
+do.cell(r,6).fill = fill(YELLOW); do.cell(r,6).border = thin(NAVY); r += 2
+
+r = section(do, r, "What this does to the recommendation", span=6)
+do.cell(r,2,"12-month target price (A$)").font = F(9)
+do.cell(r,4, f"='{FFN}'!$C${TGT}").number_format = CUR2; do.cell(r,4).font = F(9, False, BLACK_F); r += 1
+do.cell(r,2,"Last close (A$)").font = F(9)
+do.cell(r,4, f"={REF['price']}").number_format = CUR2; do.cell(r,4).font = F(9, False, BLACK_F); r += 1
+UPS = r
+do.cell(r,2,"Upside in the target (A$/share)").font = F(9, True)
+do.cell(r,4, f"=D{r-2}-D{r-1}").number_format = CUR2; do.cell(r,4).font = F(9, True, BLACK_F); r += 1
+do.cell(r,2,"Shared value already inside the target (A$/share)").font = F(9)
+INBRIDGE = r
+do.cell(r,4, f"='{EBN}'!$D${ESG_TOT}").number_format = CUR2; do.cell(r,4).font = F(9, False, BLACK_F); r += 1
+do.cell(r,2,"Share of the upside attributable to shared value").font = F(10, True, NAVY)
+do.cell(r,4, f"=D{INBRIDGE}/D{UPS}").number_format = PCT; do.cell(r,4).font = F(12, True, BLACK_F)
+do.cell(r,4).fill = fill(YELLOW); do.cell(r,4).border = thin(NAVY); r += 1
+do.cell(r,2,"Plus the downstream option, outside the target (A$/share)").font = F(9)
+do.cell(r,4, f"=F{DO_PS}").number_format = CUR2; do.cell(r,4).font = F(9, False, BLACK_F); r += 1
+do.cell(r,2,"Target plus the risked option (A$/share)").font = F(10, True, NAVY)
+do.cell(r,4, f"=D{UPS-2}+F{DO_PS}").number_format = CUR2; do.cell(r,4).font = F(11, True, BLACK_F); r += 2
+
+for t in [
+ "The point of this sheet. Measured against the A$6.12 target, the shared-value bridge looks like a rounding",
+ "adjustment. Measured against the UPSIDE - the A$0.64 per share between the last close and the target - it is",
+ "most of the investment case. The market is paying for a lithium miner. We are paying for the operator whose",
+ "carbon position and downstream reach let it sell tonnes the others cannot. That gap is the recommendation.",
+]:
+    do.cell(r,2,t).font = F(8, False, GREY, True); r += 1
+DON = "Downstream Option"
 
 # ==================================================================
 # 17. SOTP NAV
@@ -1421,7 +1553,7 @@ for t in [
 # ------------------------------------------------------------------ order and save
 order = ["Cover","Assumptions","Deck","Revenue Build","Income Statement","Balance Sheet","Cash Flow",
          "DCF","Scenario Engine","Scenario Summary","Sensitivity","SOTP NAV","Trading Comps",
-         "Precedents","Football Field","ESG Value Bridge","Returns","Sources"]
+         "Precedents","Football Field","ESG Value Bridge","Downstream Option","Returns","Sources"]
 wb._sheets = [wb[n] for n in order if n in wb.sheetnames] + [s for s in wb._sheets if s.title not in order]
 wb.active = 0
 wb.save(OUT)
