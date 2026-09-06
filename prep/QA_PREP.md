@@ -1,7 +1,7 @@
 # Q&A prep — PLS Group (ASX:PLS)
 ### FMAA x Shared Value Project 2026 · campus final 15 Sep · state final 16 Sep · national final 22 Sep
 
-**The one-line answer to everything:** BUY, A$6.12 target against A$5.48, 13.4% total return
+**The one-line answer to everything:** BUY, A$6.14 target against A$5.48, 13.6% total return
 against a 5.90% benchmark, and two thirds of that upside is shared value the market is not pricing.
 
 **Assign an owner to every section below before you present.** The failure mode in a live round is
@@ -15,9 +15,9 @@ not being wrong, it is four people looking at each other for three seconds.
 
 Do not get defensive. This is the strongest part of the pitch, not the weakest.
 
-> Three separate things drove that move and only one of them can repeat. First, short covering:
-> PLS went from the most shorted stock on the ASX at about 20% of shares to roughly 6.8%. That buyer
-> is finished, and we do not underwrite another squeeze. Second, the price recovery, which is now
+> Three separate things drove that move and only one of them can repeat. First, short covering: PLS
+> went from the most shorted stock on the ASX at about 20% of shares to 6.8% by May. That flow is
+> finished, and we do not underwrite another squeeze. Second, the price recovery, which is now
 > largely in the numbers. Third, the earnings recovery, which is not: FY26 EBITDA of A$1,137m was
 > earned at an average realised price of US$1,488/t, and the company exited the year at US$2,107/t.
 > Our target rests on the third one.
@@ -33,7 +33,7 @@ Do not get defensive. This is the strongest part of the pitch, not the weakest.
 > commercially relevant as carbon accounting reaches raw materials.
 
 **Correction to have ready if they say you are above the whole street:** vendor *averages* cluster
-A$4.50–5.70, but the full individual spread across 17–20 analysts runs A$2.50 to A$6.83. A$6.12 sits
+A$4.50–5.70, but the full individual spread across 17–20 analysts runs A$2.50 to A$6.83. A$6.14 sits
 inside that range and below the most bullish analyst.
 
 ### "Isn't ore sorting just good engineering? How is that shared value?"
@@ -54,6 +54,20 @@ This is the sharpest question available and the slide answers it in red.
 > power benefits are already inside the A$569/t FY26 cost base and the A$575–625/t FY27 guidance that
 > the DCF discounts. Nothing is added. What the bridge does is decompose a valuation we have already
 > struck and ask how much of it depends on ESG-linked operating decisions. The answer is A$0.43.
+
+### "Short interest is back above 10%. Doesn't that undermine you?"
+
+**This is now a live question — do not be caught out by it.** Short interest bottomed at 6.8% in
+May 2026 and has rebuilt to **10.09% as at 4 August 2026, up 0.75 percentage points in a single
+week**. Our own risk register names a rebuild above 10% as a warning signal. It has triggered.
+
+> It does, and we flag it on appendix F2 rather than dropping the indicator once it turned against
+> us. Two things are true at once. The covering that drove much of the last twelve months is
+> finished, so that flow cannot repeat. And shorts rebuilding to 10% says a well-resourced group
+> thinks the re-rating overshot. We disagree with them, and our target never depended on a squeeze:
+> it rests on FY27 earnings and the growth option. What it does change is sizing. At 10% short
+> interest and 1.09x reward to risk, this is an overweight to build into rather than take in a
+> single trade.
 
 ### "Why PLS and not BHP or Rio Tinto?"
 
@@ -89,15 +103,15 @@ Concede immediately that it is a judgement.
 ### "Why an annuity instead of a perpetuity?"
 
 > Because an orebody is finite. A growing perpetuity would have valued the terminal period at
-> A$18.9bn instead of A$9.9bn on an asset that runs out of rock. It also drops terminal value from
-> about 68% of enterprise value to 50.8%, so less of the answer rests on an assumption nobody can test.
+> A$19.0bn instead of A$9.9bn on an asset that runs out of rock. It also drops terminal value from
+> about 68% of enterprise value to 50.7%, so less of the answer rests on an assumption nobody can test.
 
 ### "Your reward-to-risk is barely 1:1. Why is that a buy?"
 
 Do not argue with the arithmetic.
 
-> It is 1.07x and we put that on the slide rather than burying it. What justifies the position is the
-> expected return against the mandate, not the shape of the distribution: 13.4% against a 5.90%
+> It is 1.09x and we put that on the slide rather than burying it. What justifies the position is the
+> expected return against the mandate, not the shape of the distribution: 13.6% against a 5.90%
 > benchmark for a fund that needs two points. We would also note the bear case stacks every bad
 > outcome simultaneously — prices at marginal cost, no P2000, no Colina, flat volumes for a decade —
 > and still lands 19% above the price the market actually printed at the last trough.
@@ -113,7 +127,7 @@ Do not argue with the arithmetic.
 
 > 8.88%. Cost of equity is 9.38% straight from the case's prescribed inputs: 5% risk-free plus 0.73
 > beta times a 6% market risk premium. We add 10% target gearing at a 6.25% pre-tax cost of debt,
-> 4.38% after tax, even though PLS is currently net cash by A$1.46bn, because that is a through-cycle
+> 4.38% after tax, even though PLS is currently net cash by A$1.44bn, because that is a through-cycle
 > structure rather than a point-in-time one.
 
 ---
@@ -128,9 +142,11 @@ failure. If they find one you did disclose, it is evidence you did the work.**
 | "What is PLS's Scope 3?" | Not disclosed. We name it as a material gap and it is our second engagement ask, because the low-carbon claim cannot be *declared* without it. |
 | "What is emissions intensity per tonne?" | Not a disclosed KPI. Third-party aggregator figures exist, disagree with each other, and we judged them unreliable rather than cite them. |
 | "What tailings method does Pilgangoora use?" | We could not establish it and we refuse to assert either way. It is carried as an unpriced risk, and it matters more as P2000 roughly doubles tailings volumes. |
-| "What is their TRIFR / Indigenous employment / gender split?" | Not retrievable from our research environment. We reported the gap rather than substituting sector averages. It is the first thing we would retrieve. |
+| "What is their TRIFR?" | 2.77 in FY26, an 11% improvement, achieved while volumes rose 17% and a mothballed plant restarted. That is a reasonable proxy for whether they can execute a doubling of throughput. |
+| "Indigenous employment and procurement?" | Still not retrievable. For a Pilbara operator whose growth depends on heritage approvals, that is the disclosure we most want and still do not have. |
+| "Female participation? Environmental incidents?" | 21.9% in FY26, up on the prior year. Zero major environmental, water or waste incidents. |
 | "What is their MSCI or Sustainalytics rating?" | Not retrievable. We would argue the case asks us to go *beneath* the rank anyway, and everything material we found came from operating facts, not scores. |
-| "What are their total borrowings?" | Only the US$600m notes issue is confirmed. One source suggests about A$1.2bn including leases. On the higher figure net cash falls to about A$1.09bn, costing roughly A$0.12/share. |
+| "What are their total borrowings?" | A$853m at 30 June 2026, after the US$600m notes issue and net of revolving facility repayments. Net cash A$1,437m. Our balance sheet ties to the reported A$6,258m of total assets. |
 | "Is ESG in management's pay?" | We could not verify it. That is exactly why it is an engagement ask: a strategy that depends on management goodwill does not survive a change of management. |
 
 ---
@@ -163,7 +179,7 @@ Both. Do not flinch.
 Have this answer word-perfect. It is the best question you can get.
 
 > A sustained price relapse. If spodumene averages 20% below our base case across the forecast, the
-> target falls to about A$4.98 and the recommendation is wrong. We would also change our mind if the
+> target falls to about A$3.86 and the recommendation is wrong. We would also change our mind if the
 > P2000 study slips past the December quarter, or if short interest rebuilds above 10% of shares,
 > because that would tell us a well-resourced group disagrees with us and we would want to know why.
 
@@ -182,27 +198,29 @@ Have this answer word-perfect. It is the best question you can get.
 
 | | |
 |---|---|
-| Target / last close / upside | A$6.12 / A$5.48 / +11.7% |
-| Total return vs benchmark | 13.4% vs 5.90%, outperformance 7.5% |
-| Bear / base / bull | A$2.26 / A$6.50 / A$8.93 |
+| Target / last close / upside | A$6.14 / A$5.48 / +12.0% |
+| Total return vs benchmark | 13.6% vs 5.90%, outperformance 7.7% |
+| Bear / base / bull | A$2.30 / A$6.53 / A$8.96 |
 | WACC / cost of equity | 8.88% / 9.38% |
 | FY26 revenue / EBITDA / NPAT | A$1,934m / A$1,137m (59%) / A$526m |
 | FY26 production / cost / realised | 879.5kt / A$569/t FOB / US$1,488/t |
+| FY26 ESG | Scope 1+2 down 5%, TRIFR 2.77 (-11%), female participation 21.9%, zero major incidents |
 | Q4 FY26 realised | US$2,107/t actual grade, US$2,415/t SC6-equivalent |
 | FY27 guidance | 1,030–1,100kt, A$575–625/t, capex A$620–685m |
-| Cash / net cash | A$2,290m / A$1,462m |
+| Cash / borrowings / net cash | A$2,290m / A$853m / A$1,437m |
 | P2000 | A$2.6bn NPV, 55% IRR, ~A$1.2bn capex, DFS Dec-qtr 2026, first ore mid-2029 |
 | Resource / reserve | 446Mt @ 1.28% Li2O / 214Mt @ 1.19% (Aug 2023) |
-| ESG bridge / share of upside | A$0.43 / 67% |
+| ESG bridge / share of upside | A$0.43 / 66% of the A$0.66 upside |
 | Downstream option, risked | A$0.32, held outside the target |
-| Mine life / terminal value | 16.1 years / A$9.9bn annuity vs A$18.9bn perpetuity |
-| Short interest | ~20% (Sep 2024) to ~6.8% (May 2026) |
+| Mine life / terminal value | 16.1 years / A$9.9bn annuity vs A$19.0bn perpetuity |
+| Short interest | 20% (Sep 2024), 6.8% (May 2026), **10.09% (4 Aug 2026)** |
 
 ---
 
 ## Before you submit
 
 1. Test the Jotform upload a day early. The deck is about 5MB and the workbook about 200KB.
-2. Refresh the ASIC short-interest figure; ours is dated 26 May 2026.
+2. Refresh the ASIC short-interest figure again before each round; ours is dated 4 August 2026 at
+   10.09% and it was moving 0.75 points a week.
 3. If company filings become reachable, pull the FY26 Sustainability Report and fill the F4 gaps.
 4. Re-run `python3 deck/verify_numbers.py` after any model change. It exits non-zero on a mismatch.

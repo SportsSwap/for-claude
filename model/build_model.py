@@ -235,7 +235,7 @@ r = section(a, r, "CAPITAL STRUCTURE", span=4)
 CASH_R = r
 r = kv(a, r, "Cash and equivalents, FY26A (A$m)", P.CASH_FY26, CUR, note="A  FY26 result, 24-Aug-26", vcol=3)
 DEBT_R = r
-r = kv(a, r, "Borrowings, FY26A (A$m)", P.DEBT_FY26, CUR, note="E  US$600m senior notes translated at spot - VERIFY", vcol=3)
+r = kv(a, r, "Borrowings, FY26A (A$m)", P.DEBT_FY26, CUR, note="A  reported at 30-Jun-26 after the US$600m notes issue", vcol=3)
 NETCASH_R = r
 r = kv(a, r, "Net cash / (net debt) (A$m)", f"=C{CASH_R}-C{DEBT_R}", CUR, bold=True, color=BLACK_F, vcol=3)
 EV_R = r
@@ -557,9 +557,9 @@ r = putrow(bs, r, "Cash and cash equivalents", cash, CUR, indent=1, color=GREEN_
 BS_NWC = r
 r = putrow(bs, r, "Net working capital", {i: f"='{IS}'!{yl(i)}{IS_REV}*{REF['nwc']}" for i in BSI}, CUR, indent=1, color=BLACK_F)
 BS_PPE = r
-ppe = {2: 3200.0}
-r = putrow(bs, r, "Property, plant and equipment (net)", ppe, CUR, indent=1, color=BLACK_F,
-           note="E  FY26A net book value - VERIFY against the annual report")
+ppe = {2: 3813.0}
+r = putrow(bs, r, "Property, plant and equipment and other non-current assets", ppe, CUR, indent=1, color=BLACK_F,
+           note="D  reported FY26 total assets of A$6,258m less cash and net working capital")
 BS_TA = r
 r = putrow(bs, r, "Total assets", {i: f"=SUM({yl(i)}{BS_CASH}:{yl(i)}{BS_PPE})" for i in BSI}, CUR, bold=True, color=BLACK_F)
 r += 1
@@ -1500,7 +1500,13 @@ SRC = [
  ("FY26 unit operating cost","A$569/t FOB","A","FY26 results; -9% YoY"),
  ("FY26 capex","A$328m","A","FY26 results; mine development A$146m plus infrastructure and sustaining A$182m"),
  ("FY26 closing cash","A$2,290m","A","FY26 results; total liquidity A$2,790m"),
- ("Borrowings","US$600m senior unsecured notes","A","Inaugural international bond issued April 2026"),
+ ("Borrowings","A$853m at 30-Jun-26","A","After the US$600m senior notes issue, net of revolving facility repayments"),
+ ("Total assets","A$6,258m at 30-Jun-26","A","Up 34% on FY25; used to derive the opening PP&E and other non-current assets"),
+ ("FY26 emissions","Absolute Scope 1 and 2 down 5%","A","FY26 results; follows a 7.1% reduction in FY25"),
+ ("FY26 safety","Group TRIFR 2.77, an 11% improvement","A","FY26 results"),
+ ("FY26 female participation","21.9%","A","FY26 results"),
+ ("FY26 environmental incidents","Zero major environmental, water or waste incidents","A","FY26 results"),
+ ("Short interest, current","10.09% of shares at 4-Aug-26, up 0.75pp week on week","M","ASIC short position reports - REBUILT above the 10% level we named as a warning"),
  ("FY26 final dividend","5.0cps fully franked","A","FY26 results; ~22% of adjusted free cash flow, policy 20-30%"),
  ("FY27 production guidance","1,030 - 1,100kt","G","Given with FY26 results, 24-Aug-2026"),
  ("FY27 unit cost guidance","A$575 - 625/t FOB","G","Same; step-up attributed to Ngungaju mix"),
@@ -1526,7 +1532,7 @@ SRC = [
  ("CATL Jianxiawo","~150ktpa LCE; suspended Aug-2025, restarted mid-2026, re-suspended Aug-2026","M","Benchmark cut its 2026 site estimate from 62.5kt to 32kt LCE"),
  ("Zimbabwe export ban","All raw mineral and concentrate exports banned from 25-Feb-2026","M","Government of Zimbabwe"),
  ("BESS demand","Installations +51% in 2025; share of lithium demand ~23% to ~31% in 2026e","M","Industry data via Benchmark and Rho Motion"),
- ("Short interest","~20% of shares (Sep-2024, most shorted on ASX) falling to ~6.8% (26-May-2026)","M","ASIC short position reports via shortman.com.au"),
+ ("Short interest, history","~20% of shares (Sep-2024, most shorted on ASX), ~6.8% (26-May-2026)","M","ASIC short position reports via shortman.com.au"),
  ("Consensus target","~A$4.50 - 5.70 average; full range A$2.50 - 6.83","M","Vendor consensus reads, Aug-Sep 2026; consensus rating Buy"),
  ("Peer multiples","RIO 7.84x, S32 8.48x, MIN 7.82x, FMG 5.55x EV/EBITDA","M","Data vendors, Aug-2026 - see Trading Comps for the vendor-disagreement caveat"),
  ("Rio Tinto / Arcadium","US$6.7bn, completed 6-Mar-2025","M","Company announcements"),
@@ -1545,8 +1551,8 @@ for t in [
  "environment used to build this model, so reported figures were corroborated across two or more independent",
  "secondary reports of the same announcement rather than read off the primary PDF. Headline FY26 figures are",
  "consistent across sources. Figures tagged E are our own estimates and are identified as such wherever they appear.",
- "Known unresolved items: total borrowings at 30-Jun-26 (only the US$600m notes issue is confirmed); FY24",
- "comparatives; the Ore Reserve has not been restated since August 2023; and PLS's Scope 3 emissions are not disclosed.",
+ "Known unresolved items: FY24 comparatives; the Ore Reserve has not been restated since August 2023;",
+ "PLS's Scope 3 emissions and emissions intensity per tonne are not disclosed; and the tailings method is not disclosed.",
 ]:
     so.cell(r,2,t).font = F(8, False, GREY, True); r += 1
 

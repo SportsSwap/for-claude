@@ -11,7 +11,7 @@ module.exports = function (pres, ctx) {
     const n = ++e; const { s, cy } = apage(pres, "E" + n + "  Valuation", title, take);
     body(s, cy); foot(s, src, "E" + n);
   };
-  const YRS = S.fcst.map((y) => y.replace("F", ""));
+  const YRS = S.fcst.map((y) => y.replace(/F$/, ""));
 
   // series table across the ten forecast years
   const series = (s, x, y, label, rows, opts = {}) => {
@@ -110,24 +110,22 @@ module.exports = function (pres, ctx) {
       fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.26;
     y = series(s, C.M, y, "A$/t", [
       ["Bear", ...S.bear.cost], [{ t: "Base", b: true }, ...S.base.cost.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.cost],
-    ]) + 0.22;
+    ], { rowH: 0.25 }) + 0.16;
     s.addText("CAPITAL EXPENDITURE (A$m)", { x: C.M, y, w: 5.0, h: 0.24, isTextBox: true, margin: 0,
       fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.26;
     y = series(s, C.M, y, "A$m", [
       ["Bear", ...S.bear.capex], [{ t: "Base", b: true }, ...S.base.capex.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.capex],
-    ]) + 0.22;
+    ], { rowH: 0.25 }) + 0.16;
     s.addText("EBITDA, MODEL OUTPUT (A$m)", { x: C.M, y, w: 5.0, h: 0.24, isTextBox: true, margin: 0,
       fontFace: C.B, fontSize: 9.5, bold: true, color: C.SPOD, valign: "middle" }); y += 0.26;
     y = series(s, C.M, y, "A$m", [
       ["Bear", ...S.bear.ebitda.map(n0)], [{ t: "Base", b: true }, ...S.base.ebitda.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.ebitda.map(n0)],
-    ]) + 0.20;
-    para(s, C.M, y, 12.44, 1.16, "Reading the cost rows",
-      "FY26 actual was A$569/t and FY27 guidance is A$575-625/t, with the step-up attributed to higher-cost Ngungaju tonnes. Our base " +
-      "case uses A$600/t, the midpoint, falling to A$565/t by the 2030s as P2000 volume dilutes fixed costs.\n\n" +
-      "In the bear case costs rise to A$655/t by FY29 on lower volumes and then fall back to A$610/t as the operation is re-based. We " +
-      "deliberately did not let bear costs drift upward indefinitely: a miner facing a sustained price trough cuts, and modelling " +
-      "otherwise would have made the bear case artificially severe.",
-      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9 });
+    ], { rowH: 0.25 }) + 0.16;
+    para(s, C.M, y, 12.44, 0.76, "Reading the cost rows",
+      "FY26 actual was A$569/t against FY27 guidance of A$575-625/t, the step-up attributed to higher-cost Ngungaju tonnes. Base case " +
+      "uses the A$600/t midpoint, falling to A$565/t as P2000 volume dilutes fixed costs. Bear costs rise to A$655/t then fall back to " +
+      "A$610/t: a miner facing a sustained trough cuts, and letting bear costs drift up forever would have made that case artificially severe.",
+      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 8.8 });
    }, "Sources: PLS FY26 results and FY27 guidance (A$575-625/t, capex A$620-685m including A$175m of approved P2000 pre-FID capital); team valuation model.");
 
   // ---------------- E5-E7 statements
@@ -240,11 +238,11 @@ module.exports = function (pres, ctx) {
       ["Terminal value as a share of EV", (F.tv_pct * 100).toFixed(1) + "%"],
     ];
     table(s, C.M, cy + 2.58, [{ t: "Base case bridge", w: 4.95 }, { t: "A$m unless stated", w: 2.05, align: "right" }], rows,
-      { rowH: 0.243, size: 8.6, boldFirstCol: true });
-    para(s, C.M + 7.30, cy + 2.58, 5.14, 2.73, "Why terminal value is only half of enterprise value",
-      "On a growing perpetuity, the terminal period would have been A$18.9bn and roughly 68% of enterprise value - meaning most of the " +
+      { rowH: 0.222, size: 8.6, boldFirstCol: true });
+    para(s, C.M + 7.30, cy + 2.58, 5.14, 2.50, "Why terminal value is only half of enterprise value",
+      "On a growing perpetuity, the terminal period would have been A$19.0bn and roughly 68% of enterprise value - meaning most of the " +
       "answer would rest on an assumption about the year 2037 onward.\n\n" +
-      "The reserve-life annuity brings it to A$9.9bn and 50.8%. That is still a lot, and it is the honest position for a long-life mining " +
+      "The reserve-life annuity brings it to A$9.9bn and 50.7%. That is still a lot, and it is the honest position for a long-life mining " +
       "asset: half the value is in the ten years we forecast explicitly, half in the sixteen years of ore that follow.\n\n" +
       "It also means the model is less sensitive to the terminal assumption than a conventional DCF, which is a feature rather than a " +
       "coincidence. The sensitivity table at E11 shows the whole surface.",

@@ -80,7 +80,7 @@ module.exports = function (pres, ctx) {
       "It is a demonstration plant. Nothing at demonstration scale is a revenue line until it produces.",
       "First production is guided for the current quarter, so we are one quarterly report away from knowing.",
       "Scale-up beyond the demonstration unit is not funded and not announced.",
-      "We therefore size it at A$1,536m unrisked, apply a 45% probability, and keep the resulting A$0.21 per share out of the A$6.12 target.",
+      "We therefore size it at A$1,536m unrisked, apply a 45% probability, and keep the resulting A$0.21 per share out of the A$6.14 target.",
       "If it works, this is the single most important thing PLS does this decade, because it converts an ESG claim into a product specification.",
     ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.8 });
    }, "Sources: PLS and Calix announcements; ARENA, 'ARENA backs low emissions lithium refining in WA'; PLS June-2026 quarterly activities report. The >80% figure is the reduction in calcination emissions specifically, not in PLS's total footprint.");

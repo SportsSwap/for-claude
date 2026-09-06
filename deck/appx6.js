@@ -147,26 +147,26 @@ module.exports = function (pres, ctx) {
    }, "Sources: team research; Australian Parliament Joint Standing Committee on Northern Australia inquiry into the destruction of Indigenous heritage sites at Juukan Gorge (2020-21). PLS-specific native title agreement details could not be verified from our environment and are recorded in the gaps register.");
 
   pgD("Workforce, safety and diversity",
-      "The area where our research came back thinnest. We report what we found and flag the rest rather than filling the gaps with sector averages.",
+      "TRIFR improved 11% to 2.77 and female participation reached 21.9%. Indigenous metrics are still the gap we could not close.",
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Metric", w: 3.65 }, { t: "What we found", w: 4.95 },
       { t: "Status", w: 3.84, align: "center" }], [
-      ["Total recordable injury frequency rate", "Not retrievable for FY22-FY26", { t: "Not found", c: C.CRIMSON, b: true }],
-      ["Lost time injury frequency rate", "Not retrievable", { t: "Not found", c: C.CRIMSON, b: true }],
+      ["Total recordable injury frequency rate", "Group TRIFR of 2.77 in FY26, an 11% improvement on the prior year. The company notes it remains focused on further improvement.", { t: "Disclosed, improving", c: C.SPOD, b: true }],
+      ["Lost time injury frequency rate", "Not retrievable separately from TRIFR", { t: "Not found", c: C.OCHRE, b: true }],
       ["Fatalities", "None reported in the sources we reviewed", { t: "No reports found", c: C.OCHRE, b: true }],
-      ["Total workforce", "Not retrievable as a headcount split between employees and contractors", { t: "Not found", c: C.CRIMSON, b: true }],
-      ["Female participation", "Not retrievable at overall, operational or leadership level", { t: "Not found", c: C.CRIMSON, b: true }],
+      ["Environmental incidents", "Zero major environmental, water or waste incidents in FY26", { t: "Disclosed", c: C.SPOD, b: true }],
+      ["Female participation", "21.9% in FY26, up on the prior year. Workforce engagement scores also improved.", { t: "Disclosed", c: C.SPOD, b: true }],
       ["Board gender composition", "One of the five directors we identified is the Chair, Kathleen Conlon; a second, Sally-Anne Layman, chairs the Sustainability Committee", { t: "Partial", c: C.OCHRE, b: true }],
       ["Psychosocial safety", "No PLS-specific response to the WA parliamentary inquiry into sexual harassment in the FIFO mining sector was retrievable", { t: "Not found", c: C.CRIMSON, b: true }],
       ["Community investment", "Not retrievable as a dollar figure", { t: "Not found", c: C.CRIMSON, b: true }],
     ], { rowH: 0.42, size: 8.6, boldFirstCol: true });
-    para(s, C.M, cy + 3.75, 12.44, 1.32, "Why we are showing a table of gaps rather than omitting the topic",
-      "Our research environment could not reach company websites or the ASX announcements platform, so the FY26 Sustainability Report " +
-      "was not readable. Every figure above sits in that document. We could have substituted sector averages and produced a page that " +
-      "looked complete; a page that looks complete and is not is worse than a page that admits what it does not know.\n\n" +
-      "For the live rounds, these are the first numbers we would retrieve, and the safety record in particular would materially change " +
-      "our view of execution risk on a doubling of throughput.",
-      { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
+    para(s, C.M, cy + 3.75, 12.44, 1.32, "What the safety number tells us about execution risk",
+      "A group TRIFR of 2.77, improving 11% while volumes rose 17% and a mothballed plant was restarted, is the single most useful " +
+      "operational datapoint on this page. Safety performance under volume growth is a reasonable proxy for whether an organisation " +
+      "can execute a doubling of throughput without breaking something, and P2000 is exactly that.\n\n" +
+      "The gap we could not close is Indigenous employment and procurement spend. For a Pilbara operator whose growth depends on " +
+      "heritage approvals, that is the disclosure we would most want and the one we still do not have.",
+      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.4 });
    }, "Sources: team research. Every item marked not found was searched for and could not be verified from the environment available to us. See the gaps register at F5.");
 
   pgD("Governance",

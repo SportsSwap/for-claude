@@ -38,7 +38,8 @@ FUND_RET_FY25    = 0.0790        # C  fund return FY25
 # ---------------------------------------------------------------- capital structure
 COST_OF_DEBT     = 0.0625        # E  indicative on US$600m senior notes - VERIFY
 CASH_FY26        = 2290.0        # A  A$m closing cash FY26 (total liquidity A$2,790m)
-DEBT_FY26        = 828.0         # A/D US$600m senior unsecured notes issued Apr-26 (~A$828m proceeds)
+DEBT_FY26        = 853.0         # A  reported borrowings at 30-Jun-26, after the US$600m notes issue
+                                 #    net of revolving credit facility repayments
 TARGET_D_RATIO   = 0.10          # E  target debt / (debt+equity)
 
 # ---------------------------------------------------------------- FX

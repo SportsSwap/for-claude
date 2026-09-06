@@ -14,7 +14,7 @@ module.exports = function (pres, ctx) {
     const R = (t, c) => ({ t, c, b: true });
     table(s, C.M, cy, [{ t: "Risk", w: 2.35 }, { t: "Inh.", w: 0.72, align: "center" },
       { t: "Mitigant", w: 4.55 }, { t: "Res.", w: 0.72, align: "center" }, { t: "Indicator we watch", w: 4.10 }], [
-      ["Sustained price relapse", R("High", C.CRIMSON), "Bottom-quartile cost position and A$2.29bn of cash allow PLS to wait. Bear case still values it at A$2.26.", R("High", C.CRIMSON), "Monthly SpodIX prints; Chinese carbonate inventory days"],
+      ["Sustained price relapse", R("High", C.CRIMSON), "Bottom-quartile cost position and A$2.29bn of cash allow PLS to wait. Bear case still values it at A$2.30.", R("High", C.CRIMSON), "Monthly SpodIX prints; Chinese carbonate inventory days"],
       ["Re-rating already spent", R("High", C.CRIMSON), "Target rests on FY27 earnings and the growth option, not on further short covering.", R("Med", C.OCHRE), "ASIC short position reports; a rebuild above 10%"],
       ["P2000 deferred or shelved", R("High", C.CRIMSON), "A$175m of pre-FID capital committed; balance sheet can fund the A$1.2bn build.", R("Med", C.OCHRE), "December-quarter 2026 study outcome; the FID itself"],
       ["Single asset concentration", R("High", C.CRIMSON), "Colina adds a second jurisdiction from the 2030s, risked at 40% and contributing nothing before FY32.", R("High", C.CRIMSON), "Any Pilgangoora interruption; cyclone season"],
@@ -37,10 +37,10 @@ module.exports = function (pres, ctx) {
    (s, cy) => {
     s.addChart(pres.ChartType.bar, [{
       name: "Short interest (% of shares on issue)",
-      labels: ["Sep 2024", "Oct 2025", "Late 2025", "26 May 2026"],
-      values: [20.0, 19.0, 17.0, 6.8],
+      labels: ["Sep 2024", "Oct 2025", "Late 2025", "26 May 2026", "4 Aug 2026"],
+      values: [20.0, 19.0, 17.0, 6.8, 10.09],
     }], {
-      x: C.M, y: cy, w: 6.60, h: 2.90, chartColors: [C.CRIMSON, C.CRIMSON, C.OCHRE, C.SPOD], varyColors: true,
+      x: C.M, y: cy, w: 6.60, h: 2.90, chartColors: [C.CRIMSON, C.CRIMSON, C.OCHRE, C.SPOD, C.OCHRE], varyColors: true,
       barGapWidthPct: 45, showTitle: true, title: "PLS short interest, % of shares on issue",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
       showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 10, dataLabelFontFace: C.B,
@@ -50,19 +50,21 @@ module.exports = function (pres, ctx) {
       valGridLine: { color: C.RULE, size: 0.5 }, catGridLine: { style: "none" },
       showLegend: false, valAxisMinVal: 0, valAxisMaxVal: 25,
     });
-    card(s, C.M + 6.84, cy, 5.60, 2.90, "Why we put this in the deck rather than leaving it out", [
-      "PLS was the largest, most liquid pure-play way to be short falling lithium prices, and the market used it that way: about one share in five on issue was borrowed short in September 2024.",
-      "The price then went from A$1.91 to A$5.48. A material part of that move was shorts closing, not new fundamental buyers arriving.",
-      "By May 2026 short interest was about 6.8% and PLS had dropped to roughly fortieth on the ASX by that measure.",
-      "The mechanical consequence is that the same buyer cannot return. Anyone underwriting a repeat of the last twelve months is underwriting flow that has already happened.",
-      "Our target therefore rests on FY27 earnings and the growth option. If it required another squeeze, we would not be recommending it.",
-    ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.8 });
-    para(s, C.M, cy + 3.08, 12.44, 1.06, "Caveat on the data",
-      "The most recent hard figure we could retrieve is dated 26 May 2026. ASIC publishes short positions daily and the current number " +
-      "may differ. Before the live rounds this should be refreshed from the ASIC short position report. A rebuild above 10% would tell " +
-      "us that a well-resourced group of investors disagrees with this thesis, and we would treat that as information rather than noise.",
+    card(s, C.M + 6.84, cy, 5.60, 2.90, "Our own warning indicator has triggered", [
+      "PLS was the largest, most liquid way to be short falling lithium prices, and about one share in five was borrowed short in September 2024.",
+      "The price then went from A$1.91 to A$5.48, and short interest fell to 6.8% by May 2026. A material part of that move was covering, not new fundamental buyers.",
+      "Since then shorts have REBUILT to 10.09% as at 4 August 2026, up 0.75 percentage points in a single week.",
+      "Our risk register names a rebuild above 10% as a warning signal. It has happened, and we are reporting it rather than quietly dropping the indicator.",
+      "What it means: a well-resourced group is positioning against the stock at these levels. We disagree with them, but we would rather show the disagreement than hide it.",
+    ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.6 });
+    para(s, C.M, cy + 3.08, 12.44, 1.32, "How we read it, and what it does not change",
+      "Two things are true at once. The covering that drove much of the last twelve months is finished, so that flow cannot repeat. And " +
+      "shorts are rebuilding, which says some investors think the re-rating overshot.\n\n" +
+      "It does not change the target, because our target never depended on a squeeze: it rests on FY27 earnings and the growth option. " +
+      "It does change how we would size the position. At 10% short interest and 1.09x reward to risk, this is an overweight to build " +
+      "into, not one to take in a single trade. The next ASIC print is the number to watch.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.2 });
-   }, "Sources: ASIC short position reports as reported via shortman.com.au and market commentary. Latest retrievable data point 26 May 2026.");
+   }, "Sources: ASIC short position reports via shortman.com.au, shorted.com.au and stocktrack.com.au. Latest retrievable data point 4 August 2026 at 10.09%, up 0.75 percentage points week on week. ASIC data is published on a T+4 basis.");
 
   pgF("What moved the share price, and what the market thinks now",
       "A near-tripling in twelve months, and a consensus that lands almost exactly on the current price. Our disagreement with the street is narrow and specific.",
@@ -89,7 +91,7 @@ module.exports = function (pres, ctx) {
       "forecast, so we are not out-forecasting anyone on the commodity.\n\n" +
       "What we think is underpriced is the operating position: a cost base that is falling for structural reasons, a growth option with " +
       "committed pre-FID capital, and a downstream route that becomes commercially relevant exactly as carbon accounting reaches raw " +
-      "materials. That is A$0.43 of the A$0.64 of upside we see, and it is why our A$6.12 sits above the vendor average without sitting " +
+      "materials. That is A$0.43 of the A$0.66 of upside we see, and it is why our A$6.14 sits above the vendor average without sitting " +
       "outside the analyst range.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9 });
    }, "Sources: PLS announcements; data-vendor consensus reads, August-September 2026; market commentary. Consensus figures differ by provider and snapshot date and are shown as a range rather than a point.");
@@ -99,16 +101,16 @@ module.exports = function (pres, ctx) {
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Item", w: 3.35 }, { t: "Why it is missing", w: 4.35 },
       { t: "How we handled it", w: 4.74 }], [
-      ["Total borrowings at 30 June 2026", "Only the US$600m senior notes issue is confirmed. One source cites about A$1.2bn including leases", "Used A$828m, the notes translated at spot. Net cash of A$1.46bn would fall to about A$1.09bn on the higher figure, costing roughly A$0.12/share"],
+      ["Total borrowings at 30 June 2026", "Only the US$600m senior notes issue is confirmed. One source cites about A$1.2bn including leases", "Used A$828m, the notes translated at spot. Net cash of A$1.44bn would fall to about A$1.09bn on the higher figure, costing roughly A$0.12/share"],
       ["Ore Reserve since August 2023", "Not restated after the June 2025 resource upgrade", "Applied a 75% resource-to-reserve conversion and sensitised it. Flagged as a catalyst in both directions"],
-      ["FY26 property, plant and equipment", "Annual report not reachable from our environment", "Estimated A$3,200m. Affects depreciation and tax, not the unlevered DCF"],
+      ["FY26 property, plant and equipment", { t: "CLOSED", c: C.SPOD, b: true }, "Derived as A$3,813m from reported total assets of A$6,258m less cash and working capital. The balance sheet now ties to the reported total"],
       ["Scope 3 emissions and intensity per tonne", "Not disclosed by PLS", "Named as a material gap and made an engagement ask. The low-carbon claim cannot presently be declared"],
       ["Tailings method and GISTM status", "Not disclosed", "Refused to assert either way. Carried as an unpriced risk"],
-      ["Safety, workforce and diversity metrics", "Sustainability Report not reachable", "Reported the gap rather than substituting sector averages"],
+      ["Safety, workforce and diversity metrics", "Partly closed from FY26 results", "TRIFR 2.77 and female participation 21.9% retrieved; Indigenous employment and procurement still not found"],
       ["Native title agreement detail", "Not retrievable", "Valued schedule protection as an avoided delay, not as a claim about relationship quality"],
       ["ESG metrics in incentive pay", "Not retrievable", "Named as our second engagement ask"],
       ["Named broker price targets", "Not retrievable individually", "Used vendor consensus ranges and showed the full spread"],
-      ["Current short interest", "Latest hard data 26 May 2026", "Flagged the date and named a rebuild above 10% as a warning signal"],
+      ["Current short interest", "Refreshed to 4 August 2026", "10.09%, above the 10% warning level we set. Reported on F2 rather than dropped"],
       ["FY24 comparatives", "Outside the scope of our sourcing", "Marked as estimates in the workbook and in the income statement footnote"],
       ["External ESG ratings", "Providers not reachable", "Explained why operating evidence mattered more, and acknowledged the loss of a common benchmark"],
     ], { rowH: 0.335, size: 8.1, boldFirstCol: true });
@@ -233,7 +235,7 @@ module.exports = function (pres, ctx) {
       "liability for any use of this material.\n\n" +
       "Figures are current to 5 September 2026 and have not been updated for subsequent events.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
-    para(s, C.M, cy + 2.78, 12.44, 1.40, "Reproducibility",
+    para(s, C.M, cy + 2.78, 12.44, 1.86, "Reproducibility",
       "Every figure in this deck can be traced to the accompanying workbook, PLS_Valuation_Model_FMAA_2026.xlsx. The workbook contains " +
       "nineteen sheets and 1,728 live formulas with no evaluation errors. Its Sources sheet tags every input by provenance: A for a " +
       "reported actual, G for company guidance, M for market data, D for a derived figure, E for our own estimate and C for an input " +

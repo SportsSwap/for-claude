@@ -43,7 +43,7 @@ module.exports = function (pres, ctx) {
       ["Strengths", C.SPOD, C.SPOD_L, [
         "Bottom-quartile cost position: A$569/t FOB, about US$425/t SC6-equivalent",
         "446Mt at 1.28% Li2O, one of the largest hard-rock resources globally",
-        "A$2.29bn of cash and net cash of A$1.46bn after a full downturn",
+        "A$2.29bn of cash and net cash of A$1.44bn after a full downturn",
         "Three expansions delivered through the trough; dividend reinstated",
         "The only non-China downstream route among the six: Calix plus POSCO",
       ]],
@@ -145,7 +145,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy + 3.95, 12.44, 1.12, "The one that moves the most",
       "Product carbon intensity goes from an item almost nobody prices today to the single most material issue on the list by 2030. That " +
       "movement is the whole thesis. If we are wrong about the timing, we are wrong about the recommendation - which is why we hold the " +
-      "downstream option outside the target price rather than inside it, and why our A$6.12 stands on the cost position alone.",
+      "downstream option outside the target price rather than inside it, and why our A$6.14 stands on the cost position alone.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.4 });
    }, "Assessment is the team's, informed by SASB Metals and Mining standards, the EU Battery Regulation timetable and PLS's own disclosure. Ratings are ours, not the company's.");
 
@@ -155,7 +155,7 @@ module.exports = function (pres, ctx) {
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Metric", w: 3.45 }, { t: "What PLS discloses", w: 4.65 },
       { t: "Our assessment", w: 4.34 }], [
-      ["Scope 1 and 2, absolute", "A 7.1% reduction year on year reported in the FY25 results. Absolute tonnages were not retrievable from our sources.", { t: "Directional only", c: C.OCHRE, b: true }],
+      ["Scope 1 and 2, absolute", "Down 5% in FY26, following a 7.1% reduction in FY25. Two consecutive years of absolute reduction while volumes rose 17%. Tonnages not retrievable.", { t: "Improving, still directional", c: C.SPOD, b: true }],
       ["Scope 3", "Not found.", { t: "Material gap", c: C.CRIMSON, b: true }],
       ["Emissions intensity per tonne", "Not disclosed as a KPI. Third-party aggregators carry FY23-24 figures that disagree and that we judged unreliable.", { t: "Material gap", c: C.CRIMSON, b: true }],
       ["Net zero target", "\"The decade commencing 2040\" - a ten-year window rather than a year.", { t: "Weak", c: C.CRIMSON, b: true }],

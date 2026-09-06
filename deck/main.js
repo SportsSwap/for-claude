@@ -38,18 +38,18 @@ module.exports = function build(pres, ctx) {
   // ---------------------------------------------------------------- 1. EXEC SUMMARY
   {
     const s = pres.addSlide(); bg(s); nav(s, "Summary");
-    s.addNotes("OPEN HERE. 45 seconds, no more.\n\n\"We are recommending PLS Group, a buy, twelve-month target six dollars twelve against a last close of five forty-eight. That is 11.7% of price plus a 1.7% yield, so a 13.4% total return against a benchmark that returned 5.90%.\"\n\nThen the line that matters: \"Of the sixty-four cents of upside we see, forty-three cents comes from ESG-linked operating decisions the market is not paying for. That is two thirds. This is not a lithium price bet with an ESG slide attached.\"\n\nDo NOT walk the six boxes. They are there for the reader, not the listener. Move to slide 2.");
+    s.addNotes("OPEN HERE. 45 seconds, no more.\n\n\"We are recommending PLS Group, a buy, twelve-month target six dollars fourteen against a last close of five forty-eight. That is 12.0% of price plus a 1.7% yield, so a 13.6% total return against a benchmark that returned 5.90%.\"\n\nThen the line that matters: \"Of the sixty-six cents of upside we see, forty-three cents comes from ESG-linked operating decisions the market is not paying for. That is two thirds. This is not a lithium price bet with an ESG slide attached.\"\n\nDo NOT walk the six boxes. They are there for the reader, not the listener. Move to slide 2.");
     const cy = head(s, "Executive summary",
       "Two thirds of the upside we see is the shared-value position the market has not priced. That is the entire recommendation.");
     const bx = [
       ["01", "The asset", "A$569/t", "FY26 unit cost, FOB",
        "Pilgangoora produced 879.5kt in FY26, up 17%, at a 59% EBITDA margin. Costs fell 9% while volumes rose."],
       ["02", "The balance sheet", "A$2.29bn", "Cash at 30 June 2026",
-       "Net cash of A$1.46bn, an inaugural US$600m bond, and a dividend reinstated at 5cps fully franked."],
+       "Net cash of A$1.44bn, an inaugural US$600m bond, and a dividend reinstated at 5cps fully franked."],
       ["03", "The growth", ">2 Mtpa", "P2000 doubles Pilgangoora",
        "PFS puts the increment at A$2.6bn NPV and a 55% IRR. A$175m of pre-FID capital is already approved."],
       ["04", "The shared value", d2(F.esg_ps), "per share, inside the target",
-       "Equal to " + pc(F.esg_pct_upside,0) + " of the A$0.64 of upside. A further " + d2(F.do_ps) + " sits outside it, unpriced."],
+       "Equal to " + pc(F.esg_pct_upside,0) + " of the A$0.66 of upside. A further " + d2(F.do_ps) + " sits outside it, unpriced."],
       ["05", "The valuation", d2(F.target), "12-month target",
        "60% base-case DCF at an 8.88% WACC, 40% trading comparables. Bear " + d2(F.vps_bear) + ", bull " + d2(F.vps_bull) + "."],
       ["06", "The mandate", pc(F.tsr), "expected total return",

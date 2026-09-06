@@ -15,7 +15,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 12. DCF
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
-    s.addNotes("60 seconds. This is the slide that separates you from teams that ran a standard DCF.\n\n\"Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out. On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year, so about sixteen years remain. We value the terminal period as a sixteen-year annuity.\"\n\nThe number that lands: \"That single choice is worth nine billion dollars. A perpetuity would have given us 18.9 billion of terminal value on an asset that runs out.\"\n\nIf challenged on whether the life is pre or post-expansion: it is POST. We divide remaining ore by the FY36 rate, which already includes P2000. Doubling throughput halves the life and the model captures that.");
+    s.addNotes("60 seconds. This is the slide that separates you from teams that ran a standard DCF.\n\n\"Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out. On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year, so about sixteen years remain. We value the terminal period as a sixteen-year annuity.\"\n\nThe number that lands: \"That single choice is worth nine billion dollars. A perpetuity would have given us 19.0 billion of terminal value on an asset that runs out.\"\n\nIf challenged on whether the life is pre or post-expansion: it is POST. We divide remaining ore by the FY36 rate, which already includes P2000. Doubling throughput halves the life and the model captures that.");
     const cy = head(s, "A finite orebody gets an annuity, not a perpetuity",
       "That single choice is worth A$9.0bn of terminal value. It is the difference between valuing a mine and valuing a company that never runs out of rock.");
     // left column: the cost of capital build
@@ -27,7 +27,7 @@ module.exports = function (pres, ctx) {
       ["Equity beta", "0.73", "Case document; Yahoo 5-year monthly", { t: "Case", c: C.INK, b: true }],
       ["Cost of equity", "9.38%", "CAPM: 5.00% + 0.73 x 6.00%", { t: "Derived", c: C.MUTE }],
       ["After-tax cost of debt", "4.38%", "6.25% note coupon at the 30% rate", { t: "Estimate", c: C.OCHRE }],
-      ["Target gearing", "10%", "Through-cycle; PLS is net cash by A$1.46bn", { t: "Estimate", c: C.OCHRE }],
+      ["Target gearing", "10%", "Through-cycle; PLS is net cash by A$1.44bn", { t: "Estimate", c: C.OCHRE }],
       [{ t: "WACC", b: true }, { t: "8.88%", b: true, c: C.SPOD }, "90% equity, 10% debt after tax", { t: "Derived", c: C.MUTE }],
     ];
     table(s, C.M, cy, cols, rows, { rowH: 0.28, size: 8.8, boldFirstCol: true,
@@ -36,10 +36,10 @@ module.exports = function (pres, ctx) {
     const c2 = [{ t: "Base case DCF", w: 3.50 }, { t: "A$m", w: 1.30, align: "right" },
       { t: "Per share", w: 2.05 }, { t: "A$", w: 0.95, align: "right" }];
     table(s, C.M, cy + 2.40, c2, [
-      ["PV of explicit forecast, FY27-FY36", "9,566", "Value per share", { t: "6.50", b: true, c: C.SPOD }],
+      ["PV of explicit forecast, FY27-FY36", "9,661", "Value per share", { t: "6.50", b: true, c: C.SPOD }],
       ["PV of terminal value (annuity)", "9,894", "Last close", "5.48"],
-      ["Enterprise value", { t: "19,460", b: true }, "Implied upside", { t: "+18.6%", b: true, c: C.SPOD }],
-      ["Net cash", "1,462", "Terminal value as a share of EV", "50.8%"],
+      ["Enterprise value", { t: "19,581", b: true }, "Implied upside", { t: "+19.1%", b: true, c: C.SPOD }],
+      ["Net cash", "1,437", "Terminal value as a share of EV", "50.7%"],
     ], { rowH: 0.25, size: 8.8, boldFirstCol: true });
 
     para(s, C.M, cy + 3.80, 7.80, 1.38, "The orebody runs out. So does the cash flow.",
@@ -53,7 +53,7 @@ module.exports = function (pres, ctx) {
     s.addShape("rect", { x: bx, y: by, w: 4.42, h: 5.18, fill: { color: C.OCHRE_L }, line: { color: "E8C9A3", width: 0.75 } });
     s.addText("What that choice costs us", { x: bx + 0.20, y: by + 0.16, w: 4.0, h: 0.32, isTextBox: true, margin: 0,
       fontFace: C.B, fontSize: 12, bold: true, color: C.OCHRE, valign: "middle" });
-    s.addText("A$18.9bn", { x: bx + 0.20, y: by + 0.62, w: 4.0, h: 0.62, isTextBox: true, margin: 0,
+    s.addText("A$19.0bn", { x: bx + 0.20, y: by + 0.62, w: 4.0, h: 0.62, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 30, bold: true, color: C.FAINT, valign: "middle" });
     s.addText("if we grew the final year's cash flow at 2.5% forever", { x: bx + 0.20, y: by + 1.24, w: 4.0, h: 0.44,
       isTextBox: true, margin: 0, fontFace: C.B, fontSize: 9.2, color: C.MUTE, valign: "top", lineSpacingMultiple: 1.1 });
@@ -66,7 +66,7 @@ module.exports = function (pres, ctx) {
       fontFace: C.B, fontSize: 10.5, bold: true, color: C.OCHRE, valign: "middle" });
     s.addText("P2000 roughly doubles the mining rate. Doubling throughput without restating reserves halves the mine life, so an " +
       "expansion that looks purely additive on volume is partly just faster depletion. A growing perpetuity hides that entirely. " +
-      "The annuity forces us to pay for it.\n\nTerminal value is 50.8% of enterprise value on our approach. On a perpetuity it would " +
+      "The annuity forces us to pay for it.\n\nTerminal value is 50.7% of enterprise value on our approach. On a perpetuity it would " +
       "have been about 68%, with most of the answer resting on an assumption no orebody can honour.",
       { x: bx + 0.20, y: by + 3.58, w: 4.02, h: 1.48, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 9, color: C.TXT, valign: "top", lineSpacingMultiple: 1.1 });
@@ -77,9 +77,9 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 13. RANGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
-    s.addNotes("60 seconds. Lead with the bear case, not the base case. It builds credibility.\n\n\"Our bear case is two dollars twenty-six. That assumes prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade, all at once. Even then it is 19% above the one ninety-one the market actually printed in the last trough, when PLS had a billion less cash and was loss-making.\"\n\nThen admit the weakness: reward to risk is 1.07x. Say it plainly. \"This is not a lopsided bet and we will not present it as one. What justifies the position is the expected return against the mandate.\"\n\nClose on the grid: we need prices not to FALL by a fifth. We do not need them to rise.");
+    s.addNotes("60 seconds. Lead with the bear case, not the base case. It builds credibility.\n\n\"Our bear case is two dollars thirty. That assumes prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade, all at once. Even then it is 20% above the one ninety-one the market actually printed in the last trough, when PLS had a billion less cash and was loss-making.\"\n\nThen admit the weakness: reward to risk is 1.09x. Say it plainly. \"This is not a lopsided bet and we will not present it as one. What justifies the position is the expected return against the mandate.\"\n\nClose on the grid: we need prices not to FALL by a fifth. We do not need them to rise.");
     const cy = head(s, "The range, and what has to be true",
-      "Base A$6.50, bear A$2.26, bull A$8.93. The bear sits 19% above the price the market actually paid at the bottom of the last cycle.");
+      "Base A$6.53, bear A$2.30, bull A$8.96. The bear sits 20% above the price the market actually paid at the bottom of the last cycle.");
     // football field
     const fx = C.M, fy = cy + 0.06, fw = 7.40, fh = 2.70;
     s.addShape("rect", { x: fx, y: fy, w: fw, h: fh, fill: { color: C.MIST2 }, line: { color: C.RULE, width: 0.75 } });
@@ -108,7 +108,7 @@ module.exports = function (pres, ctx) {
         fontFace: C.B, fontSize: 8, bold: true, color: C.MUTE, align: "right", valign: "middle" });
     });
     // last close and target markers
-    [[5.48, "Last close", C.CRIMSON], [6.12, "Target", C.INK]].forEach((m, i) => {
+    [[5.48, "Last close", C.CRIMSON], [6.14, "Target", C.INK]].forEach((m, i) => {
       s.addShape("rect", { x: sx(m[0]) - 0.01, y: fy + 0.48, w: 0.022, h: 2.02, fill: { color: m[2] } });
       s.addText(m[1] + "  " + m[0].toFixed(2), { x: sx(m[0]) - 0.72 + i * 1.44, y: fy + 2.44, w: 1.44, h: 0.22,
         isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8, bold: true, color: m[2], align: "center", valign: "middle" });
@@ -116,10 +116,10 @@ module.exports = function (pres, ctx) {
 
     card(s, C.M + 7.62, cy + 0.06, 4.82, 1.52, "What the bear case actually assumes", [
       "Prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade - all at once.",
-      "Even then A$2.26 is 19% above the A$1.91 printed in the last trough, when PLS held A$974m of cash and was loss-making rather than A$2.29bn and earning A$526m.",
+      "Even then A$2.30 is 20% above the A$1.91 printed in the last trough, when PLS held A$974m of cash and was loss-making rather than A$2.29bn and earning A$526m.",
     ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.8 });
     card(s, C.M + 7.62, cy + 1.66, 4.82, 1.10, "And the honest weakness", [
-      "Reward to risk is 1.07x: +63% to bull against -59% to bear. Not a lopsided bet, and we will not present it as one.",
+      "Reward to risk is 1.09x: +64% to bull against -58% to bear. Not a lopsided bet, and we will not present it as one.",
       "What justifies the position is the expected return against the mandate, not the shape of the distribution.",
     ], { fill: C.MIST2, line: C.RULE, titleColor: C.INK, size: 8.8 });
 
@@ -153,13 +153,13 @@ module.exports = function (pres, ctx) {
       "PLS needs realised prices no worse than about 8% below our base case to justify today's price. Our base case is already 11% below " +
       "spot-implied realisation and 19% below the June-2026 quarter. The pitch does not need the price to rise. It needs the price not to fall by a fifth.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9 });
-    foot(s, "Source: team valuation model, Football Field and Sensitivity sheets. Broker target range is the full individual analyst spread across 17-20 analysts; vendor averages cluster A$4.50-5.70. Our A$6.12 sits inside the individual range and below the most bullish.", P());
+    foot(s, "Source: team valuation model, Football Field and Sensitivity sheets. Broker target range is the full individual analyst spread across 17-20 analysts; vendor averages cluster A$4.50-5.70. Our A$6.14 sits inside the individual range and below the most bullish.", P());
   }
 
   // ---------------------------------------------------------------- 14. RISKS
   {
     const s = pres.addSlide(); bg(s); nav(s, "Risks");
-    s.addNotes("45 seconds. Do not read twelve rows. Take the top two.\n\n\"The risk that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about four ninety-eight and we are wrong. We have not hedged that language.\"\n\nThen the short-interest point, which most teams will miss entirely: \"PLS went from the most shorted stock on the ASX at 20% of shares to about 6.8%. A material part of the tripling was covering, and that buyer cannot come back. Our target rests on FY27 earnings and the growth option, not on another squeeze.\"");
+    s.addNotes("45 seconds. Do not read twelve rows. Take the top two.\n\n\"The risk that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about three eighty-six and we are wrong. We have not hedged that language.\"\n\nThen the short-interest point, which most teams will miss entirely: \"PLS went from the most shorted stock on the ASX at 20% of shares to about 6.8%. A material part of the tripling was covering, and that buyer cannot come back. Our target rests on FY27 earnings and the growth option, not on another squeeze.\"");
     const cy = head(s, "What would break this, and what would tell us first",
       "Every risk below has a named early-warning indicator, because a risk you cannot observe is not one you can manage.");
     const cols = [{ t: "Risk", w: 2.75 }, { t: "Why it bites", w: 3.85 }, { t: "Mitigant", w: 3.10 },
@@ -186,7 +186,7 @@ module.exports = function (pres, ctx) {
     ];
     table(s, C.M, cy, cols, rows, { rowH: 0.61, size: 8.3 });
     para(s, C.M, cy + 3.95, 12.44, 0.74, null,
-      "The risk we are most exposed to is the first one, and we have not hedged the language on it. If spodumene averages 20% below our base case across the forecast, the target falls to about A$4.98 and this recommendation is wrong.",
+      "The risk we are most exposed to is the first one, and we have not hedged the language on it. If spodumene averages 20% below our base case across the forecast, the target falls to about A$3.86 and this recommendation is wrong.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.4 });
     foot(s, "Sources: ASIC short position reports via shortman.com.au (latest retrievable data 26 May 2026); Wood Mackenzie Lithium Energy Transition Outlook, 3 March 2026; PLS disclosures; team valuation model.", P());
   }
@@ -194,20 +194,20 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 15. RECOMMENDATION
   {
     const s = pres.addSlide(); bg(s, true);
-    s.addNotes("45 seconds. Close hard and stop talking.\n\n\"Buy. Six dollars twelve, 11.7% upside, 13.4% total return against a 5.90% benchmark. The fund needs two points of outperformance and this gives seven and a half.\"\n\n\"Two thirds of that upside is shared value the market is not paying for. And a further thirty-two cents of low-carbon downstream value sits outside the target entirely, so nothing in this recommendation depends on it.\"\n\nName the nearest catalyst: first lithium phosphate from the mid-stream plant lands THIS QUARTER, and the P2000 study lands in the December quarter. Both are inside the horizon.\n\nThen stop. Let them ask.");
+    s.addNotes("45 seconds. Close hard and stop talking.\n\n\"Buy. Six dollars twelve, 12.0% upside, 13.6% total return against a 5.90% benchmark. The fund needs two points of outperformance and this gives seven point seven.\"\n\n\"Two thirds of that upside is shared value the market is not paying for. And a further thirty-two cents of low-carbon downstream value sits outside the target entirely, so nothing in this recommendation depends on it.\"\n\nName the nearest catalyst: first lithium phosphate from the mid-stream plant lands THIS QUARTER, and the P2000 study lands in the December quarter. Both are inside the horizon.\n\nThen stop. Let them ask.");
     s.addText("Recommendation", { x: C.M, y: 0.34, w: 8, h: 0.62, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 30, bold: true, color: C.WHITE, valign: "middle" });
     s.addShape("rect", { x: C.M, y: 1.10, w: 3.55, h: 2.20, fill: { color: C.SPOD } });
     s.addText("BUY", { x: C.M, y: 1.22, w: 3.55, h: 0.80, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 42, bold: true, color: C.WHITE, align: "center", valign: "middle" });
-    s.addText("A$6.12", { x: C.M, y: 2.02, w: 3.55, h: 0.52, isTextBox: true, margin: 0,
+    s.addText("A$6.14", { x: C.M, y: 2.02, w: 3.55, h: 0.52, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 26, bold: true, color: C.WHITE, align: "center", valign: "middle" });
-    s.addText("12-month target   |   +11.7%\nTotal return 13.4% vs benchmark 5.90%", { x: C.M, y: 2.56, w: 3.55, h: 0.62,
+    s.addText("12-month target   |   +12.0%\nTotal return 13.6% vs benchmark 5.90%", { x: C.M, y: 2.56, w: 3.55, h: 0.62,
       isTextBox: true, margin: 0, fontFace: C.B, fontSize: 10, color: "DDF0EB", align: "center", valign: "top", lineSpacingMultiple: 1.15 });
 
     const pts = [
-      ["The mandate is met", "A 13.4% expected total return against a benchmark that returned 5.90%, for outperformance of 7.5%. The fund needs 2%."],
-      ["The case is the shared value", "A$0.43 of the A$0.64 of upside - 67% - comes from ESG-linked operating decisions the market is not paying for."],
+      ["The mandate is met", "A 13.6% expected total return against a benchmark that returned 5.90%, for outperformance of 7.7%. The fund needs 2%."],
+      ["The case is the shared value", "A$0.43 of the A$0.66 of upside - 66% - comes from ESG-linked operating decisions the market is not paying for."],
       ["The option is free", "A further A$0.32 per share of low-carbon downstream value sits outside the target entirely. Nothing in this recommendation needs it to land."],
     ];
     pts.forEach((p2, i) => {

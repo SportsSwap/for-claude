@@ -206,7 +206,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy + 4.20, 12.44, 1.02, "Why we still recommend it after failing four of seven",
       "Because we are not claiming a moat. We are claiming a cost position, an orebody that cannot be replicated, and a five-year window " +
       "in which carbon accounting reorders who is allowed to sell into the best markets. That is a temporal advantage, not a permanent " +
-      "one, and it is priced accordingly: our target implies 11.7% upside, not a re-rating to a premium multiple.",
+      "one, and it is priced accordingly: our target implies 12.0% upside, not a re-rating to a premium multiple.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.4 });
    }, "Framework: Hamilton Helmer, '7 Powers: The Foundations of Business Strategy', 2016. Assessments are the team's.");
 };

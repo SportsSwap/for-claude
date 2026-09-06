@@ -149,7 +149,7 @@ module.exports = function (pres, ctx) {
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9 });
     para(s, C.M + 6.34, cy + 3.20, 6.10, 1.42, "And what the amber column costs",
       "The two amber rows are options, not plans. Neither has an FID. Our base case sanctions P2000 in late 2026 and Colina after the " +
-      "December 2027 study; our bear case sanctions neither, and that single difference is most of the gap between A$6.50 and A$2.26. " +
+      "December 2027 study; our bear case sanctions neither, and that single difference is most of the gap between A$6.53 and A$2.30. " +
       "The growth pipeline is where the value is and where the risk is, and it is the same pipeline.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9 });
     fin(s, "Sources: PLS and Calix announcements; mining-technology.com; NAIF; PLS FY26 results and FY27 guidance. Capital figures are as disclosed at the time of each announcement.");

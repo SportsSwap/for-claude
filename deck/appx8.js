@@ -13,7 +13,7 @@ module.exports = function (pres, ctx) {
   const pgF = (title, take, body, src) => {
     const n = ++f; const { s, cy } = apage(pres, "F" + n + "  Risk and reference", title, take); body(s, cy); foot(s, src, "F" + n);
   };
-  const YRS = S.fcst.map((y) => y.replace("F", ""));
+  const YRS = S.fcst.map((y) => y.replace(/F$/, ""));
   const series = (s, x, y, label, rows, opts = {}) => {
     const lw = opts.lw || 2.60;
     const cols = [{ t: label, w: lw }].concat(YRS.map((yr) => ({ t: yr, w: (12.44 - lw) / 10, align: "right" })));
@@ -23,7 +23,7 @@ module.exports = function (pres, ctx) {
   // ---------------- E9 bear / E10 bull
   [["bear", "Bear", C.CRIMSON, C.CRIM_L,
     "Restart supply overwhelms demand, prices revert toward the marginal cost, P2000 is never sanctioned, Colina never proceeds and Ngungaju is throttled back.",
-    "A$2.26 is still 19% above the A$1.91 the market printed in the last trough, when PLS held A$974m of cash and was loss-making rather than A$2.29bn and earning A$526m. Note the mine life caps at 25 years, because a smaller operation depletes the orebody more slowly - which is why the bear case is not as punitive on terminal value as the price path alone would suggest."],
+    "A$2.30 is still 20% above the A$1.91 the market printed in the last trough, when PLS held A$974m of cash and was loss-making rather than A$2.29bn and earning A$526m. Note the mine life caps at 25 years, because a smaller operation depletes the orebody more slowly - which is why the bear case is not as punitive on terminal value as the price path alone would suggest."],
    ["bull", "Bull", C.INK2, C.SPOD_L,
     "The 2027-29 deficit called by Fastmarkets, Morgan Stanley and UBS arrives, prices overshoot the incentive level before mean-reverting, and both P2000 and Colina proceed on schedule.",
     "Note the mine life falls to 14.2 years. Mining faster depletes the orebody faster, so the annuity period shortens and part of the volume upside is given back in the terminal value. A growing perpetuity would have hidden that entirely and produced a materially higher bull case."],
@@ -50,17 +50,15 @@ module.exports = function (pres, ctx) {
         [{ t: "Upside / (downside)", b: true, c: sc[2] }, { t: (d.ups >= 0 ? "+" : "") + (d.ups * 100).toFixed(1) + "%", b: true, c: sc[2] }],
       ];
       table(s, C.M, y, [{ t: sc[1] + " case bridge", w: 4.60 }, { t: "A$m unless stated", w: 2.10, align: "right" }], rows,
-        { rowH: 0.245, size: 8.6, boldFirstCol: true });
+        { rowH: 0.235, size: 8.6, boldFirstCol: true });
       table(s, C.M + 7.00, y, [{ t: "Orebody", w: 3.30 }, { t: "", w: 2.14, align: "right" }], [
         ["Ore consumed to FY36 (Mt)", d.ore_used.toFixed(1)],
         ["Ore remaining after FY36 (Mt)", d.ore_left.toFixed(1)],
         ["Remaining mine life (years)", { t: d.life.toFixed(1), b: true }],
         ["Terminal annuity factor", d.annuity.toFixed(2) + "x"],
       ], { rowH: 0.245, size: 8.6, boldFirstCol: true });
-      para(s, C.M + 7.00, y + 1.30, 5.44, 1.34, "What this case is telling you",
+      para(s, C.M + 7.00, y + 1.32, 5.44, 1.72, "What this case is telling you",
         sc[5], { fill: sc[3], line: C.RULE, titleColor: sc[2], size: 8.8 });
-      para(s, C.M, y + 2.28, 12.44, 0.68, null, "Scenario narrative: " + sc[4],
-        { fill: C.MIST, line: C.RULE, size: 8.8 });
     }, "Source: team valuation model, Scenario Engine sheet. Set Assumptions!C7 to " + sc[1] + " to reproduce the full statements on this case.");
   });
 
@@ -100,7 +98,7 @@ module.exports = function (pres, ctx) {
       "So price is roughly four times as powerful as cost. Operational excellence cannot rescue this position from a sustained price relapse - which is why the risk register leads with price.",
       "Shaded cells sit below the current share price of A$5.48.",
     ], { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 8.8 });
-    para(s, C.M, cy + 2.36, 12.44, 1.26, "Where the break-even sits",
+    para(s, C.M, cy + 2.36, 12.44, 1.72, "Where the break-even sits",
       "PLS needs realised prices no worse than about 8% below our base case to justify today's share price at unchanged costs. Our base " +
       "case already sits 11% below spot-implied realisation and 19% below the June-2026 quarter exit rate. In other words the pitch does " +
       "not require the price to rise from here - it requires the price not to fall by roughly a fifth from a level we have already " +
@@ -133,13 +131,13 @@ module.exports = function (pres, ctx) {
       ["Implied value per share - low (A$)", F.comps_lo.toFixed(2)],
       ["Implied value per share - high (A$)", F.comps_hi.toFixed(2)],
       [{ t: "Midpoint (A$)", b: true, c: C.SPOD }, { t: F.comps_mid.toFixed(2), b: true, c: C.SPOD }],
-    ], { rowH: 0.27, size: 8.6, boldFirstCol: true });
+    ], { rowH: 0.25, size: 8.6, boldFirstCol: true });
     para(s, C.M + 7.30, cy + 2.55, 5.14, 1.62, "Why the 26.8x is not the relevant number",
       "PLS's trailing multiple looks extreme because FY26 EBITDA of A$1,137m captures a year that began with realised prices at US$742/t. " +
       "On our FY27 estimate of A$1,731m the same enterprise value is roughly 9.4x. That is the cyclical trap in this sector: the stock " +
       "looks expensive at the bottom and cheap at the top, and a multiple taken at either point is misleading.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.8 });
-    para(s, C.M, cy + 4.34, 12.44, 0.78, null,
+    para(s, C.M, cy + 4.46, 12.44, 0.72, null,
       "Vendor caveat: providers disagree materially on EV/EBITDA across this peer set, reflecting different snapshot dates through a volatile 2026 and different methodologies. Treat single-point figures as indicative.",
       { fill: C.MIST, line: C.RULE, size: 8.8 });
    }, "Sources: company FY26 results; data-vendor multiples, August 2026. PLS-implied values are computed in the workbook's Trading Comps sheet from the model's own FY27 EBITDA estimate.");
@@ -191,12 +189,12 @@ module.exports = function (pres, ctx) {
       ["Exploration and tenements", "180", "50%", "90", "0.03", "Includes tenements acquired adjacent to Colina"],
       ["Corporate costs capitalised", "(900)", "100%", "(900)", "(0.28)", "Present value of unallocated overhead"],
       [{ t: "Enterprise NAV", b: true }, "", "", { t: "12,950", b: true }, { t: "4.02", b: true }, ""],
-      ["Net cash", "", "", "1,462", "0.45", "FY26 cash of A$2,290m less US$600m of notes"],
+      ["Net cash", "", "", "1,437", "0.45", "FY26 cash of A$2,290m less A$853m of borrowings"],
       [{ t: "Equity NAV", b: true, c: C.SPOD }, "", "", { t: "14,412", b: true, c: C.SPOD }, { t: "4.48", b: true, c: C.SPOD }, ""],
     ], { rowH: 0.29, size: 8.5, boldFirstCol: true,
          rowFill: [null,null,null,null,null,null,null,null,C.MIST,null,C.SPOD_L] });
     para(s, C.M, cy + 3.55, 12.44, 1.44, "Why the NAV is below the DCF, and why that is the honest answer",
-      "Equity NAV of about A$4.48 sits well below both the A$6.50 base-case DCF and the A$5.48 share price. That is not a contradiction, " +
+      "Equity NAV of about A$4.48 sits well below both the A$6.53 base-case DCF and the A$5.48 share price. That is not a contradiction, " +
       "it is a different question. The NAV values each asset separately, risk-weighted, at a point in time. The DCF values the " +
       "consolidated cash flow the business actually generates, including the sixteen years of ore that follow the explicit forecast.\n\n" +
       "The gap is roughly the value of continuity: an operating business that keeps converting resource into reserve and reserve into " +
@@ -208,7 +206,7 @@ module.exports = function (pres, ctx) {
 
   // ---------------- E15 downstream option
   pgE("The downstream option, sized and risked",
-      "A$2,396m unrisked, A$1,023m risked, A$0.32 per share - and deliberately excluded from the A$6.12 target.",
+      "A$2,396m unrisked, A$1,023m risked, A$0.32 per share - and deliberately excluded from the A$6.14 target.",
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Lever", w: 2.75 }, { t: "Volume", w: 1.25, align: "right" },
       { t: "Unit margin", w: 1.35, align: "right" }, { t: "EBITDA A$m", w: 1.35, align: "right" },
@@ -231,7 +229,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M + 6.34, cy + 2.05, 6.10, 2.10, "Why it sits outside the target price",
       "Because none of it is earning yet. The mid-stream plant produces its first lithium phosphate in the September 2026 quarter, the " +
       "joint venture is still ramping, and the premium is unproven.\n\n" +
-      "Keeping it outside means the recommendation does not depend on it. The A$6.12 target rests on an operating asset with a disclosed " +
+      "Keeping it outside means the recommendation does not depend on it. The A$6.14 target rests on an operating asset with a disclosed " +
       "cost base and company-guided volumes. Everything on this page is upside we have identified, sized and then declined to bank.\n\n" +
       "Target plus the risked option would be A$6.44, or 17.5% above the last close. We are not publishing that as the target, and we " +
       "would rather a judge asked us why not than why we had.",

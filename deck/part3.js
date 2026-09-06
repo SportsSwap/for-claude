@@ -77,7 +77,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M, cy + 2.16, 6.05, 1.86, "Why we still carry this at zero in the target",
       "The mid-stream plant has not produced yet. The joint venture is still ramping. And we searched PLS's disclosed contracts for a " +
       "carbon-linked price premium and could not find one. Sizing a prize is not the same as booking it, so none of this is in the " +
-      "A$6.12 target. It is quantified on the next page and held outside.",
+      "A$6.14 target. It is quantified on the next page and held outside.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
     para(s, C.M + 6.28, cy + 2.16, 6.16, 1.86, "Why it is still the thesis",
       "Every other lever in this deck lowers a cost that a competitor can also lower. This one changes which customers PLS is allowed to " +
@@ -164,7 +164,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 11. VALUE BRIDGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
-    s.addNotes("60 seconds. Expect the double-counting question here. Answer it before it is asked.\n\n\"Nothing on this page is added to the DCF. Ore sorting and the power strategy are already inside the 569 dollar cost base the model discounts. Adding them again would count the same cash flow twice.\"\n\nThen the reframe: \"Against the six dollar twelve target, forty-three cents is 4.6%, a rounding adjustment. Against the sixty-four cents of UPSIDE, it is 67%. The upside is the right denominator, because the upside is the recommendation.\"\n\nThe dashed box on the right is the part we refused to bank.");
+    s.addNotes("60 seconds. Expect the double-counting question here. Answer it before it is asked.\n\n\"Nothing on this page is added to the DCF. Ore sorting and the power strategy are already inside the 569 dollar cost base the model discounts. Adding them again would count the same cash flow twice.\"\n\nThen the reframe: \"Against the six dollar twelve target, forty-three cents is 4.6%, a rounding adjustment. Against the sixty-six cents of UPSIDE, it is 66%. The upside is the right denominator, because the upside is the recommendation.\"\n\nThe dashed box on the right is the part we refused to bank.");
     const cy = head(s, "The bridge is an attribution, not an addition",
       "Nothing here is added to the DCF. These levers are already inside the A$569/t cost base the model discounts. The question is how much of the value depends on them.");
     // bridge visual
@@ -210,8 +210,8 @@ module.exports = function (pres, ctx) {
       isTextBox: true, margin: 0, fontFace: C.B, fontSize: 11, bold: true, color: C.INK, valign: "middle" });
 
     card(s, C.M + 8.24, cy + 0.10, 4.20, 2.42, "The arithmetic that reframes this pitch", [
-      "Measured against the A$6.12 target, A$0.43 of shared value is 4.6%. A rounding adjustment.",
-      "Measured against the A$0.64 of upside, it is " + pc(F.esg_pct_upside) + ". Most of the investment case.",
+      "Measured against the A$6.14 target, A$0.43 of shared value is 4.6%. A rounding adjustment.",
+      "Measured against the A$0.66 of upside, it is " + pc(F.esg_pct_upside) + ". Most of the investment case.",
       "The upside is the right denominator, because the upside is what the recommendation is.",
     ], { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.4 });
 
