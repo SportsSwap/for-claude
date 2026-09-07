@@ -214,7 +214,7 @@ module.exports = function (pres, ctx) {
        "The next Ore Reserve statement. A conversion below 60% would cut the target by roughly A$0.40."],
     ];
     table(s, C.M, cy, cols, rows, { rowH: 0.61, size: 8.3 });
-    para(s, C.M, cy + 3.95, 12.44, 0.74, null,
+    para(s, C.M, cy + 4.10, 12.44, 0.72, null,
       "The risk we are most exposed to is the first one, and we have not hedged the language on it. If spodumene averages 20% below our base case across the forecast, the target falls to about A$3.86 and this recommendation is wrong.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.4 });
     foot(s, "Sources: ASIC short position reports via shortman.com.au (latest retrievable data 26 May 2026); Wood Mackenzie Lithium Energy Transition Outlook, 3 March 2026; PLS disclosures; team valuation model.", P());

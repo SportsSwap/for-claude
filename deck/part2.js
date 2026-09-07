@@ -76,7 +76,7 @@ module.exports = function (pres, ctx) {
       "Bald Hill, Core Lithium's Finniss and CATL's Jianxiawo all moved to restart.", { titleColor: C.INK, size: 9.4 });
     para(s, C.M + 6.28, cy, 6.16, 1.36, "Why we do not forecast a straight line",
       "Our base case assumes PLS realises US$1,700/t in FY27 - about 11% below what current spot implies and 19% below the June-2026 " +
-      "quarter exit rate. We would rather be early and conservative on price than build a recommendation that needs the spike to hold.",
+      "quarter exit rate. That is deliberately early and conservative: the recommendation must not need the spike to hold.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
 
     const cols = [{ t: "Forecaster", w: 2.30 }, { t: "Call on the 2026 balance", w: 2.35, align: "center" },

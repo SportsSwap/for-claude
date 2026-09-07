@@ -78,7 +78,7 @@ module.exports = function (pres, ctx) {
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.4 });
    }, "Sources: PLS quarterly activities reports (realised prices, actual grade, CIF China); Benchmark Mineral Intelligence, 12 August 2026; S&P Global Platts; Trading Economics; Australian Government Resources and Energy Quarterly, June 2026. FY27-FY30 are the team's base case.");
 
-  pg(3, "Where the world's lithium actually comes from",
+  pg(3, "Where the world's lithium comes from",
      "Three countries supply most of it, from three geologically different sources with very different cost and carbon profiles.",
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Source", w: 2.35 }, { t: "Where", w: 2.30 }, { t: "Cost position", w: 2.55 },

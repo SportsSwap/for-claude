@@ -142,7 +142,7 @@ module.exports = function (pres, ctx) {
       ["Workforce and psychosocial safety", { t: "High", c: C.SPOD, b: true }, { t: "High", c: C.SPOD, b: true }, "WA parliamentary scrutiny of the fly-in fly-out sector; labour scarcity constrains growth delivery."],
       ["Governance and capital discipline", { t: "Critical", c: C.SPOD, b: true }, { t: "Critical", c: C.SPOD, b: true }, "In a cyclical commodity, when you spend matters more than what you spend on."],
     ], { rowH: 0.395, size: 8.4, boldFirstCol: true });
-    para(s, C.M, cy + 3.95, 12.44, 1.12, "The one that moves the most",
+    para(s, C.M, cy + 4.10, 12.44, 1.08, "The one that moves the most",
       "Product carbon intensity goes from an item almost nobody prices today to the single most material issue on the list by 2030. That " +
       "movement is the whole thesis. If we are wrong about the timing, we are wrong about the recommendation - which is why we hold the " +
       "downstream option outside the target price rather than inside it, and why our A$6.14 stands on the cost position alone.",

@@ -28,7 +28,7 @@ module.exports = function (pres, ctx) {
   };
 
   pgF("Full risk register",
-      "Twelve risks, each with an inherent rating, a mitigant, a residual rating and a named indicator we would actually watch.",
+      "Twelve risks, each with an inherent rating, a mitigant, a residual rating and a named indicator we would watch.",
    (s, cy) => {
     const R = (t, c) => ({ t, c, b: true });
     table(s, C.M, cy, [{ t: "Risk", w: 2.35 }, { t: "Inh.", w: 0.72, align: "center" },
@@ -45,9 +45,9 @@ module.exports = function (pres, ctx) {
       ["Sodium-ion substitution in storage", R("Low", C.SPOD), "Late-decade at the earliest, and our terminal value is a finite annuity rather than a perpetuity.", R("Med", C.OCHRE), "Sodium-ion cell cost per kWh; announced storage orders"],
       ["Key person and governance", R("Low", C.SPOD), "Chief executive since 2022 with a full cycle behind him; standing board Sustainability Committee.", R("Low", C.SPOD), "Executive departures; whether ESG enters incentive pay"],
       ["Currency", R("Low", C.SPOD), "Revenue in US dollars, costs mostly in Australian dollars. A weaker AUD helps margins.", R("Low", C.SPOD), "AUD/USD against our 0.66-0.70 forecast path"],
-    ], { rowH: 0.335, size: 8.1, boldFirstCol: true });
-    para(s, C.M, cy + 4.30, 12.44, 0.86, null,
-      "The first four are the ones that decide this position. Everything below them is manageable within a normal holding period. If a judge asks which single line would make us wrong, it is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$4.98 and the recommendation with it.",
+    ], { rowH: 0.35, size: 7.9, boldFirstCol: true });
+    para(s, C.M, cy + 4.64, 12.44, 0.54, null,
+      "The first four decide this position; the rest are manageable within a normal holding period. The one that would make us wrong is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$4.98.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.2 });
    }, "Source: team assessment. Inherent and residual ratings are ours. Indicators are chosen because they are publicly observable at a known frequency, not because they are exhaustive.");
 
@@ -66,8 +66,8 @@ module.exports = function (pres, ctx) {
       dataLabelColor: C.MUTE, dataLabelFormatCode: '0.0"%"',
       catAxisLabelFontFace: C.B, catAxisLabelFontSize: 8.5, catAxisLabelColor: C.MUTE,
       valAxisLabelFontFace: C.B, valAxisLabelFontSize: 8.5, valAxisLabelColor: C.MUTE,
-      valGridLine: { color: C.RULE, size: 0.5 }, catGridLine: { style: "none" },
-      showLegend: false, valAxisMinVal: 0, valAxisMaxVal: 25,
+      valGridLine: { style: "none" }, catGridLine: { style: "none" },
+      showLegend: false, valAxisMinVal: 0, valAxisMaxVal: 24,
     });
     card(s, C.M + 6.84, cy, 5.60, 2.90, "Our own warning indicator has triggered", [
       "PLS was the largest, most liquid way to be short falling lithium prices, and about one share in five was borrowed short in September 2024.",
@@ -116,11 +116,11 @@ module.exports = function (pres, ctx) {
    }, "Sources: PLS announcements; data-vendor consensus reads, August-September 2026; market commentary. Consensus figures differ by provider and snapshot date and are shown as a range rather than a point.");
 
   pgF("What we could not verify",
-      "The register of every material gap in our own work. We would rather hand a judge this list than have them assemble it.",
+      "The register of every material gap in our own work, what caused each one, and what we did about it.",
    (s, cy) => {
     table(s, C.M, cy, [{ t: "Item", w: 3.35 }, { t: "Why it is missing", w: 4.35 },
       { t: "How we handled it", w: 4.74 }], [
-      ["Total borrowings at 30 June 2026", "Only the US$600m senior notes issue is confirmed. One source cites about A$1.2bn including leases", "Used A$828m, the notes translated at spot. Net cash of A$1.44bn would fall to about A$1.09bn on the higher figure, costing roughly A$0.12/share"],
+      ["Total borrowings at 30 June 2026", { t: "CLOSED", c: C.SPOD, b: true }, "Reported borrowings of A$853m now used, against FY26 cash of A$2,290m for net cash of A$1,437m. An earlier A$1.2bn source including leases was not adopted"],
       ["Ore Reserve since August 2023", "Not restated after the June 2025 resource upgrade", "Applied a 75% resource-to-reserve conversion and sensitised it. Flagged as a catalyst in both directions"],
       ["FY26 property, plant and equipment", { t: "CLOSED", c: C.SPOD, b: true }, "Derived as A$3,813m from reported total assets of A$6,258m less cash and working capital. The balance sheet now ties to the reported total"],
       ["Scope 3 emissions and intensity per tonne", "Not disclosed by PLS", "Named as a material gap and made an engagement ask. The low-carbon claim cannot presently be declared"],
@@ -132,7 +132,7 @@ module.exports = function (pres, ctx) {
       ["Current short interest", "Refreshed to 4 August 2026", "10.09%, above the 10% warning level we set. Reported on F2 rather than dropped"],
       ["FY24 comparatives", "Outside the scope of our sourcing", "Marked as estimates in the workbook and in the income statement footnote"],
       ["External ESG ratings", "Providers not reachable", "Explained why operating evidence mattered more, and acknowledged the loss of a common benchmark"],
-    ], { rowH: 0.32, size: 8.1, boldFirstCol: true });
+    ], { rowH: 0.295, size: 8.1, boldFirstCol: true });
     para(s, C.M, cy + 3.98, 12.44, 1.22, "What the research constraint cost us",
       "Our research environment could not open company websites or the ASX announcements platform, so every reported figure was " +
       "corroborated across two or more independent secondary reports of the same announcement rather than read from the primary document. " +

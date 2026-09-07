@@ -48,6 +48,16 @@ ACTUALS = ["A$1,934m","A$1,137m","A$526m","879.5kt","US$1,488/t","A$569/t","A$2.
            "1,030-1,100kt","A$575-625/t","A$620-685m","US$2,107/t","446Mt","214Mt",
            "A$2.6bn","55%","A$175m","5.48","1.91","6.81","A$853m","2.77","21.9%","10.09%"]
 
+# Figures the model superseded. Presence checks alone will not catch a stale number
+# sitting beside its replacement, which is how A$828m survived a borrowings correction.
+FORBIDDEN = [
+ ("A$828m",  "superseded borrowings estimate; reported figure is A$853m"),
+ ("A$6.12",  "superseded target; the target is A$6.14"),
+ ("11.7%",   "superseded upside; upside is 12.0%"),
+ ("A$6,258m less cash", None),   # allowed: this phrasing is correct
+]
+stale = [(f, why) for f, why in FORBIDDEN if why and f in txt]
+
 print(f"{'figure':30s} {'expected from model':>22s}   on slides")
 print("-" * 68)
 missing = []
@@ -60,8 +70,11 @@ absent = [a for a in ACTUALS if a not in txt]
 print(f"reported actuals present: {len(ACTUALS)-len(absent)}/{len(ACTUALS)}")
 if absent: print("  NOT FOUND:", ", ".join(absent))
 print()
+if stale:
+    print("SUPERSEDED FIGURES STILL ON THE SLIDES:")
+    for f, why in stale: print(f"  {f}: {why}")
 if missing:
     print("DECK IS OUT OF SYNC WITH THE MODEL:")
     for l, e in missing: print(f"  {l}: model says {e}, not found in slide text")
-print("RESULT:", "FAIL" if (missing or absent) else "PASS - deck ties to the model")
+print("RESULT:", "FAIL" if (missing or absent or stale) else "PASS - deck ties to the model")
 sys.exit(1 if (missing or absent) else 0)

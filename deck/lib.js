@@ -101,6 +101,7 @@ function stat(s, x, y, w, value, label, sub, opts = {}) {
 
 // A tinted panel with a heading and body lines.
 function card(s, x, y, w, h, title, lines, opts = {}) {
+  _clash(s, x, y, w, opts.label || (title || "card"));
   s.addShape("rect", { x, y, w, h, fill: { color: opts.fill || C.MIST2 },
     line: { color: opts.line || C.RULE, width: 0.75 } });
   let ty = y + 0.16;
@@ -177,7 +178,16 @@ function fitSize(paras, widthIn, heightIn, want, lsm, extraIn, label) {
   return 6.8;
 }
 
+function _clash(s, x, y, w, label) {
+  (s.__blocks || []).forEach((b) => {
+    if (y < b.y1 - 0.02 && x < b.x1 - 0.05 && x + w > b.x0 + 0.05) {
+      FIT.warnings.push("CLASH " + label + ": starts at " + y.toFixed(2) +
+                        " but the " + b.kind + " above it ends at " + b.y1.toFixed(2));
+    }
+  });
+}
 function para(s, x, y, w, h, title, text, opts = {}) {
+  _clash(s, x, y, w, opts.label || (title || "para"));
   s.addShape("rect", { x, y, w, h, fill: { color: opts.fill || C.MIST2 },
     line: { color: opts.line || C.RULE, width: 0.75 } });
   let ty = y + 0.14;
@@ -223,7 +233,9 @@ function table(s, x, y, cols, rows, opts = {}) {
       rx += c.w;
     });
   });
-  return y + th + rows.length * rh;
+  const bot = y + th + rows.length * rh;
+  s.__blocks = (s.__blocks || []).concat([{ x0: x, x1: cx, y1: bot, kind: "table" }]);
+  return bot;
 }
 
 // Section divider (does not count toward the 15-slide limit).
@@ -316,7 +328,9 @@ function statement(s, x, y, rows, opts = {}) {
         align: "right", valign: "middle" });
     });
   });
-  return y + 0.28 + rows.length * rh;
+  const sbot = y + 0.28 + rows.length * rh;
+  s.__blocks = (s.__blocks || []).concat([{ x0: x, x1: x + lw + n * cw, y1: sbot, kind: "statement" }]);
+  return sbot;
 }
 
 // Appendix page furniture: tag, title, takeaway, footer, page number.

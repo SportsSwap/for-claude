@@ -71,7 +71,7 @@ module.exports = function (pres, ctx) {
     series(s, C.M, cy + 3.22, "US$/t realised", [
       ["Bear", ...S.bear.price], ["Base", ...S.base.price], ["Bull", ...S.bull.price],
     ], { rowH: 0.27 });
-    para(s, C.M, cy + 4.32, 12.44, 0.80, null,
+    para(s, C.M, cy + 4.47, 12.44, 0.71, null,
       "Anchor points: FY26 actual realised US$1,488/t; June-2026 quarter US$2,107/t; spot SC6 about US$2,038-2,200/t in August 2026; the Australian Government forecast a 2026 average of US$2,236/t. Our base FY27 of US$1,700/t is below all of them.",
       { fill: C.MIST, line: C.RULE, size: 8.8 });
    }, "Source: team valuation model, Deck sheet. Anchors per PLS quarterly reports, Benchmark Mineral Intelligence, S&P Global Platts and the Australian Government Resources and Energy Quarterly, June 2026.");

@@ -26,7 +26,7 @@ module.exports = function (pres, ctx) {
       ["First ore", "Guided mid-2029", "Equivalent to FY30 on PLS's June year end. Our base case assumes 250kt in FY30 ramping to 885kt by FY33."],
       ["Underground option", "Under study", "An underground mining option is being assessed to further improve project economics."],
     ], { rowH: 0.38, size: 8.8, boldFirstCol: true });
-    para(s, C.M, cy + 4.10, 12.44, 1.06, "How we treat it, and why we do not simply take the A$2.6bn",
+    para(s, C.M, cy + 4.24, 12.44, 0.94, "How we treat it, and why we do not simply take the A$2.6bn",
       "The A$2.6bn is a pre-feasibility number from June 2024, struck before the price collapse and recovery. We do not add it to our " +
       "valuation. We model the production profile it implies inside the DCF, so it is exposed to our price deck and our cost " +
       "assumptions rather than the company's. In the risked sum-of-the-parts we carry P2000 at 70%: a study that is due but not " +
@@ -69,7 +69,7 @@ module.exports = function (pres, ctx) {
     stat(s, C.M + 3.15, cy, 2.90, "5 Jun 2026", "Officially opened", "Attended by the WA Premier and the then-Chair of the Australian Renewable Energy Agency.", { color: C.INK });
     stat(s, C.M + 6.30, cy, 2.90, "Sep-qtr 2026", "First production", "First spodumene calcination and lithium phosphate production. Inside our investment horizon.", { color: C.OCHRE });
     stat(s, C.M + 9.45, cy, 2.99, "A$0.21", "Risked value per share", "Our estimate at a 45% probability, held outside the target price.", { color: C.SPOD });
-    card(s, C.M, cy + 1.62, 6.10, 2.32, "What it actually does", [
+    card(s, C.M, cy + 1.62, 6.10, 2.32, "What it does", [
       "Calix electric-kiln technology replaces fossil-fired calcination with electric heat that can be renewably powered.",
       "The output is lithium phosphate, a mid-stream product, rather than raw concentrate.",
       "PLS captures conversion margin it currently cedes to third-party converters, most of them Chinese.",

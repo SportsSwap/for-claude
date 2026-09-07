@@ -75,8 +75,9 @@ module.exports = function (pres, ctx) {
       s.addText((p >= 0 ? "+" : "") + (p * 100).toFixed(0) + "%", { x: gx + i * cw, y: cy + 0.32, w: cw, h: rh,
         isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8.5, bold: true, color: C.WHITE, align: "center", valign: "middle" });
     });
-    s.addText("Unit cost", { x: C.M, y: cy + 0.32, w: 1.43, h: rh, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 8, bold: true, color: C.MUTE, align: "right", valign: "middle" });
+    s.addShape("rect", { x: C.M, y: cy + 0.32, w: 1.43, h: rh, fill: { color: C.INK } });
+    s.addText("Unit cost", { x: C.M + 0.08, y: cy + 0.32, w: 1.27, h: rh, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 8, bold: true, color: C.WHITE, align: "right", valign: "middle" });
     cf.forEach((c2, ri) => {
       const y = cy + 0.32 + (ri + 1) * rh;
       s.addShape("rect", { x: C.M, y, w: 1.43, h: rh, fill: { color: C.INK } });
@@ -98,7 +99,7 @@ module.exports = function (pres, ctx) {
       "So price is roughly four times as powerful as cost. Operational excellence cannot rescue this position from a sustained price relapse - which is why the risk register leads with price.",
       "Shaded cells sit below the current share price of A$5.48.",
     ], { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 8.8 });
-    para(s, C.M, cy + 2.36, 12.44, 1.72, "Where the break-even sits",
+    para(s, C.M, cy + 2.36, 12.44, 1.78, "Where the break-even sits",
       "PLS needs realised prices no worse than about 8% below our base case to justify today's share price at unchanged costs. Our base " +
       "case already sits 11% below spot-implied realisation and 19% below the June-2026 quarter exit rate. In other words the pitch does " +
       "not require the price to rise from here - it requires the price not to fall by roughly a fifth from a level we have already " +
@@ -157,14 +158,14 @@ module.exports = function (pres, ctx) {
       ["Jan 2024", "Livent", "Allkem", "US$10.6bn", "Merger of equals", "Created Arcadium, which Rio acquired 14 months later."],
       ["Oct 2025", "Ganfeng Lithium", "Leo Lithium (Goulamina 40%)", "US$343m", "Staged cash", "Plus a 1.5% gross revenue royalty for 20 years."],
     ], { rowH: 0.375, size: 8.4, boldFirstCol: true });
-    para(s, C.M, cy + 3.30, 6.10, 1.62, "Why we gave this method zero weight",
+    para(s, C.M, cy + 3.46, 6.10, 1.72, "Why we gave this method zero weight",
       "Two reasons, either of which would have made a stated multiple spurious. First, no broker-published EV/EBITDA or EV/resource " +
       "multiple for these deals was retrievable, and the targets' resource statements are on inconsistent bases - JORC against " +
       "exploration target, ore tonnes against lithium carbonate equivalent - so any multiple we built would be meaningless.\n\n" +
       "Second, applying a control premium to our own discounted cash flow and calling the result an independent method is circular. " +
       "It would inflate the football field using our own assumptions twice.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9 });
-    para(s, C.M + 6.34, cy + 3.30, 6.10, 1.62, "What the deals do tell us",
+    para(s, C.M + 6.34, cy + 3.46, 6.10, 1.72, "What the deals do tell us",
       "Lithium dealmaking fell about 89% in 2025 across just four transactions, then accelerated in early 2026 on recovering prices and " +
       "concern about future deficits. The Huayou acquisition of Atlantic Lithium in May 2026 was reported explicitly as price-rebound " +
       "driven.\n\n" +

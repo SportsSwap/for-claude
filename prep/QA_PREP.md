@@ -86,8 +86,8 @@ They read the appendix. Say so, and do not soften the number.
 **If they push on the specification:** we deliberately correlated the P2000 and Colina go-decisions
 with the price draw. Drawing them independently fails those projects in precisely the states where
 they are worth most, which destroys the real option value the whole growth case rests on. That
-correlation is worth about four percentage points on the headline probability, and we would rather
-be right about the mechanism than flattered by the number.
+correlation is worth about four percentage points on the headline probability. Getting the mechanism
+right matters more than the flattering number.
 
 **If they ask why you show it at all:** because a point estimate with no distribution behind it is
 not a valuation, it is an opinion with a decimal place. Appendix E16 has the full histogram, the

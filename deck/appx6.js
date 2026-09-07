@@ -48,8 +48,9 @@ module.exports = function (pres, ctx) {
         fontFace: C.B, fontSize: 9.8, bold: true, color: i === 4 ? C.OCHRE : C.INK, valign: "middle" });
       s.addText(st[1], { x: C.M + 2.85, y: y + 0.04, w: 9.40, h: 0.52, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 8.7, color: C.TXT, valign: "middle", lineSpacingMultiple: 1.05 });
+      s.__blocks = (s.__blocks || []).concat([{ x0: C.M, x1: C.M + 12.44, y1: y + 0.60, kind: "step rows" }]);
     });
-    para(s, C.M, cy + 3.46, 12.44, 1.74, "Why we included the fifth row",
+    para(s, C.M, cy + 4.10, 12.44, 1.10, "Why we included the fifth row",
       "A judge will ask whether ore sorting is really shared value or just good engineering. It is both, and " +
       "that the label does not change the cash flow. What it does change is how much weight the lever can carry: an advantage any " +
       "competitor can buy is worth having and not worth paying a premium for. That is why our level-one argument rests on the mid-stream " +
