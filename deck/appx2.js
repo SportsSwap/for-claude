@@ -99,7 +99,7 @@ module.exports = function (pres, ctx) {
       ["What we could not verify", "Whether any impairment or writedown has been taken on the investment. We searched and found none, but treat that as unconfirmed rather than as evidence of none"],
     ], { rowH: 0.42, size: 8.8, boldFirstCol: true, headH: 0.01,
          rowFill: [null,null,null,null,null,C.SPOD_L,C.OCHRE_L] });
-    para(s, C.M, cy + 3.20, 12.44, 1.30, "How we value it, and why the option to 30% matters more than the 18%",
+    para(s, C.M, cy + 3.20, 12.44, 1.98, "How we value it, and why the option to 30% matters more than the 18%",
       "We size the joint venture at 43,000 tonnes a year, an assumed A$4,200 per tonne conversion margin and an 18% share, giving about " +
       "A$32.5m of attributable EBITDA, capitalised at 8x for A$260m and risked at 70% - the lowest risking of the three downstream " +
       "levers, because both trains are built. That is A$0.06 per share, which is not why this asset matters.\n\n" +
@@ -149,7 +149,7 @@ module.exports = function (pres, ctx) {
       ["POSCO", "Long-term concentrate feedstock into the Gwangyang joint venture", "Linked to joint-venture requirements"],
       ["Yibin Tianyi", "An additional spodumene offtake was signed; tonnage not disclosed in our sources", "Not disclosed"],
     ], { rowH: 0.52, size: 8.5, boldFirstCol: true });
-    para(s, C.M, cy + 3.55, 6.10, 1.42, "What spot linkage did in FY26",
+    para(s, C.M, cy + 3.50, 6.10, 1.70, "What spot linkage did in FY26",
       "Realised prices moved from US$742/t in the September 2025 quarter to US$2,107/t in the June 2026 quarter, a factor of 2.8 inside " +
       "one financial year. A fixed-price book would have muted both the collapse and the recovery. PLS took the full force of each.\n\n" +
       "Grade normalisation is confirmed in the company's own reporting: it discloses both an actual-grade and an SC6-equivalent realised " +
@@ -182,7 +182,7 @@ module.exports = function (pres, ctx) {
       "The chair's Lynas background is directly relevant: rare earths is the one other Australian critical-minerals sector that has had " +
       "to argue provenance and processing to non-Chinese customers.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9 });
-    para(s, C.M + 6.34, cy + 3.02, 6.10, 1.62, "What we could not confirm",
+    para(s, C.M + 6.34, cy + 3.02, 6.10, 2.16, "What we could not confirm",
       "Multiple sources describe the board as six members - five independent non-executive directors plus the chief executive - but we " +
       "could positively identify only the five people listed. At least one director's identity could not be confirmed from the sources " +
       "available to us, and company websites were not reachable from our research environment.\n\n" +

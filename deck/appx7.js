@@ -35,8 +35,8 @@ module.exports = function (pres, ctx) {
       ["ESG Value Bridge, Downstream Option", "Shared-value levers converted to A$ per share; the downstream prize sized and risked", "The analytical contribution of this submission"],
       ["SOTP NAV, Trading Comps, Precedents, Football Field", "Cross-checks and the weighted target price", "So the DCF is not marking its own homework"],
       ["Sources", "Every input tagged A, G, M, D, E or C for provenance", "So a reviewer can audit any number back to where it came from"],
-    ], { rowH: 0.375, size: 8.4, boldFirstCol: true });
-    para(s, C.M, cy + 3.95, 12.44, 1.02, "Colour convention, and how to interrogate it",
+    ], { rowH: 0.35, size: 8.4, boldFirstCol: true });
+    para(s, C.M, cy + 3.96, 12.44, 1.26, "Colour convention, and how to interrogate it",
       "Blue text is a hardcoded input, black is a formula, green is a link to another sheet, and yellow fill marks the judgements a " +
       "reviewer should challenge first. To stress the model, change Assumptions!C7 to Bear or Bull and every statement, the DCF and the " +
       "target price repoint. To test a single judgement, the yellow cells are the ones that matter: beta, the resource-to-reserve " +
@@ -53,7 +53,7 @@ module.exports = function (pres, ctx) {
       { name: "Base", labels: YRS, values: S.base.price },
       { name: "Bull", labels: YRS, values: S.bull.price },
     ], {
-      x: C.M, y: cy, w: 7.60, h: 3.05, chartColors: [C.CRIMSON, C.SPOD, C.INK2], lineSize: 2.5, lineSmooth: false,
+      x: C.M, y: cy, w: 7.60, h: 3.05, chartColors: [C.S3, C.S2, C.S1], lineSize: 2.5, lineSmooth: false,
       showTitle: true, title: "Realised price by scenario (US$/t, actual grade)",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
       catAxisLabelFontFace: C.B, catAxisLabelFontSize: 8, catAxisLabelColor: C.MUTE,
@@ -83,22 +83,24 @@ module.exports = function (pres, ctx) {
     let y = cy;
     [["base", "BASE CASE", C.SPOD], ["bear", "BEAR CASE", C.CRIMSON], ["bull", "BULL CASE", C.INK2]].forEach((sc) => {
       s.addText(sc[1], { x: C.M, y, w: 3.0, h: 0.24, isTextBox: true, margin: 0,
-        fontFace: C.B, fontSize: 9.5, bold: true, color: sc[2], valign: "middle" });
-      y += 0.26;
+        fontFace: C.B, fontSize: 9.5, bold: true, color: sc[2], valign: "top" });
+      y += 0.21;
       y = series(s, C.M, y, "kt of concentrate", [
         ["Pilgan plant", ...S[sc[0]].assets.pilgan],
         ["Ngungaju plant", ...S[sc[0]].assets.ngungaju],
         ["P2000 increment", ...S[sc[0]].assets.p2000],
         ["Colina, Brazil", ...S[sc[0]].assets.colina],
         [{ t: "Total", b: true }, ...S[sc[0]].prod.map((v) => ({ t: n0(v), b: true }))],
-      ], { rowH: 0.245, size: 8 }) + 0.16;
+      ], { rowH: 0.20, headH: 0.24, size: 8 }) + 0.09;
     });
-    para(s, C.M, y, 12.44, 1.02, "The assumptions that matter",
-      "Pilgan nameplate is about 1.0Mtpa after P1000; it produced 879.5kt in FY26 with Ngungaju idle. Ngungaju is about 200ktpa and " +
-      "restarted in July 2026. P2000 lifts total Pilgangoora capacity above 2.0Mtpa, with first ore guided mid-2029, so we show it as " +
-      "the increment over the two existing plants. Colina first production in FY32 is our assumption, not a company target - PLS has " +
-      "not adopted Latin Resources' original 2026 plan.",
-      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9 });
+    s.addText([
+      { text: "Where these numbers come from.  ", options: { bold: true, color: C.INK } },
+      { text: "Pilgan nameplate is about 1.0Mtpa after P1000; it produced 879.5kt in FY26 with Ngungaju idle. Ngungaju is about " +
+        "200ktpa and restarted in July 2026. P2000 lifts Pilgangoora capacity above 2.0Mtpa, first ore guided mid-2029, so we show it as " +
+        "the increment over the two existing plants. Colina first production in FY32 is our assumption, not a company target - PLS has " +
+        "not adopted Latin Resources' original 2026 plan.", options: { color: C.TXT } },
+    ], { x: C.M, y: y + 0.04, w: 12.44, h: 0.52, isTextBox: true, margin: 0,
+         fontFace: C.B, fontSize: 8.2, valign: "top", lineSpacingMultiple: 1.06 });
    }, "Sources: PLS FY27 guidance of 1,030-1,100kt; P2000 pre-feasibility study; Ngungaju restart announcement; team valuation model, Deck sheet.");
 
   // ---------------- E4 cost and capex
@@ -107,21 +109,21 @@ module.exports = function (pres, ctx) {
    (s, cy) => {
     let y = cy;
     s.addText("UNIT OPERATING COST, FOB (A$/t)", { x: C.M, y, w: 5.0, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.26;
+      fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.22;
     y = series(s, C.M, y, "A$/t", [
       ["Bear", ...S.bear.cost], [{ t: "Base", b: true }, ...S.base.cost.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.cost],
-    ], { rowH: 0.25 }) + 0.16;
+    ], { rowH: 0.22, headH: 0.26 }) + 0.12;
     s.addText("CAPITAL EXPENDITURE (A$m)", { x: C.M, y, w: 5.0, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.26;
+      fontFace: C.B, fontSize: 9.5, bold: true, color: C.INK, valign: "middle" }); y += 0.22;
     y = series(s, C.M, y, "A$m", [
       ["Bear", ...S.bear.capex], [{ t: "Base", b: true }, ...S.base.capex.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.capex],
-    ], { rowH: 0.25 }) + 0.16;
+    ], { rowH: 0.22, headH: 0.26 }) + 0.12;
     s.addText("EBITDA, MODEL OUTPUT (A$m)", { x: C.M, y, w: 5.0, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 9.5, bold: true, color: C.SPOD, valign: "middle" }); y += 0.26;
+      fontFace: C.B, fontSize: 9.5, bold: true, color: C.SPOD, valign: "middle" }); y += 0.22;
     y = series(s, C.M, y, "A$m", [
       ["Bear", ...S.bear.ebitda.map(n0)], [{ t: "Base", b: true }, ...S.base.ebitda.map((v) => ({ t: n0(v), b: true }))], ["Bull", ...S.bull.ebitda.map(n0)],
-    ], { rowH: 0.25 }) + 0.16;
-    para(s, C.M, y, 12.44, 0.76, "Reading the cost rows",
+    ], { rowH: 0.22, headH: 0.26 }) + 0.12;
+    para(s, C.M, y, 12.44, 1.36, "Reading the cost rows",
       "FY26 actual was A$569/t against FY27 guidance of A$575-625/t, the step-up attributed to higher-cost Ngungaju tonnes. Base case " +
       "uses the A$600/t midpoint, falling to A$565/t as P2000 volume dilutes fixed costs. Bear costs rise to A$655/t then fall back to " +
       "A$610/t: a miner facing a sustained trough cuts, and letting bear costs drift up forever would have made that case artificially severe.",

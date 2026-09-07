@@ -79,11 +79,11 @@ module.exports = function (pres, ctx) {
   pgC("Peer positioning: lithium exposure against balance-sheet capacity",
       "The two things that decide who gets to act counter-cyclically. PLS is the only one of the six with both.",
    (s, cy) => {
-    const bx = C.M, by = cy, bw = 7.40, bh = 4.10;
+    const bx = C.M, by = cy, bw = 7.40, bh = 5.14;
     s.addShape("rect", { x: bx, y: by, w: bw, h: bh, fill: { color: C.MIST2 }, line: { color: C.RULE, width: 0.75 } });
     s.addText("Lithium exposure  →", { x: bx + 0.55, y: by + bh - 0.30, w: 6.4, h: 0.26, isTextBox: true, margin: 0,
       fontFace: C.B, fontSize: 9, bold: true, color: C.MUTE, align: "center", valign: "middle" });
-    s.addText("Balance-sheet capacity  →", { x: bx - 1.55, y: by + bh / 2 - 0.15, w: 3.0, h: 0.26, isTextBox: true, margin: 0,
+    s.addText("Balance-sheet capacity  →", { x: bx - 1.40, y: by + bh / 2 - 0.15, w: 3.0, h: 0.26, isTextBox: true, margin: 0,
       fontFace: C.B, fontSize: 9, bold: true, color: C.MUTE, align: "center", valign: "middle", rotate: 270 });
     const pts = [
       ["BHP", 0.05, 0.95, C.FAINT], ["Rio Tinto", 0.30, 0.80, C.FAINT],
@@ -99,7 +99,7 @@ module.exports = function (pres, ctx) {
         fontFace: C.B, fontSize: isPLS ? 9.5 : 8.5, bold: isPLS, color: isPLS ? C.SPOD : C.MUTE,
         align: "center", valign: "middle" });
     });
-    card(s, C.M + 7.62, cy, 4.82, 4.10, "Reading the chart", [
+    card(s, C.M + 7.62, cy, 4.82, 5.14, "Reading the chart", [
       "Vertical axis is capacity to act: net cash or low gearing, and the ability to fund growth through a trough.",
       "Horizontal axis is how much of the business is actually lithium.",
       "BHP, Rio Tinto, Fortescue and South32 have the balance sheet but not the exposure. A lithium recovery barely moves their earnings.",

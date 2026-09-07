@@ -49,7 +49,7 @@ module.exports = function (pres, ctx) {
       s.addText(st[1], { x: C.M + 2.85, y: y + 0.04, w: 9.40, h: 0.52, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 8.7, color: C.TXT, valign: "middle", lineSpacingMultiple: 1.05 });
     });
-    para(s, C.M, cy + 4.14, 12.44, 1.00, "Why we included the fifth row",
+    para(s, C.M, cy + 3.46, 12.44, 1.74, "Why we included the fifth row",
       "A judge will ask whether ore sorting is really shared value or just good engineering. The honest answer is that it is both, and " +
       "that the label does not change the cash flow. What it does change is how much weight the lever can carry: an advantage any " +
       "competitor can buy is worth having and not worth paying a premium for. That is why our level-one argument rests on the mid-stream " +
@@ -69,7 +69,7 @@ module.exports = function (pres, ctx) {
       ["Comparison with brine", "South American brine operations consume large volumes in evaporation ponds in water-stressed basins, and have generated sustained community conflict. Hard rock does not carry that exposure"],
     ], { rowH: 0.44, size: 8.8, boldFirstCol: true, headH: 0.01,
          rowFill: [null,null,C.OCHRE_L,C.CRIM_L,C.CRIM_L,C.SPOD_L] });
-    para(s, C.M, cy + 2.78, 6.10, 1.72, "The honest framing",
+    para(s, C.M, cy + 2.78, 6.10, 2.40, "The honest framing",
       "Using saline, non-potable groundwater rather than competing for community fresh water is an avoided-conflict advantage " +
       "for a Pilbara hard-rock miner. But it is largely a geological given, not a distinctive strategic decision by PLS.\n\n" +
       "We therefore describe it as a risk PLS does not have rather than an advantage PLS created. Framing a favourable accident of " +
@@ -201,14 +201,14 @@ module.exports = function (pres, ctx) {
       ["CDP", { t: "Not retrieved", c: C.MUTE }, "Not accessible from our environment"],
       ["Controversies and fines", { t: "None found", c: C.OCHRE }, "No environmental prosecutions, EPA breaches or material ESG litigation surfaced in our searches"],
     ], { rowH: 0.40, size: 8.8, boldFirstCol: true });
-    para(s, C.M, cy + 2.30, 6.10, 2.10, "Why this is less damaging than it looks",
+    para(s, C.M, cy + 2.50, 6.10, 2.56, "Why this is less damaging than it looks",
       "The case explicitly asks entrants to go beneath a company's ESG rank and reporting. A rating is a third party's weighted average " +
       "of disclosure quality; it is not evidence about whether ESG is wired into strategy.\n\n" +
       "Everything material in our assessment came from operating facts: a sorter that reduces milled tonnes, a kiln that removes " +
       "calcination emissions, a target expressed as a decade, an offsets scheme found underfunded. None of those needed a rating, and a " +
       "rating would not have revealed any of them.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.2 });
-    para(s, C.M + 6.34, cy + 2.30, 6.10, 2.10, "But we are not pretending it is costless",
+    para(s, C.M + 6.34, cy + 2.50, 6.10, 2.56, "But we are not pretending it is costless",
       "Two things we lost. First, we cannot benchmark PLS against BHP, Rio Tinto, Fortescue, South32 and Mineral Resources on a common " +
       "external scale, so our comparative judgement rests on our own reading of each company's disclosure rather than on a third party's.\n\n" +
       "Second, ratings do move flows. Index inclusion and ESG-mandated funds respond to them, so a rating change is a real, if crude, " +

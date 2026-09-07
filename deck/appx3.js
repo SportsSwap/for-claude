@@ -50,10 +50,10 @@ module.exports = function (pres, ctx) {
       labels: ["FY24A","FY25A","Q1 FY26","Q2 FY26","FY26 avg","Q4 FY26","FY27F","FY28F","FY29F","FY30F"],
       values: [1116, 688, 742, 1161, 1488, 2107, 1700, 1780, 1850, 1800],
     }], {
-      x: C.M, y: cy, w: 7.55, h: 3.05, chartColors: [C.SPOD], lineSize: 3, lineSmooth: false,
+      x: C.M, y: cy, w: 7.55, h: 3.62, chartColors: [C.S2], lineSize: 2.25, lineSmooth: false,
       showTitle: true, title: "PLS realised price: reported, then our base case (US$/t)",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
-      showValue: true, dataLabelPosition: "t", dataLabelFontSize: 8, dataLabelFontFace: C.B,
+      showValue: true, dataLabelPosition: "t", dataLabelFontSize: 7.5, dataLabelFontFace: C.B,
       dataLabelColor: C.MUTE, dataLabelFormatCode: "#,##0",
       catAxisLabelFontFace: C.B, catAxisLabelFontSize: 8, catAxisLabelColor: C.MUTE,
       valAxisLabelFontFace: C.B, valAxisLabelFontSize: 8.5, valAxisLabelColor: C.MUTE,
@@ -69,8 +69,8 @@ module.exports = function (pres, ctx) {
       ["Lithium carbonate, 12-Aug-26", "US$18,310/t"],
       ["Lithium carbonate, China, 4-Sep-26", "CNY 152,000/t"],
       ["Australian Government REQ 2026 forecast", "US$2,236/t"],
-    ], { rowH: 0.33, size: 8.5, boldFirstCol: true });
-    para(s, C.M, cy + 3.22, 12.44, 1.30, "Two things this chart is designed to make obvious",
+    ], { rowH: 0.40, size: 8.5, boldFirstCol: true });
+    para(s, C.M, cy + 3.78, 12.44, 1.40, "Two things this chart is designed to make obvious",
       "First, the June-2026 quarter print of US$2,107/t is above every year in our forecast. Our base case does not assume the recovery " +
       "continues; it assumes prices settle roughly a fifth below the exit rate and stay there. Second, the Australian Government's own " +
       "Resources and Energy Quarterly forecast a 2026 spodumene average of US$2,236/t - materially above the US$1,700/t we use for FY27. " +

@@ -1,5 +1,5 @@
 // Slides 12-15: valuation, risks, recommendation.
-const { C, bg, nav, head, foot, stat, card, para, table, divider } = require('./lib.js');
+const { C, bg, nav, head, foot, subhead, stat, card, para, table, divider } = require('./lib.js');
 const F = require('./model_facts.json');
 const d2 = (x)=>"A$"+x.toFixed(2);
 const pc = (x,d=1)=>(x*100).toFixed(d)+"%";
@@ -77,83 +77,112 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 13. RANGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
-    s.addNotes("60 seconds. Lead with the bear case, not the base case. It builds credibility.\n\n\"Our bear case is two dollars thirty. That assumes prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade, all at once. Even then it is 20% above the one ninety-one the market actually printed in the last trough, when PLS had a billion less cash and was loss-making.\"\n\nThen admit the weakness: reward to risk is 1.09x. Say it plainly. \"This is not a lopsided bet and we will not present it as one. What justifies the position is the expected return against the mandate.\"\n\nClose on the grid: we need prices not to FALL by a fifth. We do not need them to rise.");
     const cy = head(s, "The range, and what has to be true",
-      "Base A$6.53, bear A$2.30, bull A$8.96. The bear sits 20% above the price the market actually paid at the bottom of the last cycle.");
-    // football field
-    const fx = C.M, fy = cy + 0.06, fw = 7.40, fh = 2.70;
-    s.addShape("rect", { x: fx, y: fy, w: fw, h: fh, fill: { color: C.MIST2 }, line: { color: C.RULE, width: 0.75 } });
-    s.addText("Valuation range by method (A$ per share)", { x: fx + 0.18, y: fy + 0.10, w: 5.5, h: 0.28,
-      isTextBox: true, margin: 0, fontFace: C.B, fontSize: 11, bold: true, color: C.INK, valign: "middle" });
-    const lo = 1.5, hi = 9.5, plotX = fx + 2.62, plotW = 4.50;
-    const sx = (v) => plotX + (v - lo) / (hi - lo) * plotW;
-    const bars = [
-      ["DCF, base case", 6.50, 6.50, C.SPOD, "60%"],
-      ["DCF, bear to bull", 2.26, 8.93, C.INK2, "-"],
-      ["Trading comparables", 4.76, 6.37, C.INK2, "40%"],
-      ["Broker targets", 2.50, 6.83, C.FAINT, "-"],
-      ["52-week traded range", 1.91, 6.81, C.FAINT, "-"],
+      "Base A$6.53, bear A$2.30, bull A$8.96. Our own Monte Carlo puts the odds of being right at 47%, so we build the position rather than take it in one.");
+
+    // --- football field, laid out like a research-desk valuation summary
+    const fx = C.M, fy = cy + 0.02;
+    const LOW = 1.2, HIGH = 12.2;
+    const colM = 2.55, colBar = 4.95, colW = 0.72, colP = 0.78, colC = 3.36;
+    const bx0 = fx + colM, sx = (v) => bx0 + (v - LOW) / (HIGH - LOW) * colBar;
+    let hy = fy;
+    [["Methodology", fx, colM, "left"], ["", bx0, colBar, "left"],
+     ["Weight", fx + colM + colBar, colW, "center"], ["Value", fx + colM + colBar + colW, colP, "right"],
+     ["Basis", fx + colM + colBar + colW + colP + 0.14, colC, "left"]].forEach((h) => {
+      s.addText(h[0], { x: h[1], y: hy, w: h[2], h: 0.26, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 9, bold: true, color: C.INK, align: h[3], valign: "middle" });
+    });
+    s.addShape("rect", { x: fx, y: hy + 0.26, w: 12.44, h: 0.018, fill: { color: C.INK } });
+    hy += 0.36;
+    const METH = [
+      ["DCF, base case",          F.vps_base, F.vps_base, "60%", C.S2,
+       "WACC 8.88% from the case's prescribed inputs; terminal value an annuity over remaining ore"],
+      ["DCF, bear to bull",       F.vps_bear, F.vps_bull, "-",   C.S1,
+       "Every bad outcome at once against every good one. Shown to frame asymmetry"],
+      ["Monte Carlo, P25 to P75", 3.13,       7.65,       "-",   C.S4,
+       "20,000 trials randomising price, cost, WACC, reserve conversion and both growth decisions"],
+      ["Trading comparables",     F.comps_lo, F.comps_hi, "40%", C.S2,
+       "8.0x to 11.0x FY27E EBITDA against a diversified peer median near 7.8x"],
+      ["Precedent transactions",  F.vps_base, 8.27,       "-",   C.MUTE,
+       "Reference only: we found no consistent transaction multiple"],
+      ["Broker targets",          2.50,       6.83,       "-",   C.MUTE,
+       "Full individual spread across 17-20 analysts. Our target sits inside it"],
+      ["52-week traded range",    1.91,       6.81,       "-",   C.FAINT,
+       "Where the market has paid"],
     ];
-    bars.forEach((b, i) => {
-      const y = fy + 0.52 + i * 0.40;
-      s.addText(b[0], { x: fx + 0.18, y, w: 2.36, h: 0.30, isTextBox: true, margin: 0,
-        fontFace: C.B, fontSize: 8.6, color: C.TXT, valign: "middle" });
-      const pt = b[1] === b[2];
-      const w = pt ? 0.09 : sx(b[2]) - sx(b[1]);
-      s.addShape("rect", { x: sx(b[1]) - (pt ? 0.045 : 0), y: y + 0.06, w, h: 0.19, fill: { color: b[3] } });
-      s.addText(pt ? b[1].toFixed(2) : b[1].toFixed(2) + " - " + b[2].toFixed(2),
-        { x: sx(b[2]) + (pt ? 0.16 : 0.06), y, w: 1.30, h: 0.30, isTextBox: true, margin: 0,
-          fontFace: C.B, fontSize: 8, color: C.MUTE, valign: "middle" });
-      s.addText(b[4], { x: fx + fw - 0.52, y, w: 0.40, h: 0.30, isTextBox: true, margin: 0,
-        fontFace: C.B, fontSize: 8, bold: true, color: C.MUTE, align: "right", valign: "middle" });
+    const barTop = hy + 0.04, barBot = hy + METH.length * 0.42 - 0.06;
+    const MARKS = [[5.48, "Last close 5.48", C.CRIMSON, -1.26], [F.target, "Target " + F.target.toFixed(2), C.INK, 0.05]];
+    // drawn before the rows so the value labels paint over them, not the other way round
+    MARKS.forEach((mk) => s.addShape("rect", { x: sx(mk[0]) - 0.008, y: barTop, w: 0.016,
+      h: barBot - barTop, fill: { color: mk[2] } }));
+    METH.forEach((m, i) => {
+      const y = hy + i * 0.42;
+      if (i % 2 === 1) s.addShape("rect", { x: fx, y: y - 0.02, w: 12.44, h: 0.40, fill: { color: C.MIST2 } });
+      s.addText(m[0], { x: fx, y, w: colM - 0.10, h: 0.36, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 8.8, bold: true, color: C.TXT, valign: "middle" });
+      const pt = m[1] === m[2];
+      const w  = pt ? 0.10 : Math.max(0.10, sx(m[2]) - sx(m[1]));
+      s.addShape("roundRect", { x: sx(m[1]) - (pt ? 0.05 : 0), y: y + 0.09, w, h: 0.18,
+        rectRadius: 0.04, fill: { color: m[4] } });
+      let lx = sx(m[1]) - 0.60;
+      MARKS.forEach((mk) => {                       // keep the value clear of the reference lines
+        const mx = sx(mk[0]);
+        if (mx > lx - 0.04 && mx < lx + 0.57) lx = mx - 0.62;
+      });
+      s.addText(m[1].toFixed(2), { x: lx, y, w: 0.53, h: 0.36, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 7.4, color: C.MUTE, align: "right", valign: "middle" });
+      if (!pt) s.addText(m[2].toFixed(2), { x: sx(m[2]) + 0.05, y, w: 0.53, h: 0.36, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 7.4, color: C.MUTE, align: "left", valign: "middle" });
+      s.addText(m[3], { x: fx + colM + colBar, y, w: colW, h: 0.36, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 8.6, bold: m[3] !== "-", color: m[3] === "-" ? C.FAINT : C.INK,
+        align: "center", valign: "middle" });
+      s.addText(pt ? d2(m[1]) : d2((m[1] + m[2]) / 2), { x: fx + colM + colBar + colW, y, w: colP, h: 0.36,
+        isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8.8, bold: true, color: C.INK,
+        align: "right", valign: "middle" });
+      s.addText(m[5], { x: fx + colM + colBar + colW + colP + 0.14, y, w: colC, h: 0.36, isTextBox: true,
+        margin: 0, fontFace: C.B, fontSize: 7.3, color: C.MUTE, valign: "middle", lineSpacingMultiple: 1.0 });
     });
-    // last close and target markers
-    [[5.48, "Last close", C.CRIMSON], [6.14, "Target", C.INK]].forEach((m, i) => {
-      s.addShape("rect", { x: sx(m[0]) - 0.01, y: fy + 0.48, w: 0.022, h: 2.02, fill: { color: m[2] } });
-      s.addText(m[1] + "  " + m[0].toFixed(2), { x: sx(m[0]) - 0.72 + i * 1.44, y: fy + 2.44, w: 1.44, h: 0.22,
-        isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8, bold: true, color: m[2], align: "center", valign: "middle" });
+    MARKS.forEach((mk) => {
+      s.addText(mk[1], { x: sx(mk[0]) + mk[3], y: barBot + 0.01, w: 1.22, h: 0.22, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 7.8, bold: true, color: mk[2], align: mk[3] < 0 ? "right" : "left", valign: "middle" });
     });
 
-    card(s, C.M + 7.62, cy + 0.06, 4.82, 1.52, "What the bear case actually assumes", [
-      "Prices revert to marginal cost, P2000 is never sanctioned, Colina never proceeds and volumes stay flat for a decade - all at once.",
-      "Even then A$2.30 is 20% above the A$1.91 printed in the last trough, when PLS held A$974m of cash and was loss-making rather than A$2.29bn and earning A$526m.",
-    ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.8 });
-    card(s, C.M + 7.62, cy + 1.66, 4.82, 1.10, "And the honest weakness", [
-      "Reward to risk is 1.09x: +64% to bull against -58% to bear. Not a lopsided bet, and we will not present it as one.",
-      "What justifies the position is the expected return against the mandate, not the shape of the distribution.",
-    ], { fill: C.MIST2, line: C.RULE, titleColor: C.INK, size: 8.8 });
-
-    // sensitivity grid
-    const gy = cy + 2.92;
-    s.addText("Base-case value per share against realised price and unit cost (A$)", { x: C.M, y: gy, w: 7.0, h: 0.26,
-      isTextBox: true, margin: 0, fontFace: C.B, fontSize: 10, bold: true, color: C.INK, valign: "middle" });
-    const pcols = ["-20%","-10%","Base","+10%","+20%"];
-    const crows = ["-10%","-5%","Base","+5%","+10%"];
-    // generated from the model's own price and cost coefficients, so it cannot drift from the workbook
-    const pf = [-0.20,-0.10,0,0.10,0.20], cf = [-0.10,-0.05,0,0.05,0.10], SH = 3220;
-    const grid = cf.map((c3) => pf.map((p3) => F.vps_base + (F.k_price*p3 - F.k_cost*c3)/SH));
-    const gx = C.M + 1.15, cw = 0.92, rh = 0.27;
-    pcols.forEach((h,i)=>{ s.addShape("rect",{x:gx+i*cw,y:gy+0.30,w:cw,h:rh,fill:{color:C.INK}});
-      s.addText(h,{x:gx+i*cw,y:gy+0.30,w:cw,h:rh,isTextBox:true,margin:0,fontFace:C.B,fontSize:8,bold:true,color:C.WHITE,align:"center",valign:"middle"}); });
-    s.addText("Unit cost", { x: C.M, y: gy + 0.30, w: 1.13, h: rh, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 7.5, bold: true, color: C.MUTE, align: "right", valign: "middle" });
-    crows.forEach((r,ri)=>{
-      const y = gy + 0.30 + (ri+1)*rh;
-      s.addShape("rect",{x:C.M,y,w:1.13,h:rh,fill:{color:C.INK}});
-      s.addText(r,{x:C.M,y,w:1.13,h:rh,isTextBox:true,margin:0,fontFace:C.B,fontSize:8,bold:true,color:C.WHITE,align:"center",valign:"middle"});
-      grid[ri].forEach((v,ci)=>{
-        const on = (ri===2&&ci===2);
-        s.addShape("rect",{x:gx+ci*cw,y,w:cw,h:rh,fill:{color:on?C.SPOD_L:(v>5.48?C.MIST2:C.CRIM_L)},line:{color:C.RULE,width:0.5}});
-        s.addText(v.toFixed(2),{x:gx+ci*cw,y,w:cw,h:rh,isTextBox:true,margin:0,fontFace:C.B,fontSize:8.2,
-          bold:on,color:on?C.SPOD:(v>5.48?C.TXT:C.CRIMSON),align:"center",valign:"middle"});
+    // --- sensitivity grid and the two things a reader should take from it
+    const gy = hy + METH.length * 0.42 + 0.22;
+    subhead(s, C.M, gy, 6.35, "Base-case value per share against realised price and unit cost (A$)", { size: 10 });
+    const pf = [-0.20, -0.10, 0, 0.10, 0.20], cf = [-0.10, -0.05, 0, 0.05, 0.10], SH = 3220;
+    const gx = C.M + 1.10, cw = 1.05, rh = 0.205;
+    pf.forEach((p3, i) => {
+      s.addShape("rect", { x: gx + i * cw, y: gy + 0.44, w: cw, h: rh, fill: { color: C.INK } });
+      s.addText((p3 >= 0 ? "+" : "") + (p3 * 100).toFixed(0) + "%", { x: gx + i * cw, y: gy + 0.44, w: cw, h: rh,
+        isTextBox: true, margin: 0, fontFace: C.B, fontSize: 7.8, bold: true, color: C.WHITE, align: "center", valign: "middle" });
+    });
+    s.addText("Unit cost", { x: C.M, y: gy + 0.44, w: 1.08, h: rh, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 7.4, bold: true, color: C.MUTE, align: "right", valign: "middle" });
+    cf.forEach((c3, ri) => {
+      const y = gy + 0.44 + (ri + 1) * rh;
+      s.addShape("rect", { x: C.M, y, w: 1.08, h: rh, fill: { color: C.INK } });
+      s.addText((c3 >= 0 ? "+" : "") + (c3 * 100).toFixed(0) + "%", { x: C.M, y, w: 1.08, h: rh, isTextBox: true,
+        margin: 0, fontFace: C.B, fontSize: 7.8, bold: true, color: C.WHITE, align: "center", valign: "middle" });
+      pf.forEach((p3, ci) => {
+        const v = F.vps_base + (F.k_price * p3 - F.k_cost * c3) / SH;
+        const on = ri === 2 && ci === 2;
+        s.addShape("rect", { x: gx + ci * cw, y, w: cw, h: rh,
+          fill: { color: on ? C.SPOD_L : (v > 5.48 ? C.MIST2 : C.CRIM_L) }, line: { color: C.RULE, width: 0.5 } });
+        s.addText(v.toFixed(2), { x: gx + ci * cw, y, w: cw, h: rh, isTextBox: true, margin: 0,
+          fontFace: C.B, fontSize: 8, bold: on, color: on ? C.SPOD : (v > 5.48 ? C.TXT : C.CRIMSON),
+          align: "center", valign: "middle" });
       });
     });
-    para(s, C.M + 6.20, gy + 0.30, 6.24, 1.62, "What has to be true",
-      "Read across the top for the commodity call and down the side for operational delivery. Shaded cells are below the current price.\n\n" +
-      "PLS needs realised prices no worse than about 8% below our base case to justify today's price. Our base case is already 11% below " +
-      "spot-implied realisation and 19% below the June-2026 quarter. The pitch does not need the price to rise. It needs the price not to fall by a fifth.",
-      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9 });
-    foot(s, "Source: team valuation model, Football Field and Sensitivity sheets. Broker target range is the full individual analyst spread across 17-20 analysts; vendor averages cluster A$4.50-5.70. Our A$6.14 sits inside the individual range and below the most bullish.", P());
+    para(s, C.M + 6.60, gy, 5.84, 1.72, "What has to be true, and where it breaks",
+      "Read across for the commodity call and down for operational delivery. Shaded cells sit below today's price. " +
+      "PLS needs realised prices no worse than about 8% below our base case to justify A$5.48, and that base case is " +
+      "already 11% below spot-implied realisation.\n\n" +
+      "Against that: reward to risk is 1.09x, and 20,000 trials put the probability of intrinsic value beating " +
+      "today's price at 46.6%. Expected value clears the hurdle on a median that does not, so we build the " +
+      "position over several prints rather than take it in one.",
+      { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 8.8 });
+    foot(s, "Source: team valuation model, Football Field and Sensitivity sheets; Monte Carlo per appendix E16. Broker range is the full individual analyst spread; vendor averages cluster A$4.50-5.70.", P());
   }
 
   // ---------------------------------------------------------------- 14. RISKS
@@ -241,7 +270,5 @@ module.exports = function (pres, ctx) {
       { x: C.M, y: 6.30, w: 12.44, h: 0.52, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 9.5, italic: true, color: "8FA8BE", valign: "top", lineSpacingMultiple: 1.1 });
     foot(s, "", P());
-    s.addText(String(ctx.p), { x: 12.35, y: 7.02, w: 0.55, h: 0.30, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 8.5, color: "5F7183", align: "right", valign: "middle" });
   }
 };

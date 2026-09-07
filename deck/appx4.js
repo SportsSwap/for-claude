@@ -78,7 +78,7 @@ module.exports = function (pres, ctx) {
       labels: ["Battery storage 2025", "Battery storage 2026e"],
       values: [23, 31],
     }], {
-      x: C.M, y: cy, w: 5.30, h: 2.60, chartColors: [C.INK2, C.SPOD], varyColors: true, barGapWidthPct: 60,
+      x: C.M, y: cy, w: 5.30, h: 2.60, chartColors: [C.S1, C.S2], varyColors: true, barGapWidthPct: 60,
       showTitle: true, title: "Storage share of total lithium demand (%)",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
       showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 11, dataLabelFontFace: C.B,

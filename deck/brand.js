@@ -17,6 +17,15 @@ module.exports = {
   CRIMSON:"A3282C",   // negative
   CRIM_L: "F7E2E2",
   GOLD:   "C99A2E",
+  // chart series - validated with the dataviz palette checker, light mode:
+  //   lightness band PASS, chroma floor PASS, CVD separation PASS (worst 11.8),
+  //   normal-vision floor PASS (worst 21.2), contrast vs surface PASS.
+  //   Assigned in fixed order, never cycled. Grey is reserved for "other", not a series.
+  S1:     "1D6FD9",   // blue
+  S2:     "10A07E",   // spodumene green
+  S3:     "C2710B",   // ochre
+  S4:     "9C2BAD",   // violet
+  SEQ:    ["CFE0F7","9DC0EE","6BA0E4","3980DA","1D6FD9","174F9B"],  // sequential, one hue
   // text
   TXT:    "1B2733",
   MUTE:   "5F7183",

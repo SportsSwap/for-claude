@@ -1556,10 +1556,97 @@ for t in [
 ]:
     so.cell(r,2,t).font = F(8, False, GREY, True); r += 1
 
+
+# ==================================================================
+# MONTE CARLO  (results imported from the committed simulation script)
+# ==================================================================
+import json as _json
+_mcp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "deck", "montecarlo.json")
+if os.path.exists(_mcp):
+    MC = _json.load(open(_mcp))
+    mc = newsheet("Monte Carlo", widths={"B": 34, "C": 20, "D": 16, "E": 62}, freeze="B6")
+    title(mc, "Monte Carlo simulation",
+          "20,000 trials over the same FCFF mechanics as the Scenario Engine sheet")
+    r = 6
+    mc.cell(r, 2, "These results are produced by model/monte_carlo.py, which is committed alongside this workbook. "
+                  "They are imported values, not live formulas.").font = F(9, True, RED)
+    r += 1
+    mc.cell(r, 2, f"Seed {MC['seed']}, {MC['trials']:,} trials. Re-running the script with the same seed reproduces "
+                  "every figure on this sheet exactly.").font = F(8, False, GREY, True)
+    r += 2
+
+    r = section(mc, r, "What is randomised, and how", span=0)
+    for h, c in [("Input", 2), ("Distribution", 3), ("Spread", 4), ("Why it is drawn that way", 5)]:
+        cc = mc.cell(r, c, h); cc.font = F(9, True, WHITE); cc.fill = fill(NAVY)
+    r += 1
+    for row in [
+        ("Price level",        "Lognormal", "28%",  "A commodity price forecast is wrong by a multiple, and the error persists across years"),
+        ("Annual price noise", "Normal",    "10%",  "Year-to-year variation around that level"),
+        ("Unit cost",          "Normal",    "7%",   "Disclosed and guided within an A$50/t band"),
+        ("P2000 proceeds",     "Bernoulli", "70%",  "Conditioned on the price draw, not independent of it"),
+        ("Colina proceeds",    "Bernoulli", "40%",  "Same treatment, lower unconditional rate, only reachable after P2000"),
+        ("WACC",               "Normal",    "60bp", "The CAPM inputs are prescribed by the case; the gearing weight is not"),
+        ("Reserve conversion", "Normal",    "8pp",  "Sets the life of the terminal annuity"),
+    ]:
+        for i, v in enumerate(row):
+            mc.cell(r, 2 + i, v).font = F(9, i == 0)
+        r += 1
+    r += 1
+
+    r = section(mc, r, "Distribution of intrinsic value per share", span=0)
+    for h, c in [("Statistic", 2), ("A$/share", 3), ("vs last close", 4)]:
+        cc = mc.cell(r, c, h); cc.font = F(9, True, WHITE); cc.fill = fill(NAVY)
+    r += 1
+    lastclose_r = r
+    for k, key, bold in [("Mean", "mean", True), ("Median", "median", True), ("Standard deviation", "stdev", False),
+                         ("P5", "p5", False), ("P10", "p10", False), ("P25", "p25", False),
+                         ("P75", "p75", False), ("P90", "p90", False), ("P95", "p95", False)]:
+        mc.cell(r, 2, k).font = F(9, bold)
+        c = mc.cell(r, 3, round(MC[key], 2)); c.number_format = CUR2; c.font = F(9, bold, BLUE_IN)
+        if key != "stdev":     # live formula so the reader can repoint the reference price
+            f = mc.cell(r, 4, f"=C{r}/Assumptions!$C$11-1")
+            f.number_format = PCT; f.font = F(9, bold)
+        r += 1
+    r += 1
+
+    r = section(mc, r, "Probabilities the simulation reports", span=0)
+    for k, key, col in [("Intrinsic value above the A$5.48 last close", "prob_above_lastclose", AMBER),
+                        ("Intrinsic value above our A$6.14 target",     "prob_above_target",    AMBER),
+                        ("More than 20% below the last close",          "prob_loss_20pc",       RED),
+                        ("More than doubles",                           "prob_double",          TEAL)]:
+        mc.cell(r, 2, k).font = F(9, True)
+        c = mc.cell(r, 3, round(MC[key], 4)); c.number_format = PCT; c.font = F(9, True, col)
+        r += 1
+    r += 1
+    for t in [
+        "Read the mean and the median together. The mean at A$%.2f sits above the last close; the median at A$%.2f sits below it."
+        % (MC["mean"], MC["median"]),
+        "The gap between them is the shape of the distribution: a long right tail from the growth options against a fat left tail from price.",
+        "This does not move the target, which is a base-case point estimate. It is why the position is built over several prints.",
+        "The P2000 and Colina decisions are deliberately correlated with the price draw. Drawing them independently would fail",
+        "those projects in exactly the states where they are worth most, and it understates the answer by about four percentage points.",
+    ]:
+        mc.cell(r, 2, t).font = F(8, False, GREY, True); r += 1
+    r += 2
+
+    r = section(mc, r, "Histogram (bin centre, share of trials)", span=0)
+    for h, c in [("Value per share (A$)", 2), ("Share of trials", 3), ("Trials", 4)]:
+        cc = mc.cell(r, c, h); cc.font = F(9, True, WHITE); cc.fill = fill(NAVY)
+    r += 1
+    for centre, pct, cnt in zip(MC["hist_centres"], MC["hist_pct"], MC["hist_counts"]):
+        mc.cell(r, 2, round(centre, 2)).number_format = CUR2
+        c = mc.cell(r, 3, round(pct / 100.0, 5)); c.number_format = PCT
+        mc.cell(r, 4, cnt).number_format = "#,##0"
+        for cx in (2, 3, 4): mc.cell(r, cx).font = F(9, False, BLUE_IN)
+        r += 1
+    r += 1
+    srcnote(mc, r, "Source: model/monte_carlo.py, run against the same FCFF mechanics as the Scenario Engine sheet. "
+                   "Percentiles are of modelled intrinsic value per share, not of a traded price.")
+
 # ------------------------------------------------------------------ order and save
 order = ["Cover","Assumptions","Deck","Revenue Build","Income Statement","Balance Sheet","Cash Flow",
          "DCF","Scenario Engine","Scenario Summary","Sensitivity","SOTP NAV","Trading Comps",
-         "Precedents","Football Field","ESG Value Bridge","Downstream Option","Returns","Sources"]
+         "Precedents","Football Field","ESG Value Bridge","Downstream Option","Monte Carlo","Returns","Sources"]
 wb._sheets = [wb[n] for n in order if n in wb.sheetnames] + [s for s in wb._sheets if s.title not in order]
 wb.active = 0
 wb.save(OUT)

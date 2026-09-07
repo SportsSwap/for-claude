@@ -208,15 +208,14 @@ module.exports = function (pres, ctx) {
   pgE("The downstream option, sized and risked",
       "A$2,396m unrisked, A$1,023m risked, A$0.32 per share - and deliberately excluded from the A$6.14 target.",
    (s, cy) => {
-    table(s, C.M, cy, [{ t: "Lever", w: 2.75 }, { t: "Volume", w: 1.25, align: "right" },
+    table(s, C.M, cy, [{ t: "Lever", w: 4.00 }, { t: "Volume", w: 1.25, align: "right" },
       { t: "Unit margin", w: 1.35, align: "right" }, { t: "EBITDA A$m", w: 1.35, align: "right" },
       { t: "Multiple", w: 1.05, align: "center" }, { t: "NPV A$m", w: 1.20, align: "right" },
-      { t: "Risk", w: 0.90, align: "center" }, { t: "A$/sh", w: 1.00, align: "right" },
-      { t: "", w: 1.59 }], [
-      ["Mid-stream lithium phosphate", "400kt", "A$480/t", "192", "8.0x", "1,536", { t: "45%", c: C.OCHRE }, { t: "0.21", b: true }, ""],
-      ["POSCO joint venture equity", "43ktpa", "A$4,200/t", "33", "8.0x", "260", { t: "70%", c: C.SPOD }, { t: "0.06", b: true }, ""],
-      ["Low-carbon qualification premium", "1,000kt", "A$75/t", "75", "8.0x", "600", { t: "25%", c: C.CRIMSON }, { t: "0.05", b: true }, ""],
-      [{ t: "Total", b: true }, "", "", { t: "300", b: true }, "", { t: "2,396", b: true }, "", { t: "0.32", b: true, c: C.SPOD }, ""],
+      { t: "Risk", w: 0.90, align: "center" }, { t: "A$/sh", w: 1.34, align: "right" }], [
+      ["Mid-stream lithium phosphate", "400kt", "A$480/t", "192", "8.0x", "1,536", { t: "45%", c: C.OCHRE }, { t: "0.21", b: true }],
+      ["POSCO joint venture equity", "43ktpa", "A$4,200/t", "33", "8.0x", "260", { t: "70%", c: C.SPOD }, { t: "0.06", b: true }],
+      ["Low-carbon qualification premium", "1,000kt", "A$75/t", "75", "8.0x", "600", { t: "25%", c: C.CRIMSON }, { t: "0.05", b: true }],
+      [{ t: "Total", b: true }, "", "", { t: "300", b: true }, "", { t: "2,396", b: true }, "", { t: "0.32", b: true, c: C.SPOD }],
     ], { rowH: 0.42, size: 8.5, boldFirstCol: true, rowFill: [null,null,null,C.SPOD_L] });
     para(s, C.M, cy + 2.05, 6.10, 2.10, "The assumptions, stated so they can be attacked",
       "Mid-stream: 400kt of concentrate calcined in-house, being 20% of a 2Mtpa base, at the conversion margin retained rather than " +

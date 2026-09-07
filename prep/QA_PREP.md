@@ -69,6 +69,33 @@ week**. Our own risk register names a rebuild above 10% as a warning signal. It 
 > interest and 1.09x reward to risk, this is an overweight to build into rather than take in a
 > single trade.
 
+### "Your own Monte Carlo says you're only 47% likely to be right."
+
+They read the appendix. Say so, and do not soften the number.
+
+> Correct, and we put it on the slide rather than in a footnote. Across 20,000 trials the mean
+> intrinsic value is A$5.69, above the A$5.48 close, and the median is A$5.19, below it. Both are
+> true at once, and the gap between them *is* the answer: a long right tail from the growth options
+> against a fat left tail from price.
+
+> What that changes is not the target. A$6.14 is a point estimate of the base case and it stands on
+> its own inputs. What it changes is conviction, and therefore sizing. An expected value that clears
+> the hurdle on a median that does not is a position you build over several prints rather than take
+> in one — which is exactly where the short-interest rebuild leaves us too, arrived at independently.
+
+**If they push on the specification:** we deliberately correlated the P2000 and Colina go-decisions
+with the price draw. Drawing them independently fails those projects in precisely the states where
+they are worth most, which destroys the real option value the whole growth case rests on. That
+correlation is worth about four percentage points on the headline probability, and we would rather
+be right about the mechanism than flattered by the number.
+
+**If they ask why you show it at all:** because a point estimate with no distribution behind it is
+not a valuation, it is an opinion with a decimal place. Appendix E16 has the full histogram, the
+input distributions, and the seed. The Monte Carlo sheet in the workbook reproduces every figure.
+
+**Numbers to have cold:** P10 A$1.99 · P25 A$3.13 · P75 A$7.65 · P90 A$10.09 · probability above the
+close 46.6% · above the A$6.14 target 39.3% · more than 20% below the close 40.9%.
+
 ### "Why PLS and not BHP or Rio Tinto?"
 
 > For a shared-value mandate specifically, four of the six use ESG to defend cash flows they already

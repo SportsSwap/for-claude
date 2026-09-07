@@ -30,7 +30,7 @@ module.exports = function (pres, ctx) {
       values: [1116, 688, 1488, 1700, 1780, 1850, 1800],
     }], {
       x: C.M, y: cy + 1.30, w: 6.05, h: 3.30,
-      chartColors: [C.INK2], barGapWidthPct: 45,
+      chartColors: [C.S1], barGapWidthPct: 45,
       showTitle: true, title: "Realised price per tonne, actual then base case (US$/t)",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
       showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 8.5,
@@ -55,13 +55,13 @@ module.exports = function (pres, ctx) {
     table(s, C.M + 6.28, cy + 2.82, [
       { t: "", w: 1.62 }, { t: "FY26 actual", w: 1.20, align: "center" },
       { t: "FY27 guidance", w: 1.58, align: "center" }, { t: "Driver", w: 1.76 },
-    ], rows, { rowH: 0.42, size: 8.4, headSize: 8.4, boldFirstCol: true });
-    para(s, C.M + 6.28, cy + 4.94, 6.16, 0.74, null,
-      "A 17-25% volume step-up in FY27 at a unit cost only 1-10% higher. The extra Ngungaju tonnes cost more than " +
-      "the Pilgan average and are still well down the global curve.",
-      { fill: C.MIST, line: C.RULE, size: 8.8 });
+    ], rows, { rowH: 0.34, size: 8.4, headSize: 8.4, boldFirstCol: true });
+    para(s, C.M + 6.28, cy + 4.56, 6.16, 0.62, null,
+      "A 17-25% volume step-up at a unit cost only 1-10% higher. The extra Ngungaju tonnes cost more than the " +
+      "Pilgan average and still sit well down the global curve.",
+      { fill: C.MIST, line: C.RULE, size: 8.6 });
 
-    foot(s, "Source: PLS Group FY26 results, 24 August 2026; June-2026 quarterly activities report. Realised price is on actual product grade (about SC5.2), which sits below the SC6 benchmark. FOB means free on board, i.e. the cost to get product onto the ship, excluding freight.", P());
+    foot(s, "Source: PLS Group FY26 results, 24 August 2026, and the June-2026 quarterly activities report. Realised price is on actual product grade (about SC5.2), below the SC6 benchmark. FOB excludes freight.", P());
   }
 
   // ---------------------------------------------------------------- 4. THE CYCLE
@@ -144,7 +144,7 @@ module.exports = function (pres, ctx) {
       values: [220, 425, 787, 900, 1100],
     }], {
       x: C.M, y: cy, w: 7.10, h: 3.42,
-      chartColors: [C.INK2, C.SPOD, C.MUTE, C.MUTE, C.CRIMSON],
+      chartColors: [C.SEQ[1], C.SEQ[2], C.SEQ[3], C.SEQ[4], C.SEQ[5]],
       varyColors: true, barGapWidthPct: 40,
       showTitle: true, title: "Where the tonnes sit on the cost curve (US$/t of SC6 concentrate)",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,

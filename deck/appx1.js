@@ -19,21 +19,26 @@ module.exports = function (pres, ctx) {
       ["A", "Company and assets", "A1-A11", ["Pilgangoora overview","Resource, reserve and mine life","P680 and ore sorting","P1000","P2000 expansion economics","Ngungaju restart","Mid-stream plant","POSCO joint venture","Colina, Brazil","Offtake portfolio","Board and management"]],
       ["B", "Industry", "B1-B12", ["The lithium value chain","Price history","Supply by country and source","The Jianxiawo timeline","Resource nationalism","Restart supply tracker","Cost curve detail","Electric-vehicle demand","Storage demand","Chemistry mix","Market balance by forecaster","Substitution and recycling risk"]],
       ["C", "Strategic frameworks", "C1-C6", ["Porter's five forces","Helmer's seven powers","Barriers to entry","SWOT","Peer positioning","Why not the other five"]],
-      ["D", "ESG and shared value", "D1-D11", ["Materiality now and in 2030","Emissions and targets","Power strategy","Ore sorting case study","Water","Tailings and biodiversity","Traditional Owners","Workforce and safety","Governance","ESG in remuneration","Ratings and what we could not verify"]],
-      ["E", "Valuation", "E1-E15", ["Model architecture","WACC","Price deck and convergence","Production build","Cost and capex build","Income statement","Balance sheet","Cash flow","FCFF and DCF","Bear case","Bull case","Mine life and terminal value","Sensitivities","Comparables and precedents","Downstream option"]],
+      ["D", "ESG and shared value", "D1-D11", ["Materiality now and in 2030","Emissions and targets","Power strategy","Ore sorting case study","Water","Tailings and biodiversity","Traditional Owners","Workforce and safety","Governance","ESG in remuneration","Ratings and unverified items"]],
+      ["E", "Valuation", "E1-E16", ["Model architecture","WACC","Price deck and convergence","Production build","Cost and capex build","Income statement","Balance sheet","Cash flow","FCFF and DCF","Bear case","Bull case","Mine life and terminal value","Sensitivities","Comparables and precedents","Downstream option","Monte Carlo simulation"]],
       ["F", "Risk and reference", "F1-F7", ["Full risk register","Short interest","Share price catalysts","Broker views and register","Gaps register","Glossary","Bibliography"]],
     ];
     secs.forEach((sec, i) => {
-      const x = C.M + (i % 3) * 4.16, y = 2.00 + Math.floor(i / 3) * 2.42;
-      s.addShape("rect", { x, y, w: 3.98, h: 2.22, fill: { color: "16304C" } });
+      const x = C.M + (i % 3) * 4.16, y = 2.10 + Math.floor(i / 3) * 2.28;
+      s.addShape("rect", { x, y, w: 3.98, h: 2.06, fill: { color: "16304C" } });
       s.addText(sec[0], { x: x + 0.18, y: y + 0.12, w: 0.5, h: 0.34, isTextBox: true, margin: 0,
         fontFace: C.H, fontSize: 18, bold: true, color: C.SPOD, valign: "middle" });
       s.addText(sec[1], { x: x + 0.72, y: y + 0.12, w: 2.4, h: 0.34, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 12, bold: true, color: C.WHITE, valign: "middle" });
       s.addText(sec[2], { x: x + 3.10, y: y + 0.12, w: 0.75, h: 0.34, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 9, color: "8FA8BE", align: "right", valign: "middle" });
-      s.addText(sec[3].map((t) => "▪  " + t).join("\n"), { x: x + 0.20, y: y + 0.52, w: 3.62, h: 1.60,
-        isTextBox: true, margin: 0, fontFace: C.B, fontSize: 7.6, color: "C9D8E6", valign: "top", lineSpacingMultiple: 1.06 });
+      const half = Math.ceil(sec[3].length / 2);
+      [sec[3].slice(0, half), sec[3].slice(half)].forEach((colItems, ci) => {
+        s.addText(colItems.map((t) => "▪  " + t).join("\n"), {
+          x: x + 0.20 + ci * 1.84, y: y + 0.52, w: 1.80, h: 1.44,
+          isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8, color: "C9D8E6",
+          valign: "top", lineSpacingMultiple: 1.10 });
+      });
     });
   }
 

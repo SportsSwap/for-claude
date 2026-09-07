@@ -7,63 +7,84 @@ function bg(s, dark) {
   s.background = { color: dark ? C.INK : C.PAPER };
 }
 
-// Top navigation breadcrumb: functional wayfinding, rendered as text only.
+// Bottom navigation pills. Functional wayfinding, and the active section is filled.
 function nav(s, active) {
-  let x = C.M;
+  const n = SECTIONS.length, w = 1.46, gap = 0.075;
+  const total = n * w + (n - 1) * gap;
+  let x = (C.W - total) / 2;
   SECTIONS.forEach((name) => {
     const on = name === active;
+    if (on) s.addShape("roundRect", { x, y: 7.00, w, h: 0.30, rectRadius: 0.06,
+      fill: { color: C.INK } });
     s.addText(name, {
-      x, y: 0.16, w: 1.62, h: 0.24, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 9, bold: on,
-      color: on ? C.INK : C.FAINT, align: "left", valign: "middle",
+      x, y: 7.00, w, h: 0.30, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 8.5, bold: on,
+      color: on ? C.WHITE : C.FAINT, align: "center", valign: "middle",
     });
-    x += 1.58;
+    x += w + gap;
   });
 }
 
-// Slide title plus the one-line analytical takeaway ("action title").
+// The action title lives INSIDE a full-width dark band, with the section label beneath it.
+// Returns the y at which slide content should begin.
 function head(s, title, takeaway, opts = {}) {
-  let fs = opts.size || 25;
-  if (!opts.size) { if (title.length > 66) fs = 20; else if (title.length > 54) fs = 22; }
-  s.addText(title, {
-    x: C.M, y: opts.navless ? 0.30 : 0.50, w: 12.4, h: 0.52, isTextBox: true, margin: 0,
-    fontFace: C.H, fontSize: fs, bold: true, color: C.INK, valign: "middle",
+  const BAND = 1.06;
+  s.addShape("rect", { x: 0, y: 0, w: C.W, h: BAND, fill: { color: C.INK } });
+  // the claim carries the slide, so it goes in the band, in white, at size
+  const claim = takeaway || title;
+  let fs = 17;
+  if (claim.length > 150) fs = 14.5; else if (claim.length > 105) fs = 15.5;
+  s.addText(claim, {
+    x: C.M, y: 0.09, w: 11.15, h: 0.62, isTextBox: true, margin: 0,
+    fontFace: C.H, fontSize: fs, bold: true, color: C.WHITE,
+    valign: "middle", lineSpacingMultiple: 1.02,
   });
-  const by = (opts.navless ? 0.30 : 0.50) + 0.56;
-  if (takeaway) {
-    const bh = takeaway.length > 108 ? 0.56 : 0.44;
-    s.addShape("rect", { x: C.M, y: by, w: 12.44, h: bh, fill: { color: C.MIST } });
-    s.addText(takeaway, {
-      x: C.M + 0.16, y: by, w: 12.12, h: bh, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 12, bold: true, color: C.INK2, valign: "middle",
-      lineSpacingMultiple: 1.0,
-    });
-    return by + bh + 0.16;
-  }
-  return by + 0.10;
+  s.addText(opts.label || title, {
+    x: C.M, y: 0.72, w: 9.6, h: 0.26, isTextBox: true, margin: 0,
+    fontFace: C.B, fontSize: 10, color: "9FB4C7", valign: "middle",
+  });
+  // ticker chip, top right
+  s.addShape("roundRect", { x: 11.72, y: 0.30, w: 1.16, h: 0.42, rectRadius: 0.08,
+    fill: { color: C.SPOD } });
+  s.addText("ASX: PLS", { x: 11.72, y: 0.30, w: 1.16, h: 0.42, isTextBox: true, margin: 0,
+    fontFace: C.B, fontSize: 9.5, bold: true, color: C.WHITE, align: "center", valign: "middle" });
+  return 1.42;
 }
 
 function foot(s, source, page) {
   if (source) {
     s.addText(source, {
-      x: C.M, y: 7.02, w: 11.3, h: 0.30, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 7.5, italic: true, color: C.FAINT, valign: "middle",
+      x: C.M, y: 6.68, w: 11.3, h: 0.26, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 7.2, italic: true, color: C.FAINT, valign: "middle",
     });
   }
   if (page !== undefined && page !== null) {
     s.addText(String(page), {
-      x: 12.35, y: 7.02, w: 0.55, h: 0.30, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: 8.5, color: C.FAINT, align: "right", valign: "middle",
-    });
+      x: 12.20, y: 6.68, w: 0.68, h: 0.26, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: 8.5, bold: true, color: C.MUTE, align: "right", valign: "middle" });
   }
+}
+
+// A sub-section heading with a rule under it - the benchmark deck's main structural device.
+function subhead(s, x, y, w, text, opts = {}) {
+  s.addText(text, { x, y, w, h: 0.28, isTextBox: true, margin: 0,
+    fontFace: C.B, fontSize: opts.size || 11, bold: true,
+    color: opts.color || C.INK, valign: "middle", align: opts.align || "left" });
+  s.addShape("rect", { x, y: y + 0.28, w, h: 0.015, fill: { color: opts.rule || C.INK } });
+  return y + 0.38;
 }
 
 // A large figure with a caption beneath it.
 function stat(s, x, y, w, value, label, sub, opts = {}) {
   const col = opts.color || C.INK;
+  // a long value ("Sep-qtr 2026") wraps and shoves the KPI off the row baseline; step it down instead
+  const want = opts.size || 30;
+  let vsz = want;
+  while (vsz > 15 && String(value).length * 0.62 * vsz / 72 > w - 0.04) vsz -= 0.5;
+  if (vsz < want - 0.05) FIT.warnings.push("stat \"" + value + "\": " + want + "pt -> " + vsz + "pt");
   s.addText(value, {
     x, y, w, h: 0.62, isTextBox: true, margin: 0,
-    fontFace: C.H, fontSize: opts.size || 30, bold: true, color: col, valign: "bottom",
+    fontFace: C.H, fontSize: vsz, bold: true, color: col, valign: "bottom",
     align: opts.align || "left",
   });
   s.addText(label, {
@@ -99,17 +120,51 @@ function card(s, x, y, w, h, title, lines, opts = {}) {
     ty += (opts.titleH || 0.40) + 0.06;
   }
   if (lines && lines.length) {
+    const gap = opts.gap === undefined ? 5 : opts.gap;
+    const cw2 = w - 0.56, ch2 = y + h - ty - 0.12;
+    const csz = fitSize(lines, cw2, ch2, opts.size || 9.5, 1.0,
+                        (lines.length - 1) * gap / 72, opts.label || (title || "card"));
     s.addText(lines.map((t, i) => ({
       text: t, options: { bullet: { code: "25AA" }, breakLine: i < lines.length - 1 },
     })), {
-      x: x + 0.20, y: ty, w: w - 0.40, h: y + h - ty - 0.12, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: opts.size || 9.5, color: opts.color || C.TXT,
-      valign: "top", paraSpaceAfter: opts.gap === undefined ? 5 : opts.gap, lineSpacingMultiple: 1.0,
+      x: x + 0.20, y: ty, w: w - 0.40, h: ch2, isTextBox: true, margin: 0,
+      fontFace: C.B, fontSize: csz, color: opts.color || C.TXT,
+      valign: "top", paraSpaceAfter: gap, lineSpacingMultiple: 1.0,
     });
   }
 }
 
 // Plain paragraph block inside a panel (no bullets).
+// ---------------------------------------------------------------- text fitting
+// Calibri averages ~0.50em per character across mixed-case prose. Estimating the
+// wrapped line count lets a panel shrink its own type rather than spill past its
+// border, which is what every hand-placed height was quietly risking.
+const FIT = { warnings: [] };
+function _lines(text, widthIn, size) {
+  const cpl = Math.max(8, (widthIn * 144) / size);
+  let n = 0;
+  String(text).split("\n").forEach((para) => {
+    n += para.length === 0 ? 1 : Math.ceil(para.length / cpl);
+  });
+  return n;
+}
+// largest size <= want that fits `paras` (array of strings) into widthIn x heightIn
+function fitSize(paras, widthIn, heightIn, want, lsm, extraIn, label) {
+  const extra = extraIn || 0;
+  for (let size = want; size >= 6.8; size -= 0.1) {
+    let n = 0;
+    paras.forEach((t) => { n += _lines(t, widthIn, size); });
+    if (n * (size * 1.2 * lsm / 72) + extra <= heightIn) {
+      if (size < want - 0.05 && label) {
+        FIT.warnings.push(label + ": " + want.toFixed(1) + "pt -> " + size.toFixed(1) + "pt");
+      }
+      return Math.round(size * 10) / 10;
+    }
+  }
+  if (label) FIT.warnings.push("OVERFLOW " + label + " (at 6.8pt floor)");
+  return 6.8;
+}
+
 function para(s, x, y, w, h, title, text, opts = {}) {
   s.addShape("rect", { x, y, w, h, fill: { color: opts.fill || C.MIST2 },
     line: { color: opts.line || C.RULE, width: 0.75 } });
@@ -119,8 +174,10 @@ function para(s, x, y, w, h, title, text, opts = {}) {
       fontFace: C.B, fontSize: opts.titleSize || 11.5, bold: true, color: opts.titleColor || C.INK, valign: "middle" });
     ty += 0.36;
   }
-  s.addText(text, { x: x + 0.18, y: ty, w: w - 0.36, h: y + h - ty - 0.10, isTextBox: true, margin: 0,
-    fontFace: C.B, fontSize: opts.size || 9.5, color: opts.color || C.TXT, valign: "top", lineSpacingMultiple: 1.05 });
+  const pw = w - 0.36, ph = y + h - ty - 0.10;
+  const psz = fitSize([text], pw, ph, opts.size || 9.5, 1.05, 0, opts.label || (title || "para"));
+  s.addText(text, { x: x + 0.18, y: ty, w: pw, h: ph, isTextBox: true, margin: 0,
+    fontFace: C.B, fontSize: psz, color: opts.color || C.TXT, valign: "top", lineSpacingMultiple: 1.05 });
 }
 
 // Data table. cols = [{t:"Header", w:2.1, align:"left"}], rows = [[...], ...]
@@ -166,8 +223,8 @@ function divider(pres, num, title, blurb, contents) {
     fontFace: C.H, fontSize: 88, bold: true, color: C.SPOD, valign: "middle",
   });
   s.addText(title, {
-    x: 2.35, y: 2.30, w: 9.2, h: 0.9, isTextBox: true, margin: 0,
-    fontFace: C.H, fontSize: 36, bold: true, color: C.WHITE, valign: "middle",
+    x: 2.35, y: 2.30, w: 9.6, h: 0.9, isTextBox: true, margin: 0,
+    fontFace: C.H, fontSize: title.length > 30 ? 30 : 36, bold: true, color: C.WHITE, valign: "middle",
   });
   if (blurb) {
     s.addText(blurb, {
@@ -197,7 +254,7 @@ function appx(pres, tag, title, takeaway, page) {
   return s;
 }
 
-module.exports = { C, SECTIONS, bg, nav, head, foot, stat, card, para, table, divider, appx };
+module.exports = { FIT, fitSize, C, SECTIONS, bg, nav, head, foot, subhead, stat, card, para, table, divider, appx };
 
 // ---- appendix helpers -------------------------------------------------
 const T = require('./model_tables.json');
@@ -254,10 +311,7 @@ function statement(s, x, y, rows, opts = {}) {
 function apage(pres, tag, title, takeaway) {
   const s = pres.addSlide();
   bg(s, false);
-  s.addText("APPENDIX   |   " + tag.toUpperCase(), { x: C.M, y: 0.16, w: 12.4, h: 0.24,
-    isTextBox: true, margin: 0, fontFace: C.B, fontSize: 8, bold: true, color: C.SPOD,
-    charSpacing: 1.4, valign: "middle" });
-  const cy = head(s, title, takeaway, { size: title.length > 62 ? 18 : 20 });
+  const cy = head(s, title, takeaway, { label: "APPENDIX  |  " + tag });
   return { s, cy };
 }
 

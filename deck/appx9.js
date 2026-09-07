@@ -25,7 +25,7 @@ module.exports = function (pres, ctx) {
       ["Offsets regime repriced", R("Med", C.OCHRE), "Sector-wide, not PLS-specific. An operator that gets ahead of it gains rather than loses.", R("Med", C.OCHRE), "Western Australian offsets policy review outcomes"],
       ["Sodium-ion substitution in storage", R("Low", C.SPOD), "Late-decade at the earliest, and our terminal value is a finite annuity rather than a perpetuity.", R("Med", C.OCHRE), "Sodium-ion cell cost per kWh; announced storage orders"],
       ["Key person and governance", R("Low", C.SPOD), "Chief executive since 2022 with a full cycle behind him; standing board Sustainability Committee.", R("Low", C.SPOD), "Executive departures; whether ESG enters incentive pay"],
-      ["Currency", R("Low", C.SPOD), "Revenue in US dollars, costs largely in Australian dollars - a weaker Australian dollar helps margins.", R("Low", C.SPOD), "AUD/USD against our 0.66-0.70 forecast path"],
+      ["Currency", R("Low", C.SPOD), "Revenue in US dollars, costs mostly in Australian dollars. A weaker AUD helps margins.", R("Low", C.SPOD), "AUD/USD against our 0.66-0.70 forecast path"],
     ], { rowH: 0.335, size: 8.1, boldFirstCol: true });
     para(s, C.M, cy + 4.30, 12.44, 0.86, null,
       "The first four are the ones that decide this position. Everything below them is manageable within a normal holding period. If a judge asks which single line would make us wrong, it is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$4.98 and the recommendation with it.",
@@ -40,7 +40,7 @@ module.exports = function (pres, ctx) {
       labels: ["Sep 2024", "Oct 2025", "Late 2025", "26 May 2026", "4 Aug 2026"],
       values: [20.0, 19.0, 17.0, 6.8, 10.09],
     }], {
-      x: C.M, y: cy, w: 6.60, h: 2.90, chartColors: [C.CRIMSON, C.CRIMSON, C.OCHRE, C.SPOD, C.OCHRE], varyColors: true,
+      x: C.M, y: cy, w: 6.60, h: 2.90, chartColors: [C.S3, C.S3, C.S3, C.S2, C.S3], varyColors: true,
       barGapWidthPct: 45, showTitle: true, title: "PLS short interest, % of shares on issue",
       titleFontFace: C.B, titleFontSize: 11, titleColor: C.INK,
       showValue: true, dataLabelPosition: "outEnd", dataLabelFontSize: 10, dataLabelFontFace: C.B,
@@ -79,14 +79,14 @@ module.exports = function (pres, ctx) {
       ["Jul 2026", "Ngungaju restarted; FY27 guidance of 1,030-1,100kt issued", "A 17-25% volume step-up flagged"],
       ["24 Aug 2026", "FY26 results: revenue up 152%, EBITDA up roughly ninefold, dividend reinstated", "Shares rise on the day; the stock reaches A$5.48"],
     ], { rowH: 0.335, size: 8.5, boldFirstCol: true });
-    para(s, C.M, cy + 3.05, 6.10, 1.72, "Where consensus sits",
+    para(s, C.M, cy + 3.05, 6.10, 2.14, "Where consensus sits",
       "Vendor averages cluster between about A$4.50 and A$5.70 against a A$5.48 last close, with the full individual spread running from " +
       "A$2.50 to A$6.83 across seventeen to twenty analysts. The consensus rating is Buy.\n\n" +
       "In plain terms the street thinks PLS is roughly fairly valued and that the range of reasonable answers is enormous - a factor of " +
       "2.7 between the most bearish and most bullish analyst. That dispersion is itself the opportunity: it means the disagreement is " +
       "about lithium price assumptions, not about the company.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9 });
-    para(s, C.M + 6.34, cy + 3.05, 6.10, 1.72, "What we think the street is missing",
+    para(s, C.M + 6.34, cy + 3.05, 6.10, 2.14, "What we think the street is missing",
       "Not the lithium price. Our FY27 assumption of US$1,700/t is deliberately below spot and below the Australian Government's own " +
       "forecast, so we are not out-forecasting anyone on the commodity.\n\n" +
       "What we think is underpriced is the operating position: a cost base that is falling for structural reasons, a growth option with " +
@@ -113,8 +113,8 @@ module.exports = function (pres, ctx) {
       ["Current short interest", "Refreshed to 4 August 2026", "10.09%, above the 10% warning level we set. Reported on F2 rather than dropped"],
       ["FY24 comparatives", "Outside the scope of our sourcing", "Marked as estimates in the workbook and in the income statement footnote"],
       ["External ESG ratings", "Providers not reachable", "Explained why operating evidence mattered more, and acknowledged the loss of a common benchmark"],
-    ], { rowH: 0.335, size: 8.1, boldFirstCol: true });
-    para(s, C.M, cy + 4.30, 12.44, 0.86, "The honest framing",
+    ], { rowH: 0.32, size: 8.1, boldFirstCol: true });
+    para(s, C.M, cy + 3.98, 12.44, 1.22, "The honest framing",
       "Our research environment could not open company websites or the ASX announcements platform, so every reported figure was " +
       "corroborated across two or more independent secondary reports of the same announcement rather than read from the primary document. " +
       "Headline FY26 figures are consistent across sources. Everything above is what that constraint cost us.",

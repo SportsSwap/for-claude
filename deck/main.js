@@ -56,18 +56,18 @@ module.exports = function build(pres, ctx) {
        pcs(F.upside) + " price and a 1.7% yield, against a benchmark that returned 5.90%. Outperformance of " + pc(F.outperf) + "."],
     ];
     bx.forEach((b, i) => {
-      const x = C.M + (i % 3) * 4.16, y = cy + Math.floor(i / 3) * 2.22;
-      s.addShape("rect", { x, y, w: 3.98, h: 2.02, fill: { color: C.MIST2 }, line: { color: C.RULE, width: 0.75 } });
+      const x = C.M + (i % 3) * 4.16, y = cy + Math.floor(i / 3) * 2.68;
+      s.addShape("rect", { x, y, w: 3.98, h: 2.50, fill: { color: C.MIST2 }, line: { color: C.RULE, width: 0.75 } });
       s.addText(b[0], { x: x + 0.18, y: y + 0.12, w: 0.5, h: 0.28, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 10, bold: true, color: C.SPOD, valign: "middle" });
       s.addText(b[1], { x: x + 0.68, y: y + 0.12, w: 3.1, h: 0.28, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 10.5, bold: true, color: C.MUTE, valign: "middle" });
-      s.addText(b[2], { x: x + 0.18, y: y + 0.42, w: 3.6, h: 0.56, isTextBox: true, margin: 0,
-        fontFace: C.H, fontSize: 26, bold: true, color: C.INK, valign: "middle" });
-      s.addText(b[3], { x: x + 0.18, y: y + 0.98, w: 3.6, h: 0.24, isTextBox: true, margin: 0,
+      s.addText(b[2], { x: x + 0.18, y: y + 0.44, w: 3.6, h: 0.62, isTextBox: true, margin: 0,
+        fontFace: C.H, fontSize: 30, bold: true, color: C.INK, valign: "middle" });
+      s.addText(b[3], { x: x + 0.18, y: y + 1.06, w: 3.6, h: 0.24, isTextBox: true, margin: 0,
         fontFace: C.B, fontSize: 9, bold: true, color: C.SPOD, valign: "middle" });
-      s.addText(b[4], { x: x + 0.18, y: y + 1.24, w: 3.62, h: 0.92, isTextBox: true, margin: 0,
-        fontFace: C.B, fontSize: 9.2, color: C.TXT, valign: "top", lineSpacingMultiple: 1.12 });
+      s.addText(b[4], { x: x + 0.18, y: y + 1.30, w: 3.62, h: 1.10, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: 9.6, color: C.TXT, valign: "top", lineSpacingMultiple: 1.16 });
     });
     foot(s, "Source: PLS Group FY26 results (24 August 2026); P2000 Pre-Feasibility Study (June 2024); team valuation model. Spodumene concentrate is the lithium-bearing rock concentrate PLS ships; SC6 denotes a 6% Li2O grade.", P());
   }
@@ -94,11 +94,11 @@ module.exports = function build(pres, ctx) {
     ];
     table(s, C.M, cy, cols, rows, { rowH: 0.52, size: 8.8, boldFirstCol: true,
       rowFill: [null, null, null, null, null, C.SPOD_L] });
-    para(s, C.M, 5.18, 6.10, 1.60, "The screen this case actually asks for",
+    para(s, C.M, 5.00, 6.10, 1.60, "The screen this case asks for",
       "Porter and Kramer's test is whether solving a societal problem creates a new pool of value. Four of these six use ESG " +
       "to protect cash flows they already have. That is competent risk management, and it is not shared value. Only PLS sits " +
       "in a market where the environmental outcome is the reason the customer exists.", { titleColor: C.INK });
-    para(s, C.M + 6.30, 5.18, 6.14, 1.60, "The honest caveat",
+    para(s, C.M + 6.30, 5.00, 6.14, 1.60, "The honest caveat",
       "PLS is also the riskiest of the six: one commodity, one principal asset, and a price that has moved by a factor of three " +
       "in two years. A shared-value mandate does not suspend that. It is why our bear case is severe and why we size the " +
       "downstream prize outside the target rather than inside it.", { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE });
