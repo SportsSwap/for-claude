@@ -121,15 +121,25 @@ function card(s, x, y, w, h, title, lines, opts = {}) {
   }
   if (lines && lines.length) {
     const gap = opts.gap === undefined ? 5 : opts.gap;
-    const cw2 = w - 0.56, ch2 = y + h - ty - 0.12;
-    const csz = fitSize(lines, cw2, ch2, opts.size || 9.5, 1.0,
-                        (lines.length - 1) * gap / 72, opts.label || (title || "card"));
-    s.addText(lines.map((t, i) => ({
-      text: t, options: { bullet: { code: "25AA" }, breakLine: i < lines.length - 1 },
-    })), {
-      x: x + 0.20, y: ty, w: w - 0.40, h: ch2, isTextBox: true, margin: 0,
-      fontFace: C.B, fontSize: csz, color: opts.color || C.TXT,
-      valign: "top", paraSpaceAfter: gap, lineSpacingMultiple: 1.0,
+    const ncol = opts.cols || 1;                       // a wide card reads better in columns
+    const colGap = 0.24;
+    const colW = (w - 0.40 - (ncol - 1) * colGap) / ncol;
+    const per = Math.ceil(lines.length / ncol);
+    const chunks = [];
+    for (let k = 0; k < ncol; k++) chunks.push(lines.slice(k * per, (k + 1) * per));
+    const cw2 = colW - 0.34, ch2 = y + h - ty - 0.12;
+    const tallest = chunks.reduce((a, b) => (b.length > a.length ? b : a), chunks[0]);
+    const csz = fitSize(tallest, cw2, ch2, opts.size || 9.5, 1.0,
+                        tallest.length * gap / 72, opts.label || (title || "card"));
+    chunks.forEach((chunk, k) => {
+      if (!chunk.length) return;
+      s.addText(chunk.map((t, i) => ({
+        text: t, options: { bullet: { code: "25AA" }, breakLine: i < chunk.length - 1 },
+      })), {
+        x: x + 0.20 + k * (colW + colGap), y: ty, w: colW, h: ch2, isTextBox: true, margin: 0,
+        fontFace: C.B, fontSize: csz, color: opts.color || C.TXT,
+        valign: "top", paraSpaceAfter: gap, lineSpacingMultiple: 1.0,
+      });
     });
   }
 }
@@ -141,7 +151,9 @@ function card(s, x, y, w, h, title, lines, opts = {}) {
 // border, which is what every hand-placed height was quietly risking.
 const FIT = { warnings: [] };
 function _lines(text, widthIn, size) {
-  const cpl = Math.max(8, (widthIn * 144) / size);
+  // 0.53em per character and a 1.25 line box, both measured against slides that
+  // still overflowed at the earlier 0.50/1.20 estimate
+  const cpl = Math.max(8, widthIn / (0.53 * size / 72));
   let n = 0;
   String(text).split("\n").forEach((para) => {
     n += para.length === 0 ? 1 : Math.ceil(para.length / cpl);
@@ -154,7 +166,7 @@ function fitSize(paras, widthIn, heightIn, want, lsm, extraIn, label) {
   for (let size = want; size >= 6.8; size -= 0.1) {
     let n = 0;
     paras.forEach((t) => { n += _lines(t, widthIn, size); });
-    if (n * (size * 1.2 * lsm / 72) + extra <= heightIn) {
+    if (n * (size * 1.25 * lsm / 72) + extra <= heightIn * 0.97) {
       if (size < want - 0.05 && label) {
         FIT.warnings.push(label + ": " + want.toFixed(1) + "pt -> " + size.toFixed(1) + "pt");
       }

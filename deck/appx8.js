@@ -158,7 +158,7 @@ module.exports = function (pres, ctx) {
       ["Oct 2025", "Ganfeng Lithium", "Leo Lithium (Goulamina 40%)", "US$343m", "Staged cash", "Plus a 1.5% gross revenue royalty for 20 years."],
     ], { rowH: 0.375, size: 8.4, boldFirstCol: true });
     para(s, C.M, cy + 3.30, 6.10, 1.62, "Why we gave this method zero weight",
-      "Two reasons, and we would rather state them than present a spurious multiple. First, no broker-published EV/EBITDA or EV/resource " +
+      "Two reasons, either of which would have made a stated multiple spurious. First, no broker-published EV/EBITDA or EV/resource " +
       "multiple for these deals was retrievable, and the targets' resource statements are on inconsistent bases - JORC against " +
       "exploration target, ore tonnes against lithium carbonate equivalent - so any multiple we built would be meaningless.\n\n" +
       "Second, applying a control premium to our own discounted cash flow and calling the result an independent method is circular. " +
@@ -193,7 +193,7 @@ module.exports = function (pres, ctx) {
       [{ t: "Equity NAV", b: true, c: C.SPOD }, "", "", { t: "14,412", b: true, c: C.SPOD }, { t: "4.48", b: true, c: C.SPOD }, ""],
     ], { rowH: 0.29, size: 8.5, boldFirstCol: true,
          rowFill: [null,null,null,null,null,null,null,null,C.MIST,null,C.SPOD_L] });
-    para(s, C.M, cy + 3.55, 12.44, 1.44, "Why the NAV is below the DCF, and why that is the honest answer",
+    para(s, C.M, cy + 3.55, 12.44, 1.44, "Why the NAV is below the DCF, and why we did not average the two",
       "Equity NAV of about A$4.48 sits well below both the A$6.53 base-case DCF and the A$5.48 share price. That is not a contradiction, " +
       "it is a different question. The NAV values each asset separately, risk-weighted, at a point in time. The DCF values the " +
       "consolidated cash flow the business actually generates, including the sixteen years of ore that follow the explicit forecast.\n\n" +
@@ -217,7 +217,7 @@ module.exports = function (pres, ctx) {
       ["Low-carbon qualification premium", "1,000kt", "A$75/t", "75", "8.0x", "600", { t: "25%", c: C.CRIMSON }, { t: "0.05", b: true }],
       [{ t: "Total", b: true }, "", "", { t: "300", b: true }, "", { t: "2,396", b: true }, "", { t: "0.32", b: true, c: C.SPOD }],
     ], { rowH: 0.42, size: 8.5, boldFirstCol: true, rowFill: [null,null,null,C.SPOD_L] });
-    para(s, C.M, cy + 2.05, 6.10, 2.10, "The assumptions, stated so they can be attacked",
+    para(s, C.M, cy + 2.05, 6.10, 3.10, "The assumptions, stated so they can be attacked",
       "Mid-stream: 400kt of concentrate calcined in-house, being 20% of a 2Mtpa base, at the conversion margin retained rather than " +
       "ceded to a third-party converter. Neither the volume share nor the margin is disclosed by PLS.\n\n" +
       "POSCO: 43ktpa of hydroxide at an assumed A$4,200/t conversion margin, PLS share 18%. The option to lift that stake to 30% is not " +
@@ -225,13 +225,13 @@ module.exports = function (pres, ctx) {
       "Qualification premium: 1,000kt of qualified volume at an assumed A$75/t. This is the weakest of the three and we risk it hardest, " +
       "at 25%, because no verified carbon-linked premium exists in any PLS contract we could find.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9 });
-    para(s, C.M + 6.34, cy + 2.05, 6.10, 2.10, "Why it sits outside the target price",
+    para(s, C.M + 6.34, cy + 2.05, 6.10, 3.10, "Why it sits outside the target price",
       "Because none of it is earning yet. The mid-stream plant produces its first lithium phosphate in the September 2026 quarter, the " +
       "joint venture is still ramping, and the premium is unproven.\n\n" +
       "Keeping it outside means the recommendation does not depend on it. The A$6.14 target rests on an operating asset with a disclosed " +
       "cost base and company-guided volumes. Everything on this page is upside we have identified, sized and then declined to bank.\n\n" +
-      "Target plus the risked option would be A$6.44, or 17.5% above the last close. We are not publishing that as the target, and we " +
-      "would rather a judge asked us why not than why we had.",
+      "Target plus the risked option would be A$6.44, or 17.5% above the last close. We do not publish that number. A target " +
+      "should rest on what is already producing, and this is not yet.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9 });
    }, "Source: team valuation model, Downstream Option sheet. Volumes, margins, multiples and probabilities are the team's assumptions and are all visible and editable in the workbook.");
   ctx.pgF = pgF;

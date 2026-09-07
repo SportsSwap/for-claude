@@ -90,9 +90,9 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 9. LEVEL 2
   {
     const s = pres.addSlide(); bg(s); nav(s, "Shared Value");
-    s.addNotes("45 seconds. This slide is deliberately self-critical and that is the point.\n\n\"These two levers are worth about 48 dollars a tonne. They are also things a good operator would do without an ESG label, and we would rather say so than be caught pretending otherwise.\"\n\nShow the arithmetic if asked: FY26 costs fell 58 dollars a tonne, volumes rose 17%, so roughly half is fixed-cost dilution and we attribute the other half to ore sorting. That is our estimate, not a disclosure, and it says so on the slide.");
+    s.addNotes("45 seconds. This slide is deliberately self-critical and that is the point.\n\n\"These two levers are worth about 48 dollars a tonne. They are also things a good operator would do without an ESG label, so we do not claim them as a differentiator.\"\n\nShow the arithmetic if asked: FY26 costs fell 58 dollars a tonne, volumes rose 17%, so roughly half is fixed-cost dilution and we attribute the other half to ore sorting. That is our estimate, not a disclosure, and it says so on the slide.");
     const cy = head(s, "Productivity: real money, honestly labelled",
-      "These two levers are worth about A$48/t. They are also things a good operator would do without an ESG label, and we would rather say so than be caught pretending otherwise.");
+      "These two levers are worth about A$48/t. They are also things a good operator would do without an ESG label, so we do not claim them as a differentiator.");
     para(s, C.M, cy, 6.05, 2.30, "Lever 1  |  Sensor-based ore sorting",
       "The A$103m P680 project installed a TOMRA sensor-based sorter, described by the supplier as the largest in lithium at over " +
       "1,000 tonnes per hour, commissioned in August 2024. It rejects barren rock before the crushing and flotation stages, so fewer " +

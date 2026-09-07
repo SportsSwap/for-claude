@@ -244,7 +244,7 @@ module.exports = function (pres, ctx) {
     para(s, C.M + 7.30, cy + 2.58, 5.14, 2.50, "Why terminal value is only half of enterprise value",
       "On a growing perpetuity, the terminal period would have been A$19.0bn and roughly 68% of enterprise value - meaning most of the " +
       "answer would rest on an assumption about the year 2037 onward.\n\n" +
-      "The reserve-life annuity brings it to A$9.9bn and 50.7%. That is still a lot, and it is the honest position for a long-life mining " +
+      "The reserve-life annuity brings it to A$9.9bn and 50.7%. That is still a lot, and it is the right treatment for a long-life mining " +
       "asset: half the value is in the ten years we forecast explicitly, half in the sixteen years of ore that follow.\n\n" +
       "It also means the model is less sensitive to the terminal assumption than a conventional DCF, which is a feature rather than a " +
       "coincidence. The sensitivity table at E11 shows the whole surface.",

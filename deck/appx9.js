@@ -4,8 +4,27 @@ const { C, bg, head, foot, stat, card, para, table, apage } = L;
 
 module.exports = function (pres, ctx) {
   let f = 0;
-  const pgF = (title, take, body, src) => {
-    const n = ++f; const { s, cy } = apage(pres, "F" + n + "  Risk and reference", title, take); body(s, cy); foot(s, src, "F" + n);
+  let BIB = [];
+  // give each source group height in proportion to how many entries it holds,
+  // rather than a uniform box that leaves the short ones half empty
+  const bibPage = (s, cy, gs) => {
+    const AVAIL = 6.60 - cy, GAP = 0.12;
+    const chrome = 0.64;                                  // title block plus padding
+    const rows = gs.map((g) => Math.ceil(g[2].length / 2));
+    const total = rows.reduce((a, b) => a + b, 0);
+    const free = AVAIL - gs.length * chrome - (gs.length - 1) * GAP;
+    let y = cy;
+    gs.forEach((g, i) => {
+      const h = chrome + free * (rows[i] / total);
+      card(s, C.M, y, 12.44, h, g[0], g[2],
+           { fill: C.MIST2, line: C.RULE, titleColor: g[1], size: 8.6, gap: 2, titleH: 0.30, cols: 2 });
+      y += h + GAP;
+    });
+  };
+  const pgF = (title, take, body, src, cont) => {
+    const n = cont ? f : ++f;
+    const tag = "F" + n + (cont ? " cont." : "");
+    const { s, cy } = apage(pres, tag + "  Risk and reference", title, take); body(s, cy); foot(s, src, tag);
   };
 
   pgF("Full risk register",
@@ -55,7 +74,7 @@ module.exports = function (pres, ctx) {
       "The price then went from A$1.91 to A$5.48, and short interest fell to 6.8% by May 2026. A material part of that move was covering, not new fundamental buyers.",
       "Since then shorts have REBUILT to 10.09% as at 4 August 2026, up 0.75 percentage points in a single week.",
       "Our risk register names a rebuild above 10% as a warning signal. It has happened, and we are reporting it rather than quietly dropping the indicator.",
-      "What it means: a well-resourced group is positioning against the stock at these levels. We disagree with them, but we would rather show the disagreement than hide it.",
+      "What it means: a well-resourced group is positioning against the stock at these levels. We disagree with them, and the position is on the record either way.",
     ], { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 8.6 });
     para(s, C.M, cy + 3.08, 12.44, 1.32, "How we read it, and what it does not change",
       "Two things are true at once. The covering that drove much of the last twelve months is finished, so that flow cannot repeat. And " +
@@ -114,7 +133,7 @@ module.exports = function (pres, ctx) {
       ["FY24 comparatives", "Outside the scope of our sourcing", "Marked as estimates in the workbook and in the income statement footnote"],
       ["External ESG ratings", "Providers not reachable", "Explained why operating evidence mattered more, and acknowledged the loss of a common benchmark"],
     ], { rowH: 0.32, size: 8.1, boldFirstCol: true });
-    para(s, C.M, cy + 3.98, 12.44, 1.22, "The honest framing",
+    para(s, C.M, cy + 3.98, 12.44, 1.22, "What the research constraint cost us",
       "Our research environment could not open company websites or the ASX announcements platform, so every reported figure was " +
       "corroborated across two or more independent secondary reports of the same announcement rather than read from the primary document. " +
       "Headline FY26 figures are consistent across sources. Everything above is what that constraint cost us.",
@@ -211,11 +230,15 @@ module.exports = function (pres, ctx) {
         "Announcements for the lithium transactions listed at E13",
       ]],
     ];
-    groups.forEach((g, i) => {
-      const x = C.M + (i % 3) * 4.16, y = cy + Math.floor(i / 3) * 2.52;
-      card(s, x, y, 3.98, 2.38, g[0], g[2], { fill: C.MIST2, line: C.RULE, titleColor: g[1], size: 7.3, gap: 2 });
-    });
+    BIB = groups;
+    bibPage(s, cy, groups.slice(0, 3));
    }, "Research constraint: company websites and the ASX announcements platform were not reachable from our environment, so company disclosures were accessed through secondary reporting and corroborated across independent sources. See F4 for the full gaps register.");
+
+  pgF("Bibliography, continued",
+      "The ESG evidence, the strategy frameworks, and the peer data behind the comparables.",
+   (s, cy) => {
+    bibPage(s, cy, BIB.slice(3));
+   }, "Every figure in this submission traces to a source on this page or the previous one, or to the source register in the submitted workbook.", true);
 
   pgF("Disclaimer and team",
       "Prepared as a university case-competition submission using publicly available information.",

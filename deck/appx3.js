@@ -163,9 +163,9 @@ module.exports = function (pres, ctx) {
       ["Bald Hill", "Mineral Resources", "Restarted after being idled since November 2024; first shipment targeted in the first quarter of FY27", "Direct Australian competitor tonnes returning to a recovering market"],
       ["Finniss", "Core Lithium", "Moving to restart", "A previously uneconomic Northern Territory operation made viable again by price"],
       ["Jianxiawo", "CATL", "Restarted mid-2026, re-suspended August 2026", "The largest single swing factor in the market"],
-      ["Ngungaju", { t: "PLS Group", c: C.SPOD, b: true }, "Restarted July 2026, steady state targeted within four months", "PLS is part of this supply response. We are not pretending otherwise"],
+      ["Ngungaju", { t: "PLS Group", c: C.SPOD, b: true }, "Restarted July 2026, steady state targeted within four months", "PLS is part of this supply response"],
     ], { rowH: 0.58, size: 8.6, boldFirstCol: true, rowFill: [null, null, null, C.SPOD_L] });
-    para(s, C.M, cy + 2.90, 12.44, 1.86, "The uncomfortable point we put on the slide rather than in a footnote",
+    para(s, C.M, cy + 2.90, 12.44, 1.86, "Our own recommendation adds to the supply we are worried about",
       "PLS is not a bystander to the restart wave. It restarted Ngungaju in the same window as Bald Hill and Finniss, and it is guiding " +
       "to a 17-25% volume increase in FY27. Every producer restarting at once is precisely what caps a price recovery, and our own " +
       "recommendation contributes to it.\n\n" +

@@ -126,7 +126,7 @@ module.exports = function (pres, ctx) {
       "The one point of convergence is that 2025 was the peak surplus year. Beyond that, credible houses disagree by a full turn of the " +
       "cycle. We have not resolved the disagreement by picking a favourite: Wood Mackenzie's surplus-until-the-2030s view is effectively " +
       "our bear case, and the Fastmarkets, Morgan Stanley and UBS deficit calls are effectively our bull case. Our base case sits between " +
-      "them, which is the honest place for it to sit.",
+      "them, which is where it belongs.",
       { fill: C.MIST, line: C.RULE, titleColor: C.INK, size: 9.4 });
    }, "Sources: S&P Global Commodity Insights; Macquarie; Fastmarkets; Morgan Stanley; UBS; Wood Mackenzie Lithium Energy Transition Outlook, 3 March 2026; IEA Global Critical Minerals Outlook 2026. Figures are as reported by each house at different dates and are not on a common definition.");
 
@@ -147,7 +147,7 @@ module.exports = function (pres, ctx) {
       "as structurally independent of vehicle policy becomes partly substitutable, and our long-run price of about US$1,750/t realised is " +
       "too high. Our terminal value is an annuity over sixteen years, so roughly half our enterprise value sits in a period where this risk " +
       "is live.\n\n" +
-      "That is a vulnerability and we would rather state it than have a judge find it. The mitigant is that it is a slow risk with " +
+      "That is a vulnerability. The mitigant is that it is a slow risk with " +
       "visible tells - sodium-ion cell cost per kWh and announced storage orders - rather than a sudden one.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.4 });
    }, "Sources: Benchmark Mineral Intelligence; BloombergNEF; IEA. Timelines are the team's read of published roadmaps and are inherently uncertain.");

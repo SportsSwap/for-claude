@@ -50,7 +50,7 @@ module.exports = function (pres, ctx) {
         fontFace: C.B, fontSize: 8.7, color: C.TXT, valign: "middle", lineSpacingMultiple: 1.05 });
     });
     para(s, C.M, cy + 3.46, 12.44, 1.74, "Why we included the fifth row",
-      "A judge will ask whether ore sorting is really shared value or just good engineering. The honest answer is that it is both, and " +
+      "A judge will ask whether ore sorting is really shared value or just good engineering. It is both, and " +
       "that the label does not change the cash flow. What it does change is how much weight the lever can carry: an advantage any " +
       "competitor can buy is worth having and not worth paying a premium for. That is why our level-one argument rests on the mid-stream " +
       "plant and the Korean joint venture rather than on this.",
@@ -69,12 +69,12 @@ module.exports = function (pres, ctx) {
       ["Comparison with brine", "South American brine operations consume large volumes in evaporation ponds in water-stressed basins, and have generated sustained community conflict. Hard rock does not carry that exposure"],
     ], { rowH: 0.44, size: 8.8, boldFirstCol: true, headH: 0.01,
          rowFill: [null,null,C.OCHRE_L,C.CRIM_L,C.CRIM_L,C.SPOD_L] });
-    para(s, C.M, cy + 2.78, 6.10, 2.40, "The honest framing",
+    para(s, C.M, cy + 2.78, 6.10, 2.40, "What we are and are not claiming",
       "Using saline, non-potable groundwater rather than competing for community fresh water is an avoided-conflict advantage " +
       "for a Pilbara hard-rock miner. But it is largely a geological given, not a distinctive strategic decision by PLS.\n\n" +
       "We therefore describe it as a risk PLS does not have rather than an advantage PLS created. Framing a favourable accident of " +
-      "geology as a shared-value achievement is exactly the move this case asks entrants to be sceptical about, and we would rather " +
-      "apply that scepticism to our own pick.",
+      "geology as a shared-value achievement is exactly the move this case asks entrants to be sceptical about, so we apply that " +
+      "scepticism to our own pick.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.2 });
     para(s, C.M + 6.34, cy + 2.78, 6.10, 1.72, "What we would ask management",
       "Publish water intensity in kilolitres per tonne of concentrate, and a stewardship target. Both are standard under SASB's Metals " +
@@ -92,7 +92,7 @@ module.exports = function (pres, ctx) {
       "We could not establish whether Pilgangoora uses filtered or dry-stack tailings or a conventional wet storage facility, nor its " +
       "conformance status with the Global Industry Standard on Tailings Management.\n\n" +
       "Filtered tailings would be a differentiator and several competing lithium operations promote it. PLS may well use it. " +
-      "But an undisclosed practice cannot be underwritten, and we would rather record an unpriced risk than assert a strength we cannot " +
+      "But an undisclosed practice cannot be underwritten, so we record an unpriced risk instead of a strength we cannot " +
       "evidence.\n\n" +
       "This matters because P2000 roughly doubles throughput, and therefore roughly doubles tailings volumes, on an asset whose tailings " +
       "method we cannot see.",
@@ -135,7 +135,7 @@ module.exports = function (pres, ctx) {
       "presence of a verified strength.",
       { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE, size: 9.2 });
     para(s, C.M, cy + 2.22, 12.44, 1.86, "The circularity we had to confront, stated plainly",
-      "There is a tension in our own argument, and we would rather set it out than have it found. We claim social licence protects the " +
+      "There is a tension in our own argument. We claim social licence protects the " +
       "P2000 schedule. We also report that the offsets regime behind environmental approvals in the region has been independently " +
       "judged inadequate, and that we could not verify PLS's Indigenous engagement metrics.\n\n" +
       "The resolution is that these are different approvals with different failure modes. Heritage approval turns on relationships with " +
@@ -208,7 +208,7 @@ module.exports = function (pres, ctx) {
       "calcination emissions, a target expressed as a decade, an offsets scheme found underfunded. None of those needed a rating, and a " +
       "rating would not have revealed any of them.",
       { fill: C.SPOD_L, line: "AFD3CC", titleColor: C.SPOD, size: 9.2 });
-    para(s, C.M + 6.34, cy + 2.50, 6.10, 2.56, "But we are not pretending it is costless",
+    para(s, C.M + 6.34, cy + 2.50, 6.10, 2.56, "What the missing ratings cost us",
       "Two things we lost. First, we cannot benchmark PLS against BHP, Rio Tinto, Fortescue, South32 and Mineral Resources on a common " +
       "external scale, so our comparative judgement rests on our own reading of each company's disclosure rather than on a third party's.\n\n" +
       "Second, ratings do move flows. Index inclusion and ESG-mandated funds respond to them, so a rating change is a real, if crude, " +

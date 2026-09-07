@@ -98,7 +98,7 @@ module.exports = function build(pres, ctx) {
       "Porter and Kramer's test is whether solving a societal problem creates a new pool of value. Four of these six use ESG " +
       "to protect cash flows they already have. That is competent risk management, and it is not shared value. Only PLS sits " +
       "in a market where the environmental outcome is the reason the customer exists.", { titleColor: C.INK });
-    para(s, C.M + 6.30, 5.00, 6.14, 1.60, "The honest caveat",
+    para(s, C.M + 6.30, 5.00, 6.14, 1.60, "The risk that comes with it",
       "PLS is also the riskiest of the six: one commodity, one principal asset, and a price that has moved by a factor of three " +
       "in two years. A shared-value mandate does not suspend that. It is why our bear case is severe and why we size the " +
       "downstream prize outside the target rather than inside it.", { fill: C.OCHRE_L, line: "E8C9A3", titleColor: C.OCHRE });
