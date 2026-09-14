@@ -47,7 +47,7 @@ module.exports = function (pres, ctx) {
       ["Currency", R("Low", C.SPOD), "Revenue in US dollars, costs mostly in Australian dollars. A weaker AUD helps margins.", R("Low", C.SPOD), "AUD/USD against our 0.66-0.70 forecast path"],
     ], { rowH: 0.35, size: 7.9, boldFirstCol: true });
     para(s, C.M, cy + 4.64, 12.44, 0.54, null,
-      "The first four decide this position; the rest are manageable within a normal holding period. The one that would make us wrong is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$4.98.",
+      "The first four decide this position; the rest are manageable within a normal holding period. The one that would make us wrong is the first: a sustained price relapse of about a fifth from our base case takes the target to roughly A$3.80: the DCF leg falls to A$3.65 on the disclosed price coefficient, and FY27 EBITDA falls 30% on 1.5x operating leverage, taking the comparables leg to A$4.02.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.2 });
    }, "Source: team assessment. Inherent and residual ratings are ours. Indicators are chosen because they are publicly observable at a known frequency, not because they are exhaustive.");
 

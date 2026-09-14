@@ -206,7 +206,7 @@ Both. Do not flinch.
 Have this answer word-perfect. It is the best question you can get.
 
 > A sustained price relapse. If spodumene averages 20% below our base case across the forecast, the
-> target falls to about A$3.86 and the recommendation is wrong. We would also change our mind if the
+> target falls to about A$3.80 and the recommendation is wrong. We would also change our mind if the
 > P2000 study slips past the December quarter, or if short interest rebuilds above 10% of shares,
 > because that would tell us a well-resourced group disagrees with us and we would want to know why.
 

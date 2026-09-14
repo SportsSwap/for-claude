@@ -15,7 +15,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 12. DCF
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
-    s.addNotes("60 seconds. This is the slide that separates you from teams that ran a standard DCF.\n\n\"Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out. On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year, so about sixteen years remain. We value the terminal period as a sixteen-year annuity.\"\n\nThe number that lands: \"That single choice is worth nine billion dollars. A perpetuity would have given us 19.0 billion of terminal value on an asset that runs out.\"\n\nIf challenged on whether the life is pre or post-expansion: it is POST. We divide remaining ore by the FY36 rate, which already includes P2000. Doubling throughput halves the life and the model captures that.");
+    s.addNotes("S12 | 50s | SPEAKER D | this separates you from every team that ran a textbook DCF\n\n\"Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out.\"\n\n\"On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year. About sixteen years left. So we value the terminal period as a sixteen-year annuity, not a perpetuity.\"\n\n\"That single choice is worth nine billion dollars of terminal value. A perpetuity would have handed us nineteen billion on an asset that runs out of rock. It's the difference between valuing a mine and valuing a company that never depletes.\"\n\nLAND: A$9.0bn versus A$19.0bn.\nIF ASKED pre- or post-expansion: POST. Remaining ore over the FY36 rate, which already includes P2000.");
     const cy = head(s, "A finite orebody gets an annuity, not a perpetuity",
       "That single choice is worth A$9.0bn of terminal value. It is the difference between valuing a mine and valuing a company that never runs out of rock.");
     // left column: the cost of capital build
@@ -77,6 +77,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 13. RANGE
   {
     const s = pres.addSlide(); bg(s); nav(s, "Valuation");
+    s.addNotes("S13 | 18s | SPEAKER D | plant it, do not narrate a football field\n\n\"Base six fifty-three, bear two dollars thirty, bull eight ninety-six. Our own Monte Carlo puts the probability of being right at 47%. So this is a position you build over several prints rather than take in one.\"\n\nLAND: we ran it, and we are telling you it's 47%.");
     const cy = head(s, "The range, and what has to be true",
       "Base A$6.53, bear A$2.30, bull A$8.96. Our own Monte Carlo puts the odds of being right at 47%, so we build the position rather than take it in one.");
 
@@ -188,7 +189,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 14. RISKS
   {
     const s = pres.addSlide(); bg(s); nav(s, "Risks");
-    s.addNotes("45 seconds. Do not read twelve rows. Take the top two.\n\n\"The risk that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about three eighty-six and we are wrong. We have not hedged that language.\"\n\nThen the short-interest point, which most teams will miss entirely: \"PLS went from the most shorted stock on the ASX at 20% of shares to about 6.8%. A material part of the tripling was covering, and that buyer cannot come back. Our target rests on FY27 earnings and the growth option, not on another squeeze.\"");
+    s.addNotes("S14 | 18s | SPEAKER D | do not read twelve rows\n\n\"Twelve risks, each with an indicator we can observe. The one that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about three dollars eighty and we're wrong. We haven't hedged that.\"\n\nLAND: three dollars eighty, said without flinching.\nDO NOT say short interest is 6.8%. It rebuilt to 10.09%, above our own 10% warning line, and it is on appendix F2. If it comes up, give the current number.");
     const cy = head(s, "What would break this, and what would tell us first",
       "Every risk below has a named early-warning indicator, because a risk you cannot observe is not one you can manage.");
     const cols = [{ t: "Risk", w: 2.75 }, { t: "Why it bites", w: 3.85 }, { t: "Mitigant", w: 3.10 },
@@ -215,7 +216,7 @@ module.exports = function (pres, ctx) {
     ];
     table(s, C.M, cy, cols, rows, { rowH: 0.61, size: 8.3 });
     para(s, C.M, cy + 4.10, 12.44, 0.72, null,
-      "The risk we are most exposed to is the first one, and we have not hedged the language on it. If spodumene averages 20% below our base case across the forecast, the target falls to about A$3.86 and this recommendation is wrong.",
+      "The risk we are most exposed to is the first one, and we have not hedged the language on it. If spodumene averages 20% below our base case across the forecast, the target falls to about A$3.80 and this recommendation is wrong.",
       { fill: C.OCHRE_L, line: "E8C9A3", size: 9.4 });
     foot(s, "Sources: ASIC short position reports via shortman.com.au (latest retrievable data 26 May 2026); Wood Mackenzie Lithium Energy Transition Outlook, 3 March 2026; PLS disclosures; team valuation model.", P());
   }
@@ -223,7 +224,7 @@ module.exports = function (pres, ctx) {
   // ---------------------------------------------------------------- 15. RECOMMENDATION
   {
     const s = pres.addSlide(); bg(s, true);
-    s.addNotes("45 seconds. Close hard and stop talking.\n\n\"Buy. Six dollars twelve, 12.0% upside, 13.6% total return against a 5.90% benchmark. The fund needs two points of outperformance and this gives seven point seven.\"\n\n\"Two thirds of that upside is shared value the market is not paying for. And a further thirty-two cents of low-carbon downstream value sits outside the target entirely, so nothing in this recommendation depends on it.\"\n\nName the nearest catalyst: first lithium phosphate from the mid-stream plant lands THIS QUARTER, and the P2000 study lands in the December quarter. Both are inside the horizon.\n\nThen stop. Let them ask.");
+    s.addNotes("S15 | 32s | SPEAKER D | close on the number you opened with, then stop talking\n\n\"Buy. Six dollars fourteen. 12.0% upside, 13.6% total return against a 5.90% benchmark.\"\n\n\"Two thirds of that upside is shared value the market isn't paying for. The nearest catalyst is this quarter: first lithium phosphate from the mid-stream plant. The P2000 study lands in the December quarter. Both sit inside our horizon.\"\n\n\"This screen re-ranks all six miners in the case set. PLS is just where it bites hardest.\"\n\nThen stop. Silence is fine. Let them ask.");
     s.addText("Recommendation", { x: C.M, y: 0.34, w: 8, h: 0.62, isTextBox: true, margin: 0,
       fontFace: C.H, fontSize: 30, bold: true, color: C.WHITE, valign: "middle" });
     s.addShape("rect", { x: C.M, y: 1.10, w: 3.55, h: 2.20, fill: { color: C.SPOD } });
