@@ -1,0 +1,457 @@
+<title>PLS Pitch Run Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+
+<style>
+:root{
+  --ink:#0B2545; --ink2:#16304C;
+  --spod:#0E7C7B; --spod-ink:#0A5F5E;
+  --ochre:#B0570A; --crimson:#9E2429;
+  --ground:#F4F6F9; --surface:#FFFFFF; --raise:#EDF1F6;
+  --text:#16202E; --muted:#5A6879; --faint:#8B97A6;
+  --rule:#D7DFE8; --rule-soft:#E7ECF2;
+  --chipA:#1D6FD9; --chipB:#0E7C7B; --chipC:#B0570A; --chipD:#6B3FA0;
+  --shadow:0 1px 2px rgba(11,37,69,.06),0 8px 24px -12px rgba(11,37,69,.18);
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#0A1826; --ink2:#132437;
+    --spod:#46B3AC; --spod-ink:#8FD8D2;
+    --ochre:#E2913C; --crimson:#E0656A;
+    --ground:#0A1420; --surface:#122031; --raise:#18293C;
+    --text:#E3EAF2; --muted:#97A6B8; --faint:#6B7B8E;
+    --rule:#24384E; --rule-soft:#1C2E42;
+    --chipA:#6BA5EA; --chipB:#46B3AC; --chipC:#E2913C; --chipD:#B08BDC;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#0A1826; --ink2:#132437;
+  --spod:#46B3AC; --spod-ink:#8FD8D2;
+  --ochre:#E2913C; --crimson:#E0656A;
+  --ground:#0A1420; --surface:#122031; --raise:#18293C;
+  --text:#E3EAF2; --muted:#97A6B8; --faint:#6B7B8E;
+  --rule:#24384E; --rule-soft:#1C2E42;
+  --chipA:#6BA5EA; --chipB:#46B3AC; --chipC:#E2913C; --chipD:#B08BDC;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--text);font-family:var(--sans);
+  font-size:15px;line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:20px;padding-block:0}
+h1,h2,h3{text-wrap:balance;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--spod);outline-offset:2px;border-radius:3px}
+
+/* ---------- masthead ---------- */
+.mast{background:var(--ink);color:#fff;padding-block:18px 16px}
+.mast .wrap{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:baseline}
+.mast h1{font-family:var(--serif);font-size:25px;font-weight:600;letter-spacing:-.01em;line-height:1.1}
+.mast .sub{min-width:0;flex:1 1 auto;font-size:12.5px;color:#A9BDD2;font-variant-numeric:tabular-nums}
+.tick{margin-left:auto;font-family:var(--mono);font-size:12px;color:#7E96B0;letter-spacing:.04em}
+
+/* ---------- clock ---------- */
+.clock{position:sticky;top:0;z-index:20;background:var(--ink2);color:#fff;
+  border-bottom:1px solid rgba(255,255,255,.09)}
+.clock .wrap{display:flex;align-items:center;gap:14px;padding-block:10px;flex-wrap:wrap}
+.elapsed{font-family:var(--mono);font-size:30px;font-weight:500;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;min-width:3.4em}
+.delta{font-family:var(--mono);font-size:13px;font-weight:500;padding:3px 9px;border-radius:999px;
+  background:rgba(255,255,255,.11);white-space:nowrap}
+.delta.ahead{background:rgba(70,179,172,.22);color:#9FE2DC}
+.delta.late{background:rgba(224,101,106,.2);color:#FFB3B6}
+.onnow{font-size:12.5px;color:#A9BDD2;min-width:0;flex:1 1 180px}
+.onnow b{color:#fff;font-weight:600}
+.ctl{display:flex;gap:7px;margin-left:auto}
+.ctl button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.17);
+  color:#fff;border-radius:7px;padding:7px 13px;font-size:13px;font-weight:500}
+.ctl button:hover{background:rgba(255,255,255,.19)}
+.ctl button.go{background:var(--spod);border-color:transparent;color:#04201F;font-weight:600}
+:root[data-theme="dark"] .ctl button.go,
+:root:not([data-theme="light"]) .ctl button.go{color:#04201F}
+
+/* ---------- tabs + filters ---------- */
+.bar{background:var(--surface);border-bottom:1px solid var(--rule);position:sticky;top:56px;z-index:15}
+.bar .wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-block:9px}
+.tabs{display:flex;gap:3px}
+.tabs button{background:none;border:0;padding:7px 12px;border-radius:7px;font-size:13.5px;
+  font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--raise);color:var(--text);font-weight:600}
+.seg{display:flex;gap:3px;margin-left:auto;align-items:center}
+.seg .lbl{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);margin-right:5px}
+.seg button{background:none;border:1px solid var(--rule);border-radius:6px;padding:4px 10px;
+  font-size:12.5px;font-weight:600;color:var(--muted);font-family:var(--mono)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+#find{flex:1 1 240px;min-width:0;background:var(--raise);border:1px solid var(--rule);
+  border-radius:8px;padding:8px 12px;font:inherit;font-size:14px;color:var(--text)}
+#find::placeholder{color:var(--faint)}
+
+main{padding-block:22px 64px}
+.pane[hidden]{display:none!important}
+
+/* ---------- script ---------- */
+.slide{display:grid;grid-template-columns:78px minmax(0,1fr);gap:0 18px;background:var(--surface);
+  border:1px solid var(--rule);border-radius:10px;margin-bottom:12px;overflow:hidden;
+  box-shadow:var(--shadow);transition:opacity .18s}
+.slide.dim{opacity:.32}
+.slide.live{border-color:var(--spod);box-shadow:0 0 0 2px color-mix(in srgb,var(--spod) 35%,transparent),var(--shadow)}
+.rail{background:var(--raise);border-right:1px solid var(--rule-soft);padding:14px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center}
+.sn{font-family:var(--serif);font-size:27px;font-weight:600;line-height:1;color:var(--ink)}
+:root[data-theme="dark"] .sn,:root:not([data-theme="light"]) .sn{color:var(--text)}
+.sn small{display:block;font-family:var(--sans);font-size:9px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--faint);font-weight:600;margin-bottom:2px}
+.budget{font-family:var(--mono);font-size:15px;font-weight:600}
+.cum{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.who{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.05em;
+  padding:2px 7px;border-radius:999px;color:#fff}
+.who[data-s="A"]{background:var(--chipA)} .who[data-s="B"]{background:var(--chipB)}
+.who[data-s="C"]{background:var(--chipC)} .who[data-s="D"]{background:var(--chipD)}
+.body{padding:14px 16px 15px 0;min-width:0;overflow-wrap:break-word}
+.slide h3{font-family:var(--serif);font-size:19px;font-weight:600;letter-spacing:-.01em;margin-bottom:3px}
+.coach{font-size:12.5px;color:var(--ochre);font-style:italic;margin:5px 0 10px}
+.say em{font-style:normal;font-weight:600;box-shadow:inset 0 -.38em 0 color-mix(in srgb,var(--spod) 20%,transparent)}
+.say{font-size:15.5px;line-height:1.58;margin:0 0 9px;padding-left:13px;
+  border-left:2px solid var(--rule);color:var(--text)}
+.say:last-of-type{margin-bottom:11px}
+.cues{display:flex;flex-direction:column;gap:5px;margin-top:11px;padding-top:11px;
+  border-top:1px dashed var(--rule)}
+.cue{font-size:12.5px;line-height:1.45;display:flex;gap:8px}
+.cue i{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;font-weight:600;
+  text-transform:uppercase;padding:2px 6px;border-radius:4px;white-space:nowrap;height:fit-content;margin-top:1px}
+.cue.land i{background:color-mix(in srgb,var(--spod) 17%,transparent);color:var(--spod-ink)}
+.cue.cut  i{background:color-mix(in srgb,var(--ochre) 17%,transparent);color:var(--ochre)}
+.cue.hand i{background:var(--raise);color:var(--muted)}
+.cue.warn i{background:color-mix(in srgb,var(--crimson) 15%,transparent);color:var(--crimson)}
+.cue.warn span{color:var(--crimson)}
+.hand-gap{display:flex;align-items:center;gap:9px;margin:0 0 12px 96px;
+  font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.05em}
+.hand-gap::before,.hand-gap::after{content:"";height:1px;background:var(--rule);flex:1}
+
+/* ---------- callout ---------- */
+.key{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--spod);
+  border-radius:8px;padding:15px 17px;margin-bottom:20px;box-shadow:var(--shadow)}
+.key h2{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:7px}
+.key p{margin:0 0 8px;overflow-wrap:break-word;font-size:14.5px;line-height:1.55;max-width:68ch}
+.key p:last-child{margin-bottom:0}
+.key .line{font-size:16px;line-height:1.5;padding:11px 14px;background:var(--raise);
+  border-radius:7px;margin:10px 0;font-weight:500}
+.key small{color:var(--muted);font-size:12.5px}
+
+/* ---------- Q&A ---------- */
+.tier{font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;margin:22px 0 9px}
+.tier:first-child{margin-top:0}
+details.q{background:var(--surface);border:1px solid var(--rule);border-radius:9px;
+  margin-bottom:8px;overflow:hidden}
+details.q[open]{box-shadow:var(--shadow)}
+details.q summary{padding:12px 15px;cursor:pointer;font-weight:600;font-size:15px;
+  list-style:none;display:flex;gap:11px;align-items:flex-start}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::before{content:"?";font-family:var(--serif);font-weight:600;color:var(--spod);
+  font-size:18px;line-height:1.15;flex:none}
+details.q[open] summary{border-bottom:1px solid var(--rule-soft)}
+.ans{padding:13px 15px 15px}
+.ans p{margin:0 0 10px;overflow-wrap:break-word;font-size:15px;line-height:1.58;max-width:70ch}
+.ans p.said{padding-left:13px;border-left:2px solid var(--spod)}
+.ans p:last-child{margin-bottom:0}
+.ans .note{font-size:13px;color:var(--muted)}
+.refs{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.ref{font-family:var(--mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;
+  background:var(--raise);color:var(--muted);letter-spacing:.04em}
+.rapid{width:100%;border-collapse:collapse;font-size:14px}
+.rapid th{text-align:left;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);padding:0 12px 7px 0;font-weight:600}
+.rapid td{padding:9px 12px 9px 0;border-top:1px solid var(--rule-soft);vertical-align:top;line-height:1.5}
+.rapid td:first-child{font-weight:600;width:33%;min-width:130px}
+.rapid-wrap{background:var(--surface);border:1px solid var(--rule);border-radius:9px;
+  padding:14px 16px;overflow-x:auto}
+.empty{color:var(--muted);font-size:14px;padding:26px 0;text-align:center}
+
+/* ---------- figures ---------- */
+.figs{background:var(--surface);border:1px solid var(--rule);border-radius:9px;overflow:hidden}
+.figrow{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,1.65fr);gap:14px;
+  padding:11px 16px;border-top:1px solid var(--rule-soft);font-size:14px;align-items:baseline}
+.figrow:first-child{border-top:0}
+.figrow dt{color:var(--muted);font-size:13px}
+.figrow dd{margin:0;font-family:var(--mono);font-size:13.5px;line-height:1.5;
+  font-variant-numeric:tabular-nums;word-break:break-word}
+.tag{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);font-weight:600;margin:0 0 9px}
+
+.foot{margin-top:26px;padding-top:15px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--faint);line-height:1.6}
+
+@media(max-width:640px){
+  .wrap{padding-inline:16px}
+  .mast h1{font-size:21px} .tick{display:none}
+  .clock .wrap{gap:10px} .elapsed{font-size:26px} .ctl{margin-left:0;width:100%}
+  .ctl button{flex:1}
+  .bar{top:auto;position:static}
+  .slide{grid-template-columns:60px minmax(0,1fr);gap:0 13px}
+  .rail{padding:11px 6px} .sn{font-size:21px} .budget{font-size:13px}
+  .body{padding:12px 14px 13px 0}
+  .say{font-size:15px}
+  .hand-gap{margin-left:73px}
+  .figrow{grid-template-columns:1fr;gap:3px}
+  .seg{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="mast">
+  <div class="wrap">
+    <h1>PLS Group &middot; pitch run sheet</h1>
+    <div class="sub">FMAA &times; Shared Value Project 2026 &middot; 10-minute slot &middot; title through slide 15</div>
+    <div class="tick">ASX: PLS</div>
+  </div>
+</header>
+
+<div class="clock">
+  <div class="wrap">
+    <div class="elapsed" id="elapsed">0:00</div>
+    <div class="delta" id="delta">not started</div>
+    <div class="onnow" id="onnow">Target finish <b>8:59</b>. Press start when you open your mouth.</div>
+    <div class="ctl">
+      <button id="go" class="go">Start</button>
+      <button id="reset">Reset</button>
+    </div>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tab-script" aria-selected="true" aria-controls="pane-script">Run sheet</button>
+      <button role="tab" id="tab-qa" aria-selected="false" aria-controls="pane-qa">Q&amp;A</button>
+      <button role="tab" id="tab-figs" aria-selected="false" aria-controls="pane-figs">Figures</button>
+    </div>
+    <input id="find" type="search" placeholder="Search the Q&amp;A…" hidden aria-label="Search questions and answers">
+    <div class="seg" id="seg">
+      <span class="lbl">Speaker</span>
+      <button data-s="all" aria-pressed="true">All</button>
+      <button data-s="A" aria-pressed="false">A</button>
+      <button data-s="B" aria-pressed="false">B</button>
+      <button data-s="C" aria-pressed="false">C</button>
+      <button data-s="D" aria-pressed="false">D</button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="pane" id="pane-script" role="tabpanel" aria-labelledby="tab-script">
+    <div class="key">
+      <h2>Say this out loud, once</h2>
+      <p>A$0.43 against the A$6.14 target is 4.6% and looks like rounding. Against the A$0.66 of
+        upside it is 66% and it is the whole case. One step further is the sentence that decides
+        whether the pitch lands:</p>
+      <p class="line">Strip those operating decisions out and the target is about A$5.71. That is a
+        5.7% total return against a 5.90% benchmark. We would be recommending a hold.</p>
+      <p><small>A$6.14 less A$0.43 is A$5.71, which is 4.1% above the A$5.48 close, plus a 1.6%
+        yield. Say it on slide 1 or slide 11. Not both.</small></p>
+    </div>
+    <div id="slides"></div>
+  </section>
+
+  <section class="pane" id="pane-qa" role="tabpanel" aria-labelledby="tab-qa" hidden>
+    <div id="qalist"></div>
+  </section>
+
+  <section class="pane" id="pane-figs" role="tabpanel" aria-labelledby="tab-figs" hidden>
+    <p class="tag">Numbers to have cold</p>
+    <dl class="figs" id="figs"></dl>
+    <div class="foot">
+      Every figure ties to the submitted workbook and is checked by
+      <span style="font-family:var(--mono)">deck/verify_numbers.py</span>.
+      Refresh the ASIC short-interest figure before each round: ours is dated 4 August 2026 at
+      10.09% and was moving 0.75 points a week.
+    </div>
+  </section>
+
+  <div class="foot">
+    Rehearse to 9:00, not 10:00. If you are cut off at ten minutes, the only thing you must have
+    said is slide 11. Print the appendix index and tape it beside the laptop: double counting
+    &rarr; E-bridge, why not a perpetuity &rarr; E12, short interest &rarr; F2, what you could not
+    verify &rarr; F4.
+  </div>
+</main>
+
+<script id="payload" type="application/json">{"script":[{"n":null,"title":"Title","sec":8,"words":15,"spoken":6,"speaker":"A","say":["Good morning. We're recommending PLS Group, ASX ticker PLS, a spodumene producer in the Pilbara."],"land":null,"cut":null,"handover":null,"coach":"Do not introduce four names. Judges have your team sheet."},{"n":"1","title":"Recommendation","sec":50,"words":110,"spoken":44,"speaker":"A","say":["Buy. Twelve-month target of six dollars fourteen against a last close of five dollars forty-eight. That's 12.0% of price and a 1.6% yield, so a 13.6% total return against a benchmark that returned 5.90%. The fund needs two points of outperformance. This gives seven point seven.","The part that matters isn't the target. It's where the upside comes from. Sixty-six cents of upside, and forty-three cents of it traces to operating decisions PLS made for environmental reasons that the market is pricing as ordinary cost control.","Strip those decisions out and we'd be recommending a hold. That's the pitch, and we'll spend the next eight minutes defending that forty-three cents."],"land":"66% of the upside, not 4.6% of the target.","cut":"the benchmark sentence. Keep the forty-three cents.","handover":null,"coach":null},{"n":"2","title":"Why PLS, not the other five","sec":35,"words":81,"spoken":32,"speaker":"A","say":["The case gave us six miners. Four of them use ESG spending to defend cash flows they already have. Rehabilitation provisions, emissions targets on an iron ore business that sells the same tonne either way. That's competent risk management. It isn't shared value.","PLS is the only one where the societal need *is* the demand. Decarbonisation is why the customer exists, and carbon intensity is becoming a condition of sale. That's the screen, and it only selects one of the six."],"land":"for four of six, the tonne sells either way.","cut":"the examples in sentence two.","handover":"So what does the company look like underneath that?","coach":null},{"n":"3","title":"FY26 results","sec":18,"words":38,"spoken":15,"speaker":"B","say":["One line on the year. Record volumes, a 59% margin, and unit costs *down* 9% while volumes rose 17%. Costs falling while volumes rise, through the worst lithium downturn in a decade. That's the operating position we're underwriting."],"land":"costs down 9%, volumes up 17%, same year.","cut":null,"handover":null,"coach":"Do not read four statistics off the screen. Judges read faster than you speak."},{"n":"4","title":"The price cycle","sec":25,"words":54,"spoken":22,"speaker":"B","say":["Prices tripled off the 2025 trough, then fell two hundred and seventy dollars a tonne in a single week in August as Bald Hill, Finniss and Jianxiawo restarted. We're not going to pretend that didn't happen. Wood Mackenzie still calls surplus into the early 2030s, and we carry their view as our bear case."],"land":"we carry the bear's view, not our own.","cut":"the three mine names.","handover":null,"coach":"This is the credibility slide. Judges expect a lithium bull to wave the price away."},{"n":"5","title":"Structural demand","sec":22,"words":50,"spoken":20,"speaker":"B","say":["Every team here will tell you lithium demand grows with electric vehicles. That argument rests on one policy variable and that variable just turned hostile. Ours doesn't need it. Storage installations grew about 51% last year, and storage is not subsidy-driven. The demand leg holds without a single EV assumption."],"land":"our demand case survives the subsidy repeal.","cut":null,"handover":null,"coach":null},{"n":"6","title":"Cost curve","sec":35,"words":86,"spoken":34,"speaker":"B","say":["Here's why we can be relaxed about the price. Our bear case assumes a realised price of about eleven hundred and forty-five US dollars a tonne. At that price the top quartile of world supply is under water and Pilgangoora is still generating cash margin.","That's what swing supply means in practice. The tonnes that come off are somebody else's. PLS doesn't just survive a downturn, it buys assets during one. It bought Latin Resources in scrip at the trough and restarted Ngungaju when prices recovered."],"land":"at our bear price, a quarter of world supply loses money and PLS doesn't.","cut":"the Latin Resources sentence.","handover":"That's the asset. Here's the argument.","coach":"Slow down. This is the mechanism that makes the bear case survivable."},{"n":"7","title":"Three levels","sec":12,"words":24,"spoken":10,"speaker":"C","say":["Porter and Kramer describe three levels. Almost every mining ESG story lives at level two. We're claiming level one, and here's what that's worth."],"land":null,"cut":"nothing. This is already the floor.","handover":null,"coach":"You are explaining Porter and Kramer to the Shared Value Project. Do not teach them their own framework."},{"n":"8","title":"Carbon-declarable tonnes","sec":50,"words":100,"spoken":40,"speaker":"C","say":["Calcination is the most energy-intensive step in the chain. PLS owns a Calix electric calciner outright, opened in June, that cuts those emissions by more than 80%. Which means the tonne has a low, *declarable* carbon footprint.","That word is doing the work. From 2027 the EU Battery Regulation requires a carbon footprint declaration and a battery passport. US foreign-entity rules point the same way. A tonne that can't be declared can't enter those chains at any price.","So this is a market-access story before it is a cost story. PLS is building tonnes that qualify where competitors' tonnes won't."],"land":"declarable. Say the word three times.","cut":"the US foreign-entity clause.","handover":null,"coach":"Walk the four boxes left to right as one chain. Each arrow is a \"which means\"."},{"n":"9","title":"The two cost levers","sec":50,"words":107,"spoken":43,"speaker":"C","say":["Two levers, and we'll label them honestly.","First, ore sorting. The A$103m P680 project installed a TOMRA sorter, over a thousand tonnes an hour. It rejects barren rock before crushing, so fewer tonnes get milled for the same lithium. FY26 unit costs fell fifty-eight dollars a tonne. We attribute about thirty of that to sorting.","Second, power. Pilgangoora runs its own generation. Gas has displaced diesel, solar and storage are next. About eighteen dollars a tonne.","Forty-eight dollars a tonne between them. Both are things a good operator would do without an ESG label, so we don't claim them as a differentiator. We claim them as cash."],"land":"A$48/t, and that we are not overclaiming it.","cut":"the power detail. Say \"power adds eighteen.\"","handover":null,"coach":null},{"n":"10","title":"Where our story is thin","sec":30,"words":71,"spoken":28,"speaker":"C","say":["We went looking for holes in PLS's shared-value story and we found six. The net-zero target is a *decade*, not a year. The decade commencing 2040. There's no SBTi validation and no Scope 3 disclosure, on a company whose product is consumed downstream. The tailings method isn't disclosed either, so we carry it as an unpriced risk rather than assume it's fine.","We took the haircut before we built the number."],"land":"a decade is not a date.","cut":"the tailings sentence.","handover":"So here's the number after that haircut.","coach":"Do not apologise and do not hedge. This is a scoring slide."},{"n":"11","title":"The ESG value bridge","sec":62,"words":126,"spoken":50,"speaker":"D","say":["First, what this bridge is not. Nothing on it is added to the DCF. Ore sorting and the power strategy are already inside the five sixty-nine cost base the model discounts. This is an attribution, not an addition. We're asking where the value comes from, not adding it twice.","Forty-three cents a share. Thirty cents is the two cost levers. Thirteen cents is a P2000 permitting delay we think social licence avoids.","Now the arithmetic that reframes the pitch. Measured against the six-fourteen target, forty-three cents is 4.6%. A rounding adjustment. Measured against the sixty-six cents of upside, it's 66%. Most of the investment case.","And there's a further thirty-two cents of downstream value we've deliberately left *outside* the target. Nothing here depends on it landing."],"land":"attribution, not addition. Then 4.6% versus 66%.","cut":"the thirty-two cents. Keep it for Q&A.","handover":null,"coach":"The most important slide in the deck. Expect the double-counting question. Answer it before it is asked."},{"n":"12","title":"A finite orebody gets an annuity","sec":50,"words":99,"spoken":40,"speaker":"D","say":["Most DCFs end with a perpetuity growing at two and a half percent forever. A mine runs out.","On our production profile Pilgangoora consumes 104 of its 334 million mineable tonnes by FY36 and exits at 14.3 million tonnes a year. About sixteen years left. So we value the terminal period as a sixteen-year annuity, not a perpetuity.","That single choice is worth nine billion dollars of terminal value. A perpetuity would have handed us nineteen billion on an asset that runs out of rock. It's the difference between valuing a mine and valuing a company that never depletes."],"land":"A$9.0bn versus A$19.0bn.","cut":null,"handover":null,"coach":"This separates you from every team that ran a textbook DCF."},{"n":"13","title":"The range","sec":18,"words":37,"spoken":15,"speaker":"D","say":["Base six fifty-three, bear two dollars thirty, bull eight ninety-six. Our own Monte Carlo puts the probability of being right at 47%. So this is a position you build over several prints rather than take in one."],"land":"we ran it, and we are telling you it's 47%.","cut":null,"handover":null,"coach":"Plant it. Do not narrate a football field."},{"n":"14","title":"Risks","sec":18,"words":43,"spoken":17,"speaker":"D","say":["Twelve risks, each with an indicator we can observe. The one that decides this position is a sustained price relapse. If spodumene averages 20% below our base case, the target falls to about three dollars eighty and we're wrong. We haven't hedged that."],"land":"three dollars eighty, said without flinching.","cut":null,"handover":null,"coach":null},{"n":"15","title":"Close","sec":32,"words":69,"spoken":28,"speaker":"D","say":["Buy. Six dollars fourteen. 12.0% upside, 13.6% total return against a 5.90% benchmark.","Two thirds of that upside is shared value the market isn't paying for. The nearest catalyst is this quarter: first lithium phosphate from the mid-stream plant. The P2000 study lands in the December quarter. Both sit inside our horizon.","This screen re-ranks all six miners in the case set. PLS is just where it bites hardest."],"land":"the same target you opened with, unchanged.","cut":null,"handover":null,"coach":"Close on the number you opened with. Then stop talking."}],"qa":[{"tier":"Tier 1 — the questions you will definitely get","qs":[{"q":"The stock has already tripled. Why buy now?","a":["Three separate things drove that move and only one of them can repeat. First, short covering: PLS went from the most shorted stock on the ASX at about 20% of shares to 6.8% by May. That flow is finished, and we do not underwrite another squeeze. It has since rebuilt to 10.09%, which we treat as a risk rather than as fuel. Second, the price recovery, which is now largely in the numbers. Third, the earnings recovery, which is not: FY26 EBITDA of A$1,137m was earned at an average realised price of US$1,488/t, and the company exited the year at US$2,107/t. Our target rests on the third one."],"notes":["Do not get defensive. This is the strongest part of the pitch, not the weakest.","Have ready: the June-quarter realised price of US$2,107/t versus the FY26 average of US$1,488/t."],"refs":[]},{"q":"Your target is above consensus. What do you know that the street doesn't?","a":["Nothing about the lithium price, deliberately. Our FY27 assumption of US$1,700/t is 11% below spot-implied realisation and below the Australian Government's own 2026 forecast of US$2,236/t. Where we differ is the operating position: a cost base falling for structural reasons, a growth option with A$175m of pre-FID capital already committed, and a downstream route that becomes commercially relevant as carbon accounting reaches raw materials."],"notes":["Correction to have ready if they say you are above the whole street: vendor averages cluster A$4.50–5.70, but the full individual spread across 17–20 analysts runs A$2.50 to A$6.83. A$6.14 sits inside that range and below the most bullish analyst."],"refs":[]},{"q":"Isn't ore sorting just good engineering? How is that shared value?","a":["Yes, and we say so on slide 9 and again in appendix D4. PLS would have bought that sorter without an ESG rationale. Under Porter and Kramer that still qualifies as level two, redefining productivity, but level two is not a differentiator because any competitor can buy a sorter. That is exactly why our level-one argument rests on the mid-stream plant and the Korean joint venture instead, and why we quantify ore sorting at A$30/t rather than dressing it up as a moat."],"notes":["Agree with them. It is on the slide."],"refs":["D4"]},{"q":"Are you double-counting? Those cost savings are already in your cash flows.","a":["No, and the sheet says so at the top: this is an attribution, not an addition. The ore-sorting and power benefits are already inside the A$569/t FY26 cost base and the A$575–625/t FY27 guidance that the DCF discounts. Nothing is added. What the bridge does is decompose a valuation we have already struck and ask how much of it depends on ESG-linked operating decisions. The answer is A$0.43."],"notes":["This is the sharpest question available and the slide answers it in red."],"refs":[]},{"q":"Short interest is back above 10%. Doesn't that undermine you?","a":["It does, and we flag it on appendix F2 rather than dropping the indicator once it turned against us. Two things are true at once. The covering that drove much of the last twelve months is finished, so that flow cannot repeat. And shorts rebuilding to 10% says a well-resourced group thinks the re-rating overshot. We disagree with them, and our target never depended on a squeeze: it rests on FY27 earnings and the growth option. What it does change is sizing. At 10% short interest and 1.09x reward to risk, this is an overweight to build into rather than take in a single trade."],"notes":["This is now a live question — do not be caught out by it. Short interest bottomed at 6.8% in May 2026 and has rebuilt to *10.09% as at 4 August 2026, up 0.75 percentage points in a single week*. Our own risk register names a rebuild above 10% as a warning signal. It has triggered."],"refs":["F2"]},{"q":"Your own Monte Carlo says you're only 47% likely to be right.","a":["Correct, and we put it on the slide rather than in a footnote. Across 20,000 trials the mean intrinsic value is A$5.69, above the A$5.48 close, and the median is A$5.19, below it. Both are true at once, and the gap between them is the answer: a long right tail from the growth options against a fat left tail from price. What that changes is not the target. A$6.14 is a point estimate of the base case and it stands on its own inputs. What it changes is conviction, and therefore sizing. An expected value that clears the hurdle on a median that does not is a position you build over several prints rather than take in one — which is exactly where the short-interest rebuild leaves us too, arrived at independently."],"notes":["They read the appendix. Say so, and do not soften the number.","If they push on the specification: we deliberately correlated the P2000 and Colina go-decisions with the price draw. Drawing them independently fails those projects in precisely the states where they are worth most, which destroys the real option value the whole growth case rests on. That correlation is worth about four percentage points on the headline probability. Getting the mechanism right matters more than the flattering number.","If they ask why you show it at all: because a point estimate with no distribution behind it is not a valuation, it is an opinion with a decimal place. Appendix E16 has the full histogram, the input distributions, and the seed. The Monte Carlo sheet in the workbook reproduces every figure.","Numbers to have cold: P10 A$1.99 · P25 A$3.13 · P75 A$7.65 · P90 A$10.09 · probability above the close 46.6% · above the A$6.14 target 39.3% · more than 20% below the close 40.9%."],"refs":["E16"]},{"q":"Why PLS and not BHP or Rio Tinto?","a":["For a shared-value mandate specifically, four of the six use ESG to defend cash flows they already have. Scope 1 and 2 abatement on iron ore is a cost of staying in business, not a new pool of value. Rio has genuine lithium exposure but bought it at the top of the cycle for US$6.7bn with US$14.1bn of net debt, so a lithium thesis expressed through Rio is mostly an iron ore position. PLS is the only one of the six where the environmental outcome is the reason the customer exists."],"notes":["If pushed on South32: it was our runner-up, and we say so in appendix C6."],"refs":["C6"]}]},{"tier":"Tier 2 — the technical questions","qs":[{"q":"Does your 16-year mine life use pre- or post-P2000 throughput?","a":["Post. We divide the remaining ore base by the FY36 mining rate of 14.3Mt a year, which already includes P2000 at full run rate. Doubling throughput halves the life and the model captures that directly, which is why the bull case has a shorter life at 14.2 years and gives back part of the volume upside in the terminal value."],"notes":[],"refs":[]},{"q":"Where does the 75% resource-to-reserve conversion come from?","a":["It is our assumption and it is the single most important one on the page, which is why it is highlighted yellow in the workbook. The reserve alone, 214Mt last stated in August 2023, would not support the expansion we model. At 60% conversion the target falls about A$0.40; at 90% it rises about A$0.30. The reserve has not been restated since the June 2025 resource upgrade, so the next reserve statement moves it in either direction."],"notes":["Concede immediately that it is a judgement."],"refs":[]},{"q":"Why an annuity instead of a perpetuity?","a":["Because an orebody is finite. A growing perpetuity would have valued the terminal period at A$19.0bn instead of A$9.9bn on an asset that runs out of rock. It also drops terminal value from about 68% of enterprise value to 50.7%, so less of the answer rests on an assumption nobody can test."],"notes":[],"refs":[]},{"q":"Your reward-to-risk is barely 1:1. Why is that a buy?","a":["It is 1.09x and we put that on the slide rather than burying it. What justifies the position is the expected return against the mandate, not the shape of the distribution: 13.6% against a 5.90% benchmark for a fund that needs two points. We would also note the bear case stacks every bad outcome simultaneously — prices at marginal cost, no P2000, no Colina, flat volumes for a decade — and still lands 19% above the price the market actually printed at the last trough."],"notes":["Do not argue with the arithmetic."],"refs":[]},{"q":"How did you get A$30/t for ore sorting and A$18/t for power?","a":["FY26 unit costs fell A$58/t while volumes rose 17%. We attribute roughly half to fixed-cost dilution and half, about A$29/t, to sorting. For power we take 15–20% of the A$569/t cost base as power, call it A$95/t, and assume a diesel-to-gas-and-solar switch cuts about a fifth of it. Both are our estimates with the arithmetic on the slide. PLS does not disclose either."],"notes":[],"refs":[]},{"q":"What is your WACC and why?","a":["8.88%. Cost of equity is 9.38% straight from the case's prescribed inputs: 5% risk-free plus 0.73 beta times a 6% market risk premium. We add 10% target gearing at a 6.25% pre-tax cost of debt, 4.38% after tax, even though PLS is currently net cash by A$1.44bn, because that is a through-cycle structure rather than a point-in-time one."],"notes":[],"refs":[]}]},{"tier":"Tier 4 — the ones designed to unsettle you","qs":[{"q":"Your own recommendation contributes to the oversupply you are worried about.","a":["Correct. PLS restarted Ngungaju in the same window as Bald Hill and Finniss and is guiding to a 17–25% volume increase. Everyone restarting at once is what caps a price recovery. That is why our base case assumes prices fall about a fifth from the June-quarter exit rate, and why the cost curve matters more than the price forecast: the question is not who supplies the next tonne, it is who is still profitable when they all do."],"notes":["True, and it is on slide B6."],"refs":["B6"]},{"q":"You claim social licence protects P2000, then say the offsets scheme is inadequate. Which is it?","a":["Both, and they are different approvals with different failure modes. Heritage approval turns on relationships with Traditional Owners and on process. Environmental offsets turn on a state scheme's pricing, which an independent review found too low at A$893 to A$3,781 a hectare. PLS can be strong on the first and exposed on the second at the same time. It is why schedule protection is the smallest item in our bridge at A$0.13, and why the offsets problem is an engagement ask rather than a valuation adjustment."],"notes":["Both. Do not flinch."],"refs":[]},{"q":"What would make you wrong?","a":["A sustained price relapse. If spodumene averages 20% below our base case across the forecast, the target falls to about A$3.80 and the recommendation is wrong. We would also change our mind if the P2000 study slips past the December quarter, or if short interest rebuilds above 10% of shares, because that would tell us a well-resourced group disagrees with us and we would want to know why."],"notes":["Have this answer word-perfect. It is the best question you can get."],"refs":[]},{"q":"Sodium-ion makes lithium worthless. Discuss.","a":["It is the sharpest substitution risk and we rate it that way in appendix B11. It is most credible in stationary storage, which is exactly the demand leg we lean on. Solid-state is usually mischaracterised as a lithium threat and is more likely lithium-positive per kWh. Our terminal value is a finite annuity rather than a perpetuity, so roughly half our enterprise value sits in a window where this risk is live. We would watch sodium-ion cell cost per kWh and announced storage orders."],"notes":[],"refs":["B11"]}]}],"tier3":[["What is PLS's Scope 3?","Not disclosed. We name it as a material gap and it is our second engagement ask, because the low-carbon claim cannot be declared without it."],["What is emissions intensity per tonne?","Not a disclosed KPI. Third-party aggregator figures exist, disagree with each other, and we judged them unreliable rather than cite them."],["What tailings method does Pilgangoora use?","We could not establish it and we refuse to assert either way. It is carried as an unpriced risk, and it matters more as P2000 roughly doubles tailings volumes."],["What is their TRIFR?","2.77 in FY26, an 11% improvement, achieved while volumes rose 17% and a mothballed plant restarted. That is a reasonable proxy for whether they can execute a doubling of throughput."],["Indigenous employment and procurement?","Still not retrievable. For a Pilbara operator whose growth depends on heritage approvals, that is the disclosure we most want and still do not have."],["Female participation? Environmental incidents?","21.9% in FY26, up on the prior year. Zero major environmental, water or waste incidents."],["What is their MSCI or Sustainalytics rating?","Not retrievable. We would argue the case asks us to go beneath the rank anyway, and everything material we found came from operating facts, not scores."],["What are their total borrowings?","A$853m at 30 June 2026, after the US$600m notes issue and net of revolving facility repayments. Net cash A$1,437m. Our balance sheet ties to the reported A$6,258m of total assets."],["Is ESG in management's pay?","We could not verify it. That is exactly why it is an engagement ask: a strategy that depends on management goodwill does not survive a change of management."]],"nums":[["Target / last close / upside","A$6.14 / A$5.48 / +12.0%"],["Total return vs benchmark","13.6% vs 5.90%, outperformance 7.7%"],["Bear / base / bull","A$2.30 / A$6.53 / A$8.96"],["WACC / cost of equity","8.88% / 9.38%"],["FY26 revenue / EBITDA / NPAT","A$1,934m / A$1,137m (59%) / A$526m"],["FY26 production / cost / realised","879.5kt / A$569/t FOB / US$1,488/t"],["FY26 ESG","Scope 1+2 down 5%, TRIFR 2.77 (-11%), female participation 21.9%, zero major incidents"],["Q4 FY26 realised","US$2,107/t actual grade, US$2,415/t SC6-equivalent"],["FY27 guidance","1,030–1,100kt, A$575–625/t, capex A$620–685m"],["Cash / borrowings / net cash","A$2,290m / A$853m / A$1,437m"],["P2000","A$2.6bn NPV, 55% IRR, ~A$1.2bn capex, DFS Dec-qtr 2026, first ore mid-2029"],["Resource / reserve","446Mt @ 1.28% Li2O / 214Mt @ 1.19% (Aug 2023)"],["ESG bridge / share of upside","A$0.43 / 66% of the A$0.66 upside"],["Downstream option, risked","A$0.32, held outside the target"],["Mine life / terminal value","16.1 years / A$9.9bn annuity vs A$19.0bn perpetuity"],["Short interest","20% (Sep 2024), 6.8% (May 2026), *10.09% (4 Aug 2026)*"]],"handover":{"2":8,"6":8,"10":8}}</script>
+<script>
+(function(){
+  var D = JSON.parse(document.getElementById('payload').textContent);
+  var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+  /* the source marks spoken emphasis with *asterisks* */
+  var em = function(s){ return esc(s).replace(/\*([^*]+)\*/g, '<em>$1</em>'); };
+  var mmss = function(t){ t=Math.max(0,Math.round(t)); return Math.floor(t/60)+':'+String(t%60).padStart(2,'0'); };
+
+  /* cumulative clock, including the 8-second handovers at speaker changes */
+  var marks=[], t=0;
+  D.script.forEach(function(s, i){
+    var start=t; t+=s.sec;
+    marks.push({i:i, start:start, end:t, s:s});
+    var h = D.handover[s.n];
+    if(h){ marks[marks.length-1].gap=h; t+=h; }
+  });
+  var TOTAL=t;
+
+  /* ---------- run sheet ---------- */
+  var out='';
+  marks.forEach(function(m){
+    var s=m.s, cues='';
+    if(s.land)     cues+='<div class="cue land"><i>Land</i><span>'+em(s.land)+'</span></div>';
+    if(s.cut)      cues+='<div class="cue cut"><i>Cut if behind</i><span>'+em(s.cut)+'</span></div>';
+    if(s.handover) cues+='<div class="cue hand"><i>Handover</i><span>&ldquo;'+esc(s.handover)+'&rdquo;</span></div>';
+    if(s.n==='14') cues+='<div class="cue warn"><i>Do not say</i><span>Short interest is 6.8%. It rebuilt to 10.09%, above our own 10% warning line, and it is on appendix F2. If it comes up, give the current number.</span></div>';
+    if(s.n==='12') cues+='<div class="cue hand"><i>If asked</i><span>Pre- or post-expansion? Post. Remaining ore over the FY36 rate, which already includes P2000.</span></div>';
+    out+='<article class="slide" data-speaker="'+s.speaker+'" data-i="'+m.i+'">'
+      +'<div class="rail">'
+        +'<div class="sn">'+(s.n?'<small>Slide</small>'+s.n:'<small>&nbsp;</small>&bull;')+'</div>'
+        +'<div class="budget">'+s.sec+'s</div>'
+        +'<div class="cum">'+mmss(m.end)+'</div>'
+        +'<div class="who" data-s="'+s.speaker+'">'+s.speaker+'</div>'
+      +'</div>'
+      +'<div class="body">'
+        +'<h3>'+esc(s.title)+'</h3>'
+        +(s.coach?'<p class="coach">'+esc(s.coach)+'</p>':'')
+        + s.say.map(function(p){ return '<p class="say">'+em(p)+'</p>'; }).join('')
+        +(cues?'<div class="cues">'+cues+'</div>':'')
+      +'</div></article>';
+    if(m.gap) out+='<div class="hand-gap">handover &middot; '+m.gap+'s</div>';
+  });
+  document.getElementById('slides').innerHTML=out;
+
+  /* ---------- Q&A ---------- */
+  var q='';
+  D.qa.forEach(function(tier){
+    q+='<p class="tier">'+esc(tier.tier)+'</p>';
+    tier.qs.forEach(function(it){
+      var refs = (it.refs||[]).map(function(r){ return '<span class="ref">'+esc(r)+'</span>'; }).join('');
+      q+='<details class="q"><summary>'+esc(it.q)+'</summary><div class="ans">'
+        + it.a.map(function(p){ return '<p class="said">'+em(p)+'</p>'; }).join('')
+        + it.notes.map(function(p){ return '<p class="note">'+em(p)+'</p>'; }).join('')
+        + (refs?'<div class="refs">'+refs+'</div>':'')
+        +'</div></details>';
+    });
+  });
+  q+='<p class="tier">Tier 3 &mdash; rapid fire on the gaps we disclosed</p>'
+    +'<div class="rapid-wrap"><table class="rapid"><thead><tr><th>If they ask</th><th>Say</th></tr></thead><tbody>'
+    + D.tier3.map(function(r){ return '<tr><td>'+esc(r[0])+'</td><td>'+em(r[1])+'</td></tr>'; }).join('')
+    +'</tbody></table></div>';
+  document.getElementById('qalist').innerHTML=q+'<p class="empty" id="noq" hidden>Nothing matches that.</p>';
+
+  /* ---------- figures ---------- */
+  document.getElementById('figs').innerHTML = D.nums.map(function(r){
+    return '<div class="figrow"><dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+'</dd></div>'; }).join('');
+
+  /* ---------- speaker filter ---------- */
+  var slides=[].slice.call(document.querySelectorAll('.slide')),
+      gaps=[].slice.call(document.querySelectorAll('.hand-gap'));
+  function applyFilter(v){
+    slides.forEach(function(el){ el.classList.toggle('dim', v!=='all' && el.dataset.speaker!==v); });
+    gaps.forEach(function(el){ el.style.opacity = v==='all' ? '' : '.32'; });
+    [].forEach.call(document.querySelectorAll('#seg button'), function(b){
+      b.setAttribute('aria-pressed', String(b.dataset.s===v)); });
+    try{ localStorage.setItem('pls-speaker', v); }catch(e){}
+  }
+  document.getElementById('seg').addEventListener('click', function(e){
+    var b=e.target.closest('button[data-s]'); if(b) applyFilter(b.dataset.s); });
+  var saved='all'; try{ saved=localStorage.getItem('pls-speaker')||'all'; }catch(e){}
+  applyFilter(saved);
+
+  /* ---------- tabs ---------- */
+  var find=document.getElementById('find'), seg=document.getElementById('seg');
+  [].forEach.call(document.querySelectorAll('[role="tab"]'), function(tab){
+    tab.addEventListener('click', function(){
+      [].forEach.call(document.querySelectorAll('[role="tab"]'), function(t){
+        var on = t===tab;
+        t.setAttribute('aria-selected', String(on));
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      var isQA = tab.id==='tab-qa';
+      find.hidden = !isQA; seg.hidden = tab.id!=='tab-script';
+    });
+  });
+
+  /* ---------- Q&A search ---------- */
+  find.addEventListener('input', function(){
+    var v=find.value.trim().toLowerCase(), any=false;
+    [].forEach.call(document.querySelectorAll('details.q'), function(d){
+      var hit = !v || d.textContent.toLowerCase().indexOf(v)>-1;
+      d.hidden=!hit; if(hit) any=true;
+      if(v && hit) d.open=true; if(!v) d.open=false;
+    });
+    [].forEach.call(document.querySelectorAll('.tier'), function(p){
+      var n=p.nextElementSibling, shown=false;
+      while(n && !n.classList.contains('tier')){
+        if((n.tagName==='DETAILS' && !n.hidden) || n.classList.contains('rapid-wrap')) shown=true;
+        n=n.nextElementSibling;
+      }
+      p.hidden = v ? !shown : false;
+    });
+    var rw=document.querySelector('.rapid-wrap');
+    if(rw){
+      var rows=[].slice.call(rw.querySelectorAll('tbody tr')), rany=false;
+      rows.forEach(function(tr){
+        var hit=!v || tr.textContent.toLowerCase().indexOf(v)>-1;
+        tr.hidden=!hit; if(hit) rany=true;
+      });
+      rw.hidden = v ? !rany : false;
+      if(rany) any=true;
+    }
+    document.getElementById('noq').hidden = any;
+  });
+
+  /* ---------- rehearsal clock ---------- */
+  var t0=null, acc=0, tick=null,
+      elEl=document.getElementById('elapsed'), dEl=document.getElementById('delta'),
+      nEl=document.getElementById('onnow'), goB=document.getElementById('go');
+  function now(){ return acc + (t0 ? (Date.now()-t0)/1000 : 0); }
+  function paint(){
+    var e=now(); elEl.textContent=mmss(e);
+    var cur=null;
+    for(var i=0;i<marks.length;i++){ if(e>=marks[i].start && e<marks[i].end+(marks[i].gap||0)){ cur=marks[i]; break; } }
+    slides.forEach(function(el){ el.classList.remove('live'); });
+    if(t0===null && acc===0){
+      dEl.textContent='not started'; dEl.className='delta';
+      nEl.innerHTML='Target finish <b>'+mmss(TOTAL)+'</b>. Press start when you open your mouth.';
+      return;
+    }
+    if(cur){
+      var el=slides[cur.i]; if(el){ el.classList.add('live'); }
+      var left=Math.max(0, cur.end-e);
+      nEl.innerHTML='On <b>'+(cur.s.n?'slide '+cur.s.n:'the title')+'</b> &middot; '+esc(cur.s.title)
+        +' &middot; speaker <b>'+cur.s.speaker+'</b> &middot; '+mmss(left)+' left on it';
+      var drift=e-cur.end;
+      if(drift>3){ dEl.textContent='+'+mmss(drift)+' behind'; dEl.className='delta late'; }
+      else if(drift<-3){ dEl.textContent=mmss(-drift)+' in hand'; dEl.className='delta ahead'; }
+      else { dEl.textContent='on time'; dEl.className='delta ahead'; }
+    } else {
+      var over=e-TOTAL;
+      dEl.textContent = over>0 ? '+'+mmss(over)+' over' : 'on time';
+      dEl.className = 'delta ' + (over>0?'late':'ahead');
+      nEl.innerHTML = over>0
+        ? 'Past <b>'+mmss(TOTAL)+'</b>. Stop talking and take questions.'
+        : 'Finished. Stop talking and take questions.';
+    }
+  }
+  goB.addEventListener('click', function(){
+    if(t0===null){ t0=Date.now(); goB.textContent='Pause'; goB.classList.remove('go');
+      tick=setInterval(paint,250); }
+    else { acc=now(); t0=null; goB.textContent='Resume'; goB.classList.add('go');
+      clearInterval(tick); tick=null; }
+    paint();
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    t0=null; acc=0; clearInterval(tick); tick=null;
+    goB.textContent='Start'; goB.classList.add('go'); paint();
+  });
+  paint();
+})();
+</script>

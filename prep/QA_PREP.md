@@ -17,7 +17,8 @@ Do not get defensive. This is the strongest part of the pitch, not the weakest.
 
 > Three separate things drove that move and only one of them can repeat. First, short covering: PLS
 > went from the most shorted stock on the ASX at about 20% of shares to 6.8% by May. That flow is
-> finished, and we do not underwrite another squeeze. Second, the price recovery, which is now
+> finished, and we do not underwrite another squeeze. It has since rebuilt to 10.09%, which we
+> treat as a risk rather than as fuel. Second, the price recovery, which is now
 > largely in the numbers. Third, the earnings recovery, which is not: FY26 EBITDA of A$1,137m was
 > earned at an average realised price of US$1,488/t, and the company exited the year at US$2,107/t.
 > Our target rests on the third one.

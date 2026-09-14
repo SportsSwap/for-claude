@@ -54,9 +54,10 @@ Say it on slide 1 or slide 11. Not both.
 | 14 | Risks | 18 | D |
 | 15 | Close | 32 | D |
 
-**Checkpoints.** Someone off-mic holds a card. You should be leaving slide 2 at **1:33**,
-slide 6 at **3:33**, slide 10 at **5:57**, slide 12 at **7:49**. If you are more than 15
-seconds behind at any checkpoint, take the cut line on the next slide and do not
+**Checkpoints.** Someone off-mic holds a card. Counting three 8-second handovers at the
+speaker changes, you should be leaving slide 2 at **1:33**, slide 6 at **3:21**, slide 10
+at **5:51** and slide 12 at **7:51**, finishing at **8:59**. If you are more than 15
+seconds behind at any checkpoint, take the printed cut line on the next slide. Do not
 improvise a different one.
 
 **Dividers get zero seconds.** Advance through them while still finishing the previous
