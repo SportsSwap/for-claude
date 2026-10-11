@@ -1,12 +1,12 @@
-"""Day-by-day portfolio backtest of the MACD swing strategy.
+"""Bar-by-bar portfolio backtest of the MACD swing strategy. Works on daily or intraday bars.
 
-Order of events each trading day:
-  1. Open: exits flagged at yesterday's close (MACD cross down, time stop) fill at the open.
+Order of events on each bar:
+  1. Open: exits flagged at the previous close (MACD cross down, time stop) fill at the open.
   2. Open: if a stock gaps through its stop or target, it fills at the open.
-  3. Open: entries flagged at yesterday's close fill at the open.
-  4. Intraday: stops and targets are checked against the day's low and high.
-     If both are touched on the same day, the stop is assumed to have hit first.
-  5. Close: equity is marked to market and tomorrow's exits and entries are chosen.
+  3. Open: entries flagged at the previous close fill at the open.
+  4. During the bar: stops and targets are checked against the bar's low and high.
+     If both are touched in the same bar, the stop is assumed to have hit first.
+  5. Close: equity is marked to market and the next bar's exits and entries are chosen.
 """
 
 from dataclasses import dataclass, field
@@ -21,13 +21,14 @@ from strategy import add_signals
 @dataclass
 class Position:
     ticker: str
-    entry_date: pd.Timestamp
+    entry_time: pd.Timestamp
     entry_price: float
     shares: float
     stop: float
     target: float | None
     entry_cost: float
-    days_held: int = 0
+    days_held: int = 1                  # trading sessions, counting the entry session
+    last_day: object = None
     exit_next_open: str | None = None
 
 
@@ -40,6 +41,10 @@ class Result:
     kill_switch_date: pd.Timestamp | None = None
     skipped_signals: int = 0
     notes: list[str] = field(default_factory=list)
+
+
+def fmt_time(ts: pd.Timestamp) -> str:
+    return str(ts.date()) if ts == ts.normalize() else ts.strftime("%Y-%m-%d %H:%M")
 
 
 def commission(shares: float, price: float, r: Risk) -> float:
@@ -56,18 +61,24 @@ def position_size(equity: float, cash: float, entry: float, stop: float, r: Risk
     by_cash = cash / (entry * (1 + r.commission_max_pct))
     shares = max(0.0, min(by_risk, by_cap, by_cash))
     if not r.fractional_shares:
-        shares = math.floor(shares)
-    else:
-        shares = math.floor(shares * 10_000) / 10_000
-    return shares
+        return float(math.floor(shares))
+    return math.floor(shares * 10_000) / 10_000
 
 
 def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
-        start: str | None = None, end: str | None = None) -> Result:
-    data = {t: add_signals(df, s) for t, df in prices.items() if len(df)}
-    dates = sorted(set().union(*(df.index for df in data.values())))
-    dates = [d for d in dates if (start is None or d >= pd.Timestamp(start))
-             and (end is None or d <= pd.Timestamp(end))]
+        start: str | None = None, end: str | None = None,
+        daily: dict[str, pd.DataFrame] | None = None) -> Result:
+    rows: dict[str, dict] = {}
+    for t, df in prices.items():
+        if not len(df):
+            continue
+        d = add_signals(df, s, (daily or {}).get(t))
+        d["prev_atr"] = d["atr"].shift(1)
+        rows[t] = d.to_dict("index")
+
+    times = sorted(set().union(*(rows_t.keys() for rows_t in rows.values()))) if rows else []
+    times = [ts for ts in times if (start is None or ts >= pd.Timestamp(start))
+             and (end is None or ts < pd.Timestamp(end) + pd.Timedelta(days=1))]
 
     cash = r.starting_capital
     positions: dict[str, Position] = {}
@@ -79,7 +90,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
     skipped = 0
     equity = cash
 
-    def close_position(p: Position, date, raw_price: float, reason: str):
+    def close_position(p: Position, ts, raw_price: float, reason: str):
         nonlocal cash
         price = raw_price * (1 - r.slippage_pct)
         fee = commission(p.shares, price, r)
@@ -88,9 +99,9 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         risk_dollars = p.shares * (p.entry_price - p.stop)
         trades.append({
             "ticker": p.ticker,
-            "entry_date": p.entry_date.date(),
+            "entry_date": fmt_time(p.entry_time),
             "entry_price": round(p.entry_price, 4),
-            "exit_date": date.date(),
+            "exit_date": fmt_time(ts),
             "exit_price": round(price, 4),
             "shares": p.shares,
             "stop": round(p.stop, 4),
@@ -102,56 +113,57 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         })
         del positions[p.ticker]
 
-    for date in dates:
-        bars = {t: df.loc[date] for t, df in data.items() if date in df.index}
+    for ts in times:
+        bars = {t: rows_t[ts] for t, rows_t in rows.items() if ts in rows_t}
+        day = ts.date()
 
         # 1-2. Exits at the open.
         for p in list(positions.values()):
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
-            p.days_held += 1
+            if day != p.last_day:
+                p.days_held += 1
+                p.last_day = day
             if p.exit_next_open:
-                close_position(p, date, bar["Open"], p.exit_next_open)
+                close_position(p, ts, bar["Open"], p.exit_next_open)
             elif bar["Open"] <= p.stop:
-                close_position(p, date, bar["Open"], "stop (gap)")
+                close_position(p, ts, bar["Open"], "stop (gap)")
             elif p.target and bar["Open"] >= p.target:
-                close_position(p, date, bar["Open"], "target (gap)")
+                close_position(p, ts, bar["Open"], "target (gap)")
 
-        # 3. Entries at the open, sized off yesterday's equity.
+        # 3. Entries at the open, sized off the previous bar's equity.
         for t in pending_entries:
             bar = bars.get(t)
-            prev = data[t].loc[:date].iloc[:-1]
-            if bar is None or t in positions or prev.empty:
+            if bar is None or t in positions or pd.isna(bar["prev_atr"]):
                 continue
             entry = bar["Open"] * (1 + r.slippage_pct)
-            stop = entry - s.stop_atr_mult * prev["atr"].iloc[-1]
+            stop = entry - s.stop_atr_mult * bar["prev_atr"]
             shares = position_size(equity, cash, entry, stop, r)
             if shares <= 0 or stop <= 0:
                 skipped += 1
                 continue
-            fee = commission(shares, entry, r)
-            cost = shares * entry + fee
+            cost = shares * entry + commission(shares, entry, r)
             cash -= cost
             target = entry + s.target_r * (entry - stop) if s.target_r else None
-            positions[t] = Position(t, date, entry, shares, stop, target, cost, days_held=1)
+            positions[t] = Position(t, ts, entry, shares, stop, target, cost, last_day=day)
         pending_entries = []
 
-        # 4. Intraday stops and targets.
+        # 4. Stops and targets during the bar.
         for p in list(positions.values()):
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
             if bar["Low"] <= p.stop:
-                close_position(p, date, p.stop, "stop")
+                close_position(p, ts, p.stop, "stop")
             elif p.target and bar["High"] >= p.target:
-                close_position(p, date, p.target, "target")
+                close_position(p, ts, p.target, "target")
 
-        # 5. Close: mark to market, then plan tomorrow.
+        # 5. Close: mark to market, then plan the next bar.
         for t, bar in bars.items():
             last_close[t] = bar["Close"]
         equity = cash + sum(p.shares * last_close[p.ticker] for p in positions.values())
-        equity_curve[date] = equity
+        equity_curve[ts] = equity
 
         for p in positions.values():
             bar = bars.get(p.ticker)
@@ -163,7 +175,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 p.exit_next_open = "time stop"
 
         if kill_date is None and equity <= r.starting_capital * r.kill_switch_pct:
-            kill_date = date
+            kill_date = ts
         if kill_date is not None:
             continue
 
@@ -175,19 +187,19 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         skipped += max(len(candidates) - len(pending_entries), 0)
 
     # Close anything still open at the last available price.
-    if dates:
+    if times:
         for p in list(positions.values()):
-            close_position(p, dates[-1], last_close[p.ticker], "end of test")
-        equity_curve[dates[-1]] = cash
+            close_position(p, times[-1], last_close[p.ticker], "end of test")
+        equity_curve[times[-1]] = cash
 
-    return Result(s, r, pd.DataFrame(trades), pd.Series(equity_curve, name="equity"),
+    return Result(s, r, pd.DataFrame(trades), pd.Series(equity_curve, name="equity", dtype=float),
                   kill_date, skipped)
 
 
 def stats(res: Result) -> dict:
     eq, tr = res.equity, res.trades
     if eq.empty:
-        return {}
+        return {"strategy": res.strategy.name, "trades": 0}
     start_cap = res.risk.starting_capital
     years = max((eq.index[-1] - eq.index[0]).days / 365.25, 1e-9)
     drawdown = eq / eq.cummax() - 1
@@ -201,7 +213,7 @@ def stats(res: Result) -> dict:
         "max_drawdown_pct": round(drawdown.min() * 100, 1),
         "lowest_equity": round(eq.min(), 2),
         "trades": len(tr),
-        "kill_switch_hit": str(res.kill_switch_date.date()) if res.kill_switch_date is not None else "no",
+        "kill_switch_hit": fmt_time(res.kill_switch_date) if res.kill_switch_date is not None else "no",
     }
     if len(tr):
         wins, losses = tr[tr.pnl > 0], tr[tr.pnl <= 0]
@@ -223,9 +235,9 @@ def stats(res: Result) -> dict:
 
 def buy_and_hold(df: pd.DataFrame, capital: float, start=None, end=None) -> dict:
     px = df["Close"]
-    if start:
-        px = px[px.index >= pd.Timestamp(start)]
-    if end:
+    if start is not None:
+        px = px[px.index >= pd.Timestamp(start).normalize()]
+    if end is not None:
         px = px[px.index <= pd.Timestamp(end)]
     if px.empty:
         return {}

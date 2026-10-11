@@ -14,10 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import backtest  # noqa: E402
 from config import DEFAULT_RISK, DEFAULT_STRATEGY  # noqa: E402
 from indicators import macd  # noqa: E402
+from data import resample_session  # noqa: E402
 from strategy import add_signals  # noqa: E402
 
 NO_COSTS = replace(DEFAULT_RISK, slippage_pct=0.0, commission_min=0.0, commission_per_share=0.0)
-S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None)
+S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0)
+CLASSIC = replace(DEFAULT_STRATEGY, macd_slow=26, require_below_zero=False, trend_ma=None)
 
 
 def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
@@ -26,7 +28,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
     df = pd.DataFrame(rows, index=idx, columns=["Open", "High", "Low", "Close"])
     df["Volume"] = 1_000_000
     df["atr"] = atr
-    df["momentum_20d"] = momentum
+    df["momentum_20"] = momentum
     df["entry_signal"] = [i in signal_days for i in range(len(rows))]
     df["cross_down"] = [i in cross_down_days for i in range(len(rows))]
     return df
@@ -35,7 +37,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s: df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None: df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -60,10 +62,11 @@ def test_cross_up_detected_and_warmup_suppressed():
     close = np.r_[np.linspace(200, 100, 80), np.linspace(100, 160, 40)]
     df = pd.DataFrame({"Open": close, "High": close + 1, "Low": close - 1, "Close": close,
                        "Volume": 1}, index=pd.bdate_range("2023-01-02", periods=len(close)))
-    d = add_signals(df, replace(DEFAULT_STRATEGY, trend_sma=None))
+    d = add_signals(df, CLASSIC)
     assert d["cross_up"].sum() == 1
     assert d["cross_up"].idxmax() > d.index[79]
-    assert not d["entry_signal"].iloc[:36].any()
+    assert d["entry_signal"].sum() == 1
+    assert not d["entry_signal"].iloc[:53].any()
 
 
 def test_entry_next_open_and_stop_hit(fake_signals):
@@ -157,7 +160,7 @@ def test_runs_end_to_end_on_random_walk():
             "Open": open_, "High": np.maximum(open_, close) * 1.01,
             "Low": np.minimum(open_, close) * 0.99, "Close": close, "Volume": 1,
         }, index=pd.bdate_range("2020-01-01", periods=600))
-    res = backtest.run(prices, DEFAULT_STRATEGY, DEFAULT_RISK)
+    res = backtest.run(prices, CLASSIC, DEFAULT_RISK)
     st = backtest.stats(res)
     assert st["trades"] > 0
     # P&L is rounded to cents per trade in the log.
@@ -169,3 +172,82 @@ def test_runs_end_to_end_on_random_walk():
         open_count += delta
         peak = max(peak, open_count)
     assert peak <= 3
+
+
+# --- Your setup: MACD 12/144/9, 200-day rule, zero-line crosses, intraday bars ---
+
+def ohlc(close, index):
+    close = np.asarray(close, dtype=float)
+    return pd.DataFrame({"Open": close, "High": close + 1, "Low": close - 1, "Close": close,
+                         "Volume": 1}, index=index)
+
+
+def test_dip_buy_requires_cross_below_zero_and_price_under_200_day():
+    # Fall then bounce: the MACD crosses its signal line while still under zero.
+    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    df = ohlc(close, idx)
+    d = add_signals(df, DEFAULT_STRATEGY, daily=df)
+    hits = d[d.entry_signal]
+    assert len(hits) >= 1
+    assert (hits.macd < 0).all() and (hits.Close < hits.trend_ma).all()
+    # Same bounce but the stock is above its 200-day average: no dip-buy signal.
+    lifted = ohlc(close + 500, idx)
+    low_daily = ohlc(np.full(len(close), 100.0), idx)
+    assert not add_signals(lifted, DEFAULT_STRATEGY, daily=low_daily).entry_signal.any()
+
+
+def test_200_day_ema_on_intraday_bars_uses_yesterdays_value():
+    days = pd.bdate_range("2023-01-02", periods=210)
+    daily = ohlc(np.arange(210, dtype=float), days)
+    times = [d + pd.Timedelta(hours=h, minutes=30) for d in days[-3:] for h in (9, 11, 13, 15)]
+    bars_2h = ohlc(np.full(len(times), 50.0), pd.DatetimeIndex(times))
+    d = add_signals(bars_2h, DEFAULT_STRATEGY, daily=daily)
+    expected = daily.Close.ewm(span=200, adjust=False).mean().shift(1)
+    for ts, val in d.trend_ma.items():
+        assert val == pytest.approx(expected.loc[ts.normalize()])
+
+
+def test_zero_line_cross_and_price_not_run_filter():
+    close = np.r_[np.linspace(300, 200, 300), np.linspace(200, 260, 150)]
+    df = ohlc(close, pd.bdate_range("2022-01-03", periods=len(close)))
+    zero = replace(DEFAULT_STRATEGY, entry="zero_cross", require_below_zero=False, trend_ma=None)
+    d = add_signals(df, zero)
+    hits = d[d.entry_signal]
+    assert len(hits) == 1
+    i = d.index.get_loc(hits.index[0])
+    assert d.macd.iloc[i] > 0 and d.macd.iloc[i - 1] <= 0
+    # By the time the zero line is crossed the price has run well off its low, so a tight filter blocks it.
+    assert d.loc[hits.index[0], "Close"] - d.Low.iloc[i - 19:i + 1].min() > 0.5 * d.atr.iloc[i]
+    assert not add_signals(df, replace(zero, max_run_atr=0.5)).entry_signal.any()
+
+
+def test_resample_2h_and_4h_match_tradingview_sessions():
+    day = pd.Timestamp("2024-03-05")
+    times = [day + pd.Timedelta(hours=9, minutes=30) + pd.Timedelta(hours=h) for h in range(7)]
+    h1 = pd.DataFrame({"Open": range(1, 8), "High": range(11, 18), "Low": range(0, 7),
+                       "Close": range(2, 9), "Volume": [10] * 7}, index=pd.DatetimeIndex(times), dtype=float)
+    two = resample_session(h1, 2)
+    assert [t.strftime("%H:%M") for t in two.index] == ["09:30", "11:30", "13:30", "15:30"]
+    assert two.iloc[0].tolist() == [1, 12, 0, 3, 20]
+    four = resample_session(h1, 4)
+    assert [t.strftime("%H:%M") for t in four.index] == ["09:30", "13:30"]
+    assert four.iloc[1].tolist() == [5, 17, 4, 8, 30]
+
+
+def test_time_stop_counts_trading_days_not_bars(fake_signals):
+    times = [d + pd.Timedelta(hours=h, minutes=30) for d in pd.bdate_range("2024-01-01", periods=5)
+             for h in (9, 11, 13, 15)]
+    df = pd.DataFrame([FLAT] * len(times), index=pd.DatetimeIndex(times), columns=["Open", "High", "Low", "Close"])
+    df["Volume"], df["atr"], df["momentum_20"], df["cross_down"] = 1, 1.0, 0.0, False
+    df["entry_signal"] = [i == 0 for i in range(len(times))]
+    t = backtest.run({"X": df}, replace(S, max_hold_days=2), NO_COSTS).trades.iloc[0]
+    assert t.entry_date == "2024-01-01 11:30"
+    assert t.exit_reason == "time stop" and t.exit_date == "2024-01-02 11:30"
+
+
+def test_higher_risk_pct_means_bigger_position(fake_signals):
+    df = bars([FLAT, FLAT, (100, 100, 89, 89)], signal_days=[0], atr=5.0)
+    small = backtest.run({"X": df}, S, NO_COSTS).trades.iloc[0]
+    big = backtest.run({"X": df}, S, replace(NO_COSTS, risk_per_trade=0.03)).trades.iloc[0]
+    assert big.pnl == pytest.approx(1.5 * small.pnl, abs=0.02)
