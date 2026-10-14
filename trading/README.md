@@ -92,6 +92,42 @@ past, not found an edge. Change one thing at a time, for a reason.
 **Known limit:** the stock list contains today's winners, so past results look better than they
 would have in real time (survivorship bias). Treat any backtest return as an upper bound.
 
+## Test it in TradingView (Pine Script)
+
+`pine/macd_dip_buy.pine` is the same strategy as a TradingView strategy script, so you can run it in
+TradingView's Strategy Tester on TradingView's own data and see every trade on your chart.
+
+1. Open a chart (for example NVDA or SNDK) and set the timeframe to 2h (or 1h, 4h, 45m).
+2. Open the **Pine Editor** at the bottom of the screen, delete what's there, paste in the whole file, and click **Add to chart**.
+3. Open the **Strategy Tester** tab at the bottom. **Overview** shows the equity curve, **List of trades** shows each trade.
+4. Click the gear on the strategy to change settings. To test each variant:
+
+| Variant | Settings to change from the default |
+|---|---|
+| Dip buy, below 200-day EMA | Default, nothing to change |
+| Dip buy, below 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
+| Dip buy, no 200 EMA rule | 200 EMA filter → Price must be: **Off** |
+| Zero-line cross, price not run | Entry trigger: **Zero-line cross**; Skip if price ran more than: **3**; Price must be: **Off** |
+| Zero-line cross, any | Entry trigger: **Zero-line cross**; Price must be: **Off** |
+| Trend: MACD cross above 200-day EMA | Untick "must happen under zero"; Price must be: **Above** |
+| Classic 12/26/9 | Slow length: **26**; untick "must happen under zero"; Price must be: **Above** |
+
+For each stock and variant, note **Net profit**, **Max drawdown**, **Total closed trades**, **Percent
+profitable** and **Profit factor**, or just screenshot the Overview and Performance Summary.
+
+Differences from the Python backtester:
+
+- **One stock at a time.** TradingView tests the strategy on the chart's symbol only, so the
+  3-position limit and ranking between stocks don't apply. Each stock gets the full $1,000.
+- **Commission** is set to a flat $1 per order (the IBKR minimum, which is what small orders pay),
+  plus 2 ticks of slippage.
+- **Same-bar stop and target:** when both are touched in one bar, TradingView guesses the order from
+  the bar's shape. Python always assumes the stop hit first.
+- **History** depends on your TradingView plan. Intraday charts load a limited number of bars, so a
+  2h test may only reach back a year or two.
+- The script also fires an **alert** on each buy signal. Create an alert on the strategy to get pinged,
+  and later the agent can receive these by webhook.
+
 ## Run the scanner
 
 ```bash
