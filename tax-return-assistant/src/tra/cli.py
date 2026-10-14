@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import dataclasses
+import functools
 import getpass
 import os
 import platform
@@ -30,6 +31,7 @@ from .models import ClientState
 from .paths import CONFIG_DIR
 from .privacy.audit import AuditLog
 from .privacy.detectors import find_sensitive
+from .privacy import guard
 from .privacy.guard import FileLockedError, SensitiveDataBlocked
 from .privacy.logging_filter import configure_logging
 from .run import PrepareError, prepare_client
@@ -39,7 +41,19 @@ from .workspace import Workspace
 DEFAULT_FY = 2026
 ENV_NAMES = ("TRA_HOME", "TRA_STORE", "XERO_CLIENT_ID", "FYI_BASE_URL", "FYI_ACCESS_ID", "FYI_ACCESS_SECRET",
              "FYI_APP_ID")
-EXPECTED_ERRORS = (ConfigError, FileLockedError, SensitiveDataBlocked, IngestError, PrepareError, ValueError)
+EXPECTED_ERRORS = (ConfigError, FileLockedError, SensitiveDataBlocked, IngestError, PrepareError, ValueError,
+                   UnicodeDecodeError, OSError)
+
+
+def _friendly(fn):
+    """Show expected problems as a one-line message instead of a traceback."""
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except EXPECTED_ERRORS as exc:
+            raise click.ClickException(str(exc)) from None
+    return wrapper
 
 
 def _settings() -> Settings:
@@ -63,7 +77,10 @@ def _workspace(code: str, fy: int, *, must_exist: bool = True) -> tuple[Settings
     ws = Workspace(settings.tra_home, code, fy)
     if must_exist and not ws.state_json.exists():
         raise click.ClickException(f"{code} FY{fy} doesn't exist yet. Run: tra new {code} --fy {fy}")
-    return settings, ws, AuditLog(ws.audit_path)
+    audit = AuditLog(ws.audit_path)
+    guard.set_block_listener(lambda location, kind: audit.record("guard_blocked", client=code, location=location,
+                                                                 detector=kind))
+    return settings, ws, audit
 
 
 def make_store(settings: Settings) -> DocumentStore:
@@ -92,6 +109,7 @@ def main() -> None:
 @click.option("--dependants", default=0, show_default=True)
 @click.option("--hospital-days", type=int, default=None,
               help="Days covered by private hospital insurance (leave out if unknown).")
+@_friendly
 def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, hospital_days):
     """Set up a client for an income year."""
     _settings_, ws, audit = _workspace(code, fy, must_exist=False)
@@ -106,6 +124,11 @@ def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, h
     click.echo(f"Created {code} FY{fy}.\nNext: tra ingest {code} <files...>")
 
 
+def _skip(path: Path) -> bool:
+    """Office lock files (~$name.xlsx) and hidden files are never client documents."""
+    return path.name.startswith(("~$", "."))
+
+
 def _expand(args: tuple[str, ...]) -> list[Path]:
     """Files, folders and wildcard patterns (PowerShell passes *.pdf through unexpanded)."""
     from .ingest.readers import SUPPORTED
@@ -114,9 +137,10 @@ def _expand(args: tuple[str, ...]) -> list[Path]:
     for arg in args:
         path = Path(arg)
         if any(ch in arg for ch in "*?["):
-            matches = sorted(p for p in path.parent.glob(path.name) if p.is_file())
+            matches = sorted(p for p in path.parent.glob(path.name) if p.is_file() and not _skip(p))
         elif path.is_dir():
-            matches = sorted(p for p in path.iterdir() if p.is_file() and p.suffix.lower() in SUPPORTED)
+            matches = sorted(p for p in path.iterdir()
+                             if p.is_file() and p.suffix.lower() in SUPPORTED and not _skip(p))
         else:
             matches = [path] if path.is_file() else []
         if not matches:
@@ -130,6 +154,7 @@ def _expand(args: tuple[str, ...]) -> list[Path]:
 @click.argument("paths", nargs=-1, required=True)
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
 @click.option("--type", "override_type", default=None, help="Force a document type, e.g. DIVSTMT.")
+@_friendly
 def ingest(code, paths, fy, override_type):
     """Read, redact, file and extract figures from source documents (files, folders or *.pdf patterns)."""
     settings, ws, audit = _workspace(code, fy)
@@ -161,6 +186,7 @@ def ingest(code, paths, fy, override_type):
 @click.argument("code")
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
 @click.option("--no-open", is_flag=True, help="Validate only; don't open Excel.")
+@_friendly
 def figures(code, fy, no_open):
     """Check figures.csv and open it in Excel to confirm figures."""
     _s, ws, _a = _workspace(code, fy)
@@ -184,6 +210,7 @@ def figures(code, fy, no_open):
 @main.command()
 @click.argument("code")
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
+@_friendly
 def prepare(code, fy):
     """Build the draft return, run both tax calculations and every check, and write the workpaper."""
     _s, ws, audit = _workspace(code, fy)
@@ -223,6 +250,7 @@ def _scan_file(path: Path) -> list[tuple[str, str]]:
 
 @main.command()
 @click.argument("target", type=click.Path(exists=True, path_type=Path))
+@_friendly
 def scan(target):
     """Report possible identifiers in a file or folder (types and locations, never values)."""
     files = [p for p in sorted(target.rglob("*")) if p.is_file()] if target.is_dir() else [target]
@@ -242,6 +270,7 @@ def scan(target):
 
 
 @main.command()
+@_friendly
 def doctor():
     """Check this computer's setup."""
     problem = False
@@ -286,6 +315,7 @@ def _xero_client_id() -> str:
 
 
 @xero.command()
+@_friendly
 def connect():
     """Sign in to Xero in your browser and list the organisations you can read."""
     from .xero.auth import REDIRECT_URI, TokenStore, XeroSignInError, authorize_url, exchange_code, pkce_pair, wait_for_code
@@ -316,6 +346,7 @@ def connect():
 @click.argument("code")
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
 @click.option("--tenant", default=None, help="Xero tenant id (from `tra xero connect`). Remembered per client.")
+@_friendly
 def pull(code, fy, tenant):
     """Pull P&L, balance sheet, bank transactions and chart of accounts for the income year."""
     from .xero.auth import TokenStore, XeroSignInError, refresh_tokens
@@ -358,6 +389,7 @@ def fyi():
 @fyi.command()
 @click.argument("code")
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
+@_friendly
 def push(code, fy):
     """File documents that are still only in local folders into FYI."""
     settings, ws, audit = _workspace(code, fy)
@@ -387,6 +419,7 @@ def push(code, fy):
 
 @main.command()
 @click.option("--auto-confirm", is_flag=True, help="Mark the demo figures confirmed so you can run prepare straight away.")
+@_friendly
 def demo(auto_confirm):
     """Create a fake client DEMO01 from invented documents, to try the tool safely."""
     from .demo import build_demo_documents

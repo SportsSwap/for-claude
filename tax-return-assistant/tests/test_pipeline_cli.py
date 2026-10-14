@@ -47,7 +47,7 @@ def test_new_creates_workspace(run, home):
     assert result.exit_code == 0, result.output
     ws = Workspace(home, "SMIT01", 2026)
     assert ws.load_state().help_debt is True
-    assert ws.figures_csv.read_text(encoding="utf-8").startswith("figure_id,label_key")
+    assert ws.figures_csv.read_text(encoding="utf-8-sig").startswith("figure_id,label_key")
     assert run("new", "SMIT01").exit_code == 1
 
 
@@ -198,3 +198,43 @@ def test_locked_figures_during_ingest_recovers_on_rerun(run, home, tmp_path, mon
     assert {r["label_key"] for r in _figure_rows(home)} == {"income.div_franked", "income.franking_credit"}
     filed = list((home / "Clients" / "SMIT01" / "FY2026" / "Investments").iterdir())
     assert len(filed) == 1  # no orphaned copy from the failed attempt
+
+
+def test_unreadable_pdf_is_filed_for_manual_entry(run, home, tmp_path):
+    bad = tmp_path / "statement.pdf"
+    bad.write_bytes(b"%PDF-1.4\nthis is not really a pdf")
+    run("new", "SMIT01")
+    result = run("ingest", "SMIT01", str(bad))
+    assert result.exit_code == 0, result.output
+    [row] = _index_rows(home)
+    assert row["doc_type"] == "OTHER" and row["parse_status"] == "manual_needed"
+    notes = json.loads(Workspace(home, "SMIT01", 2026).ingest_notes_json.read_text())
+    assert any(n["check_id"] == "I1" and "could not be read" in n["message"] for n in notes)
+
+
+def test_folder_skips_office_lock_and_hidden_files(run, home, tmp_path):
+    demo = build_demo_documents(tmp_path / "inbox")
+    folder = tmp_path / "inbox"
+    for stem in list(demo.paths)[1:]:
+        demo.paths[stem].unlink()
+    (folder / "~$client list.xlsx").write_bytes(b"lock")
+    (folder / ".hidden.pdf").write_bytes(b"x")
+    run("new", "SMIT01")
+    result = run("ingest", "SMIT01", str(folder))
+    assert result.exit_code == 0, result.output
+    assert len(_index_rows(home)) == 1
+
+
+def test_guard_block_is_clean_and_audited(run, home, make_tfn):
+    run("new", "SMIT01")
+    ws = Workspace(home, "SMIT01", 2026)
+    tfn = make_tfn()
+    with ws.figures_csv.open("a", encoding="utf-8") as fh:
+        fh.write(f",ded.d10,Tax agent fee client {tfn},220.00,,,,manual,Y,,\r\n")
+    result = run("figures", "SMIT01", "--no-open")
+    assert result.exit_code == 1
+    assert "Refused to write" in result.output and tfn not in result.output
+    audit = "".join(p.read_text() for p in (home / "audit").glob("*.jsonl"))
+    entries = [json.loads(line) for line in audit.splitlines()]
+    assert any(e["action"] == "guard_blocked" and e.get("detector") == "TFN" for e in entries)
+    assert tfn not in audit

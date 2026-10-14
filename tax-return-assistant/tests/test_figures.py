@@ -187,3 +187,18 @@ def test_prior_capital_losses_can_be_a_figure(tmp_path):
                     encoding="utf-8")
     loaded, errors = read_figures(path, LABELS)
     assert errors == [] and loaded[0].label_key == "cgt.prior_losses"
+
+
+def test_figures_csv_written_with_bom(tmp_path):
+    path = tmp_path / "figures.csv"
+    write_figures(path, [_fig("F0001")])
+    assert path.read_bytes().startswith(b"\xef\xbb\xbf")
+
+
+def test_figures_csv_saved_by_excel_as_ansi(tmp_path):
+    path = tmp_path / "figures.csv"
+    text = ",".join(FIGURE_COLUMNS) + "\r\nF0001,ded.d5,Driver’s licence renewal – 2026,85.00,,,,manual,Y,,\r\n"
+    path.write_bytes(text.encode("cp1252"))
+    loaded, errors = read_figures(path, LABELS)
+    assert errors == []
+    assert loaded[0].description == "Driver’s licence renewal – 2026"

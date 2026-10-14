@@ -66,10 +66,15 @@ def _yes_no(raw: str, *, blank: bool | None) -> bool | None:
 
 
 def _rows(path: Path) -> list[dict[str, str]]:
+    """Rows of a CSV the preparer may have saved from Excel: UTF-8 (with or without BOM) or Windows-1252."""
     if not path.exists():
         return []
-    with path.open(encoding="utf-8-sig", newline="") as fh:
-        return list(csv.DictReader(fh))
+    raw = path.read_bytes()
+    try:
+        text = raw.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = raw.decode("cp1252", errors="replace")
+    return list(csv.DictReader(io.StringIO(text, newline="")))
 
 
 def _blank(row: dict[str, str]) -> bool:
@@ -82,7 +87,8 @@ def _write_csv(path: Path, columns: list[str], rows: list[list[str]], location: 
     writer = csv.writer(buf, lineterminator="\r\n")
     writer.writerow(columns)
     writer.writerows(rows)
-    atomic_write_text(path, buf.getvalue(), location, prechecked=True)
+    # With a byte-order mark, Excel opens the file as UTF-8 and saves it back the same way.
+    atomic_write_text(path, buf.getvalue(), location, prechecked=True, encoding="utf-8-sig")
 
 
 def _fmt_bool(value: bool | None) -> str:

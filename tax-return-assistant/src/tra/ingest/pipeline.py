@@ -94,6 +94,28 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _file_unreadable(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict[str, DocType],
+                     audit: AuditLog) -> IngestReport:
+    """File a document whose text can't be read, so it isn't lost, and ask for manual entry."""
+    sha256 = _sha256(path)
+    duplicate = DocumentIndex(ws.index_csv).find_by_sha(sha256)
+    if duplicate:
+        audit.record("duplicate_skipped", client=ws.client_code, doc_id=duplicate.doc_id)
+        return IngestReport(duplicate, 0, [], True)
+    doc, notes = file_document(path, ws, store, doc_type="OTHER", category=doc_types["OTHER"].category,
+                               doc_date=None, sha256=sha256, pages=0, redaction_counts={},
+                               parse_status="manual_needed", audit=audit)
+    notes.append(ReviewNote("Medium", "I1", f"{doc.filed_name} could not be read (damaged, password-protected or "
+                            "not a real PDF). Open it, set its document type if needed, and enter its figures in "
+                            f"figures.csv with doc_id {doc.doc_id}.", None, "preparer", "confirm",
+                            doc_ids=(doc.doc_id,)))
+    append_notes(ws.ingest_notes_json, notes)
+    audit.record("document_ingested", client=ws.client_code, doc_id=doc.doc_id, doc_type="OTHER",
+                 filed_name=doc.filed_name, redaction_counts={}, parse_status="manual_needed", figures=0,
+                 store=doc.store)
+    return IngestReport(doc, 0, notes, False)
+
+
 def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict[str, DocType], audit: AuditLog,
                 override_type: str | None = None) -> IngestReport:
     try:
@@ -103,6 +125,8 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
         raise IngestError("redaction failed; document not processed") from None
     except UnsupportedFile as exc:
         raise IngestError(str(exc)) from None
+    except Exception:  # damaged, password-protected, or not really the file type its name says
+        return _file_unreadable(path, ws, store, doc_types, audit)
 
     index = DocumentIndex(ws.index_csv)
     duplicate = index.find_by_sha(loaded.sha256)

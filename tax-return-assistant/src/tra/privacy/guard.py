@@ -29,10 +29,33 @@ class FileLockedError(Exception):
         super().__init__(f"{path.name} is open in another program (probably Excel). Close it and re-run.")
 
 
+_listener = None
+_notifying = False
+
+
+def set_block_listener(listener) -> None:
+    """Call ``listener(location, detector_type)`` whenever a write is refused (the CLI audits it)."""
+    global _listener
+    _listener = listener
+
+
+def _blocked(location: str, detector_type: str) -> SensitiveDataBlocked:
+    global _notifying
+    if _listener is not None and not _notifying:
+        _notifying = True
+        try:
+            _listener(location, detector_type)
+        except Exception:  # an audit failure must not hide the block itself
+            pass
+        finally:
+            _notifying = False
+    return SensitiveDataBlocked(location, detector_type)
+
+
 def check_text(value: str, location: str) -> None:
     matches = find_sensitive(value)
     if matches:
-        raise SensitiveDataBlocked(location, matches[0].type)
+        raise _blocked(location, matches[0].type)
 
 
 def _check_scalar(value: object, location: str) -> None:
@@ -71,7 +94,8 @@ def check_workbook(wb: openpyxl.Workbook, location: str) -> None:
                 _check_scalar(value, f"{ws.title}!{cell.coordinate}")
 
 
-def atomic_write_text(path: Path, text: str, location: str, *, prechecked: bool = False) -> None:
+def atomic_write_text(path: Path, text: str, location: str, *, prechecked: bool = False,
+                      encoding: str = "utf-8") -> None:
     """Guard, write to a temp file beside the target, then swap it in.
 
     ``prechecked`` is for callers that have already scanned the content
@@ -82,7 +106,7 @@ def atomic_write_text(path: Path, text: str, location: str, *, prechecked: bool 
         check_text(text, location)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(text, encoding="utf-8", newline="")
+    tmp.write_text(text, encoding=encoding, newline="")
     try:
         os.replace(tmp, path)
     except PermissionError:
