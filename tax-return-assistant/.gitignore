@@ -7,9 +7,11 @@
 *.jsonl
 .env
 .venv/
-__pycache__/
-*.egg-info/
 build/
 dist/
 !tests/**
 !config/**
+# After the re-includes, so they can't re-include build output.
+__pycache__/
+*.pyc
+*.egg-info/
