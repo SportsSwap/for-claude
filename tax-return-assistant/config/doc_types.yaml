@@ -1,0 +1,72 @@
+# Document types, in classification order: the first type whose keywords match wins.
+# all: every keyword must appear. any: at least one must appear (empty = no condition).
+# Matching is case-insensitive and runs on redacted text only.
+PREFILL:
+  category: ATO
+  description: ATO pre-fill report (Online services for agents)
+  all: ["pre-fill report"]
+PRIOR:
+  category: ATO
+  description: Prior-year return or notice of assessment
+  all: ["tax return for individuals"]
+  any: ["notice of assessment", "return summary"]
+INCSTMT:
+  category: Income
+  description: Income statement / PAYG payment summary
+  any: ["income statement", "payg payment summary"]
+DIVSTMT:
+  category: Investments
+  description: Dividend statement
+  all: ["dividend"]
+  any: ["franking credit", "franked amount"]
+MFUND:
+  # Before INTSTMT and BANKSTMT: fund statements also mention interest.
+  category: Investments
+  description: Managed fund / AMIT annual tax statement
+  any: ["amit member annual statement", "annual tax statement"]
+INTSTMT:
+  category: Investments
+  description: Interest summary
+  any: ["interest summary", "interest statement"]
+BANKSTMT:
+  category: Investments
+  description: Bank account statement
+  all: ["statement"]
+  any: ["opening balance", "closing balance"]
+CGT:
+  category: Investments
+  description: Capital gains report or contract note
+  any: ["capital gains report", "contract note"]
+RENTSTMT:
+  category: Rental
+  description: Rental / property manager statement
+  any: ["rental statement", "property manager", "owner statement"]
+PHI:
+  category: Health
+  description: Private health insurance statement
+  all: ["private health insurance statement"]
+XEROPL:
+  category: Business
+  description: Xero profit and loss
+  all: ["profit and loss"]
+  any: ["xero", "account code"]
+XEROBS:
+  category: Business
+  description: Xero balance sheet
+  all: ["balance sheet"]
+  any: ["xero", "account code"]
+XEROBANK:
+  category: Business
+  description: Xero bank transactions
+  all: ["bank transactions"]
+XEROCOA:
+  category: Business
+  description: Xero chart of accounts
+  all: ["chart of accounts"]
+RECEIPT:
+  category: Deductions
+  description: Receipt or tax invoice
+  any: ["tax invoice", "receipt"]
+OTHER:
+  category: Other
+  description: Not recognised; manual entry needed
