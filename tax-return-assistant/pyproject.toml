@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tax-return-assistant"
+version = "0.1.0"
+description = "Internal tool that prepares DRAFT Australian individual tax returns, sourced workpapers and review notes. Never lodges."
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8.1",
+    "pdfplumber>=0.10",
+    "openpyxl>=3.1",
+    "pyyaml>=6.0",
+    "requests>=2.31",
+    "keyring>=24",
+    "reportlab>=4.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+tra = "tra.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
