@@ -1,0 +1,13 @@
+# Thresholds for the self-checks (spec §8.4). Adjust to the firm's risk appetite.
+prefill_tolerance: 1.00            # P1: pre-fill vs return difference that raises a note ($)
+double_count_tolerance: 1.00       # R4: same label, same amount within this ($)
+deductions_to_income_max: 0.30     # S1: total deductions over this share of total income
+work_related_to_salary_max: 0.15   # S1: D1-D5 over this share of salary
+substantiation_threshold: 300      # S4: ITAA 1997 s900-35 small-claims limit ($)
+asset_threshold: 300               # S13: work items over this are depreciating assets (s40-80) ($)
+prior_year_pct: 0.20               # Y1: movement over 20% ...
+prior_year_floor: 100              # Y1: ... and over $100
+clothing_keywords: [shirt, pants, shoes, suit, jeans, jacket, dress]
+capital_keywords: [replace, renovat, new, install]
+interest_purpose_keywords: [redraw, line of credit]
+asset_keywords: [laptop, computer, phone, tablet, monitor, desk, chair, printer]
