@@ -1,2 +1,94 @@
+# Resident individual rates for the 2024-25 income year (FY2025: 1 July 2024 - 30 June 2025).
+# Kept for late and prior-year returns. Same structure and conventions as fy2026.yaml.
+#
+# STATUS: UNVERIFIED, for the same reason as fy2026.yaml. A registered tax agent must
+# check every figure against the source before use, then set status: verified.
 income_year: 2025
 status: unverified
+verified_by: null
+verified_on: null
+sources:
+  brackets: https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents
+  lito: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-and-middle-income-earner-tax-offsets
+  medicare: https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction-for-low-income-earners
+  mls: https://www.ato.gov.au/tax-rates-and-codes/medicare-levy-surcharge-income-thresholds-and-rates
+  phi: https://www.ato.gov.au/forms-and-instructions/income-thresholds-and-rates-for-the-private-health-insurance-rebate-2025
+  help: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
+  sapto: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/seniors-and-pensioners-tax-offset
+  car: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/transport-and-travel-expenses/motor-vehicle-and-car-expenses
+  wfh: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/work-related-deductions/working-from-home-expenses/fixed-rate-method
+
+resident_brackets:
+  - {from: 0, rate: 0, base: 0}
+  - {from: 18200, rate: 0.16, base: 0}
+  - {from: 45000, rate: 0.30, base: 4288}
+  - {from: 135000, rate: 0.37, base: 31288}
+  - {from: 190000, rate: 0.45, base: 51638}
+
+lito: {max: 700, full_to: 37500, taper1_rate: 0.05, taper1_to: 45000, taper2_base: 325, taper2_rate: 0.015}
+
+medicare:
+  rate: 0.02
+  shade_in: 0.10
+  single: {lower: 27222, upper: 34027}
+  sapto_single: {lower: 43020, upper: 53775}
+  family: {lower: 45907, per_child: 4216}
+  sapto_family: {lower: 59886, per_child: 4216}
+
+mls:
+  single:
+    - {from: 0, rate: 0}
+    - {from: 97000, rate: 0.01}
+    - {from: 113000, rate: 0.0125}
+    - {from: 151000, rate: 0.015}
+  family:
+    - {from: 0, rate: 0}
+    - {from: 194000, rate: 0.01}
+    - {from: 226000, rate: 0.0125}
+    - {from: 302000, rate: 0.015}
+  family_per_child_after_first: 1500
+
+phi_rebate:
+  - from: 2024-07-01
+    to: 2025-03-31
+    under65: [0.24608, 0.16405, 0.08202, 0]
+    65to69: [0.28710, 0.20507, 0.12303, 0]
+    70plus: [0.32812, 0.24608, 0.16405, 0]
+  - from: 2025-04-01
+    to: 2025-06-30
+    under65: [0.24288, 0.16192, 0.08095, 0]
+    65to69: [0.28337, 0.20240, 0.12143, 0]
+    70plus: [0.32385, 0.24288, 0.16192, 0]
+
+# HELP 2024-25: the rate applies to TOTAL repayment income (not just the excess).
+# Each row applies from repayment income of `from` (inclusive).
+help:
+  method: percent_of_income
+  rows:
+    - {from: 54435, rate: 0.01}
+    - {from: 62851, rate: 0.02}
+    - {from: 66621, rate: 0.025}
+    - {from: 70619, rate: 0.03}
+    - {from: 74856, rate: 0.035}
+    - {from: 79347, rate: 0.04}
+    - {from: 84108, rate: 0.045}
+    - {from: 89155, rate: 0.05}
+    - {from: 94504, rate: 0.055}
+    - {from: 100175, rate: 0.06}
+    - {from: 106186, rate: 0.065}
+    - {from: 112557, rate: 0.07}
+    - {from: 119310, rate: 0.075}
+    - {from: 126468, rate: 0.08}
+    - {from: 134057, rate: 0.085}
+    - {from: 142101, rate: 0.09}
+    - {from: 150627, rate: 0.095}
+    - {from: 159664, rate: 0.10}
+
+sapto:
+  single: {max: 2230, shade_out: 32279, cut_out: 50119}
+  couple: {max: 1602, shade_out: 28974, cut_out: 41790}
+  illness_separated: {max: 2040, shade_out: 31279, cut_out: 47599}
+  taper: 0.125
+
+car_cents_per_km: {rate: 0.88, km_cap: 5000}
+wfh_rate: 0.70

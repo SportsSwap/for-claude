@@ -1,2 +1,94 @@
+# Resident individual rates for the 2025-26 income year (FY2026: 1 July 2025 - 30 June 2026).
+#
+# STATUS: UNVERIFIED. These figures were gathered through web-search summaries of
+# the sources below because ato.gov.au was unreachable from the build environment.
+# Before this file is used on a real return, a registered tax agent must check
+# every figure against the source, then set status: verified, verified_by and
+# verified_on. Until then every workpaper carries a High review note (C2).
+#
+# Conventions: "from" means income OVER this amount; rates are decimals (0.16 = 16%).
 income_year: 2026
 status: unverified
+verified_by: null
+verified_on: null
+sources:
+  brackets: https://www.ato.gov.au/tax-rates-and-codes/tax-rates-australian-residents
+  lito: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/low-and-middle-income-earner-tax-offsets
+  medicare: https://www.ato.gov.au/individuals-and-families/medicare-and-private-health-insurance/medicare-levy/medicare-levy-reduction-for-low-income-earners
+  mls: https://www.ato.gov.au/tax-rates-and-codes/medicare-levy-surcharge-income-thresholds-and-rates
+  phi: https://www.health.gov.au/news/phi-circulars/phi-1226-private-health-insurance-rebate-adjustment-factor-effective-1-april-2026
+  help: https://www.ato.gov.au/tax-rates-and-codes/study-and-training-support-loans-rates-and-repayment-thresholds
+  sapto: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/tax-offsets/seniors-and-pensioners-tax-offset
+  car: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/transport-and-travel-expenses/motor-vehicle-and-car-expenses
+  wfh: https://www.ato.gov.au/individuals-and-families/income-deductions-offsets-and-records/deductions-you-can-claim/work-related-deductions/working-from-home-expenses/fixed-rate-method
+
+# Tax on taxable income = base + rate x (income - from), for the bracket containing it.
+resident_brackets:
+  - {from: 0, rate: 0, base: 0}
+  - {from: 18200, rate: 0.16, base: 0}
+  - {from: 45000, rate: 0.30, base: 4288}
+  - {from: 135000, rate: 0.37, base: 31288}
+  - {from: 190000, rate: 0.45, base: 51638}
+
+# Low income tax offset: $700 to $37,500; less 5c per $1 to $45,000 ($325); less 1.5c per $1 after.
+lito: {max: 700, full_to: 37500, taper1_rate: 0.05, taper1_to: 45000, taper2_base: 325, taper2_rate: 0.015}
+
+# Medicare levy 2%. Low-income reduction: nil up to `lower`, then 10c per $1 over `lower`
+# until the full 2% applies at `upper`. Family thresholds are recorded but the family
+# reduction is flagged for the reviewer, not calculated (spec §3).
+medicare:
+  rate: 0.02
+  shade_in: 0.10
+  single: {lower: 28011, upper: 35013}
+  sapto_single: {lower: 44268, upper: 55335}
+  family: {lower: 47238, per_child: 4338}
+  sapto_family: {lower: 61623, per_child: 4338}  # per-child figure unconfirmed
+
+# Medicare levy surcharge tiers (income for MLS purposes OVER `from`).
+mls:
+  single:
+    - {from: 0, rate: 0}
+    - {from: 101000, rate: 0.01}
+    - {from: 118000, rate: 0.0125}
+    - {from: 158000, rate: 0.015}
+  family:
+    - {from: 0, rate: 0}
+    - {from: 202000, rate: 0.01}
+    - {from: 236000, rate: 0.0125}
+    - {from: 316000, rate: 0.015}
+  family_per_child_after_first: 1500
+
+# Private health insurance rebate: [base, tier 1, tier 2, tier 3] per age band. Tiers use the MLS thresholds.
+phi_rebate:
+  - from: 2025-07-01
+    to: 2026-03-31
+    under65: [0.24288, 0.16192, 0.08095, 0]
+    65to69: [0.28337, 0.20240, 0.12143, 0]
+    70plus: [0.32385, 0.24288, 0.16192, 0]
+  - from: 2026-04-01
+    to: 2026-06-30
+    under65: [0.24118, 0.16079, 0.08038, 0]
+    65to69: [0.28139, 0.20098, 0.12058, 0]
+    70plus: [0.32158, 0.24118, 0.16079, 0]
+
+# HELP compulsory repayment, new marginal system from 2025-26:
+# nil to $67,000; 15c per $1 over $67,000; $8,700 + 17c per $1 over $125,000;
+# from $179,286, 10% of total repayment income.
+help:
+  method: marginal
+  bands:
+    - {from: 0, base: 0, rate: 0}
+    - {from: 67000, base: 0, rate: 0.15}
+    - {from: 125000, base: 8700, rate: 0.17}
+  flat_from: 179286
+  flat_rate: 0.10
+
+# Seniors and pensioners tax offset: max offset, reduced by 12.5c per $1 of rebate income over shade_out.
+sapto:
+  single: {max: 2230, shade_out: 34919, cut_out: 52759}
+  couple: {max: 1602, shade_out: 30994, cut_out: 43810}
+  illness_separated: {max: 2040, shade_out: 33732, cut_out: 50052}
+  taper: 0.125
+
+car_cents_per_km: {rate: 0.88, km_cap: 5000}
+wfh_rate: 0.70
