@@ -1,0 +1,10 @@
+# How Xero profit and loss sections map to return labels (sole trader, Item 15).
+# Detailed P8 business labels are completed in Xero Tax; this gives the totals.
+pl_sections:
+  Income: income.business_income
+  Trading Income: income.business_income
+  Other Income: income.business_income
+  Cost of Sales: income.business_expenses
+  Less Cost of Sales: income.business_expenses
+  Operating Expenses: income.business_expenses
+  Less Operating Expenses: income.business_expenses

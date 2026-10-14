@@ -11,13 +11,21 @@ from .base import ExtractResult, Extractor
 from .dividends import DividendExtractor
 from .income_statement import IncomeStatementExtractor
 from .interest import InterestExtractor
+from .phi import PhiExtractor
 from .prefill import PrefillExtractor
+from .receipt import ReceiptExtractor
+from .rental import RentalExtractor
+from .xero_csv import XeroExportExtractor
 
 _EXTRACTORS: list[Extractor] = [
     PrefillExtractor(),
     IncomeStatementExtractor(),
     InterestExtractor(),
     DividendExtractor(),
+    RentalExtractor(),
+    PhiExtractor(),
+    ReceiptExtractor(),
+    XeroExportExtractor(),
 ]
 
 _REGISTRY = {doc_type: ext for ext in _EXTRACTORS for doc_type in ext.doc_types}
