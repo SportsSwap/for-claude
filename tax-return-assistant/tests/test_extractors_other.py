@@ -101,3 +101,10 @@ def test_xero_other_exports_file_only(tmp_path):
     csv.write_text("Balance Sheet\nAccount code,Amount\n", encoding="utf-8")
     result = _extract("XEROBS", csv)
     assert result.figures == [] and result.parse_status == "parsed"
+
+
+def test_other_document_not_marked_substantiated():
+    from tra.privacy.redact import redact_pages
+    rt = redact_pages(["CITY COUNCIL", "Rates notice", "Date: 01/02/2026", "Total 150.00"])
+    [fig] = get_extractor("OTHER").extract(rt, "D001").figures
+    assert fig.substantiated is None

@@ -84,3 +84,14 @@ def test_phi_totals_compared():
     assert ids(check_prefill(ok), "P1") == []
     missing = make_ctx([], prefill=[pre("phi.rebate_total", "581.89", "FUND")])
     assert ids(check_prefill(missing), "P2")
+
+
+def test_r5_same_document_twice():
+    docs = [doc("D002", "INCSTMT"), doc("D003", "INCSTMT")]
+    ctx = make_ctx([fig("F1", "income.salary", 85000, doc="D002"), fig("F2", "income.salary", 85000, doc="D003")],
+                   documents=docs)
+    [note] = ids(check_reconcile(ctx), "R5")
+    assert note.risk == "High" and set(note.doc_ids) == {"D002", "D003"}
+    other = make_ctx([fig("F1", "income.salary", 85000, doc="D002"), fig("F2", "income.salary", 40000, doc="D003")],
+                     documents=docs)
+    assert ids(check_reconcile(other), "R5") == []

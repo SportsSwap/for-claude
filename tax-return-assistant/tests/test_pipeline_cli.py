@@ -238,3 +238,37 @@ def test_guard_block_is_clean_and_audited(run, home, make_tfn):
     entries = [json.loads(line) for line in audit.splitlines()]
     assert any(e["action"] == "guard_blocked" and e.get("detector") == "TFN" for e in entries)
     assert tfn not in audit
+
+
+def test_demo_twice_does_not_double_count(run, home):
+    assert run("demo", "--auto-confirm").exit_code == 0
+    result = run("demo", "--auto-confirm")
+    assert result.exit_code == 0 and "already exists" in result.output
+    assert len(_index_rows(home, "DEMO01")) == 8
+    result = run("prepare", "DEMO01")
+    assert "Estimated payable $5,697.11" in result.output
+
+
+def test_trust_distribution_flagged(run, home, make_pdf):
+    path = make_pdf("dist.pdf", [["Trust distribution statement", "Smith Family Trust", "Net income 4,000.00"]])
+    run("new", "SMIT01")
+    run("ingest", "SMIT01", str(path))
+    notes = json.loads(Workspace(home, "SMIT01", 2026).ingest_notes_json.read_text())
+    assert any(n["check_id"] == "I6" and "trust distribution" in n["message"] for n in notes)
+
+
+def test_phi_cover_days_recorded(run, home, make_pdf):
+    path = make_pdf("phi.pdf", [["Private health insurance statement", "DEMO HEALTH FUND",
+                                 "Days covered by hospital cover 200",
+                                 "Premiums eligible for rebate 1 July - 31 March 1,000.00"]])
+    run("new", "SMIT01")
+    run("ingest", "SMIT01", str(path))
+    ws = Workspace(home, "SMIT01", 2026)
+    assert ws.load_state().hospital_cover_days == 200
+    notes = json.loads(ws.ingest_notes_json.read_text())
+    assert any(n["check_id"] == "I7" for n in notes)
+
+
+def test_new_non_resident(run, home):
+    assert run("new", "NRES01", "--non-resident").exit_code == 0
+    assert Workspace(home, "NRES01", 2026).load_state().resident is False

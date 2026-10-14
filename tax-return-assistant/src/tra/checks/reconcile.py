@@ -55,4 +55,18 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
                     f"and {o.figure_id} (source document) are both confirmed for ${p.amount:,}. Confirm only one.",
                     p.amount, "preparer", "confirm", label_key=p.label_key, figure_ids=(p.figure_id, o.figure_id)))
                 break
+
+    doc_types = {d.doc_id: d.doc_type for d in ctx.documents}  # R5
+    seen: dict[tuple, object] = {}
+    for f in others:
+        key = (f.label_key, f.amount, doc_types.get(f.doc_id))
+        first = seen.get(key)
+        if first is None:
+            seen[key] = f
+        elif first.doc_id != f.doc_id and key[2] is not None:
+            notes.append(ReviewNote(
+                "High", "R5", f"{label_name(ctx.labels, f.label_key)}: {first.doc_id} and {f.doc_id} are both {key[2]} "
+                f"documents showing ${f.amount:,}. Check they aren't the same document sent twice.", f.amount,
+                "preparer", "confirm", label_key=f.label_key, figure_ids=(first.figure_id, f.figure_id),
+                doc_ids=(first.doc_id, f.doc_id)))
     return notes

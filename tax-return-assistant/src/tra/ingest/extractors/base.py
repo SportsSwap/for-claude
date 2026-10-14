@@ -27,6 +27,7 @@ class ExtractResult:
     prefill: list[PrefillLine] = field(default_factory=list)
     doc_date: date | None = None
     parse_status: str = "manual_needed"  # parsed | partial | manual_needed
+    facts: dict = field(default_factory=dict)  # non-figure facts, e.g. hospital_cover_days
 
 
 class Extractor(Protocol):

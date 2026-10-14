@@ -175,6 +175,19 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
         notes.append(_note("High", "S12", "A capital gains document is filed but no CGT events are entered in "
                            "cgt_events.csv.", docs=[doc.doc_id for doc in ctx.documents if doc.doc_type == "CGT"]))
 
+    if not ctx.state.resident:
+        notes.append(_note("High", "S12", "Client is set up as a non-resident: the estimate still uses resident rates, "
+                           "LITO and the Medicare levy. Prepare this return in Xero Tax."))
+    if d("ded.d7") or d("ded.d8"):
+        notes.append(_note("Medium", "S12", "Interest or dividend deductions claimed: any net financial investment loss "
+                           "must be added to the income tests (MLS, HELP, rebates), which the estimate does not do.",
+                           label_key="ded.d7" if d("ded.d7") else "ded.d8"))
+
+    # S14 residency assumed
+    if ctx.state.resident:
+        notes.append(_note("Low", "S14", "Assumed the client was an Australian resident for tax purposes all year. "
+                           "Confirm residency.", audience="reviewer", action="assumption"))
+
     # S13 asset claimed outright
     limit = Decimal(str(cfg["asset_threshold"]))
     for f in work_figs:

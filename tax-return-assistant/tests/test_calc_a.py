@@ -110,3 +110,9 @@ def test_demo_client_net_result():
     assert r.payg_withheld == D("19000")
     assert r.net_result == D("5697.11")
     assert set(r.components()) >= {"taxable_income", "basic_tax", "net_result"}
+
+
+def test_personal_super_counts_in_income_tests():
+    # Reportable super contributions include deductible personal contributions (D12).
+    assert calc(salary=100000, d12=10000, st=state(help_debt=True)).help == D("4950.00")
+    assert calc(salary=110000, d12=15000, st=state(hospital_cover_days=0)).mls == D("950.00")

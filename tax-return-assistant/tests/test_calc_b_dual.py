@@ -67,3 +67,10 @@ def test_rates_status_note():
     assert note.message == "FY2026 rates not yet verified against ato.gov.au by a registered agent"
     verified = dataclasses.replace(RATES[2026], status="verified")
     assert check_rates_status(_ctx(rates=verified)) == []
+
+
+def test_b_includes_personal_super_in_income_tests():
+    st = state(help_debt=True, hospital_cover_days=0)
+    d = draft(salary=110000, d12=15000)
+    a, b = calculate_a(d, st, RATES[2026]), calculate_b(d, st, RATES[2026], LABELS)
+    assert b.mls_income == D("110000") and b == a

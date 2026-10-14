@@ -95,7 +95,8 @@ def calculate_a(draft: DraftReturn, state: ClientState, rates: Rates) -> TaxResu
 
     basic_tax = round_cents(_bracket_tax(ti, rates))
     rfb, resc = d("it.rfb"), d("it.resc")
-    mls_income = ti + rfb + resc + max(ZERO, -net_rent)
+    # Reportable super contributions = employer (RESC) + deductible personal contributions (D12).
+    mls_income = ti + rfb + resc + d("ded.d12") + max(ZERO, -net_rent)
     lito = round_cents(_lito(ti, rates))
     sapto = round_cents(_sapto(mls_income, state, rates))
     offsets_used = min(basic_tax, lito + sapto)

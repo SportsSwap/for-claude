@@ -109,8 +109,9 @@ def main() -> None:
 @click.option("--dependants", default=0, show_default=True)
 @click.option("--hospital-days", type=int, default=None,
               help="Days covered by private hospital insurance (leave out if unknown).")
+@click.option("--non-resident", is_flag=True, help="Not an Australian resident for tax (flagged; prepare in Xero Tax).")
 @_friendly
-def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, hospital_days):
+def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, hospital_days, non_resident):
     """Set up a client for an income year."""
     _settings_, ws, audit = _workspace(code, fy, must_exist=False)
     if ws.state_json.exists():
@@ -118,7 +119,7 @@ def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, h
     ws.create(list(CATEGORIES))
     ws.save_state(ClientState(client_code=code, income_year=fy, help_debt=help_debt, sole_trader=sole_trader,
                               age_band=age_band, sapto_status=sapto, has_spouse=spouse, dependants=dependants,
-                              hospital_cover_days=hospital_days))
+                              hospital_cover_days=hospital_days, resident=not non_resident))
     write_header_files(ws)
     audit.record("client_created", client=code, income_year=fy)
     click.echo(f"Created {code} FY{fy}.\nNext: tra ingest {code} <files...>")
@@ -332,7 +333,7 @@ def connect():
         code = wait_for_code(state)
         session = requests.Session()
         tokens = exchange_code(session, client_id, code, verifier, REDIRECT_URI)
-        TokenStore().set(tokens)
+        TokenStore().set(tokens)  # keeps only the refresh token
         orgs = connections(session, tokens.access_token)
     except (XeroSignInError, XeroError) as exc:
         raise click.ClickException(str(exc)) from None
@@ -356,14 +357,13 @@ def pull(code, fy, tenant):
     settings, ws, audit = _workspace(code, fy)
     client_id = _xero_client_id()
     store = TokenStore()
-    tokens = store.get()
-    if tokens is None:
+    refresh = store.get()
+    if refresh is None:
         raise click.ClickException("Not signed in to Xero: run 'tra xero connect' first.")
     session = requests.Session()
     try:
-        if tokens.expired():
-            tokens = refresh_tokens(session, client_id, tokens.refresh_token)
-            store.set(tokens)
+        tokens = refresh_tokens(session, client_id, refresh)  # Xero rotates the refresh token on every use
+        store.set(tokens)
         tenant = tenant or ws.load_state().xero_tenant_id
         if not tenant:
             orgs = connections(session, tokens.access_token)
@@ -425,6 +425,10 @@ def demo(auto_confirm):
     from .demo import build_demo_documents
 
     settings, ws, audit = _workspace("DEMO01", DEFAULT_FY, must_exist=False)
+    if ws.state_json.exists() and DocumentIndex(ws.index_csv).load():
+        click.echo("DEMO01 already exists, so nothing was added (running the demo again would double count).\n"
+                   "Next: tra prepare DEMO01")
+        return
     if not ws.state_json.exists():
         ws.create(list(CATEGORIES))
         ws.save_state(ClientState(client_code="DEMO01", income_year=DEFAULT_FY))

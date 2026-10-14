@@ -127,11 +127,18 @@ def _set_salary(amount):
 def test_recalc_matches_calc_a_other_branches(tmp_path, case):
     from tra.models import ClientState
     if case == "help_mls_cgt":
+        def mutate(figures):
+            _set_salary("140000")(figures)
+            from tra.models import Figure
+            figures.append(Figure("F0900", "ded.d12", "Personal super contribution", Decimal("10000"), None, "D002",
+                                  1, "manual", True, True, ""))
+
         ctx = demo_context(tmp_path, state=ClientState("DEMO01", 2026, help_debt=True, hospital_cover_days=200),
-                           mutate=_set_salary("140000"),
+                           mutate=mutate,
                            cgt_rows=[["C001", "BHP shares", "2020-01-10", "2026-03-24", "15000.00", "9000.00", "D004", "1", "Y"],
                                      ["C002", "Crypto", "2025-10-01", "2026-02-01", "3000.00", "1000.00", "", "", "Y"]])
         assert ctx.calc_a.help > 0 and ctx.calc_a.mls > 0 and ctx.draft.amount("cgt.net_gain") > 0
+        assert ctx.draft.amount("ded.d12") == Decimal("10000")
     else:
         ctx = demo_context(tmp_path, state=ClientState("DEMO01", 2026, sapto_status="single", age_band="70plus"),
                            mutate=_set_salary("12000"))

@@ -27,7 +27,9 @@ from .extractors import ExtractResult, get_extractor
 from .readers import UnsupportedFile, load
 
 # Areas the tool does not prepare. A mention in any document raises a High note (feeds spec check S12).
-UNHANDLED_PHRASES = ("employee share scheme", "foreign income", "foreign tax", "personal services income")
+UNHANDLED_PHRASES = ("employee share scheme", "foreign income", "foreign tax", "personal services income",
+                     "trust distribution", "partnership distribution", "distribution statement",
+                     "medicare entitlement statement", "medicare levy exemption")
 
 
 class IngestError(Exception):
@@ -164,6 +166,15 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
         notes.append(ReviewNote("Medium", "I1", f"Manual entry needed for {doc.filed_name} ({doc_type}).{detail} "
                                 f"Add its figures to figures.csv with doc_id {doc_id}.", None, "preparer", "confirm",
                                 doc_ids=(doc_id,)))
+    cover_days = result.facts.get("hospital_cover_days")
+    if cover_days is not None:
+        state = ws.load_state()
+        if state.hospital_cover_days is None:
+            state.hospital_cover_days = cover_days
+            ws.save_state(state)
+            notes.append(ReviewNote("Low", "I7", f"Private hospital cover days ({cover_days}) taken from "
+                                    f"{doc.filed_name}. Check them; they drive the Medicare levy surcharge.", None,
+                                    "preparer", "confirm", doc_ids=(doc_id,)))
     text = loaded.redacted.text.lower()
     for phrase in UNHANDLED_PHRASES:
         if phrase in text:

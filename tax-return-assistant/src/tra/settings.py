@@ -9,7 +9,11 @@ from pathlib import Path
 from typing import Mapping
 
 DEFAULT_CLIENT_CODE_PATTERN = r"^[A-Z0-9]{2,12}$"
-_CLOUD_FOLDER = re.compile(r"^(onedrive.*|dropbox|google ?drive|icloud ?drive)$", re.I)
+# Folder names used by OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive and iCloud.
+_CLOUD_FOLDER = re.compile(
+    r"^(onedrive.*|dropbox(\b.*)?|google ?drive.*|googledrive-.*|my drive|shared drives|icloud ?drive"
+    r"|cloudstorage|.* - (shared )?documents)$", re.I)
+_CLOUD_ENV = ("OneDrive", "OneDriveCommercial", "OneDriveConsumer")
 
 
 class ConfigError(Exception):
@@ -34,18 +38,26 @@ class Settings:
         return cls(tra_home=Path(home), store=store, client_code_pattern=pattern)
 
 
-def check_tra_home(path: Path) -> list[str]:
+def _cloud_problem(where: str) -> str:
+    return (f"TRA_HOME is inside a cloud-synced folder ({where}). Client data must stay on this "
+            "computer (Privacy Act APP 8). Choose a local folder such as C:\\TaxAssistant.")
+
+
+def check_tra_home(path: Path, env: Mapping[str, str] = os.environ) -> list[str]:
     """Problems that make a folder unsafe for client data. Empty means OK."""
     if not path.is_dir():
         return [f"TRA_HOME does not exist: {path}"]
     resolved = path.resolve()
     problems = []
-    for part in resolved.parts:
-        if _CLOUD_FOLDER.match(part):
-            problems.append(
-                f"TRA_HOME is inside a cloud-synced folder ({part}). Client data must stay on this "
-                "computer (Privacy Act APP 8). Choose a local folder such as C:\\TaxAssistant.")
-            break
+    roots = [Path(env[name]).resolve() for name in _CLOUD_ENV if env.get(name)]
+    synced_root = next((root for root in roots if resolved == root or root in resolved.parents), None)
+    if synced_root is not None:
+        problems.append(_cloud_problem(str(synced_root)))
+    else:
+        for part in resolved.parts:
+            if _CLOUD_FOLDER.match(part):
+                problems.append(_cloud_problem(part))
+                break
     for folder in (resolved, *resolved.parents):
         if (folder / ".git").exists():
             problems.append(

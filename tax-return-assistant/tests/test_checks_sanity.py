@@ -111,3 +111,15 @@ def test_s13_asset_claimed_outright():
     assert note.citation_id == "itaa97_s40_80" and note.risk == "Medium"
     assert ids(run(fig("F1", "ded.d5", 250, substantiated=True, description="Laptop bag")), "S13") == []
     assert ids(run(fig("F1", "ded.d5", 520, description="Union fees")), "S13") == []
+
+
+def test_s14_residency_assumed_and_non_resident_flagged():
+    [note] = ids(run(fig("F1", "income.salary", 50000)), "S14")
+    assert note.risk == "Low" and note.action == "assumption"
+    flagged = run(fig("F1", "income.salary", 50000), state=ClientState("TEST01", 2026, resident=False))
+    assert any(n.check_id == "S12" and "resident" in n.message.lower() for n in flagged)
+    assert ids(flagged, "S14") == []
+
+
+def test_s12_financial_investment_deductions():
+    assert any("investment loss" in n.message for n in ids(run(fig("F1", "ded.d8", 900)), "S12"))

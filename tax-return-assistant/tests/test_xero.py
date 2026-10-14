@@ -15,7 +15,7 @@ from tra.labels import load_labels
 from tra.models import ClientState
 from tra.privacy.audit import AuditLog
 from tra.workspace import Workspace
-from tra.xero.auth import TOKEN_URL, authorize_url, exchange_code, pkce_pair, refresh_tokens
+from tra.xero.auth import TOKEN_URL, Tokens, authorize_url, exchange_code, pkce_pair, refresh_tokens
 from tra.xero.client import XeroAuthError, XeroClient, XeroPermissionError, strip_sensitive
 from tra.xero.to_figures import load_mapping, pl_to_figures, pull_to_workspace
 
@@ -188,3 +188,38 @@ def test_cli_connect_needs_client_id(tmp_path):
     home.mkdir()
     result = CliRunner().invoke(main, ["xero", "connect"], env={"TRA_HOME": str(home), "XERO_CLIENT_ID": ""})
     assert result.exit_code == 1 and "XERO_CLIENT_ID" in result.output
+
+
+class _Backend:
+    def __init__(self):
+        self.store = {}
+
+    def get_password(self, service, user):
+        return self.store.get((service, user))
+
+    def set_password(self, service, user, value):
+        self.store[(service, user)] = value
+
+
+def test_token_store_keeps_only_the_refresh_token():
+    from tra.xero.auth import TokenStore
+    backend = _Backend()
+    store = TokenStore(backend=backend)
+    long_jwt = "e" * 1500
+    store.set(Tokens(long_jwt, "refresh-abc", datetime.now(timezone.utc)))
+    [value] = backend.store.values()
+    assert long_jwt not in value and len(value) < 200
+    assert store.get() == "refresh-abc"
+
+
+def test_pull_twice_with_same_data_adds_nothing(tmp_path):
+    ws = Workspace(tmp_path, "PLMB01", 2026)
+    ws.create(list(CATEGORIES))
+    ws.save_state(ClientState("PLMB01", 2026, sole_trader=True))
+    audit = AuditLog(ws.audit_path)
+    pull_to_workspace(ws, LocalStore(tmp_path), audit, FakeXero(), "tenant-9")
+    report = pull_to_workspace(ws, LocalStore(tmp_path), audit, FakeXero(), "tenant-9")
+    assert report.figures_added == 0
+    assert len(DocumentIndex(ws.index_csv).load()) == 4
+    figures, _ = read_figures(ws.figures_csv, load_labels())
+    assert len(figures) == 5

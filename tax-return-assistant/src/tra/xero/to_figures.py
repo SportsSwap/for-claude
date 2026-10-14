@@ -13,6 +13,7 @@ from pathlib import Path
 
 from ..dates import fy_bounds
 from ..figures import append_figures
+from ..filing.index import DocumentIndex
 from ..ingest.extractors.xero_csv import load_xero_mapping
 from ..ingest.pipeline import file_document
 from ..models import Figure, ReviewNote
@@ -70,18 +71,28 @@ def pull_to_workspace(ws, store, audit, client, tenant_id: str) -> PullReport:
     }
     doc_ids: dict[str, str] = {}
     notes: list[ReviewNote] = []
+    unchanged: set[str] = set()
+    index = DocumentIndex(ws.index_csv)
     with tempfile.TemporaryDirectory() as tmp:
         for doc_type, stem, _endpoint in SNAPSHOTS:
             check_value(data[doc_type], f"{stem}.json")
             path = Path(tmp) / f"{stem}.json"
-            path.write_text(json.dumps(data[doc_type], indent=2, default=str), encoding="utf-8")
+            # Stable JSON, so the same Xero data always has the same hash and is not filed twice.
+            path.write_text(json.dumps(data[doc_type], indent=2, sort_keys=True, default=str), encoding="utf-8")
+            sha = hashlib.sha256(path.read_bytes()).hexdigest()
+            existing = index.find_by_sha(sha)
+            if existing:
+                doc_ids[doc_type] = existing.doc_id
+                unchanged.add(doc_type)
+                continue
             doc, filing_notes = file_document(
-                path, ws, store, doc_type=doc_type, category="Business", doc_date=end,
-                sha256=hashlib.sha256(path.read_bytes()).hexdigest(), pages=1, redaction_counts={},
-                parse_status="parsed", audit=audit)
+                path, ws, store, doc_type=doc_type, category="Business", doc_date=end, sha256=sha, pages=1,
+                redaction_counts={}, parse_status="parsed", audit=audit)
             doc_ids[doc_type] = doc.doc_id
             notes += filing_notes
     figures, unknown = pl_to_figures(data["XEROPL"], load_mapping(), doc_ids["XEROPL"])
+    if "XEROPL" in unchanged:
+        figures, unknown = [], []  # already pulled: the profit and loss figures are in figures.csv
     added = append_figures(ws.figures_csv, figures) if figures else []
     if unknown:
         notes.append(ReviewNote("Medium", "I5", "Xero profit and loss sections not mapped to the return: "

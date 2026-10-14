@@ -33,6 +33,7 @@ KEYS = {
     "rent_other": "rent.other",
     "rent_interest": "rent.interest",
     "d5": "ded.d5",
+    "d12": "ded.d12",
     "rfb": "it.rfb",
     "resc": "it.resc",
     "p1": "phi.premiums_p1",

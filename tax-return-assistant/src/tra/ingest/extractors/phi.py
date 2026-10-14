@@ -33,5 +33,8 @@ class PhiExtractor:
                 found += 1
                 result.figures.append(figure(key, f"{fund} – {label}", amount(hit[1].group(1)), doc_id, hit[0],
                                              when, notes=notes))
+        days = search(rt, r"^(?:Days covered by hospital cover|Hospital cover days|Days covered)\D{0,10}(\d{1,3})\b")
+        if days and 0 <= int(days[1].group(1)) <= 366:
+            result.facts["hospital_cover_days"] = int(days[1].group(1))
         result.parse_status = status(found, 4)
         return result

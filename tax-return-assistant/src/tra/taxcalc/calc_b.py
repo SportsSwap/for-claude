@@ -100,7 +100,8 @@ def calculate_b(draft: DraftReturn, state: ClientState, rates: Rates, labels: di
 
     rental_net = _sum_role(draft, labels, "rental_income") - _sum_role(draft, labels, "rental_deduction")
     it_items = _sum_role(draft, labels, "it")
-    income_test = taxable + it_items + (-rental_net if rental_net < 0 else _NIL)
+    personal_super = draft.lines["ded.d12"].amount if "ded.d12" in draft.lines else _NIL
+    income_test = taxable + it_items + personal_super + (-rental_net if rental_net < 0 else _NIL)
     rfb = draft.lines["it.rfb"].amount if "it.rfb" in draft.lines else _NIL
 
     tax = round_cents(_published_tax(taxable, rates))

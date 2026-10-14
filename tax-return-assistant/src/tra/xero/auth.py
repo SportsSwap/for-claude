@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import base64
 import hashlib
-import json
 import secrets
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -69,24 +68,23 @@ def refresh_tokens(session, client_id: str, refresh_token: str) -> Tokens:
 
 
 class TokenStore:
-    """Xero tokens in the operating system's credential store (Windows Credential Manager)."""
+    """The Xero refresh token in the operating system's credential store (Windows Credential Manager).
+
+    Only the refresh token is stored: Windows limits a stored credential to about 1,280
+    characters and Xero access tokens can be longer. Each run swaps the refresh token
+    for a fresh access token, which lives in memory only.
+    """
 
     def __init__(self, service: str = "tra-xero", backend=None):
         if backend is None:
             import keyring as backend
         self.service, self.backend = service, backend
 
-    def get(self) -> Tokens | None:
-        raw = self.backend.get_password(self.service, "tokens")
-        if not raw:
-            return None
-        d = json.loads(raw)
-        return Tokens(d["access_token"], d["refresh_token"], datetime.fromisoformat(d["expires_at"]))
+    def get(self) -> str | None:
+        return self.backend.get_password(self.service, "refresh_token") or None
 
     def set(self, tokens: Tokens) -> None:
-        self.backend.set_password(self.service, "tokens", json.dumps({
-            "access_token": tokens.access_token, "refresh_token": tokens.refresh_token,
-            "expires_at": tokens.expires_at.isoformat()}))
+        self.backend.set_password(self.service, "refresh_token", tokens.refresh_token)
 
 
 def wait_for_code(expected_state: str, port: int = REDIRECT_PORT, timeout: int = 300) -> str:

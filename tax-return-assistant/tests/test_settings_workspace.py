@@ -79,3 +79,19 @@ def test_paths_with_spaces(tmp_path):
     ws = Workspace(home, "AB12", 2026)
     ws.create(list(CATEGORIES))
     assert Path(ws.clients_dir, "Rental").is_dir()
+
+
+def test_check_tra_home_more_cloud_folders(tmp_path):
+    for parts in (("Dropbox (Firm Pty Ltd)", "Tax"), ("My Drive", "Tax"), ("Firm Pty Ltd", "Tax - Documents"),
+                  ("Library", "CloudStorage", "GoogleDrive-me@example.com", "Tax")):
+        home = tmp_path.joinpath(*parts)
+        home.mkdir(parents=True)
+        assert check_tra_home(home, env={}), parts
+
+
+def test_check_tra_home_under_onedrive_env_root(tmp_path):
+    root = tmp_path / "Firm Pty Ltd OD"
+    home = root / "Tax"
+    home.mkdir(parents=True)
+    assert check_tra_home(home, env={"OneDriveCommercial": str(root)})
+    assert check_tra_home(home, env={}) == []

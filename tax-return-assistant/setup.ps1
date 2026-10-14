@@ -42,7 +42,9 @@ $current = [Environment]::GetEnvironmentVariable("TRA_HOME", "User")
 if ($current) { $default = $current }
 $answer = Read-Host "Folder for client data [$default]"
 if ([string]::IsNullOrWhiteSpace($answer)) { $answer = $default }
-if ($answer -match "(?i)onedrive|dropbox|google ?drive|icloud") {
+$cloudRoots = @($env:OneDrive, $env:OneDriveCommercial, $env:OneDriveConsumer) | Where-Object { $_ }
+$underCloudRoot = $cloudRoots | Where-Object { $answer.StartsWith($_, [StringComparison]::OrdinalIgnoreCase) }
+if ($underCloudRoot -or $answer -match "(?i)onedrive|dropbox|google ?drive|my drive|shared drives|icloud|cloudstorage| - (shared )?documents") {
     Fail "That folder is synced to the cloud. Client data must stay on this computer. Choose a folder such as C:\TaxAssistant."
 }
 New-Item -ItemType Directory -Force -Path $answer | Out-Null

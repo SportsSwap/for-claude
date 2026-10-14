@@ -92,11 +92,12 @@ The options change the calculation, so set those that apply:
 | Option | Meaning |
 |---|---|
 | `--help-debt` | The client has a HELP or other study loan |
-| `--hospital-days 365` | Days covered by private hospital insurance. Leave it out if unknown: the tool assumes cover and raises a note. |
+| `--hospital-days 365` | Days covered by private hospital insurance. Leave it out if unknown: the tool takes it from the private health statement if that shows it, otherwise assumes cover and raises a note. |
 | `--age-band 65to69` / `70plus` | For the private health rebate |
 | `--sapto single` | Eligible for the seniors and pensioners tax offset (`couple`, `illness_separated`) |
 | `--spouse`, `--dependants 2` | Raises a note: the family Medicare and MLS thresholds need family income |
 | `--sole-trader` | For Xero clients |
+| `--non-resident` | Not an Australian resident for tax. The estimate assumes residency, so this raises a High note to prepare the return in Xero Tax. |
 
 These are saved in `TRA_HOME\Work\SMIT01\FY2026\state.json`. Edit that file to change them later.
 
@@ -115,7 +116,7 @@ For each file the tool:
 3. **Extracts the figures it understands** into `figures.csv`, each marked *unconfirmed* with its source document and page.
 4. **Files the original, unchanged**, as `TRA_HOME\Clients\SMIT01\FY2026\<Category>\SMIT01_FY2026_<DocType>_<date>.pdf`, and lists it in `index.csv`. The original filename is never recorded, since filenames often contain names.
 
-Ingesting the same file twice is detected and skipped. If a document can't be read (a scan, or a layout the tool doesn't know), it is still filed and a note asks you to enter its figures by hand.
+Ingesting the same file twice is detected and skipped. If a document can't be read (a scan, a password-protected or damaged PDF, or a layout the tool doesn't know), it is still filed and a note asks you to enter its figures by hand. Excel lock files (`~$...`) and hidden files in a folder are ignored.
 
 **Documents it reads today:**
 
@@ -150,7 +151,7 @@ Also fill in, as needed:
 - **Capital gains:** `cgt_events.csv` in the same folder. One row per sale: acquired and disposed dates, proceeds and cost base. Prior-year capital losses go in `figures.csv` as `cgt.prior_losses`.
 - **Prior year:** `prior_year.csv` (`label_key,amount`) from last year's return. After the first year, the tool uses its own previous output automatically.
 
-Save as CSV and close Excel before the next step.
+Save (keep the "CSV UTF-8" format Excel opens it in) and close Excel before the next step. If the file is still open, the tool says so and changes nothing; close it and run the command again.
 
 ### 4. Prepare the draft
 
@@ -191,7 +192,7 @@ Typed-in numbers (figures and rates) are **blue**. Everything else is a formula,
 
 | ID | Checks |
 |---|---|
-| R1–R4 | Every figure has a filed source; label totals add up; unconfirmed figures listed; pre-fill and source document not both counted |
+| R1–R5 | Every figure has a filed source; label totals add up; unconfirmed figures listed; pre-fill and source document not both counted; the same document not ingested twice (same type, label and amount from two documents) |
 | P1–P4 | Return vs ATO pre-fill (differences over $1, items on pre-fill but missing, no pre-fill ingested, HELP mismatch) |
 | C1–C2 | The two tax calculations agree to the cent; the rates file is verified |
 | S1 | Deductions high relative to income |
@@ -205,10 +206,11 @@ Typed-in numbers (figures and rates) are **blue**. Everything else is a formula,
 | S9 | Medicare levy surcharge exposure |
 | S10 | Redraw or line-of-credit interest (TR 2000/2) |
 | S11 | Gifts under $2 or not confirmed as a DGR |
-| S12 | Areas the tool doesn't prepare (managed funds, family thresholds, business P8 detail, ESS, foreign income, PSI) |
+| S12 | Areas the tool doesn't prepare (managed funds, family thresholds, business P8 detail, non-residents, net financial investment losses) |
 | S13 | Equipment over $300 claimed outright (s40-80) |
+| S14 | Residency assumed (a reminder to confirm it) |
 | Y1–Y2 | Movements over 20% (and $100) against last year; items that disappeared |
-| I1–I6 | Raised at ingest: manual entry needed, no document date, FYI unavailable, duplicate file, unmapped Xero section, unhandled area mentioned |
+| I1–I7 | Raised at ingest: manual entry needed, no document date, FYI unavailable, duplicate file, unmapped Xero section, an unhandled area mentioned in a document (employee share schemes, foreign income or tax, PSI, trust or partnership distributions, Medicare levy exemption), hospital cover days taken from the health statement |
 
 Thresholds are in `config/checks.yaml`. Where the treatment is uncertain, the note says so and cites the provision or ruling. It never changes the return.
 
@@ -221,10 +223,10 @@ The tool is built so that sensitive identifiers can't end up in anything it crea
 | Control | How |
 |---|---|
 | Redact before processing | Text is redacted as it is read, before classification, extraction or logging. TFNs are detected by check digit *and* by the words "TFN" / "tax file number" (so a mistyped TFN is still caught). Medicare by check digit and keyword, cards by Luhn, BSB, account, licence and passport by format and keyword. The rest of the code accepts only redacted text. |
-| Output guard | Every file the tool writes (CSV, JSON, the workpaper, the index, logs, filenames) is scanned before writing. If anything looks like an identifier, the write is refused. |
+| Output guard | Every file the tool writes (CSV, JSON, the workpaper, the index, logs, filenames) is scanned before writing. If anything looks like an identifier, the write is refused and a `guard_blocked` entry (place and type, never the value) goes in the audit log. |
 | No values in logs | Log lines are redacted. The audit log records who did what and when, by client code and document ID, with redaction *counts*, never values or original filenames. |
 | Client codes only | Names never appear in filenames, logs or the audit log |
-| Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. There is no AI or other external service. `TRA_HOME` may not be in a cloud-synced folder. |
+| Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. There is no AI or other external service. `TRA_HOME` may not be in a cloud-synced folder (OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive, iCloud). |
 | Secrets | Xero and FYI credentials live in Windows user environment variables. The Xero token is kept in Windows Credential Manager. Nothing secret is in the code, config or repository (see `.env.example` for the names). |
 | Nothing in git | `.gitignore` blocks PDFs, spreadsheets and CSVs. A test fails if any committed file contains a valid TFN, Medicare or card number. |
 | Originals | Filed unchanged in the firm's system of record, as the firm keeps them today |
@@ -257,7 +259,7 @@ The loader rejects a file whose bracket base amounts don't match its rates, whos
 4. Run `tra xero connect` once. It opens Xero in the browser and lists the organisations.
 5. Run `tra xero pull SMIT01 --tenant <id>`. The tenant ID is remembered for that client after the first time.
 
-`pull` files the P&L, balance sheet, bank transactions and chart of accounts as documents. It adds the P&L lines as unconfirmed business income and expense figures. Complete the detailed business schedule (P8) in Xero Tax. The Xero client has been tested against mocked responses only; do a trial run on a test organisation first.
+`pull` files the P&L, balance sheet, bank transactions and chart of accounts as documents (pulling again with unchanged data adds nothing). Only the Xero refresh token is stored, in Windows Credential Manager. It adds the P&L lines as unconfirmed business income and expense figures. Complete the detailed business schedule (P8) in Xero Tax. The Xero client has been tested against mocked responses only; do a trial run on a test organisation first.
 
 ## FYI setup
 
@@ -280,7 +282,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 266 tests, all on invented data generated while the tests run.
+There are 299 tests, all on invented data generated while the tests run.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.
@@ -309,12 +311,16 @@ An LLM-based extractor could be added later in `src/tra/ingest/extractors/`. It 
 - **Individuals only.** Company and trust returns are not built.
 - **Flagged, not calculated:** these are detected and raised for the reviewer:
   - the family Medicare levy reduction and family income tests;
-  - M1 exemptions;
+  - non-resident returns;
   - foreign income;
   - employee share schemes;
   - personal services income;
+  - trust and partnership distributions;
   - managed fund (AMIT) components;
+  - net financial investment losses in the income tests;
   - the detailed business schedule (P8).
+- **Medicare levy exemptions (M1)** are only flagged when a document mentions a Medicare entitlement statement or a Medicare levy exemption. Otherwise the reviewer must consider them.
+- **Pensions and annuities** (items 5–7) have no labels yet; enter them under item 24 and adjust in Xero Tax.
 - **No OCR.** Scanned documents are filed and flagged for manual entry.
 - **Layouts.** Readers cover the ATO pre-fill report and the layouts the tool was built with. New layouts will need adding as they come up.
 - **Unverified reference data.** The rates, citations, label letters, Xero scope names and FYI endpoints are unverified until checked (see the top of this file).
