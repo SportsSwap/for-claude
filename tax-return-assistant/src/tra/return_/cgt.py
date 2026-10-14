@@ -9,7 +9,7 @@ review note asking the reviewer to confirm cost base and dates.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from decimal import Decimal
 
 from ..money import ZERO, round_cents

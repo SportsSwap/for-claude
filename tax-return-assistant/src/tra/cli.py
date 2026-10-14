@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 import getpass
 import os
 import platform
@@ -18,8 +19,10 @@ import yaml
 
 from . import __version__
 from .figures import read_figures, write_figures, write_header_files
-from .filing.local_store import LocalStore
-from .filing.store import DocumentStore
+from .filing.fyi_store import FyiError, FyiStore, load_fyi_config
+from .filing.fyi_store import make_store as _make_store
+from .filing.index import DocumentIndex
+from .filing.store import DocumentStore, FilingRequest
 from .ingest.classify import CATEGORIES, load_doc_types
 from .ingest.pipeline import IngestError, ingest_file
 from .labels import load_labels
@@ -64,7 +67,7 @@ def _workspace(code: str, fy: int, *, must_exist: bool = True) -> tuple[Settings
 
 
 def make_store(settings: Settings) -> DocumentStore:
-    return LocalStore(settings.tra_home)
+    return _make_store(settings, warn=lambda message: click.echo(f"WARNING {message}", err=True))
 
 
 def _counts(counts: dict) -> str:
@@ -326,6 +329,41 @@ def pull(code, fy, tenant):
     if report.unknown_sections:
         click.echo(f"Not mapped: {', '.join(report.unknown_sections)} (see config/xero_mapping.yaml)")
     click.echo(f"Next: tra figures {code}")
+
+@main.group()
+def fyi():
+    """FYI Docs filing."""
+
+
+@fyi.command()
+@click.argument("code")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+def push(code, fy):
+    """File documents that are still only in local folders into FYI."""
+    settings, ws, audit = _workspace(code, fy)
+    env = {name: os.environ.get(name, "") for name in ("FYI_BASE_URL", "FYI_ACCESS_ID", "FYI_ACCESS_SECRET", "FYI_APP_ID")}
+    if not all(env.values()):
+        raise click.ClickException("Set FYI_BASE_URL, FYI_ACCESS_ID, FYI_ACCESS_SECRET and FYI_APP_ID first "
+                                   "(see README, 'FYI setup').")
+    store = FyiStore(requests.Session(), env["FYI_BASE_URL"], env["FYI_ACCESS_ID"], env["FYI_ACCESS_SECRET"],
+                     env["FYI_APP_ID"], load_fyi_config())
+    index = DocumentIndex(ws.index_csv)
+    pushed, failed = [], 0
+    for doc in [d for d in index.load() if d.store == "local"]:
+        req = FilingRequest(ws.client_code, ws.income_year, doc.category, doc.filed_name, doc.doc_type, doc.doc_date)
+        try:
+            ref = store.file(Path(doc.filed_location), req)
+        except (FyiError, OSError) as exc:
+            failed += 1
+            click.echo(f"{doc.doc_id} FAILED: {exc}", err=True)
+            continue
+        index.update(dataclasses.replace(doc, store=ref.store, filed_location=ref.location))
+        pushed.append(doc.doc_id)
+        click.echo(f"{doc.doc_id} → FYI")
+    audit.record("fyi_push", client=code, doc_ids=pushed, failed=failed)
+    click.echo(f"{len(pushed)} pushed, {failed} failed.")
+    if failed:
+        raise SystemExit(1)
 
 @main.command()
 @click.option("--auto-confirm", is_flag=True, help="Mark the demo figures confirmed so you can run prepare straight away.")

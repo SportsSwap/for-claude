@@ -91,7 +91,7 @@ def test_counts_by_type(make_tfn):
     t = make_tfn()
     result = redact_pages([f"TFN {t}", "Card 4111 1111 1111 1111 and TFN 123 456 789"])
     assert dict(result.counts) == {"TFN": 2, "CARD": 1}
-    assert result.text == f"TFN [TFN REDACTED]\n\f\nCard [CARD REDACTED] and TFN [TFN REDACTED]"
+    assert result.text == "TFN [TFN REDACTED]\n\f\nCard [CARD REDACTED] and TFN [TFN REDACTED]"
 
 
 def test_redacted_text_cannot_be_built_directly():

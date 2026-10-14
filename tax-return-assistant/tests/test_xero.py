@@ -1,7 +1,7 @@
 import base64
 import hashlib
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from decimal import Decimal
 from urllib.parse import parse_qs, urlparse
 
@@ -15,7 +15,7 @@ from tra.labels import load_labels
 from tra.models import ClientState
 from tra.privacy.audit import AuditLog
 from tra.workspace import Workspace
-from tra.xero.auth import TOKEN_URL, Tokens, authorize_url, exchange_code, pkce_pair, refresh_tokens
+from tra.xero.auth import TOKEN_URL, authorize_url, exchange_code, pkce_pair, refresh_tokens
 from tra.xero.client import XeroAuthError, XeroClient, XeroPermissionError, strip_sensitive
 from tra.xero.to_figures import load_mapping, pl_to_figures, pull_to_workspace
 

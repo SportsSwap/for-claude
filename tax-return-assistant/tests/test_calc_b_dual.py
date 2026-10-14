@@ -1,7 +1,6 @@
 import dataclasses
 import random
 
-import pytest
 from taxcases import DEMO, D, draft, state
 
 from tra.checks.context import CheckContext

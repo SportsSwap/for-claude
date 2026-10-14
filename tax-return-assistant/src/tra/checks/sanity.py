@@ -11,7 +11,6 @@ from ..dates import days_in_fy
 from ..models import ReviewNote
 from ..money import ZERO
 from ..return_.cgt import anniversary, discount_eligible
-from . import label_name
 from .context import CheckContext
 
 WORK_RELATED = ("ded.d1", "ded.d2", "ded.d3", "ded.d4", "ded.d5")

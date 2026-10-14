@@ -1,0 +1,25 @@
+# FYI Docs API settings.
+#
+# UNCONFIRMED: FYI's external API uses header credentials (an access ID, an access
+# secret and an application identifier issued by FYI), but the header names and the
+# endpoint paths below could not be checked against FYI's developer documentation
+# when this was built. Confirm them with FYI (developers.fyi.app / FYI support)
+# before first use, and correct them here. Until FYI is configured, documents are
+# filed in local folders and `tra fyi push` sends them later.
+headers:
+  access_id: X-Access-Id
+  access_secret: X-Access-Secret
+  app_id: X-App-Id
+endpoints:
+  find_client: /clients?code={code}
+  upload: /documents
+# Tool category -> FYI cabinet.
+cabinet_map:
+  ATO: Tax
+  Income: Tax
+  Investments: Tax
+  Rental: Tax
+  Deductions: Tax
+  Business: Accounting
+  Health: Tax
+  Other: Tax
