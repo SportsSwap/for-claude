@@ -23,3 +23,18 @@ def label_name(labels, key: str) -> str:
 
 def load_citations(path: Path | None = None) -> dict[str, dict]:
     return yaml.safe_load((path or CONFIG_DIR / "citations.yaml").read_text(encoding="utf-8"))
+
+
+def run_all_checks(ctx) -> list:
+    """Every self-check, ranked. Imported lazily so the check modules can use the helpers above."""
+    from .dual_calc import check_dual_calc, check_rates_status
+    from .notes import rank_notes
+    from .prefill import check_prefill
+    from .prior_year import check_prior_year
+    from .reconcile import check_reconcile
+    from .sanity import check_sanity
+
+    notes = []
+    for check in (check_dual_calc, check_rates_status, check_reconcile, check_prefill, check_sanity, check_prior_year):
+        notes += check(ctx)
+    return rank_notes(notes)
