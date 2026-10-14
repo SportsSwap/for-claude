@@ -7,6 +7,7 @@ store) and its SHA-256 survives. The original filename is never recorded.
 from __future__ import annotations
 
 import hashlib
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
@@ -62,8 +63,31 @@ def file_document(source: Path, ws: Workspace, store: DocumentStore, *, doc_type
                    filed_location=ref.location, doc_date=when, date_detected=doc_date is not None, pages=pages,
                    sha256=sha256, ingested_at=datetime.now().astimezone(), redaction_counts=dict(redaction_counts),
                    parse_status=parse_status, store=ref.store)
-    index.append(doc)
+    try:
+        index.append(doc)  # the commit point: once indexed, a re-run treats the file as done
+    except BaseException:
+        if ref.store == "local":
+            Path(ref.location).unlink(missing_ok=True)
+        raise
     return doc, notes
+
+
+@contextmanager
+def _restore_on_error(*paths: Path):
+    """If anything fails, put these files back as they were, so a re-run starts clean."""
+    saved = {p: p.read_bytes() if p.exists() else None for p in paths}
+    try:
+        yield
+    except BaseException:
+        for path, data in saved.items():
+            try:
+                if data is None:
+                    path.unlink(missing_ok=True)
+                else:
+                    path.write_bytes(data)
+            except OSError:
+                pass
+        raise
 
 
 def _sha256(path: Path) -> str:
@@ -98,15 +122,17 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
     if loaded.image_only_pages and not result.figures:
         result.parse_status = "manual_needed"
 
-    doc, notes = file_document(
-        path, ws, store, doc_type=doc_type, category=doc_types[doc_type].category,
-        doc_date=result.doc_date or find_doc_date(loaded.redacted.text), sha256=loaded.sha256,
-        pages=loaded.page_count, redaction_counts=dict(loaded.redacted.counts), parse_status=result.parse_status,
-        audit=audit, doc_id=doc_id)
-
-    added = append_figures(ws.figures_csv, result.figures) if result.figures else []
-    if result.prefill:
-        append_prefill(ws.prefill_json, result.prefill)
+    # Figures first, the index row last: if any step fails, everything is rolled back and
+    # the file is not marked as ingested, so running the command again does the whole job.
+    with _restore_on_error(ws.figures_csv, ws.prefill_json):
+        added = append_figures(ws.figures_csv, result.figures) if result.figures else []
+        if result.prefill:
+            append_prefill(ws.prefill_json, result.prefill)
+        doc, notes = file_document(
+            path, ws, store, doc_type=doc_type, category=doc_types[doc_type].category,
+            doc_date=result.doc_date or find_doc_date(loaded.redacted.text), sha256=loaded.sha256,
+            pages=loaded.page_count, redaction_counts=dict(loaded.redacted.counts),
+            parse_status=result.parse_status, audit=audit, doc_id=doc_id)
 
     if result.parse_status == "manual_needed" or loaded.image_only_pages:
         detail = (f" Page(s) {', '.join(map(str, loaded.image_only_pages))} have no text (scanned?)."

@@ -171,3 +171,30 @@ def test_ingest_reports_missing_path(run, tmp_path):
     result = run("ingest", "SMIT01", str(tmp_path / "nothing-*.pdf"))
     assert result.exit_code == 1
     assert "No files match" in result.output
+
+
+def test_locked_figures_during_ingest_recovers_on_rerun(run, home, tmp_path, monkeypatch):
+    """Excel holding figures.csv must not lose the document's figures on the re-run the tool asks for."""
+    import os as _os
+
+    import tra.privacy.guard as guard_mod
+    demo = build_demo_documents(tmp_path / "inbox")
+    run("new", "SMIT01")
+    real_replace = _os.replace
+
+    def locked(src, dst):
+        if str(dst).endswith("figures.csv"):
+            raise PermissionError("locked")
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(guard_mod.os, "replace", locked)
+    result = run("ingest", "SMIT01", str(demo.paths["dividend_bhp"]))
+    assert result.exit_code == 1 and "open in another program" in result.output
+    assert _index_rows(home) == []
+    monkeypatch.setattr(guard_mod.os, "replace", real_replace)
+    result = run("ingest", "SMIT01", str(demo.paths["dividend_bhp"]))
+    assert result.exit_code == 0 and "duplicate" not in result.output.lower()
+    assert len(_index_rows(home)) == 1
+    assert {r["label_key"] for r in _figure_rows(home)} == {"income.div_franked", "income.franking_credit"}
+    filed = list((home / "Clients" / "SMIT01" / "FY2026" / "Investments").iterdir())
+    assert len(filed) == 1  # no orphaned copy from the failed attempt
