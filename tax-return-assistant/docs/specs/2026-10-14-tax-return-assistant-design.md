@@ -374,6 +374,7 @@ Each check returns `ReviewNote`s. Thresholds live in `checks.yaml`.
 | P1 Pre-fill mismatch | Label differs from pre-fill by more than $1 | High |
 | P2 Pre-fill item missing | Pre-fill line has no matching figure (e.g. a second bank account's interest) | High |
 | P3 No pre-fill | No PREFILL document ingested | Medium |
+| P4 HELP mismatch | Pre-fill shows a HELP debt but the client state has none, or the reverse | High |
 | C1 Calc mismatch | Calc A ≠ calc B on any component | High |
 | C2 Rates unverified | Rates file `status: unverified` | High |
 | S1 Deductions vs income | Total deductions over 30% of total income, or D1–D5 over 15% of salary | Medium |
@@ -387,7 +388,8 @@ Each check returns `ReviewNote`s. Thresholds live in `checks.yaml`.
 | S9 MLS exposure | MLS income over threshold and hospital cover days < days in year | Medium (client question) |
 | S10 Interest purpose | Rental interest with "redraw" or "line of credit" in the description (TR 2000/2) | Medium |
 | S11 Gifts | D9 gift under $2, or recipient not noted as a DGR (Div 30) | Low |
-| S12 Unhandled area | ESS, PSI, foreign income, managed fund AMIT, family Medicare reduction, M1 exemption detected | High (reviewer) |
+| S12 Unhandled area | ESS, PSI, foreign income, managed fund AMIT, family Medicare reduction, M1 exemption detected (ingest raises I6 when the document text mentions these) | High (reviewer) |
+| S13 Asset claimed outright | A single work-related item over $300 that reads as equipment (laptop, phone, desk, chair…). It's a depreciating asset; an immediate deduction applies only at or under $300 (s40-80) | Medium |
 | Y1 Prior-year movement | Label moved more than 20% **and** more than $100 against `prior_year.csv` | Medium |
 | Y2 Prior-year item gone | Label present last year, absent this year (e.g. rental stopped) | Medium (client question) |
 
@@ -399,7 +401,7 @@ Each check returns `ReviewNote`s. Thresholds live in `checks.yaml`.
 
 `citations.yaml` maps citation ids to a reference and a one-line description:
 
-- ITAA 1997 s8-1, s25-5, s26-31, s28-25, s40-27, s102-5, s115-25, s900-35, Div 30, Div 43, Div 207;
+- ITAA 1997 s8-1, s25-5, s26-31, s28-25, s40-27, s40-80, s102-5, s115-25, s900-35, Div 30, Div 43, Div 207;
 - TR 97/12, TR 97/23, TR 2000/2, TR 2024/3, PCG 2023/1;
 - Medicare Levy Act 1986, HESA 2003, TASA 2009 s30-10.
 
