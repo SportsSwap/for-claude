@@ -5,7 +5,7 @@
 #
 # role: how the calculation treats the amount
 #   income | franking | deduction | rental_income | rental_deduction |
-#   business_income | business_deduction | loss | withheld | phi | it | info
+#   business_income | business_deduction | loss | withheld | phi | it | cgt | info
 # tab: the workpaper tab the figures appear on. order: ATO item order.
 income.salary:            {item: "1",  label: "C", description: "Salary or wages – gross payments", role: income, tab: "Salary & Wages", order: 10}
 income.salary_tax_withheld: {item: "1", label: "Tax withheld", description: "Salary or wages – tax withheld", role: withheld, tab: "Salary & Wages", order: 11}
@@ -33,7 +33,7 @@ ded.d15:                  {item: "D15", label: "", description: "Other deduction
 loss.l1:                  {item: "L1", label: "", description: "Tax losses of earlier income years claimed", role: loss, tab: "Losses", order: 250}
 income.business_income:   {item: "15", label: "", description: "Business income (Xero P&L total; complete P8 in Xero Tax)", role: business_income, tab: "Business", order: 315}
 income.business_expenses: {item: "15", label: "", description: "Business expenses (Xero P&L total; complete P8 in Xero Tax)", role: business_deduction, tab: "Business", order: 316}
-cgt.prior_losses:         {item: "18", label: "", description: "Net capital losses brought forward (applied in the CGT schedule)", role: info, tab: "Capital Gains", order: 317}
+cgt.prior_losses:         {item: "18", label: "", description: "Net capital losses brought forward (applied in the CGT schedule)", role: cgt, tab: "Capital Gains", order: 317}
 cgt.total_gains:          {item: "18", label: "H", description: "Total current year capital gains", role: info, tab: "Capital Gains", order: 318, computed: true}
 cgt.net_gain:             {item: "18", label: "A", description: "Net capital gain", role: income, tab: "Capital Gains", order: 319, computed: true}
 rent.gross:               {item: "21", label: "P", description: "Gross rent", role: rental_income, tab: "Rental", order: 321}

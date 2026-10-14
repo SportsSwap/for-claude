@@ -179,3 +179,11 @@ def test_labels_ordered_and_have_tabs():
     assert all(d.tab for d in LABELS.values())
     assert LABELS["income.interest"].item == "10" and LABELS["income.interest"].label == "L"
     assert LABELS["cgt.net_gain"].computed is True
+
+
+def test_prior_capital_losses_can_be_a_figure(tmp_path):
+    path = tmp_path / "figures.csv"
+    path.write_text(",".join(FIGURE_COLUMNS) + "\nF0001,cgt.prior_losses,2025 NOA losses c/f,3000.00,,D002,1,manual,Y,,\n",
+                    encoding="utf-8")
+    loaded, errors = read_figures(path, LABELS)
+    assert errors == [] and loaded[0].label_key == "cgt.prior_losses"
