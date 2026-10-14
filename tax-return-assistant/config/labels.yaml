@@ -1,0 +1,50 @@
+# Internal label keys mapped to the ATO individual return (2026 instructions).
+# Item numbers and descriptions are the reliable reference. Label LETTERS are
+# from the instructions but have not been checked against the 2026 forms:
+# letter_verified stays false until a registered agent confirms each one.
+#
+# role: how the calculation treats the amount
+#   income | franking | deduction | rental_income | rental_deduction |
+#   business_income | business_deduction | loss | withheld | phi | it | info
+# tab: the workpaper tab the figures appear on. order: ATO item order.
+income.salary:            {item: "1",  label: "C", description: "Salary or wages – gross payments", role: income, tab: "Salary & Wages", order: 10}
+income.salary_tax_withheld: {item: "1", label: "Tax withheld", description: "Salary or wages – tax withheld", role: withheld, tab: "Salary & Wages", order: 11}
+income.allowances:        {item: "2",  label: "K", description: "Allowances, earnings, tips, director's fees", role: income, tab: "Salary & Wages", order: 20}
+it.rfb:                   {item: "IT1", label: "", description: "Total reportable fringe benefits amounts", role: it, tab: "Salary & Wages", order: 25}
+it.resc:                  {item: "IT2", label: "", description: "Reportable employer superannuation contributions", role: it, tab: "Salary & Wages", order: 26}
+income.interest:          {item: "10", label: "L", description: "Gross interest", role: income, tab: "Interest", order: 100}
+income.interest_tfn_withheld: {item: "10", label: "M", description: "Interest – TFN amounts withheld", role: withheld, tab: "Interest", order: 101}
+income.div_unfranked:     {item: "11", label: "S", description: "Dividends – unfranked amount", role: income, tab: "Dividends", order: 110}
+income.div_franked:       {item: "11", label: "T", description: "Dividends – franked amount", role: income, tab: "Dividends", order: 111}
+income.franking_credit:   {item: "11", label: "U", description: "Dividends – franking credit", role: franking, tab: "Dividends", order: 112}
+income.div_tfn_withheld:  {item: "11", label: "V", description: "Dividends – TFN amounts withheld", role: withheld, tab: "Dividends", order: 113}
+ded.d1:                   {item: "D1", label: "A", description: "Work-related car expenses", role: deduction, tab: "D1 Car", order: 201}
+ded.d2:                   {item: "D2", label: "B", description: "Work-related travel expenses", role: deduction, tab: "D2 Travel", order: 202}
+ded.d3:                   {item: "D3", label: "C", description: "Work-related clothing, laundry and dry-cleaning", role: deduction, tab: "D3 Clothing", order: 203}
+ded.d4:                   {item: "D4", label: "D", description: "Work-related self-education expenses", role: deduction, tab: "D4 Self-education", order: 204}
+ded.d5:                   {item: "D5", label: "E", description: "Other work-related expenses", role: deduction, tab: "D5 Other work-related", order: 205}
+ded.d6:                   {item: "D6", label: "K", description: "Low-value pool deduction", role: deduction, tab: "D6 Low-value pool", order: 206}
+ded.d7:                   {item: "D7", label: "I", description: "Interest deductions", role: deduction, tab: "D7 Interest", order: 207}
+ded.d8:                   {item: "D8", label: "H", description: "Dividend deductions", role: deduction, tab: "D8 Dividend deductions", order: 208}
+ded.d9:                   {item: "D9", label: "J", description: "Gifts or donations", role: deduction, tab: "D9 Gifts", order: 209}
+ded.d10:                  {item: "D10", label: "M", description: "Cost of managing tax affairs", role: deduction, tab: "D10 Tax affairs", order: 210}
+ded.d12:                  {item: "D12", label: "", description: "Personal superannuation contributions", role: deduction, tab: "D12 Personal super", order: 212}
+ded.d15:                  {item: "D15", label: "", description: "Other deductions", role: deduction, tab: "D15 Other deductions", order: 215}
+loss.l1:                  {item: "L1", label: "", description: "Tax losses of earlier income years claimed", role: loss, tab: "Losses", order: 250}
+income.business_income:   {item: "15", label: "", description: "Business income (Xero P&L total; complete P8 in Xero Tax)", role: business_income, tab: "Business", order: 315}
+income.business_expenses: {item: "15", label: "", description: "Business expenses (Xero P&L total; complete P8 in Xero Tax)", role: business_deduction, tab: "Business", order: 316}
+cgt.prior_losses:         {item: "18", label: "", description: "Net capital losses brought forward (applied in the CGT schedule)", role: info, tab: "Capital Gains", order: 317}
+cgt.total_gains:          {item: "18", label: "H", description: "Total current year capital gains", role: info, tab: "Capital Gains", order: 318, computed: true}
+cgt.net_gain:             {item: "18", label: "A", description: "Net capital gain", role: income, tab: "Capital Gains", order: 319, computed: true}
+rent.gross:               {item: "21", label: "P", description: "Gross rent", role: rental_income, tab: "Rental", order: 321}
+rent.interest:            {item: "21", label: "Q", description: "Rental interest deductions", role: rental_deduction, tab: "Rental", order: 322}
+rent.capital_works:       {item: "21", label: "F", description: "Capital works deductions", role: rental_deduction, tab: "Rental", order: 323}
+rent.other:               {item: "21", label: "U", description: "Other rental deductions", role: rental_deduction, tab: "Rental", order: 324}
+income.other:             {item: "24", label: "", description: "Other income", role: income, tab: "Other Income", order: 340}
+phi.premiums_p1:          {item: "PHI", label: "", description: "Premiums eligible for rebate 1 Jul–31 Mar", role: phi, tab: "Private Health", order: 601}
+phi.rebate_p1:            {item: "PHI", label: "", description: "Government rebate received 1 Jul–31 Mar", role: phi, tab: "Private Health", order: 602}
+phi.premiums_p2:          {item: "PHI", label: "", description: "Premiums eligible for rebate 1 Apr–30 Jun", role: phi, tab: "Private Health", order: 603}
+phi.rebate_p2:            {item: "PHI", label: "", description: "Government rebate received 1 Apr–30 Jun", role: phi, tab: "Private Health", order: 604}
+phi.premiums_total:       {item: "PHI", label: "", description: "Pre-fill: total premiums eligible for rebate", role: info, tab: "Private Health", order: 605}
+phi.rebate_total:         {item: "PHI", label: "", description: "Pre-fill: total rebate received", role: info, tab: "Private Health", order: 606}
+help.indicator:           {item: "HELP", label: "", description: "Pre-fill: study and training loan debt indicator", role: info, tab: "Other Income", order: 700}
