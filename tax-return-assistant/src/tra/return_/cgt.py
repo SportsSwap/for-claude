@@ -26,13 +26,17 @@ class CgtSummary:
     events_used: tuple[str, ...]
 
 
+def anniversary(acquired: date) -> date:
+    """The first anniversary of acquisition (1 March for a 29 February acquisition)."""
+    try:
+        return acquired.replace(year=acquired.year + 1)
+    except ValueError:  # 29 February
+        return date(acquired.year + 1, 3, 1)
+
+
 def discount_eligible(acquired: date, disposed: date) -> bool:
     """Held at least 12 months, not counting the acquisition or disposal day."""
-    try:
-        anniversary = acquired.replace(year=acquired.year + 1)
-    except ValueError:  # 29 February
-        anniversary = date(acquired.year + 1, 3, 1)
-    return disposed > anniversary
+    return disposed > anniversary(acquired)
 
 
 def compute_cgt(events, prior_losses: Decimal, resident: bool = True) -> CgtSummary:

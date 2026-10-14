@@ -1,0 +1,24 @@
+# Citations used in review notes. Every entry ships with verified: false: the
+# legislation and ATO websites were unreachable when this was built. A
+# registered tax agent should confirm each reference and set verified: true.
+# Unverified citations appear in the workpaper as "(citation to be confirmed by reviewer)".
+itaa97_s8_1:      {ref: "ITAA 1997 s8-1", description: "General deductions", verified: false}
+itaa97_s25_5:     {ref: "ITAA 1997 s25-5", description: "Tax-related expenses (cost of managing tax affairs)", verified: false}
+itaa97_s26_31:    {ref: "ITAA 1997 s26-31", description: "Travel related to residential rental property not deductible", verified: false}
+itaa97_s28_25:    {ref: "ITAA 1997 s28-25", description: "Cents per kilometre method, 5,000 business km limit", verified: false}
+itaa97_s40_27:    {ref: "ITAA 1997 s40-27", description: "Second-hand depreciating assets in residential premises", verified: false}
+itaa97_s40_80:    {ref: "ITAA 1997 s40-80(2)", description: "Immediate deduction for non-business assets costing $300 or less", verified: false}
+itaa97_s102_5:    {ref: "ITAA 1997 s102-5", description: "Net capital gain method statement", verified: false}
+itaa97_s115_25:   {ref: "ITAA 1997 s115-25", description: "CGT discount: asset held at least 12 months", verified: false}
+itaa97_s900_35:   {ref: "ITAA 1997 s900-35", description: "Substantiation exception for small total of work expenses ($300)", verified: false}
+itaa97_div30:     {ref: "ITAA 1997 Div 30", description: "Gifts to deductible gift recipients ($2 minimum)", verified: false}
+itaa97_div43:     {ref: "ITAA 1997 Div 43", description: "Capital works deductions", verified: false}
+itaa97_div207:    {ref: "ITAA 1997 Div 207", description: "Franked distributions: gross-up and tax offset", verified: false}
+tr97_12:          {ref: "TR 97/12", description: "Work-related clothing, uniforms and footwear", verified: false}
+tr97_23:          {ref: "TR 97/23", description: "Deductions for repairs (repair vs capital improvement)", verified: false}
+tr2000_2:         {ref: "TR 2000/2", description: "Interest on redraw and line of credit facilities (mixed purpose)", verified: false}
+tr2024_3:         {ref: "TR 2024/3", description: "Self-education expenses", verified: false}
+pcg2023_1:        {ref: "PCG 2023/1", description: "Working from home fixed rate method", verified: false}
+mla1986:          {ref: "Medicare Levy Act 1986", description: "Medicare levy and surcharge", verified: false}
+hesa2003:         {ref: "Higher Education Support Act 2003", description: "HELP compulsory repayments", verified: false}
+tasa2009_s30_10:  {ref: "TASA 2009 s30-10", description: "Code of Professional Conduct", verified: false}

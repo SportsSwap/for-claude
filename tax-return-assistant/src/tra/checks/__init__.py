@@ -19,3 +19,7 @@ def label_name(labels, key: str) -> str:
     if d is None:
         return key
     return f"Item {d.item}{' ' + d.label if d.label and len(d.label) <= 2 else ''} {d.description}"
+
+
+def load_citations(path: Path | None = None) -> dict[str, dict]:
+    return yaml.safe_load((path or CONFIG_DIR / "citations.yaml").read_text(encoding="utf-8"))
