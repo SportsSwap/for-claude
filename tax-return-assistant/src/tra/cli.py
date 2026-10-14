@@ -106,14 +106,34 @@ def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, h
     click.echo(f"Created {code} FY{fy}.\nNext: tra ingest {code} <files...>")
 
 
+def _expand(args: tuple[str, ...]) -> list[Path]:
+    """Files, folders and wildcard patterns (PowerShell passes *.pdf through unexpanded)."""
+    from .ingest.readers import SUPPORTED
+
+    files: list[Path] = []
+    for arg in args:
+        path = Path(arg)
+        if any(ch in arg for ch in "*?["):
+            matches = sorted(p for p in path.parent.glob(path.name) if p.is_file())
+        elif path.is_dir():
+            matches = sorted(p for p in path.iterdir() if p.is_file() and p.suffix.lower() in SUPPORTED)
+        else:
+            matches = [path] if path.is_file() else []
+        if not matches:
+            raise click.ClickException(f"No files match {arg}")
+        files += [m for m in matches if m not in files]
+    return files
+
+
 @main.command()
 @click.argument("code")
-@click.argument("files", nargs=-1, required=True, type=click.Path(exists=True, dir_okay=False, path_type=Path))
+@click.argument("paths", nargs=-1, required=True)
 @click.option("--fy", default=DEFAULT_FY, show_default=True)
 @click.option("--type", "override_type", default=None, help="Force a document type, e.g. DIVSTMT.")
-def ingest(code, files, fy, override_type):
-    """Read, redact, file and extract figures from source documents."""
+def ingest(code, paths, fy, override_type):
+    """Read, redact, file and extract figures from source documents (files, folders or *.pdf patterns)."""
     settings, ws, audit = _workspace(code, fy)
+    files = _expand(paths)
     store, doc_types = make_store(settings), load_doc_types()
     failed = 0
     for n, path in enumerate(files, start=1):

@@ -153,3 +153,21 @@ def test_demo_auto_confirm(run, home):
     assert rows
     assert all(r["confirmed"] == ("N" if r["notes"] == "prefill" else "Y") for r in rows)
     assert "tra prepare DEMO01" in result.output
+
+
+def test_ingest_accepts_folder_and_unexpanded_wildcard(run, home, tmp_path):
+    demo = build_demo_documents(tmp_path / "inbox")
+    run("new", "SMIT01")
+    result = run("ingest", "SMIT01", str(tmp_path / "inbox" / "receipt_*.pdf"))
+    assert result.exit_code == 0, result.output
+    assert len(_index_rows(home)) == 2
+    result = run("ingest", "SMIT01", str(tmp_path / "inbox"))
+    assert result.exit_code == 0, result.output
+    assert len(_index_rows(home)) == len(demo.paths)
+
+
+def test_ingest_reports_missing_path(run, tmp_path):
+    run("new", "SMIT01")
+    result = run("ingest", "SMIT01", str(tmp_path / "nothing-*.pdf"))
+    assert result.exit_code == 1
+    assert "No files match" in result.output
