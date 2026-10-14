@@ -8,3 +8,14 @@ pl_sections:
   Less Cost of Sales: income.business_expenses
   Operating Expenses: income.business_expenses
   Less Operating Expenses: income.business_expenses
+
+# OAuth scopes requested by `tra xero connect`. Apps created on or after 2 March 2026
+# must use Xero's granular scopes. These names are UNCONFIRMED: check them on
+# developer.xero.com when the firm registers its app and correct them here.
+scopes:
+  - openid
+  - offline_access
+  - accounting.reports.profitandloss.read
+  - accounting.reports.balancesheet.read
+  - accounting.banktransactions.read
+  - accounting.settings.read

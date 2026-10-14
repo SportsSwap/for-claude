@@ -5,12 +5,15 @@ from __future__ import annotations
 import getpass
 import os
 import platform
+import secrets
 import sys
+import webbrowser
 from pathlib import Path
 
 import click
 import openpyxl
 import pdfplumber
+import requests
 import yaml
 
 from . import __version__
@@ -245,6 +248,84 @@ def doctor():
     if problem:
         raise SystemExit(1)
 
+
+@main.group()
+def xero():
+    """Xero, for sole trader clients. Read-only: nothing is ever written to Xero."""
+
+
+def _xero_client_id() -> str:
+    client_id = os.environ.get("XERO_CLIENT_ID", "").strip()
+    if not client_id:
+        raise click.ClickException("XERO_CLIENT_ID is not set. Register the firm's app on developer.xero.com "
+                                   "(see README, 'Xero setup') and set it as a Windows user environment variable.")
+    return client_id
+
+
+@xero.command()
+def connect():
+    """Sign in to Xero in your browser and list the organisations you can read."""
+    from .xero.auth import REDIRECT_URI, TokenStore, XeroSignInError, authorize_url, exchange_code, pkce_pair, wait_for_code
+    from .xero.client import XeroError, connections
+    from .xero.to_figures import load_mapping
+
+    client_id = _xero_client_id()
+    _settings()
+    verifier, challenge = pkce_pair()
+    state = secrets.token_urlsafe(16)
+    click.echo("Opening Xero sign-in in your browser. Approve access, then come back here.")
+    webbrowser.open(authorize_url(client_id, REDIRECT_URI, load_mapping()["scopes"], state, challenge))
+    try:
+        code = wait_for_code(state)
+        session = requests.Session()
+        tokens = exchange_code(session, client_id, code, verifier, REDIRECT_URI)
+        TokenStore().set(tokens)
+        orgs = connections(session, tokens.access_token)
+    except (XeroSignInError, XeroError) as exc:
+        raise click.ClickException(str(exc)) from None
+    click.echo("Signed in. Organisations available:")
+    for org in orgs:
+        click.echo(f"  {org.get('tenantName')}  (tenant id {org.get('tenantId')})")
+    click.echo("Next: tra xero pull <CLIENT CODE> --tenant <tenant id>")
+
+
+@xero.command()
+@click.argument("code")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+@click.option("--tenant", default=None, help="Xero tenant id (from `tra xero connect`). Remembered per client.")
+def pull(code, fy, tenant):
+    """Pull P&L, balance sheet, bank transactions and chart of accounts for the income year."""
+    from .xero.auth import TokenStore, XeroSignInError, refresh_tokens
+    from .xero.client import XeroClient, XeroError, connections
+    from .xero.to_figures import pull_to_workspace
+
+    settings, ws, audit = _workspace(code, fy)
+    client_id = _xero_client_id()
+    store = TokenStore()
+    tokens = store.get()
+    if tokens is None:
+        raise click.ClickException("Not signed in to Xero: run 'tra xero connect' first.")
+    session = requests.Session()
+    try:
+        if tokens.expired():
+            tokens = refresh_tokens(session, client_id, tokens.refresh_token)
+            store.set(tokens)
+        tenant = tenant or ws.load_state().xero_tenant_id
+        if not tenant:
+            orgs = connections(session, tokens.access_token)
+            if len(orgs) != 1:
+                names = ", ".join(f"{o.get('tenantName')} ({o.get('tenantId')})" for o in orgs)
+                raise click.ClickException(f"Choose the organisation with --tenant. Available: {names}")
+            tenant = orgs[0]["tenantId"]
+        report = pull_to_workspace(ws, make_store(settings), audit,
+                                   XeroClient(session, tokens.access_token, tenant), tenant)
+    except (XeroSignInError, XeroError) as exc:
+        raise click.ClickException(str(exc)) from None
+    click.echo(f"Filed Xero reports as {', '.join(report.doc_ids.values())}; {report.figures_added} figures added "
+               "to figures.csv (unconfirmed).")
+    if report.unknown_sections:
+        click.echo(f"Not mapped: {', '.join(report.unknown_sections)} (see config/xero_mapping.yaml)")
+    click.echo(f"Next: tra figures {code}")
 
 @main.command()
 @click.option("--auto-confirm", is_flag=True, help="Mark the demo figures confirmed so you can run prepare straight away.")
