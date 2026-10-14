@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import getpass
 import os
 import platform
 import sys
@@ -25,13 +26,14 @@ from .privacy.audit import AuditLog
 from .privacy.detectors import find_sensitive
 from .privacy.guard import FileLockedError, SensitiveDataBlocked
 from .privacy.logging_filter import configure_logging
+from .run import PrepareError, prepare_client
 from .settings import ConfigError, Settings, check_tra_home, validate_client_code
 from .workspace import Workspace
 
 DEFAULT_FY = 2026
 ENV_NAMES = ("TRA_HOME", "TRA_STORE", "XERO_CLIENT_ID", "FYI_BASE_URL", "FYI_ACCESS_ID", "FYI_ACCESS_SECRET",
              "FYI_APP_ID")
-EXPECTED_ERRORS = (ConfigError, FileLockedError, SensitiveDataBlocked, IngestError, ValueError)
+EXPECTED_ERRORS = (ConfigError, FileLockedError, SensitiveDataBlocked, IngestError, PrepareError, ValueError)
 
 
 def _settings() -> Settings:
@@ -152,6 +154,25 @@ def figures(code, fy, no_open):
         else:
             click.echo(str(ws.figures_csv))
 
+
+@main.command()
+@click.argument("code")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+def prepare(code, fy):
+    """Build the draft return, run both tax calculations and every check, and write the workpaper."""
+    _s, ws, audit = _workspace(code, fy)
+    try:
+        result = prepare_client(ws, audit, getpass.getuser())
+    except EXPECTED_ERRORS as exc:
+        raise click.ClickException(str(exc)) from None
+    net = result.calc_a.net_result
+    risks = {r: sum(n.risk == r for n in result.notes) for r in ("High", "Medium", "Low")}
+    click.echo(f"Workpaper: {result.workpaper}")
+    click.echo(f"Estimated {'payable' if net >= 0 else 'refund'} ${abs(net):,.2f}")
+    click.echo(f"Review notes: {risks['High']} High, {risks['Medium']} Medium, {risks['Low']} Low")
+    for note in [n for n in result.notes if n.risk == "High"][:5]:
+        click.echo(f"  High {note.check_id}: {note.message}")
+    click.echo("Draft only — review and sign-off by a registered tax agent required. Nothing has been lodged.")
 
 def _scan_file(path: Path) -> list[tuple[str, str]]:
     suffix = path.suffix.lower()
