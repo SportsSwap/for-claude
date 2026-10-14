@@ -45,12 +45,20 @@ class RedactedText:
         return "\n\f\n".join(self.pages)
 
 
+_MAX_PASSES = 10
+
+
 def _redact_one(text: str, counts: Counter) -> str:
+    """Redact until nothing is found, so the output always passes the output guard."""
     out = text
-    for m in reversed(detectors.find_sensitive(text)):
-        out = out[:m.start] + PLACEHOLDER[m.type] + out[m.end:]
-        counts[m.type] += 1
-    return out
+    for _ in range(_MAX_PASSES):
+        matches = detectors.find_sensitive(out)
+        if not matches:
+            return out
+        for m in reversed(matches):
+            out = out[:m.start] + PLACEHOLDER[m.type] + out[m.end:]
+            counts[m.type] += 1
+    raise RuntimeError("redaction did not settle")
 
 
 def redact_pages(pages: list[str]) -> RedactedText:

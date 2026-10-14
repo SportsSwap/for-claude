@@ -129,3 +129,69 @@ def test_identifiers_joined_by_underscores(make_tfn):
     assert redact_text(f"scan_{t}_final.pdf") == "scan_[TFN REDACTED]_final.pdf"
     assert redact_text("OTHER_4111111111111111_x") == "OTHER_[CARD REDACTED]_x"
     assert redact_text("SMIT01_FY2026_DIVSTMT_2026-03-24.pdf") == "SMIT01_FY2026_DIVSTMT_2026-03-24.pdf"
+
+
+# --- final review fixes ---------------------------------------------------------------
+
+from tra.privacy.guard import check_text  # noqa: E402
+
+
+@pytest.mark.parametrize("text", [
+    "Transfer to account 12345678 ref 456789",
+    "TFN 123 456 789 Payer 98765432",
+    "Medicare 1234 56789 0 ref 12345678901",
+    "Driver licence 12345678 class C1234",
+])
+def test_redaction_is_idempotent_and_passes_the_guard(text):
+    once = redact_text(text)
+    assert redact_text(once) == once
+    check_text(once, "test")
+
+
+@pytest.mark.parametrize("text", [
+    "RSA licence 2025-26 renewal",
+    "Licence fee 2026",
+    "Driver's licence renewal FY2026",
+])
+def test_licence_years_are_not_licence_numbers(text):
+    assert redact_text(text) == text
+    check_text(text, "test")
+
+
+def test_wider_separators(make_tfn):
+    t = make_tfn()
+    for sep in ("  ", " ", "–", "\r\n", " \n", "\n "):
+        out = redact_text(f"Number {t[:3]}{sep}{t[3:6]}{sep}{t[6:]} end")
+        assert t[6:] not in out and "[TFN REDACTED]" in out, repr(sep)
+    assert "[TFN REDACTED]" in redact_text("TFN 123  456  789")
+
+
+def test_bank_account_with_bsb_and_acc_keyword():
+    out = redact_text("Bank account: 062 000 1234 5678")
+    assert not any(ch.isdigit() for ch in out)
+    assert redact_text("Acc 1234 5678") == "Acc [ACCOUNT REDACTED]"
+
+
+def test_digits_touching_letters(make_tfn):
+    t = make_tfn()
+    assert t not in redact_text(f"TFN {t}Date 01/07/2025")
+    assert t not in redact_text(f"Ref{t} ")
+
+
+def test_passport_variants():
+    assert redact_text("Passport number: PA 1234567") == "Passport number: [PASSPORT REDACTED]"
+    assert redact_text("passport pa1234567") == "passport [PASSPORT REDACTED]"
+
+
+def test_abn_does_not_swallow_the_next_line(make_tfn):
+    t = make_tfn()
+    out = redact_text(f"Payer ABN 51 824 753 556\n{t[:3]} {t[3:6]} {t[6:]}")
+    assert out == "Payer ABN 51 824 753 556\n[TFN REDACTED]"
+
+
+def test_hashes_and_guids_are_not_identifiers(make_tfn):
+    t = make_tfn()
+    sha = ("ab" + t + "cd" * 30)[:64]
+    guid = "12345678-1234-4234-9234-123456789012"
+    for text in (sha, f"id {guid}"):
+        assert redact_text(text) == text

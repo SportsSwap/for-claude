@@ -37,25 +37,34 @@ _NEVER = [
     re.compile(r"\$\s?\d[\d,]*(?:\.\d+)?"),
     re.compile(r"(?<![\d,])\d{1,3}(?:,\d{3})+(?:\.\d+)?(?![\d,])"),
     re.compile(r"(?<![\d.])\d+\.\d+(?![\d.])"),
+    # Hashes and GUIDs (index.csv, Xero ids): long hex strings with at least one letter.
+    re.compile(r"(?<![0-9A-Za-z])(?=[0-9A-Fa-f]*[A-Fa-f])[0-9A-Fa-f]{16,}(?![0-9A-Za-z])"),
+    re.compile(r"(?<![0-9A-Fa-f])[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}(?![0-9A-Fa-f])"),
 ]
 
-# A run of digit groups joined by a single space, tab, hyphen or line break.
-# Underscore counts as a boundary: filenames join words with it.
-_RUN = re.compile(r"(?<![A-Za-z0-9$])\d+(?:(?:[ \t]|-|\n)\d+)*(?![A-Za-z0-9])")
+# A run of digit groups. Groups may be separated by up to three spaces (including
+# non-breaking spaces), or by a hyphen, dash or line break with optional spaces around
+# it, which is how numbers come out of PDF text extraction. A run may touch letters
+# ("123456789Date") or underscores (filenames); hashes and GUIDs are masked above.
+_SEP = r"(?:[ \t\u00a0]{1,3}|[ \t\u00a0]*(?:-|\u2013|\u2014|\r?\n)[ \t\u00a0]*)"
+_RUN = re.compile(rf"(?<![0-9$])\d+(?:{_SEP}\d+)*(?![0-9])")
 _GROUP = re.compile(r"\d+")
 
 _TFN_KW = re.compile(r"\b(?:TFN|tax\s+file\s+(?:number|no\.?))", re.I)
 _MEDICARE_KW = re.compile(r"\bmedicare\b", re.I)
 _ABN_KW = re.compile(r"\bABN\b", re.I)
 _BSB_KW = re.compile(r"\bBSB\b", re.I)
-_ACCOUNT_KW = re.compile(r"\b(?:account|acct|acc\s*no|a/c)\b", re.I)
+_ACCOUNT_KW = re.compile(r"\b(?:account|acct|acc|acc\s*no|a/c)\b", re.I)
 _LICENCE_KW = re.compile(r"\b(?:licen[cs]e|DL\s*no|driver)\b", re.I)
 _PASSPORT_KW = re.compile(r"\bpassport\b", re.I)
 
 _BSB_STANDALONE = re.compile(r"(?<![A-Za-z0-9-])\d{3}-\d{3}(?![A-Za-z0-9-])")
 _BSB_AFTER_KW = re.compile(r"(?<!\d)\d{3}[ -]?\d{3}(?!\d)")
 _LICENCE_TOKEN = re.compile(r"(?<!\w)[A-Za-z0-9]{4,10}(?!\w)")
-_PASSPORT_TOKEN = re.compile(r"(?<!\w)[A-Z]{1,2}\d{7}(?!\w)")
+# Years and income years are not licence numbers: 2026, FY2026, 2025-26.
+_NOT_LICENCE = re.compile(r"^(?:FY)?(?:19|20)\d{2}$", re.I)
+_PASSPORT_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Za-z]{1,2} ?\d{7}(?!\d)")
+_PLACEHOLDER = re.compile(r"\[[A-Z]+ REDACTED\]")
 
 _TFN_WINDOW = 40
 _OTHER_WINDOW = 30
@@ -98,8 +107,11 @@ def _mask_abns(text: str, scan: list[str]) -> None:
     joined = "".join(scan)
     for start, end, groups in _runs(joined):
         digits = _digits(text, groups)
-        after_kw = bool(_ABN_KW.search(joined[max(0, start - 10):start]))
-        if after_kw or (len(digits) == 11 and abn_valid(digits)):
+        if _ABN_KW.search(joined[max(0, start - 10):start]):
+            # Mask the ABN's 11 digits only, so a number on the next line is still checked.
+            span = _prefix_match(text, groups, (11,))
+            _mask(scan, *(span or (start, end)))
+        elif len(digits) == 11 and abn_valid(digits):
             _mask(scan, start, end)
 
 
@@ -123,6 +135,14 @@ def _first_run_after(kw_end: int, scan: str, window: int):
             yield start, end, groups
 
 
+def _keywords(kw: re.Pattern, text: str):
+    """Keyword matches, ignoring those inside an earlier redaction's placeholder."""
+    inside = [m.span() for m in _PLACEHOLDER.finditer(text)]
+    for k in kw.finditer(text):
+        if not any(a <= k.start() < b for a, b in inside):
+            yield k
+
+
 def _context_matches(text: str, scan: list[str]) -> list[Match]:
     found: list[Match] = []
 
@@ -136,7 +156,7 @@ def _context_matches(text: str, scan: list[str]) -> list[Match]:
         (_TFN_KW, "TFN", _TFN_WINDOW, (9, 8)),
         (_MEDICARE_KW, "MEDICARE", _OTHER_WINDOW, (10, 11)),
     ):
-        for k in kw.finditer(text):
+        for k in _keywords(kw, text):
             for _start, _end, groups in _first_run_after(k.end(), "".join(scan), window):
                 span = _prefix_match(text, groups, lengths)
                 if span and "x" not in "".join(scan[span[0]:span[1]]):
@@ -144,7 +164,7 @@ def _context_matches(text: str, scan: list[str]) -> list[Match]:
                     break
 
     joined = "".join(scan)
-    for k in _BSB_KW.finditer(joined):
+    for k in _keywords(_BSB_KW, joined):
         m = _BSB_AFTER_KW.search(joined, k.end(), k.end() + _OTHER_WINDOW)
         if m:
             take("BSB", *m.span())
@@ -152,23 +172,24 @@ def _context_matches(text: str, scan: list[str]) -> list[Match]:
     for m in _BSB_STANDALONE.finditer(joined):
         take("BSB", *m.span())
 
-    for k in _ACCOUNT_KW.finditer(text):
+    for k in _keywords(_ACCOUNT_KW, text):
         for start, end, groups in _first_run_after(k.end(), "".join(scan), _OTHER_WINDOW):
-            if 5 <= len(_digits(text, groups)) <= 10 and "x" not in "".join(scan[start:end]):
+            # Up to 16 digits: "account 062 000 1234 5678" (BSB and account together) is claimed whole.
+            if 5 <= len(_digits(text, groups)) <= 16 and "x" not in "".join(scan[start:end]):
                 take("ACCOUNT", start, end)
                 break
 
     joined = "".join(scan)
-    for k in _LICENCE_KW.finditer(joined):
+    for k in _keywords(_LICENCE_KW, joined):
         for m in _LICENCE_TOKEN.finditer(joined, k.end(), k.end() + _OTHER_WINDOW + 10):
             if m.start() > k.end() + _OTHER_WINDOW:
                 break
-            if sum(c.isdigit() for c in m.group()) >= 4:
+            if sum(c.isdigit() for c in m.group()) >= 4 and not _NOT_LICENCE.match(m.group()):
                 take("LICENCE", *m.span())
                 break
         joined = "".join(scan)
 
-    for k in _PASSPORT_KW.finditer(joined):
+    for k in _keywords(_PASSPORT_KW, joined):
         m = _PASSPORT_TOKEN.search(joined, k.end(), k.end() + _OTHER_WINDOW + 9)
         if m:
             take("PASSPORT", *m.span())
