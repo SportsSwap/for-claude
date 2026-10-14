@@ -122,3 +122,10 @@ def test_context_false_only_checksum(make_tfn):
 def test_two_labelled_tfns_on_one_page():
     out = redact_text("Your TFN 123 456 789\nSpouse TFN 987 654 321")
     assert out == "Your TFN [TFN REDACTED]\nSpouse TFN [TFN REDACTED]"
+
+
+def test_identifiers_joined_by_underscores(make_tfn):
+    t = make_tfn()
+    assert redact_text(f"scan_{t}_final.pdf") == "scan_[TFN REDACTED]_final.pdf"
+    assert redact_text("OTHER_4111111111111111_x") == "OTHER_[CARD REDACTED]_x"
+    assert redact_text("SMIT01_FY2026_DIVSTMT_2026-03-24.pdf") == "SMIT01_FY2026_DIVSTMT_2026-03-24.pdf"

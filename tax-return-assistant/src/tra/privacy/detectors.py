@@ -40,7 +40,8 @@ _NEVER = [
 ]
 
 # A run of digit groups joined by a single space, tab, hyphen or line break.
-_RUN = re.compile(r"(?<![\w$])\d+(?:(?:[ \t]|-|\n)\d+)*(?!\w)")
+# Underscore counts as a boundary: filenames join words with it.
+_RUN = re.compile(r"(?<![A-Za-z0-9$])\d+(?:(?:[ \t]|-|\n)\d+)*(?![A-Za-z0-9])")
 _GROUP = re.compile(r"\d+")
 
 _TFN_KW = re.compile(r"\b(?:TFN|tax\s+file\s+(?:number|no\.?))", re.I)
@@ -51,7 +52,7 @@ _ACCOUNT_KW = re.compile(r"\b(?:account|acct|acc\s*no|a/c)\b", re.I)
 _LICENCE_KW = re.compile(r"\b(?:licen[cs]e|DL\s*no|driver)\b", re.I)
 _PASSPORT_KW = re.compile(r"\bpassport\b", re.I)
 
-_BSB_STANDALONE = re.compile(r"(?<![\w-])\d{3}-\d{3}(?![\w-])")
+_BSB_STANDALONE = re.compile(r"(?<![A-Za-z0-9-])\d{3}-\d{3}(?![A-Za-z0-9-])")
 _BSB_AFTER_KW = re.compile(r"(?<!\d)\d{3}[ -]?\d{3}(?!\d)")
 _LICENCE_TOKEN = re.compile(r"(?<!\w)[A-Za-z0-9]{4,10}(?!\w)")
 _PASSPORT_TOKEN = re.compile(r"(?<!\w)[A-Z]{1,2}\d{7}(?!\w)")
