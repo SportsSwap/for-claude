@@ -95,6 +95,19 @@ def style_wrap(cell) -> None:
     cell.alignment = Alignment(wrap_text=True, vertical="top")
 
 
+def setup_print(ws: Worksheet, *, landscape: bool = True, header_row: int | None = None) -> None:
+    """A4, one page wide, header row repeated on every printed page."""
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
+    ws.page_setup.orientation = "landscape" if landscape else "portrait"
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 0
+    ws.print_options.horizontalCentered = True
+    ws.page_margins.left = ws.page_margins.right = 0.4
+    if header_row:
+        ws.print_title_rows = f"{header_row}:{header_row}"
+
+
 def set_widths(ws: Worksheet, widths: dict[str, float]) -> None:
     for column, width in widths.items():
         ws.column_dimensions[column].width = width

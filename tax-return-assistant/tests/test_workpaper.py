@@ -58,7 +58,8 @@ def test_banner_and_rates_status(built):
     path, _, _ = built
     wb = openpyxl.load_workbook(path)
     assert wb["Cover"]["A1"].value == "DRAFT – NOT FOR LODGMENT"
-    assert "A1:H2" in [str(r) for r in wb["Cover"].merged_cells.ranges]
+    assert "A1:B2" in [str(r) for r in wb["Cover"].merged_cells.ranges]
+    assert all(ws.page_setup.fitToWidth == 1 for ws in wb.worksheets)
     texts = [c.value for row in wb["Rates"].iter_rows() for c in row if isinstance(c.value, str)]
     assert any("unverified" in t for t in texts)
 
@@ -162,3 +163,27 @@ def test_no_formula_sums_over_its_own_cell(tmp_path):
                         lo, hi = sorted((min_row, max_row))
                         assert not (min_col <= cell.column <= max_col and lo <= cell.row <= hi), \
                             f"{ws.title}!{cell.coordinate} {cell.value}"
+
+
+def test_no_total_mixes_different_labels(built):
+    import re
+    path, _, _ = built
+    wb = openpyxl.load_workbook(path)
+    for name in ("Salary & Wages", "Interest", "Dividends", "Rental", "D5 Other work-related", "Private Health"):
+        ws = wb[name]
+        sums = 0
+        for row in ws.iter_rows():
+            for cell in row:
+                m = re.fullmatch(r"=SUM\(J(\d+):J(\d+)\)", str(cell.value or ""))
+                if m:
+                    sums += 1
+                    keys = {ws.cell(row=r, column=11).value for r in range(int(m.group(1)), int(m.group(2)) + 1)} - {None}
+                    assert len(keys) == 1, f"{name}!{cell.coordinate} adds {keys}"
+        assert sums >= 1, name
+
+
+def test_rental_tab_shows_net_rent(built):
+    path, _, ctx = built
+    ws = openpyxl.load_workbook(path)["Rental"]
+    labels = [ws.cell(row=r, column=3).value for r in range(1, ws.max_row + 1)]
+    assert "Net rent" in labels

@@ -107,12 +107,14 @@ FIGURE_HEADERS = ["Figure ID", "Date", "Description", "Return label", "Source do
                   "Confirmed", "Substantiated", "Amount", "key", "Notes"]
 
 
-def _write_figure_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
-                       start: int) -> int:
+def _write_header(ws: Worksheet, row: int) -> None:
     for col, header in enumerate(FIGURE_HEADERS, start=1):
-        ws.cell(row=start - 1, column=col, value=header)
-    L.style_header_row(ws, start - 1, len(FIGURE_HEADERS))
-    row = start
+        ws.cell(row=row, column=col, value=header)
+    L.style_header_row(ws, row, len(FIGURE_HEADERS))
+
+
+def _write_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
+                row: int) -> int:
     for f in figures:
         d = ctx.labels[f.label_key]
         ws.cell(row=row, column=1, value=f.figure_id)
@@ -140,19 +142,42 @@ def _write_figure_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperConte
     return row
 
 
+def _write_figure_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
+                       start: int) -> int:
+    _write_header(ws, start - 1)
+    return _write_rows(ws, figures, ctx, docs, start)
+
+
+RENTAL_DEDUCTION_KEYS = ("rent.interest", "rent.capital_works", "rent.other")
+
+
 def _category_tab(ws: Worksheet, tab: str, figures: list[Figure], ctx: WorkpaperContext,
                   docs: dict[str, Document], wp: WorkpaperMap) -> None:
+    """Figures grouped by return label, each group with its own subtotal (labels are never added together)."""
     _title(ws, f"{tab} — {ctx.client_code} {fy_label(ctx.income_year)}",
            "Confirmed figures only. Each amount traces to the filed source document and page.")
-    end = _write_figure_rows(ws, figures, ctx, docs, FIRST_ROW)
-    ws.cell(row=end, column=3, value="Total")
-    L.style_label(ws.cell(row=end, column=3))
-    total = ws.cell(row=end, column=10, value=f"=SUM(J{FIRST_ROW}:J{end - 1})")
-    L.style_total(total)
-    wp.total_cells.append(f"{_q(tab)}!J{end}")
+    _write_header(ws, FIRST_ROW - 1)
+    row = FIRST_ROW
+    subtotals: dict[str, str] = {}
+    for key in [k for k in ctx.labels if any(f.label_key == k for f in figures)]:
+        start = row
+        row = _write_rows(ws, [f for f in figures if f.label_key == key], ctx, docs, row)
+        ws.cell(row=row, column=3, value=f"Total {label_name(ctx.labels, key)}")
+        L.style_label(ws.cell(row=row, column=3))
+        L.style_total(ws.cell(row=row, column=10, value=f"=SUM(J{start}:J{row - 1})"))
+        wp.total_cells.append(f"{_q(tab)}!J{row}")
+        subtotals[key] = f"J{row}"
+        row += 2
+    if "rent.gross" in subtotals or any(k in subtotals for k in RENTAL_DEDUCTION_KEYS):
+        less = "".join(f"-{subtotals[k]}" for k in RENTAL_DEDUCTION_KEYS if k in subtotals)
+        ws.cell(row=row, column=3, value="Net rent")
+        L.style_label(ws.cell(row=row, column=3))
+        L.style_total(ws.cell(row=row, column=10, value=f"={subtotals.get('rent.gross', '0')}{less}"))
+        wp.total_cells.append(f"{_q(tab)}!J{row}")
     ws.column_dimensions["K"].hidden = True
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.CATEGORY_WIDTHS)
+    L.setup_print(ws, header_row=FIRST_ROW - 1)
 
 
 def _cgt_tab(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
@@ -212,6 +237,7 @@ def _cgt_tab(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: 
         wp.total_cells.append(f"{_q(CGT_TAB)}!J{row}")
         row += 1
     L.set_widths(ws, L.CATEGORY_WIDTHS)
+    L.setup_print(ws)
     return {"cgt.total_gains": f"{_q(CGT_TAB)}!$J${refs['total'][1:]}",
             "cgt.net_gain": f"{_q(CGT_TAB)}!$J${refs['net'][1:]}"}
 
@@ -268,6 +294,7 @@ def _summary(ws: Worksheet, ctx: WorkpaperContext, tab_of: dict[str, str], cgt_r
     ws.column_dimensions["J"].hidden = True
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.SUMMARY_WIDTHS)
+    L.setup_print(ws, header_row=FIRST_ROW - 1)
     return refs
 
 
@@ -371,6 +398,7 @@ def _rates(ws: Worksheet, ctx: WorkpaperContext) -> dict[str, str]:
         ws.cell(row=b.row, column=2, value=url)
         b.row += 1
     L.set_widths(ws, L.RATES_WIDTHS)
+    L.setup_print(ws, landscape=False)
     return b.refs
 
 
@@ -481,6 +509,7 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
             "cross-check it. Items flagged in Review Notes are not included in this estimate.")
     L.style_subtitle(ws.cell(row=note_row, column=1))
     L.set_widths(ws, L.TAXCALC_WIDTHS)
+    L.setup_print(ws)
     return f"{_q('Tax Calc')}!$B${row_of['net_result']}"
 
 
@@ -510,6 +539,7 @@ def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=11, value=d.sha256[:16])
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.SOURCES_WIDTHS)
+    L.setup_print(ws, header_row=FIRST_ROW - 1)
 
 
 def _citation_text(ctx: WorkpaperContext, citation_id: str | None) -> str:
@@ -543,10 +573,11 @@ def _review_notes(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=9, value=", ".join(n.figure_ids + n.doc_ids))
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.NOTES_WIDTHS)
+    L.setup_print(ws, header_row=FIRST_ROW - 1)
 
 
 def _cover(ws: Worksheet, ctx: WorkpaperContext, net_ref: str) -> None:
-    ws.merge_cells("A1:H2")
+    ws.merge_cells("A1:B2")
     ws["A1"] = BANNER
     L.style_banner(ws["A1"])
     start, end = fy_bounds(ctx.income_year)
@@ -580,6 +611,7 @@ def _cover(ws: Worksheet, ctx: WorkpaperContext, net_ref: str) -> None:
         L.style_subtitle(ws.cell(row=text_row, column=1, value=line))
         text_row += 1
     L.set_widths(ws, L.COVER_WIDTHS)
+    L.setup_print(ws, landscape=False)
 
 
 # --- entry point ---------------------------------------------------------------------------
