@@ -37,8 +37,14 @@ Back to [[Tax Return Assistant]]
 - An odd partial-TFN case.
 - No command to remove a document ingested by mistake.
 
+## Found in the Windows test (17 Oct 2026)
+- **Fixed:** Windows blocked `Activate.ps1` on a fresh PC. Commands now start with `.\tra`, which needs no activating and no change to Windows settings.
+- **Fixed:** in the window setup ran in, the tool said `TRA_HOME is not set`. It now finds the folder setup saved.
+- **Fixed:** the README's list of demo review notes was missing the residency note (S14).
+- Not yet tried on a firm laptop.
+
 ## Ideas
-- **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it.
+- **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it. (`.\tra` already removed the activate step.)
 - Simple local web page instead of commands.
 - Company and trust returns.
 - An AI reader for messy documents, on redacted text, once the firm approves.

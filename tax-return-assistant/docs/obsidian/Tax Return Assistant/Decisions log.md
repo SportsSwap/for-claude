@@ -38,4 +38,8 @@ A second Claude reviewed everything.
 - **All of those were fixed**, each with a test.
 - The smaller issues are listed in [[Known issues and ideas]].
 
+## Windows test (17 Oct 2026)
+- **Commands start with `.\tra`** (a small `tra.cmd` file) instead of activating the tool first. Windows blocks `Activate.ps1` by default, and firm laptops may not let me change that.
+- **The tool finds `TRA_HOME` from my Windows account** when the PowerShell window doesn't have it, so it works straight after setup.
+
 Related: [[How it works]], [[Privacy rules]]

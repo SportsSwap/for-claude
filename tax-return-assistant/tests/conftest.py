@@ -41,6 +41,12 @@ def _card(rng: random.Random, length: int = 16) -> str:
     return "".join(map(str, body + [(10 - total % 10) % 10]))
 
 
+@pytest.fixture(autouse=True)
+def _ignore_saved_windows_variables(monkeypatch):
+    """Tests see only the environment they set, never TRA_HOME etc. saved for the Windows account."""
+    monkeypatch.setattr("tra.settings.saved_user_variable", lambda name: "")
+
+
 @pytest.fixture
 def rng() -> random.Random:
     return random.Random(20260630)

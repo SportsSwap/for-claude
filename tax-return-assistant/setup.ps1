@@ -57,11 +57,9 @@ Write-Host ""
 & .\.venv\Scripts\tra.exe doctor
 
 Write-Host ""
-Write-Host "Done. Each time you open PowerShell to use the tool:" -ForegroundColor Green
+Write-Host "Done. To use the tool, open PowerShell in this folder and start each command with .\tra :" -ForegroundColor Green
 Write-Host "    cd `"$PSScriptRoot`""
-Write-Host "    .\.venv\Scripts\Activate.ps1"
-Write-Host "If PowerShell refuses to run Activate.ps1, run this once:"
-Write-Host "    Set-ExecutionPolicy -Scope CurrentUser RemoteSigned"
+Write-Host "    .\tra doctor"
 Write-Host ""
-Write-Host "Try it safely with invented data:  tra demo --auto-confirm   then   tra prepare DEMO01"
+Write-Host "Try it safely with invented data:  .\tra demo --auto-confirm   then   .\tra prepare DEMO01"
 Write-Host "Make sure the drive holding $answer is encrypted with BitLocker."

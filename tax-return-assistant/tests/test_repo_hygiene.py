@@ -11,7 +11,7 @@ from tra.privacy.detectors import find_sensitive
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED = {"4111111111111111"}
-TEXT_SUFFIXES = {".py", ".md", ".yaml", ".yml", ".toml", ".txt", ".ps1", ".cfg", ".ini", ".example", ""}
+TEXT_SUFFIXES = {".py", ".md", ".yaml", ".yml", ".toml", ".txt", ".ps1", ".cmd", ".cfg", ".ini", ".example", ""}
 
 
 def _tracked_files() -> list[Path]:

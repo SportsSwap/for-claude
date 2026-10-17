@@ -1,9 +1,11 @@
+import sys
 from pathlib import Path
 
 import pytest
 
 from tra.models import ClientState
 from tra.settings import ConfigError, Settings, check_tra_home, validate_client_code
+from tra.settings import saved_user_variable as real_saved_user_variable
 from tra.workspace import Workspace
 
 CATEGORIES = ("ATO", "Income", "Investments", "Rental", "Deductions", "Business", "Health", "Other")
@@ -16,6 +18,28 @@ def test_settings_from_env(tmp_path):
     assert s.client_code_pattern == r"^[A-Z0-9]{2,12}$"
     with pytest.raises(ConfigError, match="TRA_HOME is not set"):
         Settings.from_env({})
+
+
+def test_settings_fall_back_to_variables_saved_for_the_windows_account(tmp_path, monkeypatch):
+    # setup.ps1 saves TRA_HOME for the account, but a PowerShell window opened earlier
+    # (including the one setup ran in) doesn't have it in its environment.
+    saved = {"TRA_HOME": str(tmp_path), "TRA_STORE": "fyi"}
+    monkeypatch.setattr("tra.settings.saved_user_variable", lambda name: saved.get(name, ""))
+    s = Settings.from_env({})
+    assert (s.tra_home, s.store) == (tmp_path, "fyi")
+    other = tmp_path / "other"
+    assert Settings.from_env({"TRA_HOME": str(other)}).tra_home == other  # the window's own value wins
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="reads the Windows registry")
+def test_saved_user_variable_reads_the_windows_account(monkeypatch):
+    # conftest stubs the lookup out for every test; this one needs the real thing.
+    monkeypatch.setattr("tra.settings.saved_user_variable", real_saved_user_variable)
+    assert real_saved_user_variable("TRA_TEST_NOT_A_VARIABLE") == ""
+    temp = real_saved_user_variable("TEMP")  # Windows saves this per account as %USERPROFILE%\AppData\Local\Temp
+    if not temp:
+        pytest.skip("TEMP isn't saved for this Windows account")
+    assert "%" not in temp and Path(temp).is_dir()
 
 
 def test_check_tra_home_cloud_paths(tmp_path):

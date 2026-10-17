@@ -44,23 +44,23 @@ These steps need people at the firm. The tool reminds you on every workpaper unt
    powershell -ExecutionPolicy Bypass -File .\setup.ps1
    ```
    It creates a private Python environment (`.venv`) and installs the tool. It then asks where client data should live (default `C:\TaxAssistant`), saves that as `TRA_HOME`, and runs `tra doctor`.
-4. **Each time you use the tool**, open PowerShell in the folder and run:
+4. **Each time you use the tool**, open PowerShell in the folder and start each command with `.\tra`, for example:
    ```powershell
-   .\.venv\Scripts\Activate.ps1
+   .\tra doctor
    ```
-   If Windows refuses, run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once.
+   `.\tra` runs the copy of the tool that setup installed, so there is nothing to activate and no Windows setting to change. It works straight away, even in the window you ran setup in. (If you activate `.venv` with `.\.venv\Scripts\Activate.ps1`, plain `tra` works too, but Windows blocks that script until `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` has been run.)
 
 `TRA_HOME` must be on the laptop itself. The tool refuses to run if it is inside OneDrive, Dropbox, Google Drive or iCloud (that would send client data offshore), or inside a git repository.
 
-`tra doctor` checks the setup at any time.
+`.\tra doctor` checks the setup at any time.
 
 ---
 
 ## Try it with invented data first
 
 ```powershell
-tra demo --auto-confirm
-tra prepare DEMO01
+.\tra demo --auto-confirm
+.\tra prepare DEMO01
 ```
 
 This creates a fake client, **DEMO01**, from eight invented documents: a pre-fill report, an income statement, a bank statement, a dividend statement, a rental statement, a private health statement and two receipts. It runs them through the whole process. The documents contain made-up TFN, Medicare, card, BSB, account and licence numbers, so you can see redaction working. Open the workpaper path that `prepare` prints.
@@ -73,6 +73,7 @@ The demo gives an estimated payable of $5,697.11 and these review notes:
 | High C2 | Rates file not yet verified |
 | Medium S13 | A $1,499 laptop claimed outright; it's a depreciating asset |
 | Medium S9 | Income is over the MLS threshold and hospital cover wasn't recorded, so it was assumed |
+| Low S14 | Residency was assumed, so confirm the client was an Australian resident all year |
 | Low I2 | The union receipt had no date, so the filename uses the ingest date |
 
 ---
@@ -84,7 +85,7 @@ Clients are identified **only by their client code** (e.g. `SMIT01`), never by n
 ### 1. Set up the client
 
 ```powershell
-tra new SMIT01 --fy 2026
+.\tra new SMIT01 --fy 2026
 ```
 
 The options change the calculation, so set those that apply:
@@ -104,9 +105,9 @@ These are saved in `TRA_HOME\Work\SMIT01\FY2026\state.json`. Edit that file to c
 ### 2. Ingest the documents
 
 ```powershell
-tra ingest SMIT01 C:\Inbox\SMIT01\*.pdf
-tra ingest SMIT01 C:\Inbox\SMIT01            # a whole folder
-tra ingest SMIT01 scan.pdf --type DIVSTMT     # force the document type
+.\tra ingest SMIT01 C:\Inbox\SMIT01\*.pdf
+.\tra ingest SMIT01 C:\Inbox\SMIT01            # a whole folder
+.\tra ingest SMIT01 scan.pdf --type DIVSTMT     # force the document type
 ```
 
 For each file the tool:
@@ -134,7 +135,7 @@ Real layouts vary by bank and registry. When one isn't read correctly, enter the
 ### 3. Check and confirm the figures
 
 ```powershell
-tra figures SMIT01
+.\tra figures SMIT01
 ```
 
 This checks `figures.csv` and opens it in Excel. For every row:
@@ -156,7 +157,7 @@ Save (keep the "CSV UTF-8" format Excel opens it in) and close Excel before the 
 ### 4. Prepare the draft
 
 ```powershell
-tra prepare SMIT01
+.\tra prepare SMIT01
 ```
 
 This:
@@ -245,7 +246,7 @@ The tool is built so that sensitive identifiers can't end up in anything it crea
 
 ## Updating rates for a new year
 
-Copy `config/rates/fy2026.yaml` to `fy2027.yaml`, change `income_year`, and update every figure from the ATO pages. Set `status: unverified` until checked, then run `tra doctor`.
+Copy `config/rates/fy2026.yaml` to `fy2027.yaml`, change `income_year`, and update every figure from the ATO pages. Set `status: unverified` until checked, then run `.\tra doctor`.
 
 The loader rejects a file whose bracket base amounts don't match its rates, whose Medicare thresholds don't line up, or whose SAPTO figures don't agree with the taper. A typo is caught before it reaches a return. Run the tests (below) after editing.
 
@@ -256,8 +257,8 @@ The loader rejects a file whose bracket base amounts don't match its rates, whos
    - redirect URI: `http://localhost:8765/callback`.
 2. Check the scope names in `config/xero_mapping.yaml` against Xero's current granular scopes and correct them. Apps created after 2 March 2026 must use granular scopes.
 3. Set the app's client ID as the Windows user environment variable `XERO_CLIENT_ID`. There is no client secret.
-4. Run `tra xero connect` once. It opens Xero in the browser and lists the organisations.
-5. Run `tra xero pull SMIT01 --tenant <id>`. The tenant ID is remembered for that client after the first time.
+4. Run `.\tra xero connect` once. It opens Xero in the browser and lists the organisations.
+5. Run `.\tra xero pull SMIT01 --tenant <id>`. The tenant ID is remembered for that client after the first time.
 
 `pull` files the P&L, balance sheet, bank transactions and chart of accounts as documents (pulling again with unchanged data adds nothing). Only the Xero refresh token is stored, in Windows Credential Manager. It adds the P&L lines as unconfirmed business income and expense figures. Complete the detailed business schedule (P8) in Xero Tax. The Xero client has been tested against mocked responses only; do a trial run on a test organisation first.
 
@@ -267,7 +268,7 @@ The loader rejects a file whose bracket base amounts don't match its rates, whos
 2. Confirm the header names and endpoint paths in `config/fyi.yaml` with FYI. They are **unconfirmed**.
 3. Set `FYI_BASE_URL`, `FYI_ACCESS_ID`, `FYI_ACCESS_SECRET`, `FYI_APP_ID` and `TRA_STORE=fyi` as user environment variables.
 
-With FYI set, `ingest` files into FYI. If FYI is unavailable it files locally and raises a note; `tra fyi push SMIT01` sends those later. The FYI client has been tested against mocked responses only.
+With FYI set, `ingest` files into FYI. If FYI is unavailable it files locally and raises a note; `.\tra fyi push SMIT01` sends those later. The FYI client has been tested against mocked responses only.
 
 ## Changing the workpaper layout
 
@@ -282,7 +283,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 299 tests, all on invented data generated while the tests run.
+There are 304 tests, all on invented data generated while the tests run. Three run only on Windows (the `tra.cmd` launcher and reading the settings saved for the Windows account).
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.
@@ -324,4 +325,4 @@ An LLM-based extractor could be added later in `src/tra/ingest/extractors/`. It 
 - **No OCR.** Scanned documents are filed and flagged for manual entry.
 - **Layouts.** Readers cover the ATO pre-fill report and the layouts the tool was built with. New layouts will need adding as they come up.
 - **Unverified reference data.** The rates, citations, label letters, Xero scope names and FYI endpoints are unverified until checked (see the top of this file).
-- **Untested on Windows.** `setup.ps1` was written for Windows but could not be run where the tool was built. Try it on one laptop first.
+- **Windows testing so far.** `setup.ps1`, the demo and the tests have been run on one personal Windows 10 PC (17 October 2026). Try it on one firm laptop before using it more widely, because IT-managed Python installs and Group Policy may behave differently.

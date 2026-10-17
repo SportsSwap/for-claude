@@ -20,9 +20,11 @@ Back to [[Tax Return Assistant]]
 - [ ] Show the supervising agent the demo workpaper.
 
 ## Needs testing on a real Windows laptop
-- [ ] Run `setup.ps1`. It has never been run; report any error to Claude.
-- [ ] Run `tra demo --auto-confirm`, then `tra prepare DEMO01`, and open the workpaper in Excel.
-- [ ] Check `tra figures` opens Excel, and saving keeps the file working.
+- [x] Run `setup.ps1`. Done 17 Oct 2026 on my personal Windows 10 PC with no errors. Two first-run problems were found and fixed (see [[Known issues and ideas]]).
+- [x] Run `.\tra demo --auto-confirm`, then `.\tra prepare DEMO01`, and open the workpaper in Excel. Done 17 Oct 2026: payable $5,697.11, and it looked right in Excel.
+- [ ] Check `.\tra figures` opens Excel, and saving keeps the file working.
+  - Excel opens it, and the tool won't change the file while it's open. Still to check: save it in Excel, close it, then run `.\tra prepare` again.
+- [ ] Repeat on a firm laptop. IT may install Python differently, and the firm may lock down PowerShell.
 
 ## Optional (later)
 - [ ] **Xero:** register the firm's app at developer.xero.com, set `XERO_CLIENT_ID`, confirm the scope names, then try it on a test organisation.

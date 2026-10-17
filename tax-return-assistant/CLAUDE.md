@@ -18,9 +18,11 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact â†
 ## Working on it
 ```
 python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest          # 299 tests; LibreOffice recalc tests run if soffice exists
+.venv/bin/python -m pytest          # 304 tests; LibreOffice recalc tests run if soffice exists; 3 run only on Windows
 .venv/bin/python -m pyflakes src tests
 ```
+- On Windows the paths are `.venv\Scripts\...`. pyflakes isn't in the `dev` extras; `pip install pyflakes` into the venv.
+- Users run the tool as `.\tra <command>` (`tra.cmd`), so they never need `Activate.ps1` or a script-policy change. Settings fall back to the values saved for the Windows account (`HKCU\Environment`), so a window opened before setup still works.
 - Write the failing test first.
 - Rates live in `config/rates/fyYYYY.yaml`, marked `status: unverified` until a registered agent checks them.
 
@@ -28,7 +30,7 @@ python -m venv .venv && .venv/bin/pip install -e ".[dev]"
 Built and reviewed. Not yet used on real clients. Before that:
 - verify the rates (SAPTO FY2026 first), citations and label letters;
 - privacy officer sign-off;
-- a Windows test of `setup.ps1`;
+- a test on a firm laptop (setup, the demo and the tests passed on a personal Windows 10 PC on 17 Oct 2026);
 - move to a private repo (`for-claude` is public).
 
 Open ideas: a double-click launcher, company and trust returns. See `docs/obsidian/Tax Return Assistant/Known issues and ideas.md`.

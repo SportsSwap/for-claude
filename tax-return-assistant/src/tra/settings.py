@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping
@@ -20,6 +21,26 @@ class ConfigError(Exception):
     pass
 
 
+def saved_user_variable(name: str) -> str:
+    """The value saved for this Windows account (HKCU\\Environment), or "".
+
+    setup.ps1 saves TRA_HOME there, but a PowerShell window opened before that
+    (including the one setup ran in) doesn't have it in its environment.
+    """
+    if sys.platform != "win32":
+        return ""
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+            value, kind = winreg.QueryValueEx(key, name)
+    except OSError:
+        return ""
+    if not isinstance(value, str):
+        return ""
+    return winreg.ExpandEnvironmentStrings(value) if kind == winreg.REG_EXPAND_SZ else value
+
+
 @dataclass(frozen=True)
 class Settings:
     tra_home: Path
@@ -28,13 +49,16 @@ class Settings:
 
     @classmethod
     def from_env(cls, env: Mapping[str, str] = os.environ) -> "Settings":
-        home = env.get("TRA_HOME", "").strip()
+        def get(name: str) -> str:
+            return env.get(name, "").strip() or saved_user_variable(name).strip()
+
+        home = get("TRA_HOME")
         if not home:
             raise ConfigError("TRA_HOME is not set. Run setup.ps1, or set it to a folder on this computer.")
-        store = env.get("TRA_STORE", "local").strip().lower() or "local"
+        store = get("TRA_STORE").lower() or "local"
         if store not in ("local", "fyi"):
             raise ConfigError(f"TRA_STORE must be 'local' or 'fyi', not {store!r}")
-        pattern = env.get("TRA_CLIENT_CODE_PATTERN", "").strip() or DEFAULT_CLIENT_CODE_PATTERN
+        pattern = get("TRA_CLIENT_CODE_PATTERN") or DEFAULT_CLIENT_CODE_PATTERN
         return cls(tra_home=Path(home), store=store, client_code_pattern=pattern)
 
 

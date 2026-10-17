@@ -17,8 +17,9 @@ It **never lodges anything.** The return is still done in Xero Tax and signed of
 - **Built in:** Claude Code session <https://claude.ai/code/session_01N2pEC5oyPFnAavBcEamEbT>
 
 ## Status (17 Oct 2026)
-- All six stages built, with 299 automated tests passing
+- All six stages built, with 304 automated tests passing
 - The demo client works end to end: estimated payable $5,697.11
+- Tested on Windows (17 Oct 2026, my personal Windows 10 PC): setup, the demo and the tests all work. Still to try on a firm laptop.
 - **Not ready for real clients yet.** See [[To do before real clients]].
 
 ## Notes
