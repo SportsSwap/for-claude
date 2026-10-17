@@ -22,8 +22,7 @@ Back to [[Tax Return Assistant]]
 ## Needs testing on a real Windows laptop
 - [x] Run `setup.ps1`. Done 17 Oct 2026 on my personal Windows 10 PC with no errors. Two first-run problems were found and fixed (see [[Known issues and ideas]]).
 - [x] Run `.\tra demo --auto-confirm`, then `.\tra prepare DEMO01`, and open the workpaper in Excel. Done 17 Oct 2026: payable $5,697.11, and it looked right in Excel.
-- [ ] Check `.\tra figures` opens Excel, and saving keeps the file working.
-  - Excel opens it, and the tool won't change the file while it's open. Still to check: save it in Excel, close it, then run `.\tra prepare` again.
+- [x] Check `.\tra figures` opens Excel, and saving keeps the file working. Done 17 Oct 2026: Excel saved it (dates became 15/07/2026, amounts lost their ".00") and the tool still read every figure: payable $5,697.11. The tool also won't change the file while it's open in Excel.
 - [ ] Repeat on a firm laptop. IT may install Python differently, and the firm may lock down PowerShell.
 
 ## Optional (later)
