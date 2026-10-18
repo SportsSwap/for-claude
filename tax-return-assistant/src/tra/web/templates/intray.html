@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}In Tray{% endblock %}
+{% block content %}
+<div class="heading">
+  <div><h1>In Tray</h1><span class="muted">Documents waiting to be filed. Check each suggestion, change anything that's wrong, then File.</span></div>
+</div>
+
+<form class="card pad stack" method="post" action="/intray" enctype="multipart/form-data" aria-label="Add documents">
+  <div class="dropzone" data-dropzone>
+    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 18V6M9 11l5-5 5 5M5 22h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <label for="files">Drop documents here or <span class="link">choose files</span></label>
+    <input id="files" name="files" type="file" multiple accept=".pdf,.csv,.xlsx,.json,.docx,.jpg,.jpeg,.png,.eml,.msg">
+    <span class="muted small">Any client. Sawnx reads each one (blanking out TFNs and similar numbers straight away) and suggests where it goes. Original file names aren't kept.</span>
+  </div>
+  <div class="actions"><button class="btn" type="submit">Add to In Tray</button></div>
+</form>
+
+{% for item in items %}
+{% set s = item.suggestion %}
+<section class="card trayitem" aria-label="Waiting document {{ loop.index }}">
+  <div class="card-head">
+    <div class="title-row">
+      <span class="fileicon ext-{{ item.ext[1:] }}" aria-hidden="true">{{ item.ext[1:]|upper }}</span>
+      <h2>Document {{ loop.index }}</h2>
+      <span class="muted small">added {{ item.added_at[:16]|replace('T', ' ') }} by {{ item.by }}</span>
+    </div>
+    <div class="actions">
+      <a class="btn-ghost" href="/intray/{{ item.id }}/view" target="_blank" rel="noopener">Open</a>
+      <form method="post" action="/intray/{{ item.id }}/discard"><button class="btn-ghost btn-danger" type="submit">Discard</button></form>
+    </div>
+  </div>
+  <div class="pad-inner stack">
+    {% if item.readable %}
+    <p class="small"><strong>Sawnx thinks:</strong> {{ doc_types[s.doc_type].description if s.doc_type in doc_types else s.doc_type }}{{ ' for ' ~ (names.get(s.code) or s.code) if s.code }}{{ ', FY' ~ s.year if s.year }}.
+      {% if not s.code %}<span class="high">No client name found in it; choose the client.</span>{% endif %}</p>
+    <div class="preview mono small">{% for line in item.preview %}<div>{{ line }}</div>{% endfor %}</div>
+    {% else %}
+    <p class="small muted">This kind of file isn't read, so choose where it goes. Open it to check what it is.</p>
+    {% endif %}
+    <form class="props" method="post" action="/intray/{{ item.id }}/file">
+      <label class="field"><span>Client</span>
+        <select name="code" required><option value="">Choose a client</option>
+          {% for code, name, years in clients %}<option value="{{ code }}" {{ 'selected' if code == s.code }}>{{ name }}{{ ' (' ~ code ~ ')' if name != code }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Cabinet</span>
+        <select name="cabinet">{% for c in cabinets %}<option {{ 'selected' if c == s.cabinet }}>{{ c }}</option>{% endfor %}</select></label>
+      <label class="field"><span>Year (Tax return only)</span>
+        <select name="year"><option value="">–</option>
+          {% set ys = (clients|selectattr(0, 'equalto', s.code)|map(attribute=2)|first) or [] %}
+          {% for y in (all_years + ([s.year] if s.year else []))|unique|sort(reverse=true) %}<option value="{{ y }}" {{ 'selected' if y == s.year }}>FY{{ y }}{{ ' (not set up for this client)' if s.code and y not in ys }}</option>{% endfor %}
+        </select></label>
+      <label class="field"><span>Folder</span>
+        <select name="folder">{% for cab, fs in folder_sets.items() %}<optgroup label="{{ cab }}">{% for f in fs %}<option {{ 'selected' if f == s.folder and cab == s.cabinet }}>{{ f }}</option>{% endfor %}</optgroup>{% endfor %}</select></label>
+      <label class="field"><span>What to do</span>
+        <select name="mode"><option value="read" {{ 'selected' if s.mode == 'read' }} {{ 'disabled' if not item.readable }}>Read for the return</option><option value="store" {{ 'selected' if s.mode == 'store' }}>Store only</option></select></label>
+      <div class="actions"><button class="btn" type="submit">File</button></div>
+    </form>
+  </div>
+</section>
+{% else %}
+<p class="empty card">Nothing waiting. Add documents above.</p>
+{% endfor %}
+{% endblock %}

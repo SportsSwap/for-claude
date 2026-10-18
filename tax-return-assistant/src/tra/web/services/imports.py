@@ -98,3 +98,28 @@ def import_file(ws: Workspace, store: DocumentStore, doc_types: dict[str, DocTyp
         return outcome
     finally:
         path.unlink(missing_ok=True)
+
+
+def store_upload_in_cabinet(space, upload: FileStorage, *, folder: str, audit: AuditLog, position: int) -> ImportOutcome:
+    """Permanent and Correspondence: always stored unchanged, never read for the return."""
+    from ...cabinets import store_in_cabinet
+
+    outcome = ImportOutcome(label=f"File {position}")
+    suffix = Path(upload.filename or "").suffix.lower()
+    if suffix not in STORE_TYPES:
+        outcome.error = f"Can't use {suffix or 'files without an extension'} files. Supported: {', '.join(STORE_TYPES)}."
+        return outcome
+    uploads = space.work_dir / "_uploads"
+    uploads.mkdir(parents=True, exist_ok=True)
+    path = uploads / f"{secrets.token_hex(8)}{suffix}"
+    try:
+        upload.save(path)
+        before = {d.doc_id for d in DocumentIndex(space.index_csv).load()}
+        outcome.doc = store_in_cabinet(space, path, folder, audit)
+        outcome.duplicate = outcome.doc.doc_id in before
+        return outcome
+    except (SensitiveDataBlocked, FileLockedError, ValueError, OSError) as exc:
+        outcome.error = problem_text(exc)
+        return outcome
+    finally:
+        path.unlink(missing_ok=True)

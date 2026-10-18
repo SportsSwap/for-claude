@@ -16,6 +16,8 @@
     <select id="dlc" name="client"><option value="">All clients</option>{% for code, name in clients %}<option value="{{ code }}" {{ 'selected' if args.client == code }}>{{ name }}</option>{% endfor %}</select>
     <label class="visually-hidden" for="dly">Year</label>
     <select id="dly" name="year"><option value="">All years</option>{% for y in years %}<option value="{{ y }}" {{ 'selected' if args.year == y|string }}>FY{{ y }}</option>{% endfor %}</select>
+    <label class="visually-hidden" for="dlb">Cabinet</label>
+    <select id="dlb" name="cabinet"><option value="">All cabinets</option>{% for c in cabinet_options %}<option {{ 'selected' if args.cabinet == c }}>{{ c }}</option>{% endfor %}</select>
     {% endif %}
     <label class="visually-hidden" for="dlf">Folder</label>
     <select id="dlf" name="folder"><option value="">All folders</option>{% for f in folder_options %}<option {{ "selected" if args.folder == f }}>{{ f }}</option>{% endfor %}</select>
@@ -55,9 +57,9 @@
           <tr class="{{ 'sel' if request.args.get('view') == r.doc_id and hide_client }}">
             <td class="tick"><input type="checkbox" name="key" value="{{ r.key }}" aria-label="Tick {{ r.filed_name }}"></td>
             <td class="tick"><button class="star {{ 'on' if r.starred }}" type="submit" form="star-{{ loop.index }}" aria-label="{{ 'Unstar' if r.starred else 'Star' }} {{ r.filed_name }}" aria-pressed="{{ 'true' if r.starred else 'false' }}">{{ '★' if r.starred else '☆' }}</button></td>
-            <td class="namecell"><span class="fileicon ext-{{ r.ext }}" aria-hidden="true">{{ r.ext|upper }}</span><a href="/c/{{ r.code }}/{{ r.income_year }}/files?view={{ r.doc_id }}">{{ r.filed_name }}</a>
+            <td class="namecell"><span class="fileicon ext-{{ r.ext }}" aria-hidden="true">{{ r.ext|upper }}</span><a href="{{ r.link }}">{{ r.filed_name }}</a>
               {% if r.description %}<div class="small">{{ r.description }}</div>{% endif %}</td>
-            {% if not hide_client %}<td><a href="/c/{{ r.code }}/{{ r.income_year }}/files">{{ r.client }}</a></td><td class="mono">FY{{ r.income_year }}</td>{% endif %}
+            {% if not hide_client %}<td><a href="{{ r.client_link }}">{{ r.client }}</a></td><td class="{{ 'mono' if r.income_year }}">{{ 'FY' ~ r.income_year if r.income_year else r.cabinet }}</td>{% endif %}
             <td>{{ r.folder }}</td>
             <td class="summary"><span class="clamp" title="{{ r.summary }}">{{ r.summary }}</span></td>
             <td class="nowrap">{{ r.last_change.strftime('%d %b %Y %H:%M') }}</td>

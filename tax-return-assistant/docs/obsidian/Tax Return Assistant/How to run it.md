@@ -29,6 +29,8 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - **Looks like FYI:** a dark top bar (Home, Clients, Documents, Settings), search, and the green **+** for a new client.
 - **Home:** My Recent and My Starred documents. **Documents:** everything, sortable and filterable; tick several to star, download or move.
 - **Clients:** every client by name and where their job is up to.
+- **In Tray:** drop in documents for any client; Sawnx suggests who and where (client, cabinet, folder, year). Check it, then **File**.
+- **Cabinets:** each client has *Tax return* (per year), *Permanent* and *Correspondence*, like FYI. Open a document to change its type, folder, date or status, or upload a newer version (older ones are kept).
 - **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
 - **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.
 - **Prepare:** one button; shows the refund or payable and both calculations; download the workpaper.

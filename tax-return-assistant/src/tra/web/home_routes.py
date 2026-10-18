@@ -8,6 +8,7 @@ from urllib.parse import urlencode
 
 from flask import Flask, abort, flash, redirect, render_template, request, send_file
 
+from ..cabinets import CABINETS
 from ..privacy.guard import FileLockedError, SensitiveDataBlocked
 from .client_names import load_names
 from .messages import problem_text
@@ -17,7 +18,7 @@ from .services.doclist import SORTS, all_documents, query, resolve
 from .services.files import document_path, folder_names, move_document
 from .stars import set_stars
 
-FILTERS = ("q", "client", "year", "folder", "kind")
+FILTERS = ("q", "client", "year", "folder", "kind", "cabinet")
 
 
 def _safe_next(url: str | None, default: str = "/") -> str:
@@ -31,7 +32,7 @@ def doclist_context(rows, path: str, *, fixed: dict | None = None) -> dict:
     sort = request.args.get("sort") if request.args.get("sort") in SORTS else "changed"
     desc = request.args.get("dir", "desc" if sort == "changed" else "asc") == "desc"
     shown = query(rows, q=args["q"], client=args["client"], year=args["year"], folder=args["folder"],
-                  kind=args["kind"], starred=request.args.get("tab") == "starred", sort=sort, desc=desc)
+                  kind=args["kind"], cabinet=args["cabinet"], starred=request.args.get("tab") == "starred", sort=sort, desc=desc)
 
     def sort_url(column: str) -> str:
         params = {k: v for k, v in request.args.items() if k not in ("sort", "dir")}
@@ -42,8 +43,9 @@ def doclist_context(rows, path: str, *, fixed: dict | None = None) -> dict:
     return {"rows": shown, "sort": sort, "desc": desc, "args": args, "sort_url": sort_url,
             "here": request.full_path.rstrip("?"),
             "clients": sorted({(r.code, r.client) for r in rows}, key=lambda c: c[1].lower()),
-            "years": sorted({r.income_year for r in rows}, reverse=True),
-            "folder_options": sorted({r.folder for r in rows}), "kinds": sorted({r.kind for r in rows})}
+            "years": sorted({r.income_year for r in rows if r.income_year}, reverse=True),
+            "folder_options": sorted({r.folder for r in rows}), "kinds": sorted({r.kind for r in rows}),
+            "cabinet_options": [c for c in CABINETS if any(r.cabinet == c for r in rows)]}
 
 
 def _keys() -> list[str]:
@@ -142,3 +144,91 @@ def register_home_routes(app: Flask) -> None:
     @app.context_processor
     def _names():
         return {"client_names": load_names(settings().tra_home)}
+
+
+def register_intray_routes(app: Flask) -> None:
+    import getpass
+    import secrets as _secrets
+    from pathlib import Path
+
+    from ..cabinets import DEFAULT_FOLDERS
+    from ..ingest.classify import CATEGORIES, load_doc_types
+    from ..ingest.pipeline import IngestError
+    from .intray import _client_years, add_to_tray, discard_item, file_item, list_tray, tray_dir, tray_file_path
+
+    @app.get("/intray")
+    def intray():
+        tra_home = settings().tra_home
+        names = load_names(tra_home)
+        years = _client_years(tra_home)
+        clients = sorted(((c, names.get(c, c), ys) for c, ys in years.items()), key=lambda c: c[1].lower())
+        folder_sets = {"Tax return": list(CATEGORIES), **{k: list(v) for k, v in DEFAULT_FOLDERS.items()}}
+        return render_template("intray.html", nav="intray", items=list_tray(tra_home), clients=clients,
+                               names=names, cabinets=CABINETS, folder_sets=folder_sets, doc_types=load_doc_types(),
+                               all_years=sorted({y for ys in years.values() for y in ys}, reverse=True))
+
+    @app.post("/intray")
+    def intray_add():
+        uploads = [u for u in request.files.getlist("files") if u and u.filename]
+        if not uploads:
+            flash("Choose at least one file.", "error")
+            return redirect("/intray")
+        tra_home = settings().tra_home
+        audit, added = audit_for(None), 0
+        for n, upload in enumerate(uploads, start=1):
+            temp = tray_dir(tra_home) / "_incoming" / f"{_secrets.token_hex(8)}{Path(upload.filename).suffix.lower()}"
+            temp.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                upload.save(temp)
+                add_to_tray(tra_home, temp, getpass.getuser(), audit)
+                added += 1
+            except (ValueError, SensitiveDataBlocked, OSError) as exc:
+                flash(f"File {n}: {problem_text(exc)}", "error")
+            finally:
+                temp.unlink(missing_ok=True)
+        if added:
+            flash(f"{added} document{'' if added == 1 else 's'} added to the In Tray. Check each suggestion, then File.",
+                  "ok")
+        return redirect("/intray")
+
+    @app.post("/intray/<item_id>/file")
+    def intray_file(item_id: str):
+        form = request.form
+        code = form.get("code") or ""
+        try:
+            year = int(form["year"]) if (form.get("year") or "").isdigit() else None
+            outcome = file_item(settings(), item_id, code=code, cabinet=form.get("cabinet") or "", year=year,
+                                folder=form.get("folder") or "", mode=form.get("mode") or "store",
+                                audit=audit_for(code or None))
+        except (ValueError, IngestError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        else:
+            where = "already filed" if outcome.duplicate else "filed"
+            flash(f"{outcome.doc.filed_name} {where}.", "ok")
+        return redirect("/intray")
+
+    @app.post("/intray/<item_id>/discard")
+    def intray_discard(item_id: str):
+        try:
+            discard_item(settings().tra_home, item_id, audit_for(None))
+        except ValueError as exc:
+            flash(str(exc), "error")
+        else:
+            flash("Removed from the In Tray. Your original file wasn't touched.", "ok")
+        return redirect("/intray")
+
+    @app.get("/intray/<item_id>/view")
+    def intray_view(item_id: str):
+        path = tray_file_path(settings().tra_home, item_id)
+        if path is None:
+            abort(404)
+        import mimetypes
+
+        mimetype = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        inline = mimetype in {"application/pdf", "image/png", "image/jpeg"}
+        return send_file(path, mimetype=mimetype, as_attachment=not inline, download_name=f"In Tray item{path.suffix}",
+                         max_age=0)
+
+    @app.context_processor
+    def _tray_count():
+        return {"intray_count": len(list_tray(settings().tra_home))}

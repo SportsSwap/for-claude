@@ -245,3 +245,13 @@ td.summary { color: var(--muted); font-size: 13px; max-width: 520px; }
 .namecell .small { white-space: normal; max-width: 420px; }
 td.summary { min-width: 320px; white-space: normal; }
 .clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cabinets { display: flex; flex-wrap: wrap; gap: 6px; }
+.cabinets a { padding: 6px 12px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--text); background: var(--surface); }
+.cabinets a:hover { text-decoration: none; background: var(--raised); }
+.cabinets a.on { background: var(--bar); border-color: var(--bar); color: #fff; }
+.props { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; align-items: end; }
+.versions { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+.versions h3 { margin: 0; }
+.pad-inner { padding: 14px 18px; }
+.preview { background: var(--raised); border-radius: 6px; padding: 8px 10px; color: var(--muted); }
+.trayitem .card-head { flex-wrap: wrap; }

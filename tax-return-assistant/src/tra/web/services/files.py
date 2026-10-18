@@ -32,12 +32,15 @@ def documents(ws: Workspace, folder: str | None = None) -> list[Document]:
 
 def folders(ws: Workspace) -> list[Folder]:
     docs = documents(ws)
-    custom = {d.category for d in docs} - set(CATEGORIES)
+    standard = set(getattr(ws, "standard_folders", CATEGORIES))
+    custom = {d.category for d in docs} - standard
     if ws.clients_dir.is_dir():
         custom |= {p.name for p in ws.clients_dir.iterdir()
-                   if p.is_dir() and p.name not in CATEGORIES and FOLDER_NAME.match(p.name)}
-    names = list(CATEGORIES) + sorted(custom, key=str.lower)
-    return [Folder(n, sum(d.category == n for d in docs), n in CATEGORIES) for n in names]
+                   if p.is_dir() and p.name not in standard and FOLDER_NAME.match(p.name)}
+    standard = list(getattr(ws, "standard_folders", CATEGORIES))
+    custom -= set(standard)
+    names = standard + sorted(custom, key=str.lower)
+    return [Folder(n, sum(d.category == n for d in docs), n in standard) for n in names]
 
 
 def folder_names(ws: Workspace) -> list[str]:

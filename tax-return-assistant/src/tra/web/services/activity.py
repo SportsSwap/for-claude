@@ -21,7 +21,8 @@ def _sentence(e: dict) -> str | None:
         blanked = sum((e.get("redaction_counts") or {}).values())
         return f"{e.get('filed_name')} read · {_plural(e.get('figures'), 'figure')} · {_plural(blanked, 'number')} blanked out"
     if action == "document_stored":
-        return f"{e.get('filed_name')} stored in {e.get('folder')}"
+        where = f"{e.get('cabinet')} › " if e.get("cabinet") else ""
+        return f"{e.get('filed_name')} stored in {where}{e.get('folder')}"
     if action == "duplicate_skipped":
         return f"A file already filed as {e.get('doc_id')} was skipped"
     if action == "document_moved":
@@ -36,6 +37,14 @@ def _sentence(e: dict) -> str | None:
         return f"{e.get('file')} prepared · {_plural(e.get('notes_high'), 'High note')}"
     if action == "review_marked":
         return f"Marked reviewed by {e.get('reviewer')}"
+    if action == "document_properties_changed":
+        return f"{e.get('doc_id')} properties changed ({', '.join(e.get('fields') or [])})"
+    if action == "document_version_added":
+        return f"{e.get('doc_id')} new version (version {e.get('version')})"
+    if action == "intray_filed":
+        return f"Filed from the In Tray as {e.get('doc_id')}"
+    if action == "client_named":
+        return "Client name set"
     if action == "guard_blocked":
         return "The privacy guard refused to save something (tell the privacy officer)"
     return None

@@ -217,6 +217,15 @@ year, folder and type, a search box, stars (`TRA_HOME\sawnx_stars.json`), and bu
 documents like FYI (cabinets and categories, document properties, an In Tray with suggested filing, versions);
 (3) jobs and tasks; (4) comments, notifications and time; (5) knowledge and filing automations.
 
+**Stage 2 (18 Oct 2026).** *Cabinets:* Tax return (the per-year Workspace), Permanent and Correspondence
+(`tra/cabinets.py`: `CabinetSpace`, client-level folders under `Clients/<code>/<Cabinet>/`, own index.csv, stored only,
+named `<code>_PERM_…` / `<code>_CORR_…`; document keys `CODE/PERM/D001`). *In Tray* (`web/intray.py`): files wait in
+`TRA_HOME\InTray` under random names with a redacted preview and a suggestion (client by name match, type and folder
+by the classifier, year from the document date); filing needs the preparer's confirmation; discarding deletes only
+Sawnx's copy. *Document properties* (`tra/doc_props.py`): type, folder, date and status (To review, Final, Superseded);
+changing a read document's type warns that figures aren't re-read. *Versions* (`tra/versions.py`): a newer copy replaces
+the current file; older copies are kept in `<folder>/_versions/` and listed in versions.json.
+
 ## 13. Open items
 
 - Privacy officer approval before the AI reader is switched on (and the README privacy table updated when it is).

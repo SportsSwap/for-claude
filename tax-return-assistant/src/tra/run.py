@@ -89,7 +89,7 @@ def prepare_client(ws: Workspace, audit: AuditLog, prepared_by: str) -> PrepareR
         notes=notes, prefill=prefill_totals, prior_year=prior, labels=labels, prepared_by=prepared_by,
         tool_version=__version__, cgt_events=events, citations=ctx.citations,
         responses=responses_by_key(ws), doc_summaries=summaries(ws),
-        doc_descriptions={k: v["text"] for k, v in load_doc_notes(ws).items()}))
+        doc_descriptions={k: v.get("text", "") for k, v in load_doc_notes(ws).items()}))
 
     last_return = {key: str(line.amount) for key, line in draft.lines.items()}
     check_value(last_return, "last_return.json")

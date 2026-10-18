@@ -5,6 +5,9 @@ from __future__ import annotations
 import getpass
 import mimetypes
 import os
+import secrets
+from datetime import date
+from pathlib import Path
 
 from flask import Flask, abort, current_app, flash, redirect, render_template, request, send_file
 
@@ -18,7 +21,10 @@ from ..run import PrepareError
 from ..taxcalc.rates import RatesError
 from ..workpaper.build import citation_text
 from ..workspace import Workspace
-from ..doc_notes import load_doc_notes, save_doc_note
+from ..cabinets import CABINET_BY_CODE, CabinetSpace
+from ..doc_notes import STATUSES, load_doc_notes, save_doc_note
+from ..doc_props import set_properties
+from ..versions import add_version, list_versions, version_path
 from ..doc_summary import summaries
 from .client_names import load_names, set_name
 from .client_notes import add_note, delete_note, edit_note, list_notes
@@ -27,7 +33,7 @@ from .routes import audit_for, settings
 from .services.clients import workspace_for
 from .services.files import add_folder, document_path, documents, find_document, folder_names, folders, move_document
 from .services.figures import FiguresFileProblem, add_figure, figure_rows, label_choices, set_figure
-from .services.imports import RETURN_TYPES, import_file
+from .services.imports import RETURN_TYPES, import_file, store_upload_in_cabinet
 from .services.activity import activity
 from .services.prepare import COMPONENTS, load_summary, run_prepare, workpapers
 from .status import job_status
@@ -45,45 +51,68 @@ def base_url(ws: Workspace) -> str:
     return f"/c/{ws.client_code}/{ws.income_year}"
 
 
-def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=None, status: int = 200):
-    names = folder_names(ws)
+def space_of(ws: Workspace):
+    """The year's Tax return workspace, or the client's Permanent/Correspondence cabinet (?cab=PERM / CORR)."""
+    cab = (request.values.get("cab") or "").strip()
+    if not cab:
+        return ws
+    if cab not in CABINET_BY_CODE:
+        abort(404)
+    return CabinetSpace(ws.tra_home, ws.client_code, CABINET_BY_CODE[cab])
+
+
+def cab_q(space) -> str:
+    return f"cab={space.code}&" if isinstance(space, CabinetSpace) else ""
+
+
+def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=None, status: int = 200, space=None):
+    space = space or ws
+    names = folder_names(space)
     folder = folder if folder in names else None
     from .home_routes import doclist_context
     from .services.doclist import all_documents
 
-    rows = all_documents(ws.tra_home, code=ws.client_code, income_year=ws.income_year)
+    if isinstance(space, CabinetSpace):
+        rows = all_documents(ws.tra_home, code=ws.client_code, cabinet=space.cabinet)
+    else:
+        rows = all_documents(ws.tra_home, code=ws.client_code, income_year=ws.income_year, cabinet="Tax return")
     listing = doclist_context(rows, f"{base_url(ws)}/files", fixed={"client": "", "year": "", "folder": folder or ""})
-    return render_template("client_files.html", **client_context(ws, "files"), folders=folders(ws), folder=folder,
-                           view=find_document(ws, view_id), folder_names=names, doc_types=load_doc_types(),
-                           results=results, return_types=RETURN_TYPES, summaries=summaries(ws),
-                           descriptions=load_doc_notes(ws), total=len(rows), folders_for_move=names, **listing), status
+    return render_template("client_files.html", **client_context(ws, "files"), folders=folders(space), folder=folder,
+                           view=find_document(space, view_id), folder_names=names, doc_types=load_doc_types(),
+                           results=results, return_types=RETURN_TYPES, summaries=summaries(space),
+                           descriptions=load_doc_notes(space), total=len(rows), folders_for_move=names,
+                           space=space, cabinet=getattr(space, "cabinet", "Tax return"), cabq=cab_q(space),
+                           cab=getattr(space, "code", ""), statuses=STATUSES,
+                           versions=list_versions(space, view_id) if view_id else [], **listing), status
 
 
 def register_client_routes(app: Flask) -> None:
     @app.get("/c/<code>/<int:fy>/files")
     def files(code: str, fy: int):
         ws = workspace_for(settings(), code, fy)
-        return render_files(ws, request.args.get("folder"), request.args.get("view", ""))
+        return render_files(ws, request.args.get("folder"), request.args.get("view", ""), space=space_of(ws))
 
     @app.post("/c/<code>/<int:fy>/folders")
     def folder_add(code: str, fy: int):
         ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
         name = (request.form.get("name") or "").strip()
         try:
-            add_folder(ws, name, audit_for(code))
+            add_folder(space, name, audit_for(code))
         except (ValueError, SensitiveDataBlocked, OSError) as exc:
             flash(problem_text(exc), "error")
-            return redirect(f"{base_url(ws)}/files")
+            return redirect(f"{base_url(ws)}/files?{cab_q(space)}")
         flash(f"Folder {name} added.", "ok")
-        return redirect(f"{base_url(ws)}/files?folder={name}")
+        return redirect(f"{base_url(ws)}/files?{cab_q(space)}folder={name}")
 
     @app.get("/c/<code>/<int:fy>/doc/<doc_id>")
     def doc_view(code: str, fy: int, doc_id: str):
         ws = workspace_for(settings(), code, fy)
-        doc = find_document(ws, doc_id)
+        space = space_of(ws)
+        doc = find_document(space, doc_id)
         if doc is None:
             abort(404)
-        path = document_path(ws, doc_id)
+        path = document_path(space, doc_id)
         if path is None:
             return render_template("error.html", title="Filed in FYI", text=f"{doc.filed_name} is filed in FYI. "
                                    "Open it there.", reference=None, nav="clients")
@@ -94,22 +123,30 @@ def register_client_routes(app: Flask) -> None:
     @app.post("/c/<code>/<int:fy>/doc/<doc_id>/move")
     def doc_move(code: str, fy: int, doc_id: str):
         ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
         folder = request.form.get("folder") or ""
         try:
-            moved = move_document(ws, doc_id, folder, audit_for(code))
+            moved = move_document(space, doc_id, folder, audit_for(code))
         except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
             flash(problem_text(exc), "error")
-            return redirect(f"{base_url(ws)}/files?view={doc_id}")
+            return redirect(f"{base_url(ws)}/files?{cab_q(space)}view={doc_id}")
         flash(f"{moved.filed_name} moved to {folder}.", "ok")
-        return redirect(f"{base_url(ws)}/files?folder={folder}&view={doc_id}")
+        return redirect(f"{base_url(ws)}/files?{cab_q(space)}folder={folder}&view={doc_id}")
 
     @app.post("/c/<code>/<int:fy>/import")
     def import_docs(code: str, fy: int):
         ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
         uploads = [u for u in request.files.getlist("files") if u and u.filename]
         if not uploads:
             flash("Choose at least one file to import.", "error")
-            return redirect(f"{base_url(ws)}/files")
+            return redirect(f"{base_url(ws)}/files?{cab_q(space)}")
+        if isinstance(space, CabinetSpace):
+            audit = audit_for(code)
+            results = [store_upload_in_cabinet(space, upload, folder=request.form.get(f"folder_{i}") or "Other",
+                                               audit=audit, position=i + 1)
+                       for i, upload in enumerate(uploads)]
+            return render_files(ws, None, results=results, space=space)
         store = make_store(settings(), warn=lambda message: flash(message, "error"))
         doc_types, audit = load_doc_types(), audit_for(code)
         return_type = request.form.get("return_type") or "individual"
@@ -294,13 +331,73 @@ def register_client_routes(app: Flask) -> None:
     @app.post("/c/<code>/<int:fy>/doc/<doc_id>/description")
     def doc_description(code: str, fy: int, doc_id: str):
         ws = workspace_for(settings(), code, fy)
-        if find_document(ws, doc_id) is None:
+        space = space_of(ws)
+        if find_document(space, doc_id) is None:
             abort(404)
         try:
             audit_for(code)
-            save_doc_note(ws, doc_id, request.form.get("text") or "", getpass.getuser())
+            save_doc_note(space, doc_id, request.form.get("text") or "", getpass.getuser())
         except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
             flash(problem_text(exc), "error")
         else:
             flash("Description saved.", "ok")
-        return redirect(f"{base_url(ws)}/files?view={doc_id}")
+        return redirect(f"{base_url(ws)}/files?{cab_q(space)}view={doc_id}")
+
+    @app.post("/c/<code>/<int:fy>/doc/<doc_id>/properties")
+    def doc_properties(code: str, fy: int, doc_id: str):
+        ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
+        if find_document(space, doc_id) is None:
+            abort(404)
+        form = request.form
+        try:
+            raw_date = (form.get("doc_date") or "").strip()
+            when = date.fromisoformat(raw_date) if raw_date else None
+            doc, warnings = set_properties(space, doc_id, doc_type=form.get("doc_type") or "",
+                                           folder=form.get("folder") or "", doc_date=when,
+                                           status=form.get("status") or "", by=getpass.getuser(),
+                                           audit=audit_for(code))
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+            return redirect(f"{base_url(ws)}/files?{cab_q(space)}view={doc_id}")
+        for warning in warnings:
+            flash(warning, "error")
+        flash("Properties saved.", "ok")
+        return redirect(f"{base_url(ws)}/files?{cab_q(space)}folder={doc.category}&view={doc_id}")
+
+    @app.post("/c/<code>/<int:fy>/doc/<doc_id>/version")
+    def doc_version(code: str, fy: int, doc_id: str):
+        ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
+        if find_document(space, doc_id) is None:
+            abort(404)
+        upload = request.files.get("file")
+        if not upload or not upload.filename:
+            flash("Choose the newer copy first.", "error")
+            return redirect(f"{base_url(ws)}/files?{cab_q(space)}view={doc_id}")
+        temp = space.work_dir / "_uploads" / f"{secrets.token_hex(8)}{Path(upload.filename).suffix.lower()}"
+        temp.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            upload.save(temp)
+            warnings = add_version(space, doc_id, temp, getpass.getuser(), audit_for(code))
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        else:
+            for warning in warnings:
+                flash(warning, "error")
+            flash("New version saved; the older copy is listed below it.", "ok")
+        finally:
+            temp.unlink(missing_ok=True)
+        return redirect(f"{base_url(ws)}/files?{cab_q(space)}view={doc_id}")
+
+    @app.get("/c/<code>/<int:fy>/doc/<doc_id>/v/<int:n>")
+    def doc_old_version(code: str, fy: int, doc_id: str, n: int):
+        ws = workspace_for(settings(), code, fy)
+        space = space_of(ws)
+        doc = find_document(space, doc_id)
+        path = version_path(space, doc_id, n) if doc else None
+        if path is None:
+            abort(404)
+        mimetype = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+        return send_file(path, mimetype=mimetype, as_attachment=mimetype not in INLINE_TYPES,
+                         download_name=f"{Path(doc.filed_name).stem}_v{n}{path.suffix}", max_age=0)

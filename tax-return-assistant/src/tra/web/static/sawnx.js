@@ -28,12 +28,14 @@
       const mode = document.createElement("select");
       mode.name = "mode_" + i;
       mode.setAttribute("aria-label", "What to do with file " + (i + 1));
-      mode.append(option("read", "Read for the return", true), option("store", "Store only", false));
+      const storeOnly = choices.dataset.storeOnly === "yes";
+      mode.append(option("read", "Read for the return", !storeOnly), option("store", "Store only", storeOnly));
+      mode.hidden = storeOnly;
       const folder = document.createElement("select");
       folder.name = "folder_" + i;
       folder.setAttribute("aria-label", "Folder for file " + (i + 1));
       folders.forEach(function (f) { folder.append(option(f, "Store in " + f, f === "Other")); });
-      folder.hidden = true;
+      folder.hidden = !storeOnly;
       mode.addEventListener("change", function () { folder.hidden = mode.value !== "store"; });
       row.append(name, mode, folder);
       choices.append(row);

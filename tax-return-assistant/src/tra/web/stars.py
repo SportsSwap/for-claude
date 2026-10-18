@@ -9,7 +9,7 @@ from pathlib import Path
 from ..privacy.guard import atomic_write_text, check_value
 
 LOCATION = "sawnx_stars.json"
-KEY = re.compile(r"^([A-Z0-9]{2,12})/(\d{4})/(D\d{3,})$")
+KEY = re.compile(r"^([A-Z0-9]{2,12})/(\d{4}|PERM|CORR)/(D\d{3,})$")
 
 
 def stars_path(tra_home: Path) -> Path:

@@ -163,7 +163,8 @@ def register(app: Flask) -> None:
         return redirect("/settings")
 
     from .client_routes import register_client_routes
-    from .home_routes import register_home_routes
+    from .home_routes import register_home_routes, register_intray_routes
 
     register_client_routes(app)
     register_home_routes(app)
+    register_intray_routes(app)

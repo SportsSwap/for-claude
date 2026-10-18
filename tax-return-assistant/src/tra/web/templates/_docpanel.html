@@ -1,0 +1,57 @@
+{# The open document: actions, summary, description, the viewer. Needs view, base, cab, cabq, folder_names, summaries, descriptions. #}
+<section class="card pad stack" aria-label="Document viewer">
+  <div class="topbar">
+    <div><h2 class="mono">{{ view.filed_name }}</h2><span class="muted small">{{ view.doc_id }}{{ ' · ' ~ view.pages ~ ' page' ~ ('' if view.pages == 1 else 's') if view.pages }}</span></div>
+    <div class="actions">
+      <a class="btn-ghost" href="{{ base }}/doc/{{ view.doc_id }}{{ '?cab=' ~ cab if cab }}" target="_blank" rel="noopener">Open</a>
+      {% if view.store == 'local' %}
+      <form class="actions" method="post" action="{{ base }}/doc/{{ view.doc_id }}/move">
+        {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+        <label class="visually-hidden" for="move-to">Move to folder</label>
+        <select id="move-to" name="folder">{% for n in folder_names %}<option {{ 'selected' if n == view.category }}>{{ n }}</option>{% endfor %}</select>
+        <button class="btn-ghost" type="submit">Move</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  <p class="small">{{ summaries.get(view.doc_id, '') }}</p>
+  {% set note = descriptions.get(view.doc_id, {}) %}
+  <form class="props" method="post" action="{{ base }}/doc/{{ view.doc_id }}/properties" aria-label="Properties">
+    {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+    <label class="field"><span>Type</span>
+      <select name="doc_type">{% for code, t in doc_types.items() %}<option value="{{ code }}" {{ 'selected' if code == view.doc_type }}>{{ t.description }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Folder</span>
+      <select name="folder">{% for n in folder_names %}<option {{ 'selected' if n == view.category }}>{{ n }}</option>{% endfor %}</select></label>
+    <label class="field"><span>Document date</span><input type="date" name="doc_date" value="{{ view.doc_date.isoformat() }}"></label>
+    <label class="field"><span>Status</span>
+      <select name="status">{% for s in statuses %}<option value="{{ s }}" {{ 'selected' if s == note.get('status', '') }}>{{ s or 'No status' }}</option>{% endfor %}</select></label>
+    <div class="actions"><button class="btn-ghost" type="submit">Save properties</button></div>
+  </form>
+  {% if note.get('status') %}<p class="small"><span class="badge">{{ note.status }}</span></p>{% endif %}
+  <div class="versions">
+    <h3 class="small muted">Versions</h3>
+    <p class="small">Current version{{ ' (version ' ~ (versions|length + 1) ~ ')' if versions }}</p>
+    {% for v in versions|reverse %}
+    <p class="small"><a href="{{ base }}/doc/{{ view.doc_id }}/v/{{ v.n }}{{ '?cab=' ~ cab if cab }}" target="_blank" rel="noopener">Version {{ v.n }}</a> <span class="muted">replaced {{ v.at[:16]|replace('T', ' ') }} by {{ v.by }}</span></p>
+    {% endfor %}
+    {% if view.store == 'local' %}
+    <form class="actions" method="post" action="{{ base }}/doc/{{ view.doc_id }}/version" enctype="multipart/form-data">
+      {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+      <label class="visually-hidden" for="newver">Newer copy</label>
+      <input id="newver" type="file" name="file">
+      <button class="btn-ghost" type="submit">Upload new version</button>
+    </form>
+    {% endif %}
+  </div>
+  <form class="stack" method="post" action="{{ base }}/doc/{{ view.doc_id }}/description">
+    {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+    <label class="field" for="doc-desc"><span>Your description (what it is, what it's evidence for)</span>
+      <textarea id="doc-desc" name="text" maxlength="500" placeholder="e.g. Union fees receipt, evidence for D5">{{ descriptions.get(view.doc_id, {}).get('text', '') }}</textarea></label>
+    <div class="actions"><button class="btn-ghost" type="submit">Save description</button></div>
+  </form>
+  {% if view.store == 'local' and (view.filed_name.lower().endswith('.pdf') or view.filed_name.lower().endswith(('.png', '.jpg', '.jpeg'))) %}
+  <iframe class="viewer" src="{{ base }}/doc/{{ view.doc_id }}{{ '?cab=' ~ cab if cab }}" title="{{ view.filed_name }}"></iframe>
+  {% else %}
+  <p class="muted">This file can't be shown here. Use <strong>Open</strong> to download it.</p>
+  {% endif %}
+</section>
