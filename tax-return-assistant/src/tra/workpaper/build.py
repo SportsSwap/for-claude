@@ -25,6 +25,7 @@ from ..models import ClientState, Document, Figure, ReviewNote
 from ..privacy.guard import FileLockedError, check_workbook
 from ..return_.cgt import discount_eligible
 from ..return_.prepare import DraftReturn
+from ..review_store import note_key
 from ..taxcalc.calc_a import DEDUCTION_KEYS
 from ..taxcalc.rates import Rates
 from ..taxcalc.result import TaxResult
@@ -74,6 +75,7 @@ class WorkpaperContext:
     tool_version: str
     cgt_events: list = field(default_factory=list)
     citations: dict = field(default_factory=dict)
+    responses: dict = field(default_factory=dict)  # note_key -> the preparer's response (review.json)
 
 
 @dataclass
@@ -543,9 +545,13 @@ def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
 
 
 def _citation_text(ctx: WorkpaperContext, citation_id: str | None) -> str:
+    return citation_text(ctx.citations, citation_id)
+
+
+def citation_text(citations: dict, citation_id: str | None) -> str:
     if not citation_id:
         return ""
-    entry = ctx.citations.get(citation_id)
+    entry = citations.get(citation_id)
     if not entry:
         return f"{citation_id} (citation to be confirmed by reviewer)"
     return entry["ref"] + ("" if entry.get("verified") else " (citation to be confirmed by reviewer)")
@@ -571,6 +577,8 @@ def _review_notes(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=7, value=n.action)
         L.style_wrap(ws.cell(row=row, column=8, value=_citation_text(ctx, n.citation_id)))
         ws.cell(row=row, column=9, value=", ".join(n.figure_ids + n.doc_ids))
+        if note_key(n) in ctx.responses:
+            L.style_wrap(ws.cell(row=row, column=10, value=ctx.responses[note_key(n)]))
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.NOTES_WIDTHS)
     L.setup_print(ws, header_row=FIRST_ROW - 1)

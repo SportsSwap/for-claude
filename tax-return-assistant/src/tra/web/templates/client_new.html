@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% set nav = 'clients' %}
+{% block title %}New client{% endblock %}
+{% block content %}
+<a class="back" href="/">← Clients</a>
+<h1>New client</h1>
+{% if errors %}
+<div class="flash error" role="alert">Please fix these:
+  <ul>{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form class="card pad stack" method="post" action="/clients/new">
+  <div class="cols">
+    <label class="field col-wide"><span>Client code (the firm's code, never a name)</span>
+      <input type="text" name="code" required maxlength="12" autocomplete="off" placeholder="SMIT01" value="{{ form.get('code', '') }}"></label>
+    <label class="field col-narrow"><span>Income year</span>
+      <select name="income_year">{% for y in years %}<option value="{{ y }}" {{ 'selected' if form.get('income_year') == y|string }}>FY{{ y }} (1 July {{ y - 1 }} – 30 June {{ y }})</option>{% endfor %}</select></label>
+  </div>
+  <fieldset>
+    <legend>Return type</legend>
+    <label class="radio"><input type="radio" name="return_type" value="individual" checked> Individual</label>
+    <label class="radio dis"><input type="radio" name="return_type" value="company" disabled> Company <span class="later">coming later</span></label>
+    <label class="radio dis"><input type="radio" name="return_type" value="trust" disabled> Trust <span class="later">coming later</span></label>
+  </fieldset>
+  <div class="cols">
+    <label class="field col-side"><span>Days covered by private hospital insurance (blank if unknown)</span>
+      <input type="number" name="hospital_days" min="0" max="366" value="{{ form.get('hospital_days', '') }}"></label>
+    <label class="field col-narrow"><span>Dependants</span>
+      <input type="number" name="dependants" min="0" max="20" value="{{ form.get('dependants', '0') }}"></label>
+  </div>
+  <div class="cols">
+    <label class="field col-side"><span>Age band (private health rebate)</span>
+      <select name="age_band">{% for k, v in age_bands.items() %}<option value="{{ k }}" {{ 'selected' if form.get('age_band') == k }}>{{ v }}</option>{% endfor %}</select></label>
+    <label class="field col-side"><span>Seniors and pensioners tax offset</span>
+      <select name="sapto">{% for k, v in sapto.items() %}<option value="{{ k }}" {{ 'selected' if form.get('sapto') == k }}>{{ v }}</option>{% endfor %}</select></label>
+  </div>
+  <div class="actions">
+    <label class="check"><input type="checkbox" name="help_debt" {{ 'checked' if 'help_debt' in form }}> HELP or other study loan</label>
+    <label class="check"><input type="checkbox" name="spouse" {{ 'checked' if 'spouse' in form }}> Had a spouse</label>
+    <label class="check"><input type="checkbox" name="sole_trader" {{ 'checked' if 'sole_trader' in form }}> Sole trader (Xero)</label>
+    <label class="check"><input type="checkbox" name="non_resident" {{ 'checked' if 'non_resident' in form }}> Not an Australian resident for tax</label>
+  </div>
+  <div class="actions"><button class="btn" type="submit">Create client</button><a class="btn-ghost" href="/">Cancel</a></div>
+</form>
+{% endblock %}

@@ -119,7 +119,8 @@ def _file_unreadable(path: Path, ws: Workspace, store: DocumentStore, doc_types:
 
 
 def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict[str, DocType], audit: AuditLog,
-                override_type: str | None = None) -> IngestReport:
+                override_type: str | None = None, ai_reader=None) -> IngestReport:
+    """``ai_reader`` (off unless Sawnx's setting is on) reads redacted text the built-in readers found nothing in."""
     try:
         loaded = load(path)
     except RedactionError:
@@ -145,6 +146,9 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
     doc_id = index.next_doc_id()
     extractor = get_extractor(doc_type)
     result = extractor.extract(loaded.redacted, doc_id) if extractor else ExtractResult()
+    if ai_reader is not None and not result.figures and len(loaded.image_only_pages) < loaded.page_count:
+        read = ai_reader.extract(loaded.redacted, doc_id)
+        result.figures, result.parse_status, result.notes = read.figures, read.parse_status, result.notes + read.notes
     if loaded.image_only_pages and not result.figures:
         result.parse_status = "manual_needed"
 
@@ -159,6 +163,7 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
             doc_date=result.doc_date or find_doc_date(loaded.redacted.text), sha256=loaded.sha256,
             pages=loaded.page_count, redaction_counts=dict(loaded.redacted.counts),
             parse_status=result.parse_status, audit=audit, doc_id=doc_id)
+    notes = list(result.notes) + notes
 
     if result.parse_status == "manual_needed" or loaded.image_only_pages:
         detail = (f" Page(s) {', '.join(map(str, loaded.image_only_pages))} have no text (scanned?)."

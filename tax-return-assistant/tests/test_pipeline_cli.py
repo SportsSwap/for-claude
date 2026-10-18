@@ -272,3 +272,14 @@ def test_phi_cover_days_recorded(run, home, make_pdf):
 def test_new_non_resident(run, home):
     assert run("new", "NRES01", "--non-resident").exit_code == 0
     assert Workspace(home, "NRES01", 2026).load_state().resident is False
+
+
+def test_web_command_starts_sawnx(run, monkeypatch):
+    calls = []
+    monkeypatch.setattr("tra.web.server.run", lambda settings, **kw: calls.append((settings, kw)))
+    result = run("web", "--no-open", "--port", "9999")
+    assert result.exit_code == 0, result.output
+    [(settings, kw)] = calls
+    assert kw["port"] == 9999 and kw["open_browser"] is False
+    from tra.web.server import HOST
+    assert HOST == "127.0.0.1"

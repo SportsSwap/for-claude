@@ -19,6 +19,8 @@ from .filing.index import DocumentIndex
 from .labels import load_labels
 from .models import ReviewNote
 from .notes_store import read_notes
+from .prepare_summary import save_summary
+from .review_store import responses_by_key
 from .privacy.audit import AuditLog
 from .privacy.guard import atomic_write_text, check_value
 from .return_.prepare import build_draft
@@ -39,6 +41,7 @@ class PrepareResult:
     workpaper: Path
     notes: list[ReviewNote]
     calc_a: TaxResult
+    calc_b: TaxResult
 
 
 def next_workpaper_path(ws: Workspace) -> Path:
@@ -82,13 +85,15 @@ def prepare_client(ws: Workspace, audit: AuditLog, prepared_by: str) -> PrepareR
         client_code=ws.client_code, income_year=ws.income_year, state=state, documents=documents,
         figures=[f for f in figures if f.confirmed], draft=draft, rates=rates, calc_a=calc_a, calc_b=calc_b,
         notes=notes, prefill=prefill_totals, prior_year=prior, labels=labels, prepared_by=prepared_by,
-        tool_version=__version__, cgt_events=events, citations=ctx.citations))
+        tool_version=__version__, cgt_events=events, citations=ctx.citations,
+        responses=responses_by_key(ws)))
 
     last_return = {key: str(line.amount) for key, line in draft.lines.items()}
     check_value(last_return, "last_return.json")
     atomic_write_text(ws.last_return_json, json.dumps(last_return, indent=2), "last_return.json", prechecked=True)
+    save_summary(ws, path.name, prepared_by, calc_a, calc_b, notes)
     risks = Counter(n.risk for n in notes)
     audit.record("workpaper_generated", client=ws.client_code, file=path.name,
                  figures=sum(f.confirmed for f in figures), notes_high=risks["High"], notes_medium=risks["Medium"],
                  notes_low=risks["Low"])
-    return PrepareResult(path, notes, calc_a)
+    return PrepareResult(path, notes, calc_a, calc_b)

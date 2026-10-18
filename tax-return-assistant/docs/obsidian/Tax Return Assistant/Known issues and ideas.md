@@ -45,9 +45,16 @@ Back to [[Tax Return Assistant]]
 - **Accuracy test client TEST01** (18 Oct 2026): four made-up documents in `C:\TaxAssistant\Inbox\TEST01` (salary, interest, a franked dividend, a membership receipt). Claude's trial run matched a hand calculation to the cent. Still to do: run it myself and compare with my own calculation.
 - Not yet tried on a firm laptop.
 
+## Sawnx small issues (from the 18 Oct 2026 review, not fixed yet)
+- A folder named like a Windows device (CON, NUL, COM1) gives an unclear error.
+- If a filed document is moved outside Sawnx, its page says "Filed in FYI" instead of "file not found".
+- The AI reader's on/off setting lives in the website part of the code; tidier in a shared place.
+- The Activity list reads the whole audit log each time; fine now, slower after years.
+- If Sawnx is killed in the middle of an import, the temporary copy can stay in the client's `_uploads` folder.
+
 ## Ideas
 - **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it. (`.\tra` already removed the activate step.)
-- **Sawnx**, a local FYI-style website instead of commands: being designed (18 Oct 2026). See [[Decisions log]].
+- **Sawnx**, a local FYI-style website instead of commands: **built 18 Oct 2026**. See [[How to run it]].
 - Company and trust returns.
 - **AI reader for documents the tool can't read** (talked about 18 Oct 2026). Only for documents its own readers can't handle (new layouts, scans). The laptop reads a scan into text, blanks out TFN, Medicare, account and other numbers as it does now, and sends only that cleaned-up text to the AI. The figures come back as unconfirmed rows in figures.csv, so a person still checks each one. **Needs the privacy officer's approval first** (and the partners'): client information would leave the laptop (APP 8), and the tool currently promises no AI or outside service. A separate FYI-style document store isn't needed: the tool already files into FYI once API access is set up.
 - Match the firm's own workpaper template (edit `layout.py`).

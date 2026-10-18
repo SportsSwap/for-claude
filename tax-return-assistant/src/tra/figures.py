@@ -27,7 +27,7 @@ FIGURE_COLUMNS = ["figure_id", "label_key", "description", "amount", "date", "do
                   "confirmed", "substantiated", "notes"]
 CGT_COLUMNS = ["event_id", "asset", "acquired", "disposed", "proceeds", "cost_base", "doc_id", "page", "confirmed"]
 PRIOR_COLUMNS = ["label_key", "amount"]
-METHODS = ("parser", "manual", "xero")
+METHODS = ("parser", "manual", "xero", "ai")
 
 _TRUE = {"y", "yes", "true", "1"}
 _FALSE = {"n", "no", "false", "0", ""}

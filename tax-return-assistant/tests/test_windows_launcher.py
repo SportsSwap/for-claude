@@ -42,3 +42,22 @@ def test_launcher_before_setup_says_to_run_setup(tmp_path):
     result = _run(copy, "doctor")
     assert result.returncode == 1
     assert "setup.ps1" in result.stdout + result.stderr
+
+
+SAWNX = ROOT / "Sawnx.cmd"
+
+
+def test_sawnx_cmd_has_crlf_and_calls_tra_web():
+    data = SAWNX.read_bytes()
+    assert data.count(b"\n") > 0 and data.count(b"\n") == data.count(b"\r\n")
+    assert rb'.venv\Scripts\tra.exe" web' in data and b"\t" not in data
+
+
+@windows_only
+def test_sawnx_before_setup_says_to_run_setup(tmp_path):
+    copy = tmp_path / "Sawnx.cmd"
+    shutil.copy(SAWNX, copy)
+    result = subprocess.run([str(copy)], capture_output=True, text=True, errors="replace", timeout=120,
+                            input="\n")
+    assert result.returncode == 1
+    assert "setup.ps1" in result.stdout + result.stderr

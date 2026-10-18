@@ -1,0 +1,59 @@
+{% extends "client_base.html" %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% block tab %}
+{% if not summary %}
+<section class="card pad stack">
+  <h2>No review notes yet</h2>
+  <p class="muted">Prepare the return first. The notes come from the latest workpaper. <a href="{{ base }}/prepare">Go to Prepare</a></p>
+</section>
+{% else %}
+<div class="cols">
+  <section class="card col-wide" aria-labelledby="rn-title">
+    <div class="card-head">
+      <h2 id="rn-title">Review notes · {{ summary.workpaper }}</h2>
+      <span class="muted small">{{ counts.High }} High · {{ counts.Medium }} Medium · {{ counts.Low }} Low</span>
+    </div>
+    {% for i in items %}
+    <div class="note" id="n-{{ i.note.check_id }}">
+      <div class="note-head">
+        <span class="risk {{ i.note.risk }}">{{ i.note.risk }}</span>
+        <span class="mono muted">{{ i.note.check_id }}</span>
+        <span class="msg">{{ i.note.message }}</span>
+      </div>
+      {% if i.citation or i.note.dollar_impact is not none %}
+      <span class="muted small">{{ i.citation }}{{ ' · ' if i.citation and i.note.dollar_impact is not none }}{{ ('Impact ' ~ (i.note.dollar_impact|money)) if i.note.dollar_impact is not none }}{{ ' · for the ' ~ i.note.audience }}</span>
+      {% endif %}
+      <form class="stack" method="post" action="{{ base }}/review/response">
+        <input type="hidden" name="key" value="{{ i.key }}">
+        <label class="field" for="r-{{ loop.index }}"><span>Your response to {{ i.note.check_id }}</span><textarea id="r-{{ loop.index }}" name="text" placeholder="What you did about it">{{ i.response.text }}</textarea></label>
+        <div class="actions">
+          <label class="check" for="ok-{{ loop.index }}"><input id="ok-{{ loop.index }}" type="checkbox" name="resolved" {{ 'checked' if i.response.resolved }}> {{ i.note.check_id }} resolved</label>
+          <button class="btn-ghost" type="submit">Save response</button>
+          {% if i.response.by %}<span class="muted small">Saved by {{ i.response.by }} {{ i.response.at[:16]|replace('T', ' ') }}</span>{% endif %}
+        </div>
+      </form>
+    </div>
+    {% endfor %}
+    {% for key, r in old %}
+    <div class="note">
+      <div class="note-head"><span class="risk Low">No longer raised</span><span class="mono muted">{{ key.split('|')[0] }}</span></div>
+      <span>{{ r.text }}</span>
+    </div>
+    {% endfor %}
+  </section>
+
+  <aside class="card pad stack col-side" aria-labelledby="mr-title">
+    <h2 id="mr-title">Mark reviewed</h2>
+    {% if reviewed and reviewed.workpaper == summary.workpaper %}
+    <p><span class="badge"><span class="dot s-reviewed"></span>Reviewed</span> by {{ reviewed.by }}, {{ reviewed.at[:16]|replace('T', ' ') }}</p>
+    {% else %}
+    <p class="muted">Resolve every High note, then enter the reviewer's name. The registered agent still signs the workpaper's Cover tab.</p>
+    <form class="stack" method="post" action="{{ base }}/review/mark">
+      <label class="field" for="reviewer"><span>Reviewer's name</span><input id="reviewer" type="text" name="name" maxlength="80" autocomplete="name" required></label>
+      <button class="btn" type="submit" {{ 'disabled' if counts.High and items|selectattr('note.risk', 'equalto', 'High')|rejectattr('response.resolved')|list }}>Mark reviewed</button>
+    </form>
+    {% endif %}
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

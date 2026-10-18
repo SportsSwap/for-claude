@@ -1,0 +1,111 @@
+{% extends "client_base.html" %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% block actions %}<a class="btn" href="{{ base }}/files?import=1#import"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10" stroke="#0A0A0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Import documents</a>{% endblock %}
+{% block tab %}
+<div class="cols">
+  <section class="col-narrow" aria-label="Folders">
+    <div class="folders">
+      <span class="muted small">Folders</span>
+      <a class="folder {{ 'on' if not folder }}" href="{{ base }}/files"><span>All documents</span><span class="mono muted">{{ folders|sum(attribute='count') }}</span></a>
+      {% for f in folders %}
+      <a class="folder {{ 'on' if folder == f.name }}" href="{{ base }}/files?folder={{ f.name|urlencode }}"><span>{{ f.name }}</span><span class="mono muted">{{ f.count }}</span></a>
+      {% endfor %}
+    </div>
+    <form class="stack" method="post" action="{{ base }}/folders">
+      <label class="field"><span>New folder</span><input type="text" name="name" maxlength="40" placeholder="e.g. Engagement" required></label>
+      <button class="btn-ghost" type="submit">Add folder</button>
+    </form>
+  </section>
+
+  <div class="col-wide stack">
+    {% if results %}
+    <section class="card" aria-label="Import results">
+      <div class="card-head"><h2>Import results</h2></div>
+      {% for r in results %}
+      <div class="result">
+        {% if r.error %}
+          <span><strong>{{ r.label }}</strong>: <span class="high">{{ r.error }}</span></span>
+        {% elif r.duplicate %}
+          <span><strong>{{ r.label }}</strong>: already filed as <span class="mono">{{ r.doc.doc_id }}</span>, so it was skipped.</span>
+        {% else %}
+          <span><strong>{{ r.label }}</strong> → <span class="mono">{{ r.doc.filed_name }}</span></span>
+          <span class="muted small">{{ r.doc.doc_id }} · {{ doc_types[r.doc.doc_type].description if r.doc.doc_type in doc_types else r.doc.doc_type }} ·
+            {% if r.doc.parse_status == 'stored' %}stored only, not read{% else %}{{ r.figures_added }} figure{{ '' if r.figures_added == 1 else 's' }} found ·
+            {% set blanked = r.doc.redaction_counts.values()|sum %}{{ blanked }} number{{ '' if blanked == 1 else 's' }} blanked out{% endif %}</span>
+          {% for n in r.notes %}<span class="small"><span class="risk {{ n.risk }}">{{ n.risk }}</span> {{ n.message }}</span>{% endfor %}
+        {% endif %}
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    <section class="card tblwrap" aria-label="Documents">
+      {% if docs %}
+      <table class="docs">
+        <thead><tr><th>Document</th><th>Folder</th><th>Read</th><th class="num">Blanked</th></tr></thead>
+        <tbody>
+        {% for d in docs %}
+          <tr class="{{ 'sel' if view and view.doc_id == d.doc_id }}">
+            <td><a class="mono" href="{{ base }}/files?{{ 'folder=' ~ folder|urlencode ~ '&' if folder }}view={{ d.doc_id }}">{{ d.filed_name }}</a>
+              <div class="muted small">{{ d.doc_id }} · {{ 'Stored only' if d.parse_status == 'stored' else (doc_types[d.doc_type].description if d.doc_type in doc_types else d.doc_type) }}{{ ' · in FYI' if d.store == 'fyi' }}</div></td>
+            <td>{{ d.category }}</td>
+            <td>{% if d.parse_status == 'parsed' %}<span class="badge"><span class="dot ok"></span>Read</span>
+                {% elif d.parse_status == 'partial' %}<span class="badge"><span class="dot warn"></span>Partly read</span>
+                {% elif d.parse_status == 'stored' %}<span class="badge"><span class="dot off"></span>Not read</span>
+                {% else %}<span class="badge"><span class="dot warn"></span>Enter by hand</span>{% endif %}</td>
+            <td class="num mono muted">{{ d.redaction_counts.values()|sum if d.parse_status != 'stored' else '–' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty">No documents {{ 'in ' ~ folder if folder else 'yet' }}. Use <strong>Import documents</strong> to add some.</p>
+      {% endif %}
+    </section>
+
+    {% if view %}
+    <section class="card pad stack" aria-label="Document viewer">
+      <div class="topbar">
+        <div><h2 class="mono">{{ view.filed_name }}</h2><span class="muted small">{{ view.doc_id }} · {{ view.pages }} page{{ '' if view.pages == 1 else 's' }}</span></div>
+        <div class="actions">
+          <a class="btn-ghost" href="{{ base }}/doc/{{ view.doc_id }}" target="_blank" rel="noopener">Open</a>
+          {% if view.store == 'local' %}
+          <form class="actions" method="post" action="{{ base }}/doc/{{ view.doc_id }}/move">
+            <label class="visually-hidden" for="move-to">Move to folder</label>
+            <select id="move-to" name="folder">{% for n in folder_names %}<option {{ 'selected' if n == view.category }}>{{ n }}</option>{% endfor %}</select>
+            <button class="btn-ghost" type="submit">Move</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      {% if view.store == 'local' and (view.filed_name.lower().endswith('.pdf') or view.filed_name.lower().endswith(('.png', '.jpg', '.jpeg'))) %}
+      <iframe class="viewer" src="{{ base }}/doc/{{ view.doc_id }}" title="{{ view.filed_name }}"></iframe>
+      {% else %}
+      <p class="muted">This file can't be shown here. Use <strong>Open</strong> to download it.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+  </div>
+
+  <aside id="import" class="card pad stack col-side import-panel" aria-labelledby="import-title">
+    <h2 id="import-title">Import documents</h2>
+    <form class="stack" method="post" action="{{ base }}/import" enctype="multipart/form-data">
+      <fieldset>
+        <legend>Return type</legend>
+        {% for key, name in return_types.items() %}
+        <label class="radio {{ '' if key == 'individual' else 'dis' }}"><input type="radio" name="return_type" value="{{ key }}" {{ 'checked' if key == 'individual' else 'disabled' }}> {{ name }}{% if key != 'individual' %} <span class="later">coming later</span>{% endif %}</label>
+        {% endfor %}
+      </fieldset>
+      <div class="dropzone" data-dropzone>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 18V6M9 11l5-5 5 5M5 22h18" stroke="#7DD3C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <label for="files">Drop files here or <span class="link">choose files</span></label>
+        <input id="files" name="files" type="file" multiple accept=".pdf,.csv,.xlsx,.json,.docx,.jpg,.jpeg,.png,.eml,.msg">
+        <span class="muted small">PDF, Excel, CSV and JSON can be read. Store only also takes Word, photos and emails.</span>
+      </div>
+      <div id="choices" class="stack" data-folders='{{ folder_names|tojson }}'></div>
+      <p class="muted small">Each file is read for the return unless you choose Store only. Files that are read have TFN, Medicare, card, BSB, account, licence and passport numbers blanked out the moment they're read. Original file names aren't kept.</p>
+      <button class="btn" type="submit">Import</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

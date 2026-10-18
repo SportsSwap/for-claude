@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Clients{% endblock %} · Sawnx</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="{{ url_for('static', filename='sawnx.css') }}">
+</head>
+<body>
+<div class="shell">
+  <nav class="side" aria-label="Main">
+    <a class="brand" href="/" aria-label="Sawnx, client list">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true"><rect x="3" y="6" width="20" height="15" rx="3" stroke="#7DD3C0" stroke-width="1.8"/><path d="M3 10h20" stroke="#7DD3C0" stroke-width="1.8"/><path d="M8 3h10" stroke="#7DD3C0" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Sawnx</span>
+    </a>
+    <div class="nav">
+      <a href="/" class="{{ 'on' if nav == 'clients' }}"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 16c.8-3 3.2-4.5 6-4.5s5.2 1.5 6 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Clients</a>
+      <a href="/settings" class="{{ 'on' if nav == 'settings' }}"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.8v2M9 14.2v2M1.8 9h2M14.2 9h2M3.9 3.9l1.4 1.4M12.7 12.7l1.4 1.4M3.9 14.1l1.4-1.4M12.7 5.3l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Settings</a>
+    </div>
+    <div class="local">
+      <strong>Runs on this laptop only</strong>
+      <span class="mono">127.0.0.1 · {{ tra_home }}</span>
+      <span>AI reader: {{ 'on' if ai_reader_on else 'off' }}</span>
+    </div>
+  </nav>
+  <main class="main">
+    {% if rates_unverified %}
+    <div class="banner" role="note">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2l7.5 13h-15L9 2z" stroke="#F2B84B" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 7.5v3.5M9 13v.2" stroke="#F2B84B" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>{% for y in rates_unverified %}FY{{ y }}{{ ' and ' if not loop.last }}{% endfor %} rates are not yet verified by a registered tax agent. Every workpaper carries the High note C2 until they are.</span>
+    </div>
+    {% endif %}
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+    <div class="flash {{ category }}" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="{{ url_for('static', filename='sawnx.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{% extends "client_base.html" %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% block tab %}
+<div class="cols">
+  <section class="col-side stack" aria-label="Estimate">
+    {% if summary %}
+    {% set diffs = summary.differing() %}
+    <div class="card pad stack">
+      <span class="muted">Estimated {{ 'payable' if summary.net >= 0 else 'refund' }}</span>
+      <span class="estimate">{{ summary.net|abs|money }}</span>
+      <span class="muted small">{{ summary.workpaper }} · prepared {{ summary.prepared_at[:16]|replace('T', ' ') }} by {{ summary.prepared_by }}</span>
+      {% if client.status == 'Figures confirmed' %}<span class="small high">Figures have changed since this was prepared. Prepare again.</span>{% endif %}
+      {% if diffs %}
+      <span class="agree high">The two calculations differ. Don't rely on this estimate until that's resolved.</span>
+      {% else %}
+      <span class="agree"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8.5l3 3 7-7" stroke="#7DD3C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Calculations A and B agree to the cent</span>
+      {% endif %}
+    </div>
+    {% else %}
+    <div class="card pad stack">
+      <h2>Not prepared yet</h2>
+      <p class="muted">Prepare builds the draft return from the confirmed figures, works out the tax two separate ways, runs every check and writes the Excel workpaper.</p>
+    </div>
+    {% endif %}
+    <form method="post" action="{{ base }}/prepare">
+      <button class="btn" type="submit">{{ 'Prepare again' if summary else 'Prepare return' }}</button>
+    </form>
+    <div class="card pad stack">
+      <h2>Workpapers</h2>
+      {% for p in papers %}
+      <div class="topbar">
+        <span class="mono small">{{ p.name }}</span>
+        <a class="btn-ghost" href="{{ base }}/workpaper/{{ p.name }}">Download</a>
+      </div>
+      {% else %}
+      <p class="muted">None yet.</p>
+      {% endfor %}
+    </div>
+    <p class="muted small">Draft only. Xero Tax produces the figure that is lodged, and a registered tax agent reviews and signs off. Nothing has been lodged.</p>
+  </section>
+
+  {% if summary %}
+  <section class="card tblwrap col-wide" aria-labelledby="calc-title">
+    <div class="card-head"><h2 id="calc-title">Tax calculation</h2></div>
+    <table class="calc">
+      <thead><tr><th>Component</th><th class="num">Workpaper (A)</th><th class="num">Check (B)</th><th class="num">Difference</th></tr></thead>
+      <tbody>
+      {% for key, name in components %}
+        <tr class="{{ 'total' if key == 'net_result' }} {{ 'diff' if key in diffs }}">
+          <td>{{ name }}</td>
+          <td class="num mono">{{ summary.a[key]|money }}</td>
+          <td class="num mono">{{ summary.b[key]|money }}</td>
+          <td class="num mono {{ 'high' if key in diffs else 'muted' }}">{{ (summary.a[key] - summary.b[key])|money }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<a class="back" href="/">← Clients</a>
+<section class="card pad stack" aria-labelledby="err">
+  <h1 id="err">{{ title }}</h1>
+  <p>{{ text }}</p>
+  {% if reference %}<p class="muted">Reference <span class="mono">{{ reference }}</span></p>{% endif %}
+</section>
+{% endblock %}

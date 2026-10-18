@@ -59,6 +59,12 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
                     p.amount, "preparer", "confirm", label_key=p.label_key, figure_ids=(p.figure_id, o.figure_id)))
                 break
 
+    from_ai = [f for f in confirmed if f.method == "ai"]  # R6
+    if from_ai:
+        notes.append(ReviewNote("Medium", "R6", f"{len(from_ai)} figure(s) were read by the AI reader. Check each "
+                                "one against its source.", sum((abs(f.amount) for f in from_ai), ZERO), "reviewer",
+                                "confirm", figure_ids=tuple(f.figure_id for f in from_ai)))
+
     doc_types = {d.doc_id: d.doc_type for d in ctx.documents}  # R5
     seen: dict[tuple, object] = {}
     for f in others:

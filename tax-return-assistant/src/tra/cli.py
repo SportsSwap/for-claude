@@ -26,6 +26,7 @@ from .filing.index import DocumentIndex
 from .filing.store import DocumentStore, FilingRequest
 from .ingest.classify import CATEGORIES, load_doc_types
 from .ingest.pipeline import IngestError, ingest_file
+from .clients import ClientExists, create_client
 from .labels import load_labels
 from .models import ClientState
 from .paths import CONFIG_DIR
@@ -113,15 +114,13 @@ def main() -> None:
 @_friendly
 def new(code, fy, help_debt, sole_trader, age_band, sapto, spouse, dependants, hospital_days, non_resident):
     """Set up a client for an income year."""
-    _settings_, ws, audit = _workspace(code, fy, must_exist=False)
-    if ws.state_json.exists():
-        raise click.ClickException(f"{code} FY{fy} already exists.")
-    ws.create(list(CATEGORIES))
-    ws.save_state(ClientState(client_code=code, income_year=fy, help_debt=help_debt, sole_trader=sole_trader,
-                              age_band=age_band, sapto_status=sapto, has_spouse=spouse, dependants=dependants,
-                              hospital_cover_days=hospital_days, resident=not non_resident))
-    write_header_files(ws)
-    audit.record("client_created", client=code, income_year=fy)
+    settings, _ws, audit = _workspace(code, fy, must_exist=False)
+    try:
+        create_client(settings.tra_home, code, fy, dict(
+            help_debt=help_debt, sole_trader=sole_trader, age_band=age_band, sapto_status=sapto, has_spouse=spouse,
+            dependants=dependants, hospital_cover_days=hospital_days, resident=not non_resident), audit)
+    except ClientExists as exc:
+        raise click.ClickException(str(exc)) from None
     click.echo(f"Created {code} FY{fy}.\nNext: tra ingest {code} <files...>")
 
 
@@ -416,6 +415,17 @@ def push(code, fy):
     click.echo(f"{len(pushed)} pushed, {failed} failed.")
     if failed:
         raise SystemExit(1)
+
+@main.command()
+@click.option("--port", default=8766, show_default=True, help="Port on 127.0.0.1 (a free one is used if it's taken).")
+@click.option("--no-open", is_flag=True, help="Don't open the browser; print the address to open instead.")
+@_friendly
+def web(port, no_open):
+    """Open Sawnx, the tool's website, on this laptop only (127.0.0.1). Close the window to stop it."""
+    from .web import server
+
+    server.run(_settings(), port=port, open_browser=not no_open, echo=click.echo)
+
 
 @main.command()
 @click.option("--auto-confirm", is_flag=True, help="Mark the demo figures confirmed so you can run prepare straight away.")

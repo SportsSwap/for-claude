@@ -56,6 +56,16 @@ Write-Host "TRA_HOME set to $answer (for your Windows account)."
 Write-Host ""
 & .\.venv\Scripts\tra.exe doctor
 
+try {
+    $shortcut = (New-Object -ComObject WScript.Shell).CreateShortcut((Join-Path ([Environment]::GetFolderPath("Desktop")) "Sawnx.lnk"))
+    $shortcut.TargetPath = Join-Path $PSScriptRoot "Sawnx.cmd"
+    $shortcut.WorkingDirectory = $PSScriptRoot
+    $shortcut.Description = "Sawnx - Tax Return Assistant (runs on this laptop only)"
+    $shortcut.Save()
+    Write-Host "Desktop shortcut 'Sawnx' created. Double-click it to open the tool in your browser."
+} catch {
+    Write-Host "Couldn't create the desktop shortcut; double-click Sawnx.cmd in this folder instead."
+}
 Write-Host ""
 Write-Host "Done. To use the tool, open PowerShell in this folder and start each command with .\tra :" -ForegroundColor Green
 Write-Host "    cd `"$PSScriptRoot`""

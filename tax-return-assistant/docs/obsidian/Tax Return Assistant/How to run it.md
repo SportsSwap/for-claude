@@ -23,6 +23,17 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - Nothing to activate and no Windows settings to change. It works even in the window you ran setup in.
 - `.\tra doctor` checks the setup.
 
+## Sawnx: click instead of typing (built 18 Oct 2026)
+- **Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in the tool folder, or type `.\tra web`. A black window opens and Sawnx opens in the browser. Close the black window to stop it.
+- It runs **only on this laptop**. Other computers can't reach it and nothing goes on the internet.
+- **Clients:** every job and where it's up to. **New client** sets one up.
+- **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
+- **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.
+- **Prepare:** one button; shows the refund or payable and both calculations; download the workpaper.
+- **Review notes:** a response and a Resolved tick for each note, then **Mark reviewed**.
+- **Notes:** my file notes, plus an Activity list of everything done.
+- The commands still work, and anything done one way shows up in the other.
+
 ## Try the fake client first
 ```
 .\tra demo --auto-confirm

@@ -15,10 +15,13 @@ dependencies = [
     "requests>=2.31",
     "keyring>=24",
     "reportlab>=4.0",
+    "flask>=3.0",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# The AI reader (off unless the privacy officer approves it). Not needed otherwise.
+ai = ["anthropic>=1.0"]
 
 [project.scripts]
 tra = "tra.cli:main"
@@ -28,3 +31,6 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+tra = ["web/templates/*.html", "web/static/*"]

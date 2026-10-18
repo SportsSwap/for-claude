@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+
+<section class="card" aria-labelledby="ai-title">
+  <div class="setting">
+    <div>
+      <div class="title-row"><h2 id="ai-title">AI reader</h2><span class="badge approval">Needs privacy officer approval</span>
+        <span class="badge"><span class="dot {{ 'ok' if app_settings.ai_reader else 'off' }}"></span>{{ 'On' if app_settings.ai_reader else 'Off' }}</span></div>
+      <p class="muted">Reads documents the built-in reader can't, using only the blanked-out text, which is sent to Anthropic's Claude service. Its figures arrive unconfirmed for you to check, and the workpaper flags them (R6). Scans still need entering by hand.</p>
+      {% if app_settings.ai_reader %}<p class="small">Approved by {{ app_settings.approved_by }} on {{ app_settings.approved_on }}.{% if not key_set %} <span class="high">ANTHROPIC_API_KEY isn't set for this Windows account, so it won't run yet.</span>{% endif %}</p>{% endif %}
+    </div>
+  </div>
+  <div class="setting">
+    {% if app_settings.ai_reader %}
+    <form method="post" action="/settings/ai-reader"><input type="hidden" name="action" value="off"><button class="btn-ghost" type="submit">Switch off</button></form>
+    {% else %}
+    <form class="cols" method="post" action="/settings/ai-reader">
+      <input type="hidden" name="action" value="on">
+      <label class="field col-side"><span>Approved by (privacy officer)</span><input type="text" name="approved_by" maxlength="80"></label>
+      <label class="field col-narrow"><span>Approved on</span><input type="date" name="approved_on"></label>
+      <div class="actions"><button class="btn-ghost" type="submit">Switch on</button></div>
+    </form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card" aria-label="Connections and data">
+  <div class="setting"><div><strong>Client data folder</strong><span class="muted small">Must not be in OneDrive, SharePoint, Dropbox, Google Drive or iCloud. Checked every time Sawnx starts.</span></div><span class="mono">{{ tra_home }}</span></div>
+  {% for y in years %}
+  <div class="setting"><div><strong>Rates FY{{ y }}</strong><span class="muted small">A registered tax agent checks each figure against the ATO, then marks the file verified.</span></div>
+    <span class="badge"><span class="dot {{ 'warn' if y in unverified else 'ok' }}"></span>{{ 'Unverified' if y in unverified else 'Verified' }}</span></div>
+  {% endfor %}
+  <div class="setting"><div><strong>FYI</strong><span class="muted small">{{ 'Documents are filed in FYI.' if store == 'fyi' and fyi_ready else 'Documents are filed on this laptop until FYI API access is set up.' }}</span></div>
+    <span class="badge"><span class="dot {{ 'ok' if store == 'fyi' and fyi_ready else 'off' }}"></span>{{ 'Connected' if store == 'fyi' and fyi_ready else 'Not connected' }}</span></div>
+  <div class="setting"><div><strong>Xero</strong><span class="muted small">For sole trader clients. Connect with <span class="mono">.\tra xero connect</span>.</span></div>
+    <span class="badge"><span class="dot {{ 'ok' if xero_ready else 'off' }}"></span>{{ 'Set up' if xero_ready else 'Not set up' }}</span></div>
+  <div class="setting"><div><strong>Address</strong><span class="muted small">Only this laptop can open Sawnx. Close its black window to stop it.</span></div><span class="mono">127.0.0.1:{{ port }}</span></div>
+</section>
+{% endblock %}

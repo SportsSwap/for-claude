@@ -64,6 +64,10 @@ class Workspace:
         return self.work_dir / "last_return.json"
 
     @property
+    def last_prepare_json(self) -> Path:
+        return self.work_dir / "last_prepare.json"
+
+    @property
     def output_dir(self) -> Path:
         return self.work_dir / "Output"
 

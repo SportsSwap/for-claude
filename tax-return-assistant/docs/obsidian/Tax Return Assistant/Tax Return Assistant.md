@@ -17,8 +17,9 @@ It **never lodges anything.** The return is still done in Xero Tax and signed of
 - **Client data when it runs:** `C:\TaxAssistant` on the laptop. Never in OneDrive, never in GitHub.
 - **Built in:** Claude Code session <https://claude.ai/code/session_01N2pEC5oyPFnAavBcEamEbT>
 
-## Status (17 Oct 2026)
-- All six stages built, with 318 automated tests (315 pass on Windows; 3 need LibreOffice)
+## Status (18 Oct 2026)
+- All six stages built, with 405 automated tests (402 pass on Windows; 3 need LibreOffice)
+- **Sawnx** (the website version) built 18 Oct 2026. Tried in the browser with DEMO01 and TEST01 from New client to Reviewed: TEST01 gave the same $993.25 refund. See [[How to run it]].
 - The demo client works end to end: estimated payable $5,697.11
 - Tested on Windows (17 Oct 2026, my personal Windows 10 PC): setup, the demo and the tests all work. Still to try on a firm laptop.
 - **Not ready for real clients yet.** See [[To do before real clients]].

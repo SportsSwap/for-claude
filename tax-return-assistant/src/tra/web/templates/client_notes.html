@@ -1,0 +1,43 @@
+{% extends "client_base.html" %}
+{% block tab %}
+<div class="cols">
+  <section class="card pad stack col-wide" aria-labelledby="fn-title">
+    <h2 id="fn-title">File notes</h2>
+    <form class="stack" method="post" action="/c/{{ client.code }}/notes">
+      <input type="hidden" name="fy" value="{{ client.fy }}">
+      <label class="field" for="new-note"><span>New note (phone call, email, anything to remember)</span>
+        <textarea id="new-note" name="text" required></textarea></label>
+      <div class="actions"><button class="btn-ghost" type="submit">Add note</button></div>
+    </form>
+    <p class="muted small">Notes are kept for this client across all years. A note with a TFN or other identifier is refused.</p>
+    {% for n in notes %}
+    <div class="filenote">
+      <span class="muted small">{{ n.at[:16]|replace('T', ' ') }} · {{ n.by }}{{ ' · FY' ~ n.income_year if n.income_year }}{{ ' · edited' if n.edited_at }}</span>
+      <span>{{ n.text }}</span>
+      <details>
+        <summary class="muted small">Edit or delete</summary>
+        <form class="stack" method="post" action="/c/{{ client.code }}/notes/{{ n.id }}/edit">
+          <input type="hidden" name="fy" value="{{ client.fy }}">
+          <label class="field"><span>Note</span><textarea name="text" required>{{ n.text }}</textarea></label>
+          <div class="actions"><button class="btn-ghost" type="submit">Save</button></div>
+        </form>
+        <form method="post" action="/c/{{ client.code }}/notes/{{ n.id }}/delete">
+          <input type="hidden" name="fy" value="{{ client.fy }}">
+          <button class="btn-ghost btn-danger" type="submit">Delete note</button>
+        </form>
+      </details>
+    </div>
+    {% else %}
+    <p class="muted">No file notes yet.</p>
+    {% endfor %}
+  </section>
+  <section class="card pad col-side" aria-labelledby="act-title">
+    <h2 id="act-title">Activity</h2>
+    {% for when, text in activity %}
+    <div class="act"><span class="when">{{ when }}</span><span>{{ text }}</span></div>
+    {% else %}
+    <p class="muted">Nothing yet.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

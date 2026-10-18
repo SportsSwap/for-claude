@@ -78,6 +78,26 @@ The demo gives an estimated payable of $5,697.11 and these review notes:
 
 ---
 
+## Sawnx: the tool as a website
+
+Sawnx does everything below by clicking instead of typing commands. It opens in your browser but runs **only on this laptop**: no other computer can reach it, and nothing goes on the internet. The commands keep working, and anything done in one shows up in the other.
+
+**Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in this folder, or run `.\tra web`. A black window opens and Sawnx opens in your browser. Close the black window to stop it.
+
+| Screen | What it does |
+|---|---|
+| Clients | Every client and income year, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. **New client** sets one up. |
+| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. |
+| Figures | Tick each figure once you've checked it against its source, which shows beside the table. Fix a label or amount, or add a figure by hand. Changes save to `figures.csv` straight away. |
+| Prepare | Prepares the return (as `tra prepare`), shows the estimate and both calculations side by side, and lists every workpaper to download. |
+| Review notes | Each note with a response box and a Resolved tick. Responses go into the Response column of the next workpaper. **Mark reviewed** once every High note is resolved. |
+| Notes | Your own file notes about the client, and an activity list from the audit log. |
+| Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero. |
+
+**The AI reader is built in but switched off.** If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `ANTHROPIC_API_KEY` set for the Windows account and `.\.venv\Scripts\pip install -e ".[ai]"`.
+
+---
+
 ## Preparing a real client
 
 Clients are identified **only by their client code** (e.g. `SMIT01`), never by name.
@@ -227,7 +247,8 @@ The tool is built so that sensitive identifiers can't end up in anything it crea
 | Output guard | Every file the tool writes (CSV, JSON, the workpaper, the index, logs, filenames) is scanned before writing. If anything looks like an identifier, the write is refused and a `guard_blocked` entry (place and type, never the value) goes in the audit log. |
 | No values in logs | Log lines are redacted. The audit log records who did what and when, by client code and document ID, with redaction *counts*, never values or original filenames. |
 | Client codes only | Names never appear in filenames, logs or the audit log |
-| Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. There is no AI or other external service. `TRA_HOME` may not be in a cloud-synced folder (OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive, iCloud). |
+| Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. The AI reader is built in but **switched off**; it can only be switched on in Sawnx Settings with the approver's name and date, and then sends only redacted text to Anthropic's Claude service (APP 8 applies). `TRA_HOME` may not be in a cloud-synced folder (OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive, iCloud). |
+| Sawnx website | Listens on 127.0.0.1 only. Every request needs the random key made each time it starts; requests from other sites or host names are refused; pages are never cached. Uploads are saved under a random name, used and deleted; original filenames are never recorded. |
 | Secrets | Xero and FYI credentials live in Windows user environment variables. The Xero token is kept in Windows Credential Manager. Nothing secret is in the code, config or repository (see `.env.example` for the names). |
 | Nothing in git | `.gitignore` blocks PDFs, spreadsheets and CSVs. A test fails if any committed file contains a valid TFN, Medicare or card number. |
 | Originals | Filed unchanged in the firm's system of record, as the firm keeps them today |
@@ -283,7 +304,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 304 tests, all on invented data generated while the tests run. Three run only on Windows (the `tra.cmd` launcher and reading the settings saved for the Windows account).
+There are 405 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.
@@ -301,11 +322,12 @@ src/tra/
   checks/       reconciliation, pre-fill, sanity, prior year, ranking
   workpaper/    build.py (content), layout.py (styling)
   xero/         OAuth (PKCE), API client, figures
+  web/          Sawnx: security, services, routes, templates, static
   cli.py        the `tra` command
 tests/
 ```
 
-An LLM-based extractor could be added later in `src/tra/ingest/extractors/`. It would work on redacted text only, and only after the firm approves sending data to it (Privacy Act APP 8). None exists today.
+The AI reader (`src/tra/ingest/extractors/ai_reader.py`) works on redacted text only and is off unless switched on in Sawnx Settings after the firm approves sending data to it (Privacy Act APP 8). Its tests use a stand-in client and never call the network. Sawnx's design: [`docs/specs/2026-10-18-sawnx-design.md`](docs/specs/2026-10-18-sawnx-design.md).
 
 ## Known limitations
 

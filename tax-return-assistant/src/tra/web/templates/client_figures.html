@@ -1,0 +1,81 @@
+{% extends "client_base.html" %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% block actions %}<a class="btn-ghost" href="#add">+ Add figure</a><a class="btn" href="{{ base }}/prepare">Go to Prepare →</a>{% endblock %}
+{% block tab %}
+{% if problem %}
+<div class="flash error" role="alert">{{ problem }}. Fix those rows in Excel (<span class="mono">.\tra figures {{ client.code }}</span>), save, close Excel, then reload this page.</div>
+{% endif %}
+<div class="cols">
+  <section class="col-wide stack" aria-label="Figures">
+    {% set confirmed = rows|selectattr('confirmed')|list|length %}
+    {% set to_check = rows|rejectattr('confirmed')|rejectattr('notes', 'equalto', 'prefill')|list|length %}
+    <div class="actions muted">
+      <span><span class="mono">{{ rows|length }}</span> figures</span>
+      <span><span class="mono">{{ confirmed }}</span> confirmed</span>
+      <span><span class="mono">{{ to_check }}</span> to check</span>
+      <span class="small">Only confirmed figures go into the return. Each change is saved straight away.</span>
+    </div>
+    <div class="card tblwrap">
+      {% if rows %}
+      <table class="figs">
+        <thead><tr><th>ID</th><th>Label</th><th>Description</th><th class="num">Amount</th><th>Source</th><th>Confirmed</th><th>Substantiated</th><th><span class="visually-hidden">Save</span></th></tr></thead>
+        <tbody>
+        {% for f in rows %}
+          <tr id="{{ f.figure_id }}" class="{{ 'sel' if selected and selected.figure_id == f.figure_id }}">
+            <td class="mono muted"><a href="{{ base }}/figures?view={{ f.figure_id }}#{{ f.figure_id }}">{{ f.figure_id }}</a></td>
+            <td><label class="visually-hidden" for="l-{{ f.figure_id }}">Label for {{ f.figure_id }}</label>
+              <select id="l-{{ f.figure_id }}" name="label_key" form="f-{{ f.figure_id }}" data-autosave>
+                {% for key, name in labels %}<option value="{{ key }}" {{ 'selected' if key == f.label_key }}>{{ name }}</option>{% endfor %}
+              </select></td>
+            <td class="wrap">{{ f.description }}{% if f.notes == 'prefill' %}<div class="small high">Pre-fill row. Leave unconfirmed if another document supports this, or it's counted twice (R4).</div>{% elif f.method == 'ai' %}<div class="small">Read by the AI reader. Check it against the source.</div>{% endif %}</td>
+            <td class="num"><label class="visually-hidden" for="a-{{ f.figure_id }}">Amount for {{ f.figure_id }}</label>
+              <input id="a-{{ f.figure_id }}" class="mono num-input" type="text" name="amount" form="f-{{ f.figure_id }}" value="{{ f.amount }}" inputmode="decimal"></td>
+            <td class="mono">{% if f.doc_id %}<a href="{{ base }}/figures?view={{ f.figure_id }}#{{ f.figure_id }}">{{ f.doc_id }}{{ ' p' ~ f.page if f.page }}</a>{% else %}<span class="high">none</span>{% endif %}</td>
+            <td><input type="checkbox" name="confirmed" form="f-{{ f.figure_id }}" aria-label="Confirm {{ f.figure_id }}" {{ 'checked' if f.confirmed }} data-autosave></td>
+            <td>{% if f.label_key.startswith('ded.') or f.label_key.startswith('rent.') %}<input type="checkbox" name="substantiated" form="f-{{ f.figure_id }}" aria-label="{{ f.figure_id }} has written evidence" {{ 'checked' if f.substantiated }} data-autosave>{% else %}<span class="muted">–</span>{% if f.substantiated %}<input type="hidden" name="substantiated" value="on" form="f-{{ f.figure_id }}">{% endif %}{% endif %}</td>
+            <td><form id="f-{{ f.figure_id }}" method="post" action="{{ base }}/figures/{{ f.figure_id }}"><button class="btn-ghost" type="submit">Save</button></form></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty">No figures yet. Import documents on the Files tab, or add a figure by hand below.</p>
+      {% endif %}
+    </div>
+
+    <form id="add" class="card pad stack" method="post" action="{{ base }}/figures/new" aria-labelledby="add-title">
+      <h2 id="add-title">Add a figure by hand</h2>
+      <div class="cols">
+        <label class="field col-side"><span>Label</span><select name="label_key" required>{% for key, name in labels %}<option value="{{ key }}">{{ name }}</option>{% endfor %}</select></label>
+        <label class="field col-side"><span>Description</span><input type="text" name="description" maxlength="120" required></label>
+      </div>
+      <div class="cols">
+        <label class="field col-narrow"><span>Amount</span><input type="text" name="amount" inputmode="decimal" required></label>
+        <label class="field col-side"><span>Source document</span><select name="doc_id"><option value="">No document (raises a High note)</option>{% for d in docs %}<option value="{{ d.doc_id }}">{{ d.doc_id }} · {{ d.filed_name }}</option>{% endfor %}</select></label>
+        <label class="field col-narrow"><span>Page</span><input type="number" name="page" min="1"></label>
+      </div>
+      <div class="actions"><button class="btn-ghost" type="submit">Add figure</button></div>
+    </form>
+  </section>
+
+  <aside class="card pad stack col-side" aria-label="Source document">
+    {% if source %}
+    <div class="topbar">
+      <div><h2>{{ doc_types[source.doc_type].description if source.doc_type in doc_types else source.doc_type }}</h2>
+        <span class="mono muted small">{{ source.doc_id }}{{ ' · page ' ~ selected.page if selected.page }}</span></div>
+      <a class="btn-ghost" href="{{ base }}/doc/{{ source.doc_id }}" target="_blank" rel="noopener">Open</a>
+    </div>
+    {% if source.store == 'local' and source.filed_name.lower().endswith('.pdf') %}
+    <iframe class="viewer" src="{{ base }}/doc/{{ source.doc_id }}{{ '#page=' ~ selected.page if selected.page }}" title="{{ source.filed_name }}"></iframe>
+    {% else %}
+    <p class="muted">This document can't be shown here. Use Open.</p>
+    {% endif %}
+    {% elif selected %}
+    <p class="muted">{{ selected.figure_id }} has no source document.</p>
+    {% else %}
+    <h2>Source document</h2>
+    <p class="muted">Select a figure to see the document it came from.</p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

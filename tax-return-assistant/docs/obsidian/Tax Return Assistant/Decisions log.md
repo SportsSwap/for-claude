@@ -48,6 +48,12 @@ A second Claude reviewed everything.
 - **Sensitive numbers:** blanked out the moment a document is read, so nothing the tool makes ever holds them. The stored original stays unchanged as the firm's record, like FYI.
 - **AI reader built in but switched off** until the privacy officer approves. It would only get blanked-out text, only for documents the tool can't read.
 - Built as a small web server inside the tool (Flask), using the tool's existing code. No new database.
-- Design written: `docs/specs/2026-10-18-sawnx-design.md`. Next: my review, a Claude Design mockup, then the build.
+- **Borrowed from FYI** (its ideas from public pages, not its code or look): everything hangs off the client, folders work like FYI's cabinets, each year's return is a job with a status, file notes, and an Activity list drawn from the audit log.
+- **Mockup** (Claude Design, made-up clients only): <https://claude.ai/artifact/KRWfmgQYTKTzCFPjA7kLmW>
+- Design: `docs/specs/2026-10-18-sawnx-design.md`; build plan: `docs/plans/2026-10-18-sawnx.md`.
+- **Built 18 Oct 2026** (402 tests pass, 3 skipped). Every step was test-first.
+- **Found only by trying it in the browser**, both fixed with tests: (1) every save was refused, because a privacy setting made the browser hide where the form came from; (2) returns prepared with `.\tra prepare` didn't show in Sawnx. Lesson: always click through the real thing, not just the tests.
+- **AI reader:** Claude Opus 5.5 through Anthropic's official library (installed only if switched on), automatic fallback if a request is declined, only blanked-out text, everything it finds unconfirmed. **Off** until the privacy officer approves.
+- **Look:** the laptop's own fonts instead of the mockup's, because Sawnx fetches nothing from the internet.
 
 Related: [[How it works]], [[Privacy rules]]

@@ -28,6 +28,7 @@ class ExtractResult:
     doc_date: date | None = None
     parse_status: str = "manual_needed"  # parsed | partial | manual_needed
     facts: dict = field(default_factory=dict)  # non-figure facts, e.g. hospital_cover_days
+    notes: list = field(default_factory=list)  # ReviewNotes raised while reading (the AI reader's A2/A3)
 
 
 class Extractor(Protocol):

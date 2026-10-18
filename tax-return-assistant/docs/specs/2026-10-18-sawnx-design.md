@@ -59,20 +59,22 @@ src/tra/web/
   __init__.py        create_app(settings, session_key) -> Flask app
   server.py          `tra web`: picks the port, makes the session key, opens the browser
   security.py        session key cookie, Host and Origin checks
-  services.py        plain functions over the existing code (no Flask imports): list_clients,
-                     create_client, import_files, store_only, folders, move_document, set_figure,
-                     add_figure, prepare, notes, save_response, mark_reviewed
+  services/          plain functions over the existing code: clients, files, imports, figures,
+                     prepare, activity
   client_notes.py    client_notes.json: the preparer's file notes
+  app_settings.py    sawnx.json: the AI reader switch and who approved it
   status.py          job status for one client year
-  review_store.py    review.json: note responses and the reviewed mark
-  routes.py          Flask views; each one calls services.py and renders a template
+  routes.py          the client list, New client and Settings
+  client_routes.py   a client's tabs; each view calls a service and renders a template
+src/tra/review_store.py                  review.json (outside web/ because tra prepare uses it too)
+src/tra/clients.py                       client set-up, shared with `tra new`
   templates/         base.html, clients.html, client_*.html, settings.html
   static/            sawnx.css, sawnx.js (no third-party scripts, no CDN)
 src/tra/ingest/extractors/ai_reader.py   the AI reader (off by default, §8)
 Sawnx.cmd             double-click launcher in the tool folder (CRLF), runs `tra web`
 ```
 
-`services.py` holds the behaviour and is tested without HTTP. `routes.py` only translates requests to service calls and results to pages. Templates contain no logic beyond loops and formatting.
+The services hold the behaviour and are tested without HTTP. `routes.py` only translates requests to service calls and results to pages. Templates contain no logic beyond loops and formatting.
 
 ### 4.2 Boundaries
 
@@ -96,7 +98,7 @@ The server runs on a fixed port (8766) and falls back to a free one if 8766 is t
 
 ## 6. Screens
 
-All screens: black background, menu on the left (Clients, Settings), search across the top. A banner shows while the rates file is unverified.
+All screens: black background, menu on the left (Clients, Settings), search across the top. A banner shows while the rates file is unverified. Fonts are the laptop's own (Segoe UI and Cascadia Mono or Consolas) rather than the mockup's IBM Plex, because Sawnx fetches nothing from the internet.
 
 **Clients (home).** Table: client code, income year, job status badge, documents, figures to confirm, High notes, estimated refund or payable, last change. Search by code; filter by status. A small bar chart of jobs at each status. **New client** opens a form with the `tra new` options: income year, HELP debt, hospital cover days, age band, SAPTO status, spouse, dependants, sole trader, non-resident. Codes are validated with the existing client-code pattern.
 
@@ -106,7 +108,7 @@ All screens: black background, menu on the left (Clients, Settings), search acro
 - **Import** (a button on the Files tab). The preparer picks the **return type**: Individual (the only one enabled) or Company / Trust, shown greyed out as "coming later". Then they drop in or choose files. Each file has a choice:
   - **Read for the return** (the default; PDF, CSV, XLSX, JSON). The file goes through `ingest_file`: read, redacted at once, classified, filed into its category folder, and its figures added unconfirmed. The result shows type, parse status, figures found, redaction counts, filed name and any notes. Duplicates are reported and skipped.
   - **Store only** (also Word, images and emails: PDF, DOCX, XLSX, CSV, JPG, PNG, EML, MSG). The file is filed unchanged into the folder the preparer picks, through the existing `file_document` path, named `<code>_FY<year>_OTHER_<date>.<ext>` and listed in the index. Its contents are never read, so nothing is extracted and nothing needs redacting.
-- **Notes.** The preparer's own file notes about the client: free text, each stamped with the Windows user and time, newest first, with an optional income year. Notes can be edited and deleted. They are saved through the output guard, so a TFN or other identifier typed into a note is refused with the usual message.
+- **Notes.** The preparer's own file notes about the client: free text, each stamped with the Windows user and time, newest first, with an optional income year. Notes can be edited and deleted. They are saved through the output guard, so a TFN or other identifier typed into a note is refused with the usual message. Beside them, an **Activity** list shows the client's actions from the audit log in plain words (documents read or stored, figures changed, workpapers prepared, reviews marked), as FYI does.
 - **Figures.** One row per figure: label, description, amount, date, source document and page, method, **Confirmed** and **Substantiated** ticks, and notes. Pre-fill rows show "Leave unconfirmed if another document supports this (R4)". Selecting a row opens its source document beside the table. Labels are chosen from a list of valid keys; amounts are validated with `parse_amount`. **Add figure** creates a manual row. Every change is saved to `figures.csv` straight away through `write_figures`.
 - **Prepare.** **Prepare return** runs `prepare_client`. The result shows the estimated refund or payable large, the calculation A and B components side by side with any difference highlighted, and every workpaper version (newest first) to download.
 - **Review notes.** Notes from the latest workpaper grouped High, Medium, Low, each with its citation, a response box and a **Resolved** tick. **Mark reviewed** (asks for the reviewer's name) is enabled once every High note is resolved. Responses are carried into the Response column of the next workpaper version.
@@ -125,7 +127,7 @@ When a document is imported to be read, its text is redacted the moment it is re
 
 Preparer-made folders are directories under `TRA_HOME\Clients\<code>\FY<year>\` like the standard categories; a document's folder is its `category` in `index.csv`.
 
-`TRA_HOME\Work\<code>\FY<year>\review.json`:
+`TRA_HOME\Work\<code>\FY<year>\last_prepare.json`: the latest Prepare result (estimate, both calculations, notes) for the Prepare and Review tabs and the client list. `TRA_HOME\sawnx.json`: the AI reader switch, approver and date.
 
 `TRA_HOME\Work\<code>\FY<year>\review.json`:
 
@@ -156,7 +158,7 @@ Changing a figure after preparing moves the job back to "Figures confirmed".
 
 - An extractor in the existing plug-in point (`src/tra/ingest/extractors/`). It runs only when **all** of these are true: the setting is on; the document's text was readable; the built-in parser found no figures or only a partial read; and the API key is set as a Windows user environment variable.
 - It is given the `RedactedText` object only. Before sending, the text is scanned again with `find_sensitive`; if anything is found, nothing is sent and a High note is raised.
-- It uses the Claude API with a configurable model (the claude-api skill is consulted when building it). The prompt asks for figures as JSON against the label keys in `config/labels.yaml`. Every figure it returns is added unconfirmed, with method `ai`, its document and page, and is validated like any other row.
+- It uses the official `anthropic` Python library (an optional extra, `pip install -e ".[ai]"`) with Claude Opus 5.5 by default, structured JSON output, and the API's automatic fallback if a request is declined. The prompt asks for figures as JSON against the label keys in `config/labels.yaml`. Every figure it returns is added unconfirmed, with method `ai`, its document and page, and is validated like any other row.
 - **Switching it on** in Settings asks for the approver's name and date, recorded in `TRA_HOME\sawnx.json` and the audit log, like the rates `verified_by`. Until then the switch is off and labelled "Needs privacy officer approval". Every workpaper raises a note when any figure came from the AI reader.
 - Tested only against mocked responses. No live call is made in the tests or during the build.
 
