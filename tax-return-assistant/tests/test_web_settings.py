@@ -34,7 +34,7 @@ def test_enable_and_disable_audited(tmp_path, monkeypatch):
                                              "approved_on": "2026-10-20"})
     s = load_app_settings(settings.tra_home)
     assert (s.ai_reader, s.approved_by, s.approved_on) == (True, "Privacy Officer", "2026-10-20")
-    assert "AI reader: on" in client.get("/").get_data(as_text=True)
+    assert "AI reader: on" in client.get("/clients").get_data(as_text=True)
     disable_ai_reader(settings.tra_home, AuditLog(settings.tra_home / "audit" / "x.jsonl"))
     assert load_app_settings(settings.tra_home).ai_reader is False
     actions = []

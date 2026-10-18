@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>Home</h1>
+<nav class="tabs" aria-label="Home sections">
+  <a href="/" class="{{ 'on' if tab == 'recent' }}" {{ 'aria-current=page' if tab == 'recent' }}>My Recent <span class="count">{{ total }}</span></a>
+  <a href="/?tab=starred" class="{{ 'on' if tab == 'starred' }}" {{ 'aria-current=page' if tab == 'starred' }}>My Starred <span class="count">{{ starred_count }}</span></a>
+</nav>
+{% include "_doclist.html" %}
+{% endblock %}

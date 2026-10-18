@@ -57,11 +57,11 @@ def test_list_sorted_and_searched_by_name(tmp_path, monkeypatch):
     _app, client, settings = make_client(tmp_path, monkeypatch)
     for name, code in (("Zoe Adams", "ADAM01"), ("Ben Young", "YOUN01"), ("Amy Brown", "BROW01")):
         client.post("/clients/new", data={"name": name, "code": code, "income_year": "2026"})
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/clients").get_data(as_text=True)
     assert page.index("Amy Brown") < page.index("Ben Young") < page.index("Zoe Adams")
-    found = client.get("/?q=young").get_data(as_text=True)
+    found = client.get("/clients?q=young").get_data(as_text=True)
     assert "Ben Young" in found and "Amy Brown" not in found
-    by_code = client.get("/?q=brow").get_data(as_text=True)
+    by_code = client.get("/clients?q=brow").get_data(as_text=True)
     assert "Amy Brown" in by_code and "Ben Young" not in by_code
 
 
@@ -77,7 +77,7 @@ def test_client_page_title_and_rename(tmp_path, monkeypatch):
 def test_clients_without_names_still_listed(tmp_path, monkeypatch):
     _app, client, settings = make_client(tmp_path, monkeypatch)
     new_client(settings, "DEMO01")
-    assert "DEMO01" in client.get("/").get_data(as_text=True)
+    assert "DEMO01" in client.get("/clients").get_data(as_text=True)
 
 
 def test_new_client_needs_name_or_code(tmp_path, monkeypatch):

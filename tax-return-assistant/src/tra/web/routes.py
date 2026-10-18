@@ -69,7 +69,7 @@ def _client_options(form) -> tuple[dict, list[str]]:
 
 
 def register(app: Flask) -> None:
-    @app.get("/")
+    @app.get("/clients")
     def clients():
         rows = list_clients(settings().tra_home)
         counts = {s: sum(r.status == s for r in rows) for s in STATUSES}
@@ -163,5 +163,7 @@ def register(app: Flask) -> None:
         return redirect("/settings")
 
     from .client_routes import register_client_routes
+    from .home_routes import register_home_routes
 
     register_client_routes(app)
+    register_home_routes(app)

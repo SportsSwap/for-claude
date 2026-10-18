@@ -53,6 +53,7 @@ Back to [[Tax Return Assistant]]
 - If Sawnx is killed in the middle of an import, the temporary copy can stay in the client's `_uploads` folder.
 
 ## Ideas
+- **Sawnx like FYI, stages 2-5:** cabinets and categories, document properties, an In Tray with suggested filing, versions; jobs and tasks; comments, notifications and time; knowledge and filing rules. Stage 1 (the look, Home, the document list) is built.
 - **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it. (`.\tra` already removed the activate step.)
 - **Sawnx**, a local FYI-style website instead of commands: **built 18 Oct 2026**. See [[How to run it]].
 - Company and trust returns.

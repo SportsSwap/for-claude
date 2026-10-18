@@ -64,3 +64,12 @@ document.querySelectorAll("[data-autosave]").forEach(function (el) {
     if (form) form.requestSubmit();
   });
 });
+
+// Document list: the heading checkbox ticks or clears every row.
+document.querySelectorAll("[data-tickall]").forEach(function (all) {
+  all.addEventListener("change", function () {
+    const table = all.closest("table");
+    if (!table) return;
+    table.querySelectorAll('tbody input[type="checkbox"][name="key"]').forEach(function (box) { box.checked = all.checked; });
+  });
+});

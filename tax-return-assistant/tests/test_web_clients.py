@@ -8,7 +8,7 @@ from tra.privacy.audit import AuditLog
 
 def test_empty_home_renders(tmp_path, monkeypatch):
     _app, client, _ = make_client(tmp_path, monkeypatch)
-    resp = client.get("/")
+    resp = client.get("/clients")
     assert resp.status_code == 200
     assert "No clients yet" in resp.get_data(as_text=True)
 
@@ -57,11 +57,11 @@ def test_list_shows_status_and_search(tmp_path, monkeypatch):
     _app, client, _ = make_client(tmp_path, monkeypatch)
     for code in ("TEST09", "SAMP01"):
         client.post("/clients/new", data={"code": code, "income_year": "2026"})
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/clients").get_data(as_text=True)
     assert "TEST09" in page and "SAMP01" in page and "New" in page
-    filtered = client.get("/?q=sam").get_data(as_text=True)
+    filtered = client.get("/clients?q=sam").get_data(as_text=True)
     assert "SAMP01" in filtered and "TEST09" not in filtered
-    by_status = client.get("/?status=Prepared").get_data(as_text=True)
+    by_status = client.get("/clients?status=Prepared").get_data(as_text=True)
     assert "TEST09" not in by_status
 
 

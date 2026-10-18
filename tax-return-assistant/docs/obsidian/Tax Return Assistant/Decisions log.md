@@ -56,6 +56,7 @@ A second Claude reviewed everything.
 - **AI reader:** Claude Opus 5.5 through Anthropic's official library (installed only if switched on), automatic fallback if a request is declined, only blanked-out text, everything it finds unconfirmed. **Off** until the privacy officer approves.
 - **Look:** the laptop's own fonts instead of the mockup's, because Sawnx fetches nothing from the internet.
 - **Client names (18 Oct 2026):** Sawnx shows, sorts and searches by name; the code is suggested from the surname (Jane Citizen → CITI01). Files, logs and workpapers still use only the code, so a stray file never says who the client is. Names live in one file, `clients.json`.
+- **FYI look, stage 1 (18 Oct 2026):** light pages with a dark top bar, Home (My Recent, My Starred), a Documents page, and one FYI-style document list (sort, filter, star, bulk download and move). FYI's layout and features, not its logo or colours. Next stages, one at a time: (2) FYI-style cabinets, document properties and an In Tray where the AI suggests where each document goes; (3) jobs and tasks; (4) comments, notifications and time; (5) knowledge and filing rules. Jobs, comments and approvals only really make sense if several people share Sawnx, which would be a bigger privacy and IT decision.
 - **Document summaries (18 Oct 2026):** every document gets an automatic summary (what it is, who issued it, the figures it supports) without any AI, plus a description box for my own notes. Both go into the workpaper's Sources tab as evidence.
 
 Related: [[How it works]], [[Privacy rules]]

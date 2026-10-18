@@ -1,6 +1,6 @@
 {% extends "client_base.html" %}
 {% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
-{% block actions %}<a class="btn" href="{{ base }}/files?import=1#import"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10" stroke="#0A0A0B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Import documents</a>{% endblock %}
+{% block actions %}<a class="btn" href="{{ base }}/files?import=1#import"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 11V3M4.5 6.5L8 3l3.5 3.5M3 13h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Import documents</a>{% endblock %}
 {% block tab %}
 <div class="cols">
   <section class="col-narrow" aria-label="Folders">
@@ -39,30 +39,8 @@
     </section>
     {% endif %}
 
-    <section class="card tblwrap" aria-label="Documents">
-      {% if docs %}
-      <table class="docs">
-        <thead><tr><th>Document</th><th>Folder</th><th>Read</th><th class="num">Blanked</th></tr></thead>
-        <tbody>
-        {% for d in docs %}
-          <tr class="{{ 'sel' if view and view.doc_id == d.doc_id }}">
-            <td><a class="mono" href="{{ base }}/files?{{ 'folder=' ~ folder|urlencode ~ '&' if folder }}view={{ d.doc_id }}">{{ d.filed_name }}</a>
-              <div class="muted small">{{ d.doc_id }}{{ ' · in FYI' if d.store == 'fyi' }} · {{ summaries.get(d.doc_id, '') }}</div>
-              {% if descriptions.get(d.doc_id) %}<div class="small">{{ descriptions[d.doc_id].text }}</div>{% endif %}</td>
-            <td>{{ d.category }}</td>
-            <td>{% if d.parse_status == 'parsed' %}<span class="badge"><span class="dot ok"></span>Read</span>
-                {% elif d.parse_status == 'partial' %}<span class="badge"><span class="dot warn"></span>Partly read</span>
-                {% elif d.parse_status == 'stored' %}<span class="badge"><span class="dot off"></span>Not read</span>
-                {% else %}<span class="badge"><span class="dot warn"></span>Enter by hand</span>{% endif %}</td>
-            <td class="num mono muted">{{ d.redaction_counts.values()|sum if d.parse_status != 'stored' else '–' }}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p class="empty">No documents {{ 'in ' ~ folder if folder else 'yet' }}. Use <strong>Import documents</strong> to add some.</p>
-      {% endif %}
-    </section>
+    {% set hide_client = True %}
+    {% include "_doclist.html" %}
 
     {% if view %}
     <section class="card pad stack" aria-label="Document viewer">
@@ -104,7 +82,7 @@
         {% endfor %}
       </fieldset>
       <div class="dropzone" data-dropzone>
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 18V6M9 11l5-5 5 5M5 22h18" stroke="#7DD3C0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M14 18V6M9 11l5-5 5 5M5 22h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <label for="files">Drop files here or <span class="link">choose files</span></label>
         <input id="files" name="files" type="file" multiple accept=".pdf,.csv,.xlsx,.json,.docx,.jpg,.jpeg,.png,.eml,.msg">
         <span class="muted small">PDF, Excel, CSV and JSON can be read. Store only also takes Word, photos and emails.</span>

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Documents{% endblock %}
+{% block content %}
+<div class="heading">
+  <div><h1>Documents</h1><span class="muted">Every filed document, across all clients and years</span></div>
+</div>
+<p id="import-help" class="muted small">To import documents, open the client (Clients, or search above) and use <strong>Import documents</strong> on its Files tab.</p>
+{% include "_doclist.html" %}
+{% endblock %}

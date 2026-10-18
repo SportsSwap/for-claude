@@ -57,7 +57,7 @@ def test_prepare_error_shown(tmp_path, monkeypatch):
 
 def test_client_list_shows_estimate_and_high_notes(tmp_path, monkeypatch):
     client, _settings, _ws = _prepared(tmp_path, monkeypatch)
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/clients").get_data(as_text=True)
     assert "Refund $993.25" in page and "Prepared" in page
 
 
@@ -67,6 +67,6 @@ def test_cli_prepare_shows_in_sawnx(tmp_path, monkeypatch):
     ws = build_test01(settings)
     prepare_client(ws, AuditLog(ws.audit_path), "tester")
     assert load_summary(ws).net == Decimal("-993.25")
-    page = client.get("/").get_data(as_text=True)
+    page = client.get("/clients").get_data(as_text=True)
     assert "Refund $993.25" in page
     assert "$993.25" in client.get("/c/TEST01/2026/prepare").get_data(as_text=True)

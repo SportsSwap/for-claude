@@ -1,0 +1,78 @@
+{# The FYI-style document list. Needs: rows, total, args, sort, desc, sort_url, here, clients, years, folders, kinds.
+   Optional: hide_client (on a client's own page), folders_for_move. #}
+{% macro head(label, column, cls='') -%}
+<th class="{{ cls }}" aria-sort="{{ ('descending' if desc else 'ascending') if sort == column else 'none' }}">
+  <a class="sortlink" href="{{ sort_url(column) }}">{{ label }}{% if sort == column %}<span aria-hidden="true">{{ ' ↓' if desc else ' ↑' }}</span>{% endif %}</a>
+</th>
+{%- endmacro %}
+<section class="doclist" aria-label="Documents">
+  <form class="dl-toolbar" method="get" action="{{ here.split('?')[0] }}">
+    {% if request.args.get('tab') %}<input type="hidden" name="tab" value="{{ request.args.get('tab') }}">{% endif %}
+    {% for k in ('view',) %}{% if request.args.get(k) %}<input type="hidden" name="{{ k }}" value="{{ request.args.get(k) }}">{% endif %}{% endfor %}
+    <label class="visually-hidden" for="dlq">Search documents</label>
+    <input id="dlq" class="dl-search" type="search" name="q" value="{{ args.q }}" placeholder="Search documents">
+    {% if not hide_client %}
+    <label class="visually-hidden" for="dlc">Client</label>
+    <select id="dlc" name="client"><option value="">All clients</option>{% for code, name in clients %}<option value="{{ code }}" {{ 'selected' if args.client == code }}>{{ name }}</option>{% endfor %}</select>
+    <label class="visually-hidden" for="dly">Year</label>
+    <select id="dly" name="year"><option value="">All years</option>{% for y in years %}<option value="{{ y }}" {{ 'selected' if args.year == y|string }}>FY{{ y }}</option>{% endfor %}</select>
+    {% endif %}
+    <label class="visually-hidden" for="dlf">Folder</label>
+    <select id="dlf" name="folder"><option value="">All folders</option>{% for f in folder_options %}<option {{ "selected" if args.folder == f }}>{{ f }}</option>{% endfor %}</select>
+    <label class="visually-hidden" for="dlk">Type</label>
+    <select id="dlk" name="kind"><option value="">All types</option>{% for k in kinds %}<option {{ 'selected' if args.kind == k }}>{{ k }}</option>{% endfor %}</select>
+    <button class="btn-ghost" type="submit">Filter</button>
+    <span class="dl-count">{{ rows|length }} row{{ '' if rows|length == 1 else 's' }}</span>
+    <a class="iconbtn dark" href="{{ here }}" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.5-3.6M13 2.5v3h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </form>
+
+  <form method="post" class="dl-bulk" id="bulk">
+    <input type="hidden" name="next" value="{{ here }}">
+    <div class="dl-actions" role="group" aria-label="With ticked documents">
+      <button class="btn-ghost" type="submit" formaction="/stars" name="action" value="star">Star</button>
+      <button class="btn-ghost" type="submit" formaction="/stars" name="action" value="unstar">Unstar</button>
+      <button class="btn-ghost" type="submit" formaction="/download">Download</button>
+      {% if folders_for_move %}
+      <label class="visually-hidden" for="mvto">Move to folder</label>
+      <select id="mvto" name="folder">{% for f in folders_for_move %}<option>{{ f }}</option>{% endfor %}</select>
+      <button class="btn-ghost" type="submit" formaction="/move">Move</button>
+      {% endif %}
+    </div>
+    <div class="tblwrap card">
+      {% if rows %}
+      <table class="docs">
+        <thead><tr>
+          <th class="tick"><input type="checkbox" data-tickall aria-label="Tick all"></th>
+          <th class="tick"><span class="visually-hidden">Starred</span></th>
+          {{ head('Name', 'name') }}
+          {% if not hide_client %}{{ head('Client', 'client') }}{{ head('Year', 'year') }}{% endif %}
+          {{ head('Folder', 'folder') }}
+          <th>Summary</th>
+          {{ head('Last change', 'changed') }}
+        </tr></thead>
+        <tbody>
+        {% for r in rows %}
+          <tr class="{{ 'sel' if request.args.get('view') == r.doc_id and hide_client }}">
+            <td class="tick"><input type="checkbox" name="key" value="{{ r.key }}" aria-label="Tick {{ r.filed_name }}"></td>
+            <td class="tick"><button class="star {{ 'on' if r.starred }}" type="submit" form="star-{{ loop.index }}" aria-label="{{ 'Unstar' if r.starred else 'Star' }} {{ r.filed_name }}" aria-pressed="{{ 'true' if r.starred else 'false' }}">{{ '★' if r.starred else '☆' }}</button></td>
+            <td class="namecell"><span class="fileicon ext-{{ r.ext }}" aria-hidden="true">{{ r.ext|upper }}</span><a href="/c/{{ r.code }}/{{ r.income_year }}/files?view={{ r.doc_id }}">{{ r.filed_name }}</a>
+              {% if r.description %}<div class="small">{{ r.description }}</div>{% endif %}</td>
+            {% if not hide_client %}<td><a href="/c/{{ r.code }}/{{ r.income_year }}/files">{{ r.client }}</a></td><td class="mono">FY{{ r.income_year }}</td>{% endif %}
+            <td>{{ r.folder }}</td>
+            <td class="summary"><span class="clamp" title="{{ r.summary }}">{{ r.summary }}</span></td>
+            <td class="nowrap">{{ r.last_change.strftime('%d %b %Y %H:%M') }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty">{{ 'No documents match.' if total else 'No documents yet. Set up a client, then import documents on its Files tab.' }}</p>
+      {% endif %}
+    </div>
+  </form>
+  {% for r in rows %}
+  <form id="star-{{ loop.index }}" method="post" action="/stars" hidden>
+    <input type="hidden" name="key" value="{{ r.key }}"><input type="hidden" name="action" value="{{ 'unstar' if r.starred else 'star' }}"><input type="hidden" name="next" value="{{ here }}">
+  </form>
+  {% endfor %}
+</section>

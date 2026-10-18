@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+{% block content %}
+<h1>Help</h1>
+<section class="card pad stack prose">
+  <h2>Doing a return in Sawnx</h2>
+  <ol>
+    <li><strong>New client</strong> (the green + at the top): the client's name; the code is suggested from the surname.</li>
+    <li><strong>Files → Import documents</strong>: Individual, then for each file <em>Read for the return</em> or <em>Store only</em>. Numbers like TFNs are blanked out the moment a file is read.</li>
+    <li><strong>Figures</strong>: tick Confirmed for each figure once you've checked it against the document beside it.</li>
+    <li><strong>Prepare</strong>: one button. It shows the refund or payable and both calculations, and makes the Excel workpaper.</li>
+    <li><strong>Review notes</strong>: answer each note, tick Resolved, then <strong>Mark reviewed</strong>. A registered tax agent signs the workpaper's Cover tab. Nothing is ever lodged from Sawnx.</li>
+  </ol>
+  <h2>Finding things</h2>
+  <ul>
+    <li><strong>Home → My Recent</strong> lists documents by when they were filed or last described. Star the ones you're working on; they appear under <strong>My Starred</strong>.</li>
+    <li><strong>Documents</strong> lists everything. Click a column heading to sort; use the filters to narrow it down.</li>
+    <li>Tick several documents to star, download or move them together (moving works within one client and year).</li>
+  </ul>
+  <h2>Privacy</h2>
+  <p>Sawnx runs only on this laptop. Client names appear on screen, but files, folders, logs and workpapers use the client code. If Sawnx ever refuses to save something because it looks like a TFN or account number, tell the privacy officer.</p>
+</section>
+{% endblock %}

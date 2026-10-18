@@ -48,10 +48,15 @@ def base_url(ws: Workspace) -> str:
 def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=None, status: int = 200):
     names = folder_names(ws)
     folder = folder if folder in names else None
+    from .home_routes import doclist_context
+    from .services.doclist import all_documents
+
+    rows = all_documents(ws.tra_home, code=ws.client_code, income_year=ws.income_year)
+    listing = doclist_context(rows, f"{base_url(ws)}/files", fixed={"client": "", "year": "", "folder": folder or ""})
     return render_template("client_files.html", **client_context(ws, "files"), folders=folders(ws), folder=folder,
-                           docs=documents(ws, folder), view=find_document(ws, view_id), folder_names=names,
-                           doc_types=load_doc_types(), results=results, return_types=RETURN_TYPES,
-                           summaries=summaries(ws), descriptions=load_doc_notes(ws)), status
+                           view=find_document(ws, view_id), folder_names=names, doc_types=load_doc_types(),
+                           results=results, return_types=RETURN_TYPES, summaries=summaries(ws),
+                           descriptions=load_doc_notes(ws), total=len(rows), folders_for_move=names, **listing), status
 
 
 def register_client_routes(app: Flask) -> None:

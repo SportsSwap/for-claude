@@ -209,6 +209,14 @@ and figures.csv with no AI: type, issuer, date, and the figures it supports with
 (`doc_notes.json`, through the output guard). Both show on the Files tab and in new Summary and Description columns of
 the workpaper's Sources tab, as the evidence trail.
 
+**FYI-style layout, stage 1 (18 Oct 2026).** Light theme with a dark top bar (Home, Clients, Documents, Settings,
+search, a green + menu, help, a "Local only" badge), in Sawnx's own colours, not FYI's branding. Home has My Recent
+and My Starred. One shared document list (Home, Documents, a client's Files tab): sortable columns, filters by client,
+year, folder and type, a search box, stars (`TRA_HOME\sawnx_stars.json`), and bulk star, download (zip) and move
+(within one client and year). The client list moved to /clients. Later stages, each designed separately: (2) clients and
+documents like FYI (cabinets and categories, document properties, an In Tray with suggested filing, versions);
+(3) jobs and tasks; (4) comments, notifications and time; (5) knowledge and filing automations.
+
 ## 13. Open items
 
 - Privacy officer approval before the AI reader is switched on (and the README privacy table updated when it is).

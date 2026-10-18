@@ -3,13 +3,13 @@
 {% block title %}Clients{% endblock %}
 {% block content %}
 <div class="topbar">
-  <form class="search" method="get" action="/" role="search">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="#A1A1A8" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="#A1A1A8" stroke-width="1.5" stroke-linecap="round"/></svg>
+  <form class="search" method="get" action="/clients" role="search">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     <label for="q" class="visually-hidden">Search by name or code</label>
     <input id="q" name="q" type="search" placeholder="Search by name or code" value="{{ q }}">
     {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
   </form>
-  <a class="btn" href="/clients/new"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="#0A0A0B" stroke-width="1.8" stroke-linecap="round"/></svg>New client</a>
+  <a class="btn" href="/clients/new"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>New client</a>
 </div>
 
 <div class="heading">
@@ -18,9 +18,9 @@
     <span class="muted">{{ total }} job{{ '' if total == 1 else 's' }} · drafts only, nothing is lodged</span>
   </div>
   <div class="actions" role="group" aria-label="Filter by status">
-    <a class="btn-ghost {{ 'on' if not status }}" href="/{{ '?q=' ~ q if q }}">All</a>
+    <a class="btn-ghost {{ 'on' if not status }}" href="/clients{{ '?q=' ~ q if q }}">All</a>
     {% for s in statuses[1:] %}
-    <a class="btn-ghost {{ 'on' if status == s }}" href="/?status={{ s|urlencode }}{{ '&q=' ~ q if q }}">{{ s }}</a>
+    <a class="btn-ghost {{ 'on' if status == s }}" href="/clients?status={{ s|urlencode }}{{ '&q=' ~ q if q }}">{{ s }}</a>
     {% endfor %}
   </div>
 </div>
@@ -28,7 +28,7 @@
 <section class="card counters" aria-label="Jobs by status">
   {% set most = (counts.values()|max) or 1 %}
   {% for s in statuses %}
-  <a class="counter s-{{ s|lower|replace(' ', '-') }}" href="/?status={{ s|urlencode }}">
+  <a class="counter s-{{ s|lower|replace(' ', '-') }}" href="/clients?status={{ s|urlencode }}">
     <span class="muted small">{{ s }}</span>
     <span class="n">{{ counts[s] }}</span>
     <progress max="{{ most }}" value="{{ counts[s] }}" aria-label="{{ counts[s] }} {{ s }}"></progress>
@@ -57,7 +57,7 @@
     </tbody>
   </table>
   {% elif total %}
-  <p class="empty">No clients match. <a href="/">Show all</a></p>
+  <p class="empty">No clients match. <a href="/clients">Show all</a></p>
   {% else %}
   <p class="empty">No clients yet. Use <strong>New client</strong> to set one up, or run <span class="mono">.\tra demo</span> for a practice client.</p>
   {% endif %}

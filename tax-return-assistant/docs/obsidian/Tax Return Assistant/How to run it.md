@@ -26,7 +26,9 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 ## Sawnx: click instead of typing (built 18 Oct 2026)
 - **Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in the tool folder, or type `.\tra web`. A black window opens and Sawnx opens in the browser. Close the black window to stop it.
 - It runs **only on this laptop**. Other computers can't reach it and nothing goes on the internet.
-- **Clients:** every job and where it's up to. **New client** sets one up.
+- **Looks like FYI:** a dark top bar (Home, Clients, Documents, Settings), search, and the green **+** for a new client.
+- **Home:** My Recent and My Starred documents. **Documents:** everything, sortable and filterable; tick several to star, download or move.
+- **Clients:** every client by name and where their job is up to.
 - **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
 - **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.
 - **Prepare:** one button; shows the refund or payable and both calculations; download the workpaper.
