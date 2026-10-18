@@ -28,6 +28,7 @@ from ..privacy.guard import atomic_write_text, check_value
 from ..settings import Settings, validate_client_code
 from ..workspace import Workspace
 from .client_names import load_names
+from .rules import match_rule
 from .services.imports import READ_TYPES, STORE_TYPES, ImportOutcome, _store_only
 
 LOCATION = "tray.json"
@@ -123,9 +124,16 @@ def _suggest(path: Path, tra_home: Path) -> tuple[bool, list[str], dict]:
     if year is None and code:
         year = years[code][0]
     preview = [line.strip()[:120] for line in text.splitlines() if line.strip()][:PREVIEW_LINES]
-    return True, preview, {"code": code, "cabinet": "Tax return", "year": year,
-                           "folder": doc_types[doc_type].category, "doc_type": doc_type,
-                           "mode": "store" if doc_type == "OTHER" else "read"}
+    suggestion = {"code": code, "cabinet": "Tax return", "year": year, "folder": doc_types[doc_type].category,
+                  "doc_type": doc_type, "mode": "store" if doc_type == "OTHER" else "read"}
+    rule = match_rule(tra_home, text)
+    if rule:
+        suggestion.update(code=rule["code"], cabinet=rule["cabinet"], folder=rule["folder"])
+        if rule["cabinet"] != "Tax return":
+            suggestion["mode"] = "store"
+        elif suggestion["year"] is None:
+            suggestion["year"] = years.get(rule["code"], [None])[0]
+    return True, preview, suggestion
 
 
 def add_to_tray(tra_home: Path, source: Path, by: str, audit: AuditLog) -> TrayItem:

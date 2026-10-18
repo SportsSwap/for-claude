@@ -27,6 +27,7 @@ from ..doc_props import set_properties
 from ..versions import add_version, list_versions, version_path
 from ..doc_summary import summaries
 from .client_names import load_names, set_name
+from .comments import list_comments
 from .client_notes import add_note, delete_note, edit_note, list_notes
 from .messages import problem_text
 from .routes import audit_for, settings
@@ -83,7 +84,11 @@ def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=N
                            descriptions=load_doc_notes(space), total=len(rows), folders_for_move=names,
                            space=space, cabinet=getattr(space, "cabinet", "Tax return"), cabq=cab_q(space),
                            cab=getattr(space, "code", ""), statuses=STATUSES,
-                           versions=list_versions(space, view_id) if view_id else [], **listing), status
+                           versions=list_versions(space, view_id) if view_id else [],
+                           doc_key=f"{ws.client_code}/{getattr(space, 'code', None) or ws.income_year}/{view_id}",
+                           doc_comments=list_comments(ws.tra_home, ws.client_code,
+                                                      f"doc:{ws.client_code}/{getattr(space, 'code', None) or ws.income_year}/{view_id}")
+                           if view_id else [], **listing), status
 
 
 def register_client_routes(app: Flask) -> None:

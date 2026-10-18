@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}{{ job.name }}{% endblock %}
+{% block content %}
+<a class="back" href="/jobs">← Jobs</a>
+<div class="heading">
+  <div>
+    <div class="title-row"><h1>{{ job.name }}</h1><span class="badge">{{ job.status }}</span>{% if job.overdue %}<span class="badge high">Overdue</span>{% endif %}</div>
+    <span class="muted">{% if link_year %}<a href="/c/{{ job.code }}/{{ job.income_year or link_year }}/files">{{ client }}</a>{% else %}{{ client }}{% endif %} · {{ job.code }}</span>
+  </div>
+  {% if job.kind == 'return' %}<div class="actions"><a class="btn" href="/c/{{ job.code }}/{{ job.income_year }}/prepare">Open the return</a></div>{% endif %}
+</div>
+<div class="cols">
+  <div class="col-wide stack">
+    <form class="card pad props" method="post" action="/jobs/{{ job.id }}" aria-label="Job details">
+      {% if job.kind == 'custom' %}
+      <label class="field"><span>Status</span><select name="status">{% for s in statuses %}<option {{ 'selected' if s == job.status }}>{{ s }}</option>{% endfor %}</select></label>
+      {% else %}
+      <p class="small muted">The status follows the return: {{ job.status }}.</p>
+      {% endif %}
+      <label class="field"><span>Due</span><input type="date" name="due" value="{{ job.due.isoformat() if job.due else '' }}"></label>
+      <label class="field"><span>Assigned to</span><input type="text" name="assignee" maxlength="80" value="{{ job.assignee }}"></label>
+      <label class="field"><span>Notes</span><input type="text" name="notes" maxlength="300" value="{{ job.notes }}"></label>
+      <div class="actions"><button class="btn-ghost" type="submit">Save</button></div>
+    </form>
+
+    <section class="card" aria-labelledby="t-title">
+      <div class="card-head"><h2 id="t-title">Tasks</h2></div>
+      {% for t in tasks %}
+      <div class="result">
+        <form class="actions" method="post" action="/tasks/{{ t.id }}/done">
+          <input type="hidden" name="next" value="/jobs/{{ job.id }}">
+          {% if not t.done %}<input type="hidden" name="done" value="on">{% endif %}
+          <button class="star {{ 'on' if t.done }}" type="submit" aria-label="{{ 'Reopen' if t.done else 'Mark done' }}: {{ t.title }}">{{ '☑' if t.done else '☐' }}</button>
+          <span class="{{ 'muted' if t.done }}">{{ t.title }}</span>
+          <span class="muted small {{ 'high' if t.overdue }}">{{ t.assignee or 'Anyone' }}{{ ' · due ' ~ t.due_date.strftime('%d %b') if t.due_date }}</span>
+        </form>
+      </div>
+      {% else %}
+      <p class="empty">No tasks yet.</p>
+      {% endfor %}
+      <form class="pad-inner props" method="post" action="/jobs/{{ job.id }}/tasks">
+        <label class="field"><span>New task</span><input type="text" name="title" maxlength="300" required></label>
+        <label class="field"><span>Due</span><input type="date" name="due"></label>
+        <label class="field"><span>Assign to</span><input type="text" name="assignee" maxlength="80"></label>
+        <div class="actions"><button class="btn-ghost" type="submit">Add task</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="col-side stack">
+    <section class="card pad stack" aria-labelledby="c-title">
+      <h2 id="c-title">Comments</h2>
+      {% for c in comments %}
+      <div class="filenote"><span class="muted small">{{ c.by }} · {{ c.at[:16]|replace('T', ' ') }}</span><span>{{ c.text }}</span></div>
+      {% else %}
+      <p class="muted">No comments yet.</p>
+      {% endfor %}
+      <form class="stack" method="post" action="/comments">
+        <input type="hidden" name="code" value="{{ job.code }}"><input type="hidden" name="target" value="job:{{ job.id }}"><input type="hidden" name="next" value="/jobs/{{ job.id }}">
+        <label class="field" for="jc-text"><span>Add a comment</span><textarea id="jc-text" name="text" maxlength="1000" required></textarea></label>
+        <div class="actions"><button class="btn-ghost" type="submit">Comment</button></div>
+      </form>
+    </section>
+    <section class="card pad stack" aria-labelledby="tm-title">
+      <h2 id="tm-title">Time <span class="muted small">{{ total_minutes // 60 }}h {{ total_minutes % 60 }}m</span></h2>
+      {% for e in time %}
+      <div class="act"><span class="when">{{ e.date }}</span><span>{{ e.minutes }} min · {{ e.what }} <span class="muted">({{ e.by }})</span></span></div>
+      {% endfor %}
+      <form class="props" method="post" action="/jobs/{{ job.id }}/time">
+        <label class="field"><span>Date</span><input type="date" name="date" required></label>
+        <label class="field"><span>Minutes</span><input type="number" name="minutes" min="1" max="1440" required></label>
+        <label class="field"><span>What</span><input type="text" name="what" maxlength="300"></label>
+        <div class="actions"><button class="btn-ghost" type="submit">Record time</button></div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

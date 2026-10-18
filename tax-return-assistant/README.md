@@ -88,7 +88,9 @@ Sawnx does everything below by clicking instead of typing commands. It opens in 
 |---|---|
 | Top bar | Home, Clients, Documents, Settings; a search box for clients or documents; the green **+** for New client; **?** for help. Laid out like FYI, in Sawnx's own colours. |
 | In Tray | Drop in documents for any client. Sawnx reads each one (identifiers blanked first) and suggests the client (by finding a client's name in it), cabinet, folder, type and year; you check, change and **File**, or **Discard**. Nothing is filed without you. |
-| Home | **My Recent** (documents most recently filed or described, across all clients) and **My Starred**. |
+| Home | **My Recent**, **My Tasks**, **Delegated Tasks**, **My Starred**, **My Time** (this week) and **Notifications** (tasks and jobs due, the In Tray, colleagues' comments). |
+| Jobs | Every client's "Individual tax return FY…" job (its status follows the return) plus jobs you add (BAS, advice...), with due dates, who it's assigned to, notes, tasks, comments and time recorded against it. |
+| Knowledge | The firm's templates, policies and procedures, in folders. Firm documents only, never client documents. |
 | Documents | Every document across all clients and years. Click a heading to sort; filter by client, year, folder or type; tick several to star, download or move them. |
 | Clients | Every client by **name** (with its code), sorted by name, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. Search by name or code. **New client** asks for the name and suggests a code from the surname (Jane Citizen → CITI01). |
 | Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. **Cabinets** like FYI: *Tax return* (per year, as above), *Permanent* and *Correspondence* (per client, stored only, never read). Open a document to edit its **properties** (type, folder, date, status) and to **upload a new version**; older copies stay listed. |
@@ -96,7 +98,7 @@ Sawnx does everything below by clicking instead of typing commands. It opens in 
 | Prepare | Prepares the return (as `tra prepare`), shows the estimate and both calculations side by side, and lists every workpaper to download. |
 | Review notes | Each note with a response box and a Resolved tick. Responses go into the Response column of the next workpaper. **Mark reviewed** once every High note is resolved. |
 | Notes | Your own file notes about the client, and an activity list from the audit log. |
-| Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero. |
+| Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero, and **filing rules** ("if a document mentions X, suggest client Y, cabinet Z, folder W"; suggestions only). |
 
 **The AI reader is built in but switched off.** If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `ANTHROPIC_API_KEY` set for the Windows account and `.\.venv\Scripts\pip install -e ".[ai]"`.
 
@@ -308,7 +310,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 445 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 459 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.

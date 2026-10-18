@@ -129,6 +129,7 @@ def register(app: Flask) -> None:
     def settings_page():
         from .app_settings import load_app_settings
         from .context import unverified_years
+        from .work_routes import rules_context
 
         s = settings()
         env = os.environ
@@ -139,7 +140,8 @@ def register(app: Flask) -> None:
                                store=s.store, fyi_ready=fyi_ready, xero_ready=bool(env.get("XERO_CLIENT_ID")
                                                                                   or saved_user_variable("XERO_CLIENT_ID")),
                                key_set=bool((env.get("ANTHROPIC_API_KEY") or "").strip()), years=years,
-                               unverified=unverified_years(years), port=current_app.config["SAWNX"]["port"])
+                               unverified=unverified_years(years), port=current_app.config["SAWNX"]["port"],
+                               **rules_context(s.tra_home))
 
     @app.post("/settings/ai-reader")
     def settings_ai_reader():
@@ -164,7 +166,9 @@ def register(app: Flask) -> None:
 
     from .client_routes import register_client_routes
     from .home_routes import register_home_routes, register_intray_routes
+    from .work_routes import register_work_routes
 
     register_client_routes(app)
     register_home_routes(app)
     register_intray_routes(app)
+    register_work_routes(app)

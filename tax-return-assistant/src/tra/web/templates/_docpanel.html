@@ -54,4 +54,16 @@
   {% else %}
   <p class="muted">This file can't be shown here. Use <strong>Open</strong> to download it.</p>
   {% endif %}
+  <div class="versions">
+    <h3 class="small muted">Comments</h3>
+    {% for c in doc_comments %}
+    <div class="filenote"><span class="muted small">{{ c.by }} · {{ c.at[:16]|replace('T', ' ') }}</span><span>{{ c.text }}</span></div>
+    {% endfor %}
+    <form class="actions" method="post" action="/comments">
+      <input type="hidden" name="code" value="{{ client.code }}"><input type="hidden" name="target" value="doc:{{ doc_key }}"><input type="hidden" name="next" value="{{ base }}/files?{{ cabq }}view={{ view.doc_id }}">
+      <label class="visually-hidden" for="doc-comment">Comment on this document</label>
+      <input id="doc-comment" type="text" name="text" maxlength="1000" placeholder="Comment on this document" required>
+      <button class="btn-ghost" type="submit">Comment</button>
+    </form>
+  </div>
 </section>

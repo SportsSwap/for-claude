@@ -1,10 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
+{% macro tasklist(tasks, empty) -%}
+<section class="card tblwrap">
+  {% if tasks %}
+  <table class="docs">
+    <thead><tr><th class="tick"><span class="visually-hidden">Done</span></th><th>Task</th><th>Job</th><th>Assigned to</th><th>Due</th></tr></thead>
+    <tbody>
+    {% for t in tasks %}
+      <tr>
+        <td class="tick"><form method="post" action="/tasks/{{ t.id }}/done"><input type="hidden" name="next" value="/?tab={{ tab }}"><input type="hidden" name="done" value="on"><button class="star" type="submit" aria-label="Mark {{ t.title }} done">☐</button></form></td>
+        <td class="wrap">{{ t.title }}</td>
+        <td>{% if t.job_id %}<a href="/jobs/{{ t.job_id }}">{{ job_names.get(t.job_id, t.job_id) }}</a>{% else %}<span class="muted">–</span>{% endif %}</td>
+        <td>{{ t.assignee or 'Anyone' }}</td>
+        <td class="nowrap {{ 'high' if t.overdue }}">{{ t.due_date.strftime('%d %b %Y') if t.due_date else '–' }}{{ ' · overdue' if t.overdue }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">{{ empty }}</p>
+  {% endif %}
+</section>
+{%- endmacro %}
 {% block content %}
 <h1>Home</h1>
 <nav class="tabs" aria-label="Home sections">
   <a href="/" class="{{ 'on' if tab == 'recent' }}" {{ 'aria-current=page' if tab == 'recent' }}>My Recent <span class="count">{{ total }}</span></a>
+  <a href="/?tab=tasks" class="{{ 'on' if tab == 'tasks' }}" {{ 'aria-current=page' if tab == 'tasks' }}>My Tasks <span class="count">{{ my_tasks|length }}</span></a>
+  <a href="/?tab=delegated" class="{{ 'on' if tab == 'delegated' }}" {{ 'aria-current=page' if tab == 'delegated' }}>Delegated Tasks <span class="count">{{ delegated|length }}</span></a>
   <a href="/?tab=starred" class="{{ 'on' if tab == 'starred' }}" {{ 'aria-current=page' if tab == 'starred' }}>My Starred <span class="count">{{ starred_count }}</span></a>
+  <a href="/?tab=time" class="{{ 'on' if tab == 'time' }}" {{ 'aria-current=page' if tab == 'time' }}>My Time <span class="count">{{ (week_minutes / 60)|round(1) }}h</span></a>
+  <a href="/?tab=notifications" class="{{ 'on' if tab == 'notifications' }}" {{ 'aria-current=page' if tab == 'notifications' }}>Notifications <span class="count">{{ notes|length }}</span></a>
 </nav>
+
+{% if tab in ('recent', 'starred') %}
 {% include "_doclist.html" %}
+
+{% elif tab == 'tasks' %}
+<form id="new-task" class="card pad props" method="post" action="/tasks" aria-label="New task">
+  <input type="hidden" name="next" value="/?tab=tasks">
+  <label class="field"><span>New task</span><input type="text" name="title" maxlength="300" required placeholder="e.g. Ask for the pre-fill report"></label>
+  <label class="field"><span>Due</span><input type="date" name="due"></label>
+  <label class="field"><span>Assign to (blank = me)</span><input type="text" name="assignee" maxlength="80"></label>
+  <div class="actions"><button class="btn" type="submit">Add task</button></div>
+</form>
+<p class="muted small">Tasks assigned to you ({{ user }}) or to nobody. Add tasks for a client from its job on the Jobs page.</p>
+{{ tasklist(my_tasks, 'Nothing to do. Nice.') }}
+
+{% elif tab == 'delegated' %}
+<p class="muted small">Open tasks assigned to someone else.</p>
+{{ tasklist(delegated, 'No tasks assigned to anyone else.') }}
+
+{% elif tab == 'time' %}
+<section class="card tblwrap" aria-label="My time this week">
+  <div class="card-head"><h2>This week</h2><span class="muted">{{ week_minutes // 60 }}h {{ week_minutes % 60 }}m</span></div>
+  {% if week %}
+  <table class="docs">
+    <thead><tr><th>Date</th><th>Job</th><th class="num">Minutes</th><th>What</th></tr></thead>
+    <tbody>{% for e in week %}<tr><td class="nowrap">{{ e.date }}</td><td><a href="/jobs/{{ e.job_id }}">{{ job_names.get(e.job_id, e.job_id) }}</a></td><td class="num mono">{{ e.minutes }}</td><td class="wrap">{{ e.what }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}
+  <p class="empty">No time recorded this week. Record time on a job's page.</p>
+  {% endif %}
+</section>
+
+{% else %}
+<section class="card" aria-label="Notifications">
+  {% for n in notes %}
+  <div class="result"><a href="{{ n.link }}">{{ n.text }}</a><span class="muted small">{{ {'overdue': 'Overdue', 'today': 'Due today', 'intray': 'In Tray', 'comment': 'Comment'}[n.kind] }}</span></div>
+  {% else %}
+  <p class="empty">Nothing needs your attention.</p>
+  {% endfor %}
+</section>
+{% endif %}
 {% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Knowledge{% endblock %}
+{% block content %}
+<div class="heading">
+  <div><h1>Knowledge</h1><span class="muted">The firm's own templates, policies and procedures, for everyone to use.</span></div>
+</div>
+<div class="banner" role="note"><span>For firm documents only, not client documents. Client documents belong in the client's cabinets, where they're filed by client code.</span></div>
+<div class="cols">
+  <section class="col-narrow" aria-label="Folders">
+    <div class="folders">
+      <span class="muted small">Folders</span>
+      <a class="folder {{ 'on' if not folder }}" href="/knowledge"><span>All</span><span class="mono muted">{{ counts.values()|sum }}</span></a>
+      {% for f in folders %}<a class="folder {{ 'on' if folder == f }}" href="/knowledge?folder={{ f|urlencode }}"><span>{{ f }}</span><span class="mono muted">{{ counts[f] }}</span></a>{% endfor %}
+    </div>
+  </section>
+  <div class="col-wide stack">
+    <section class="card tblwrap" aria-label="Knowledge documents">
+      {% if docs %}
+      <table class="docs">
+        <thead><tr><th>Name</th><th>Folder</th><th>Added</th></tr></thead>
+        <tbody>
+        {% for d in docs|sort(attribute='filed_name') %}
+          <tr><td class="namecell"><span class="fileicon ext-{{ d.filed_name.rsplit('.', 1)[-1]|lower }}" aria-hidden="true">{{ d.filed_name.rsplit('.', 1)[-1]|upper }}</span><a href="/knowledge/{{ d.doc_id }}" target="_blank" rel="noopener">{{ d.filed_name }}</a></td><td>{{ d.category }}</td><td class="nowrap">{{ d.ingested_at.strftime('%d %b %Y') }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty">Nothing here yet.</p>
+      {% endif %}
+    </section>
+    <form class="card pad props" method="post" action="/knowledge" enctype="multipart/form-data" aria-label="Add to Knowledge">
+      <label class="field"><span>Files</span><input type="file" name="files" multiple accept=".pdf,.docx,.xlsx,.csv,.jpg,.jpeg,.png,.eml,.msg,.json"></label>
+      <label class="field"><span>Folder</span><select name="folder">{% for f in folders %}<option {{ 'selected' if f == (folder or 'Templates') }}>{{ f }}</option>{% endfor %}</select></label>
+      <div class="actions"><button class="btn" type="submit">Add</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

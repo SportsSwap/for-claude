@@ -30,6 +30,8 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - **Home:** My Recent and My Starred documents. **Documents:** everything, sortable and filterable; tick several to star, download or move.
 - **Clients:** every client by name and where their job is up to.
 - **In Tray:** drop in documents for any client; Sawnx suggests who and where (client, cabinet, folder, year). Check it, then **File**.
+- **Jobs:** every client has a tax return job each year; add your own (BAS, advice...) with due dates, tasks, comments and time. **Home** shows My Tasks, Delegated Tasks, My Time and Notifications.
+- **Knowledge:** the firm's templates and policies (never client documents). **Settings → Filing rules** teach the In Tray where documents usually go.
 - **Cabinets:** each client has *Tax return* (per year), *Permanent* and *Correspondence*, like FYI. Open a document to change its type, folder, date or status, or upload a newer version (older ones are kept).
 - **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
 - **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.

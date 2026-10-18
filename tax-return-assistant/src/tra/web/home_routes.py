@@ -58,10 +58,23 @@ def _keys() -> list[str]:
 def register_home_routes(app: Flask) -> None:
     @app.get("/")
     def home():
-        rows = all_documents(settings().tra_home)
-        tab = "starred" if request.args.get("tab") == "starred" else "recent"
+        import getpass
+
+        from .jobs import delegated_tasks, list_jobs, my_tasks
+        from .notifications import notifications
+        from .timesheet import my_week
+
+        tra_home, user = settings().tra_home, getpass.getuser()
+        rows = all_documents(tra_home)
+        tab = request.args.get("tab") if request.args.get("tab") in ("starred", "tasks", "delegated", "time",
+                                                                       "notifications") else "recent"
+        mine, others = my_tasks(tra_home, user), delegated_tasks(tra_home, user)
+        week, week_minutes = my_week(tra_home, user)
+        notes = notifications(tra_home, user)
+        job_names = {j.id: f"{j.name} · {load_names(tra_home).get(j.code, j.code)}" for j in list_jobs(tra_home)}
         return render_template("home.html", nav="home", tab=tab, starred_count=sum(r.starred for r in rows),
-                               total=len(rows), **doclist_context(rows, "/"))
+                               total=len(rows), my_tasks=mine, delegated=others, week=week, week_minutes=week_minutes,
+                               notes=notes, job_names=job_names, user=user, **doclist_context(rows, "/"))
 
     @app.get("/documents")
     def documents_page():

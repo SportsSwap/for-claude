@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+{% block content %}
+<div class="heading">
+  <div><h1>Jobs</h1><span class="muted">Every client's tax return job, plus any jobs you add. Overdue ones are in red.</span></div>
+</div>
+<form class="dl-toolbar" method="get" action="/jobs">
+  <label class="visually-hidden" for="jq">Search jobs</label>
+  <input id="jq" class="dl-search" type="search" name="q" value="{{ f.q }}" placeholder="Search jobs">
+  <label class="visually-hidden" for="jc">Client</label>
+  <select id="jc" name="client"><option value="">All clients</option>{% for c in clients %}<option value="{{ c }}" {{ 'selected' if f.client == c }}>{{ names.get(c, c) }}</option>{% endfor %}</select>
+  <label class="visually-hidden" for="js">Status</label>
+  <select id="js" name="status"><option value="">All statuses</option>{% for s in statuses %}<option {{ 'selected' if f.status == s }}>{{ s }}</option>{% endfor %}</select>
+  <label class="visually-hidden" for="ja">Assigned to</label>
+  <select id="ja" name="assignee"><option value="">Anyone</option>{% for a in assignees %}<option {{ 'selected' if f.assignee == a }}>{{ a }}</option>{% endfor %}</select>
+  <button class="btn-ghost" type="submit">Filter</button>
+  <span class="dl-count">{{ jobs|length }} row{{ '' if jobs|length == 1 else 's' }}</span>
+</form>
+<section class="card tblwrap" aria-label="Jobs">
+  {% if jobs %}
+  <table class="docs">
+    <thead><tr><th>Job</th><th>Client</th><th>Status</th><th>Assigned to</th><th>Due</th></tr></thead>
+    <tbody>
+    {% for j in jobs %}
+      <tr>
+        <td><a href="/jobs/{{ j.id }}">{{ j.name }}</a></td>
+        <td>{{ names.get(j.code, j.code) }} <span class="muted mono small">{{ j.code }}</span></td>
+        <td><span class="badge">{{ j.status }}</span></td>
+        <td>{{ j.assignee or '–' }}</td>
+        <td class="nowrap {{ 'high' if j.overdue }}">{{ j.due.strftime('%d %b %Y') if j.due else '–' }}{{ ' · overdue' if j.overdue }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty">{{ 'No jobs match.' if total else 'No jobs yet. Set up a client first.' }}</p>
+  {% endif %}
+</section>
+<form id="new-job" class="card pad props" method="post" action="/jobs" aria-label="New job">
+  <label class="field"><span>Client</span><select name="code" required><option value="">Choose a client</option>{% for c in clients %}<option value="{{ c }}">{{ names.get(c, c) }}</option>{% endfor %}</select></label>
+  <label class="field"><span>New job</span><input type="text" name="name" maxlength="300" required placeholder="e.g. BAS Q1, Advice letter"></label>
+  <label class="field"><span>Due</span><input type="date" name="due"></label>
+  <label class="field"><span>Assign to</span><input type="text" name="assignee" maxlength="80"></label>
+  <div class="actions"><button class="btn" type="submit">Add job</button></div>
+</form>
+{% endblock %}

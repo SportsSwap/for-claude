@@ -226,6 +226,17 @@ Sawnx's copy. *Document properties* (`tra/doc_props.py`): type, folder, date and
 changing a read document's type warns that figures aren't re-read. *Versions* (`tra/versions.py`): a newer copy replaces
 the current file; older copies are kept in `<folder>/_versions/` and listed in versions.json.
 
+**Stages 3-5 (18 Oct 2026).** *Jobs and tasks* (`web/jobs.py`, `sawnx_jobs.json`): a return job per client-year
+(status from `web/status.py`; due, assignee, notes stored), custom jobs (Not started, In progress, Waiting on client,
+Done), tasks on a job or on their own; Home has My Tasks (assigned to this Windows user or nobody) and Delegated
+Tasks. *Comments* (`web/comments.py`, `Work/<code>/comments.json`) on documents and jobs. *Time*
+(`web/timesheet.py`, `sawnx_time.json`) against jobs; Home > My Time shows this week. *Notifications*
+(`web/notifications.py`) are worked out each time: tasks and jobs due today or overdue, the In Tray, other people's
+comments from the last 7 days. *Knowledge* (`web/knowledge.py`, `TRA_HOME\Knowledge`): firm documents with readable
+names (cleaned, guarded), never client documents. *Filing rules* (`web/rules.py`, `sawnx_rules.json`): phrase →
+client, cabinet, folder; they change In Tray suggestions only. Everything is stored by client code and written
+through the output guard.
+
 ## 13. Open items
 
 - Privacy officer approval before the AI reader is switched on (and the README privacy table updated when it is).
