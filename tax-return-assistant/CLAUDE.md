@@ -14,13 +14,13 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact â†
 ## Rules that are not negotiable
 - TFN, Medicare, card, BSB, account, licence and passport numbers must never reach any file, log, filename or API. Redact first (`src/tra/privacy/`); every write goes through the output guard.
 - Never commit client data, or a checksum-valid TFN, Medicare or card number, even as a test example. `tests/test_repo_hygiene.py` enforces this. Tests generate identifiers at runtime.
-- Clients are identified by client code only. Client data lives under `TRA_HOME`, outside the repo and never in cloud-synced folders.
+- Clients are identified by client code in every file, folder, filename, log, audit entry and workpaper. Names exist only in `TRA_HOME\clients.json`, for Sawnx's screens (`web/client_names.py`); the audit log records that a client was named, never the name. Client data lives under `TRA_HOME`, outside the repo and never in cloud-synced folders.
 - Uncertain tax treatment is flagged with a citation, never guessed.
 
 ## Working on it
 ```
 python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest          # 405 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
+.venv/bin/python -m pytest          # 419 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
 .venv/bin/python -m pyflakes src tests
 ```
 - On Windows the paths are `.venv\Scripts\...`. pyflakes isn't in the `dev` extras; `pip install pyflakes` into the venv.

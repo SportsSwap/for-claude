@@ -10,9 +10,11 @@
 </div>
 {% endif %}
 <form class="card pad stack" method="post" action="/clients/new">
+  <label class="field"><span>Client's name (shown in Sawnx only; never in file names, logs or workpapers)</span>
+    <input type="text" name="name" maxlength="80" autocomplete="off" placeholder="Jane Citizen" value="{{ form.get('name', '') }}"></label>
   <div class="cols">
-    <label class="field col-wide"><span>Client code (the firm's code, never a name)</span>
-      <input type="text" name="code" required maxlength="12" autocomplete="off" placeholder="SMIT01" value="{{ form.get('code', '') }}"></label>
+    <label class="field col-wide"><span>Client code (the firm's code; leave blank to make one from the surname, e.g. CITI01)</span>
+      <input type="text" name="code" maxlength="12" autocomplete="off" placeholder="CITI01" value="{{ form.get('code', '') }}"></label>
     <label class="field col-narrow"><span>Income year</span>
       <select name="income_year">{% for y in years %}<option value="{{ y }}" {{ 'selected' if form.get('income_year') == y|string }}>FY{{ y }} (1 July {{ y - 1 }} – 30 June {{ y }})</option>{% endfor %}</select></label>
   </div>

@@ -28,6 +28,7 @@ Back to [[Tax Return Assistant]]
 ## Optional (later)
 - [ ] **Xero:** register the firm's app at developer.xero.com, set `XERO_CLIENT_ID`, confirm the scope names, then try it on a test organisation.
 - [ ] **FYI:** get API access from FYI, confirm `config/fyi.yaml`, set the `FYI_*` variables.
+- [ ] **Privacy officer:** confirm that client names shown in Sawnx (stored only in `clients.json`, never in files or logs) are OK.
 - [ ] Send Claude **blank or fake-data** copies of real bank and registry statement layouts, so readers can be added. Never real ones.
 
 Related: [[How to run it]], [[Known issues and ideas]]

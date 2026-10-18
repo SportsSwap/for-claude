@@ -55,5 +55,7 @@ A second Claude reviewed everything.
 - **Found only by trying it in the browser**, both fixed with tests: (1) every save was refused, because a privacy setting made the browser hide where the form came from; (2) returns prepared with `.\tra prepare` didn't show in Sawnx. Lesson: always click through the real thing, not just the tests.
 - **AI reader:** Claude Opus 5.5 through Anthropic's official library (installed only if switched on), automatic fallback if a request is declined, only blanked-out text, everything it finds unconfirmed. **Off** until the privacy officer approves.
 - **Look:** the laptop's own fonts instead of the mockup's, because Sawnx fetches nothing from the internet.
+- **Client names (18 Oct 2026):** Sawnx shows, sorts and searches by name; the code is suggested from the surname (Jane Citizen → CITI01). Files, logs and workpapers still use only the code, so a stray file never says who the client is. Names live in one file, `clients.json`.
+- **Document summaries (18 Oct 2026):** every document gets an automatic summary (what it is, who issued it, the figures it supports) without any AI, plus a description box for my own notes. Both go into the workpaper's Sources tab as evidence.
 
 Related: [[How it works]], [[Privacy rules]]

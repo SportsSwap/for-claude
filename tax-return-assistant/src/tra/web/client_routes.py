@@ -18,6 +18,9 @@ from ..run import PrepareError
 from ..taxcalc.rates import RatesError
 from ..workpaper.build import citation_text
 from ..workspace import Workspace
+from ..doc_notes import load_doc_notes, save_doc_note
+from ..doc_summary import summaries
+from .client_names import load_names, set_name
 from .client_notes import add_note, delete_note, edit_note, list_notes
 from .messages import problem_text
 from .routes import audit_for, settings
@@ -33,8 +36,9 @@ INLINE_TYPES = {"application/pdf", "image/png", "image/jpeg"}
 
 
 def client_context(ws: Workspace, tab: str) -> dict:
-    return {"client": {"code": ws.client_code, "fy": ws.income_year, "status": job_status(ws), "tab": tab},
-            "nav": "clients"}
+    name = load_names(ws.tra_home).get(ws.client_code)
+    return {"client": {"code": ws.client_code, "name": name, "fy": ws.income_year, "status": job_status(ws),
+                       "tab": tab}, "nav": "clients"}
 
 
 def base_url(ws: Workspace) -> str:
@@ -46,7 +50,8 @@ def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=N
     folder = folder if folder in names else None
     return render_template("client_files.html", **client_context(ws, "files"), folders=folders(ws), folder=folder,
                            docs=documents(ws, folder), view=find_document(ws, view_id), folder_names=names,
-                           doc_types=load_doc_types(), results=results, return_types=RETURN_TYPES), status
+                           doc_types=load_doc_types(), results=results, return_types=RETURN_TYPES,
+                           summaries=summaries(ws), descriptions=load_doc_notes(ws)), status
 
 
 def register_client_routes(app: Flask) -> None:
@@ -265,3 +270,32 @@ def register_client_routes(app: Flask) -> None:
         else:
             flash("Marked reviewed. The registered agent still signs the workpaper's Cover tab.", "ok")
         return redirect(f"{base_url(ws)}/review")
+
+    @app.post("/c/<code>/name")
+    def client_rename(code: str):
+        try:
+            fy = int(request.form.get("fy") or 0)
+        except ValueError:
+            fy = 0
+        ws = workspace_for(settings(), code, fy)
+        try:
+            set_name(settings().tra_home, code, request.form.get("name") or "", audit_for(code))
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        else:
+            flash("Name saved.", "ok")
+        return redirect(f"{base_url(ws)}/files")
+
+    @app.post("/c/<code>/<int:fy>/doc/<doc_id>/description")
+    def doc_description(code: str, fy: int, doc_id: str):
+        ws = workspace_for(settings(), code, fy)
+        if find_document(ws, doc_id) is None:
+            abort(404)
+        try:
+            audit_for(code)
+            save_doc_note(ws, doc_id, request.form.get("text") or "", getpass.getuser())
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        else:
+            flash("Description saved.", "ok")
+        return redirect(f"{base_url(ws)}/files?view={doc_id}")

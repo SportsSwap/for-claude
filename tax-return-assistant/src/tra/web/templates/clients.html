@@ -5,8 +5,8 @@
 <div class="topbar">
   <form class="search" method="get" action="/" role="search">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="#A1A1A8" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="#A1A1A8" stroke-width="1.5" stroke-linecap="round"/></svg>
-    <label for="q" class="visually-hidden">Search by client code</label>
-    <input id="q" name="q" type="search" placeholder="Search by client code" value="{{ q }}">
+    <label for="q" class="visually-hidden">Search by name or code</label>
+    <input id="q" name="q" type="search" placeholder="Search by name or code" value="{{ q }}">
     {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
   </form>
   <a class="btn" href="/clients/new"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="#0A0A0B" stroke-width="1.8" stroke-linecap="round"/></svg>New client</a>
@@ -39,11 +39,12 @@
 <section class="card tblwrap" aria-label="Client list">
   {% if rows %}
   <table class="clients">
-    <thead><tr><th>Client</th><th>Year</th><th>Status</th><th class="num">Documents</th><th class="num">To confirm</th><th class="num">High notes</th><th class="num">Estimate</th><th>Last change</th></tr></thead>
+    <thead><tr><th>Client</th><th>Code</th><th>Year</th><th>Status</th><th class="num">Documents</th><th class="num">To confirm</th><th class="num">High notes</th><th class="num">Estimate</th><th>Last change</th></tr></thead>
     <tbody>
     {% for r in rows %}
       <tr>
-        <td class="mono"><a href="/c/{{ r.code }}/{{ r.income_year }}/files">{{ r.code }}</a></td>
+        <td><a href="/c/{{ r.code }}/{{ r.income_year }}/files">{{ r.name or r.code }}</a></td>
+        <td class="mono muted">{{ r.code }}</td>
         <td class="mono">FY{{ r.income_year }}</td>
         <td><span class="badge"><span class="dot s-{{ r.status|lower|replace(' ', '-') }}"></span>{{ r.status }}</span></td>
         <td class="num mono">{{ r.documents }}</td>

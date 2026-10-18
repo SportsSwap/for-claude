@@ -47,7 +47,8 @@
         {% for d in docs %}
           <tr class="{{ 'sel' if view and view.doc_id == d.doc_id }}">
             <td><a class="mono" href="{{ base }}/files?{{ 'folder=' ~ folder|urlencode ~ '&' if folder }}view={{ d.doc_id }}">{{ d.filed_name }}</a>
-              <div class="muted small">{{ d.doc_id }} · {{ 'Stored only' if d.parse_status == 'stored' else (doc_types[d.doc_type].description if d.doc_type in doc_types else d.doc_type) }}{{ ' · in FYI' if d.store == 'fyi' }}</div></td>
+              <div class="muted small">{{ d.doc_id }}{{ ' · in FYI' if d.store == 'fyi' }} · {{ summaries.get(d.doc_id, '') }}</div>
+              {% if descriptions.get(d.doc_id) %}<div class="small">{{ descriptions[d.doc_id].text }}</div>{% endif %}</td>
             <td>{{ d.category }}</td>
             <td>{% if d.parse_status == 'parsed' %}<span class="badge"><span class="dot ok"></span>Read</span>
                 {% elif d.parse_status == 'partial' %}<span class="badge"><span class="dot warn"></span>Partly read</span>
@@ -78,6 +79,12 @@
           {% endif %}
         </div>
       </div>
+      <p class="small">{{ summaries.get(view.doc_id, '') }}</p>
+      <form class="stack" method="post" action="{{ base }}/doc/{{ view.doc_id }}/description">
+        <label class="field" for="doc-desc"><span>Your description (what it is, what it's evidence for)</span>
+          <textarea id="doc-desc" name="text" maxlength="500" placeholder="e.g. Union fees receipt, evidence for D5">{{ descriptions.get(view.doc_id, {}).get('text', '') }}</textarea></label>
+        <div class="actions"><button class="btn-ghost" type="submit">Save description</button></div>
+      </form>
       {% if view.store == 'local' and (view.filed_name.lower().endswith('.pdf') or view.filed_name.lower().endswith(('.png', '.jpg', '.jpeg'))) %}
       <iframe class="viewer" src="{{ base }}/doc/{{ view.doc_id }}" title="{{ view.filed_name }}"></iframe>
       {% else %}

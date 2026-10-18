@@ -196,9 +196,23 @@ Test-first, as for the rest of the tool. All test data is generated at runtime; 
 7. Settings and the AI reader (off).
 8. `Sawnx.cmd`, setup changes, README, CLAUDE.md, the Obsidian notes, and the privacy table (an LLM extractor now exists, off by default).
 
-## 12. Open items
+## 12. Additions (18 Oct 2026, after the first build)
+
+**Client names.** Sawnx shows, sorts and searches clients by name, with the code beside it. New client asks for the
+name; a blank code is suggested from the surname (Jane Citizen → CITI01). Names are stored only in
+`TRA_HOME\clients.json` (through the output guard) and can be edited on the client page. Every file, folder, filename,
+log, audit entry and workpaper still uses the code; the audit log records `client_named` with the code only.
+
+**Document summaries and descriptions.** Each filed document gets an automatic one-line summary, built from the index
+and figures.csv with no AI: type, issuer, date, and the figures it supports with their return items
+(`tra/doc_summary.py`). Store-only and unreadable documents say so. The preparer can add a description per document
+(`doc_notes.json`, through the output guard). Both show on the Files tab and in new Summary and Description columns of
+the workpaper's Sources tab, as the evidence trail.
+
+## 13. Open items
 
 - Privacy officer approval before the AI reader is switched on (and the README privacy table updated when it is).
 - The firm's IT confirms a local web server on 127.0.0.1 is acceptable on firm laptops.
 - FYI document preview inside Sawnx, once the FYI API is confirmed.
 - OCR, so the AI reader could help with scans.
+- The privacy officer confirms that client names in `clients.json` (Sawnx screens only) are acceptable.

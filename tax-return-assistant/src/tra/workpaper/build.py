@@ -76,6 +76,8 @@ class WorkpaperContext:
     cgt_events: list = field(default_factory=list)
     citations: dict = field(default_factory=dict)
     responses: dict = field(default_factory=dict)  # note_key -> the preparer's response (review.json)
+    doc_summaries: dict = field(default_factory=dict)  # doc_id -> automatic summary (doc_summary.py)
+    doc_descriptions: dict = field(default_factory=dict)  # doc_id -> the preparer's description
 
 
 @dataclass
@@ -521,7 +523,7 @@ def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
     _title(ws, f"Source documents — {ctx.client_code} {fy_label(ctx.income_year)}",
            "Every filed document. Originals are filed unchanged; the tool keeps no copy of their text.")
     headers = ["Doc ID", "Filed name", "Type", "Category", "Document date", "Date found", "Pages", "Parse status",
-               "Store", "Redacted on read", "SHA-256 (first 16)"]
+               "Store", "Redacted on read", "SHA-256 (first 16)", "Summary", "Description"]
     for col, h in enumerate(headers, start=1):
         ws.cell(row=FIRST_ROW - 1, column=col, value=h)
     L.style_header_row(ws, FIRST_ROW - 1, len(headers))
@@ -539,6 +541,8 @@ def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=9, value=d.store)
         ws.cell(row=row, column=10, value=", ".join(f"{k}×{v}" for k, v in sorted(d.redaction_counts.items())))
         ws.cell(row=row, column=11, value=d.sha256[:16])
+        L.style_wrap(ws.cell(row=row, column=12, value=ctx.doc_summaries.get(d.doc_id, "")))
+        L.style_wrap(ws.cell(row=row, column=13, value=ctx.doc_descriptions.get(d.doc_id, "")))
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.SOURCES_WIDTHS)
     L.setup_print(ws, header_row=FIRST_ROW - 1)

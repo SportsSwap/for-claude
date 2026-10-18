@@ -9,8 +9,11 @@ from flask import Flask, current_app, flash, redirect, render_template, request
 from ..clients import ClientExists, create_client
 from ..paths import CONFIG_DIR
 from ..privacy import guard
+from ..privacy.guard import SensitiveDataBlocked, check_text
 from ..privacy.audit import AuditLog
 from ..settings import Settings, saved_user_variable, validate_client_code
+from .client_names import set_name, suggest_code
+from .messages import GUARD_MESSAGE
 from .services.clients import list_clients
 from .status import STATUSES
 
@@ -70,9 +73,10 @@ def register(app: Flask) -> None:
     def clients():
         rows = list_clients(settings().tra_home)
         counts = {s: sum(r.status == s for r in rows) for s in STATUSES}
-        q = (request.args.get("q") or "").strip().upper()
+        q = (request.args.get("q") or "").strip()
         status = request.args.get("status") or ""
-        shown = [r for r in rows if r.code.startswith(q) and (not status or r.status == status)]
+        shown = [r for r in rows if (not q or q.lower() in (r.name or "").lower() or r.code.startswith(q.upper()))
+                 and (not status or r.status == status)]
         return render_template("clients.html", rows=shown, total=len(rows), counts=counts, q=q, status=status,
                                statuses=STATUSES)
 
@@ -82,7 +86,13 @@ def register(app: Flask) -> None:
         form = request.form if request.method == "POST" else {}
         errors: list[str] = []
         if request.method == "POST":
+            name = " ".join((form.get("name") or "").split())
             code = (form.get("code") or "").strip()
+            work = settings().tra_home / "Work"
+            if name and not code:
+                code = suggest_code(name, {p.name for p in work.iterdir()} if work.is_dir() else set())
+            if not name and not code:
+                errors.append("Enter the client's name (and the firm's client code if it has one).")
             try:
                 year = int(form.get("income_year") or 0)
             except ValueError:
@@ -92,13 +102,22 @@ def register(app: Flask) -> None:
             try:
                 validate_client_code(code, settings().client_code_pattern)
             except ValueError:
-                errors.append(f"{code!r} isn't a valid client code. Use the firm's client code in capitals, "
-                              "like SMIT01. Never use a name.")
+                if code:
+                    errors.append(f"{code!r} isn't a valid client code. Use the firm's client code in capitals, "
+                                  "like SMIT01. The name goes in the name box.")
+            if name:
+                try:
+                    check_text(name, "client name")
+                except SensitiveDataBlocked:
+                    errors.append(GUARD_MESSAGE)
             options, option_errors = _client_options(form)
             errors += option_errors
             if not errors:
                 try:
-                    create_client(settings().tra_home, code, year, options, audit_for(code))
+                    audit = audit_for(code)
+                    create_client(settings().tra_home, code, year, options, audit)
+                    if name:
+                        set_name(settings().tra_home, code, name, audit)
                 except ClientExists as exc:
                     errors.append(str(exc))
                 else:

@@ -9,7 +9,7 @@ Back to [[Tax Return Assistant]]
 ## The non-negotiables (my brief)
 - Never store, log or write TFNs, Medicare numbers, driver licence or passport numbers, bank account or BSB numbers, or card numbers. That covers the workpaper, filenames, logs and anything sent to an API.
 - Redact them **before** any processing.
-- Identify clients only by **client code**, never by name.
+- In files, folders, logs, the audit log and workpapers, clients are identified only by **client code**. Sawnx shows names on screen; they're kept only in `C:\TaxAssistant\clients.json` (for the privacy officer to confirm).
 - Credentials go in environment variables, never in code.
 - Client data stays local and never goes into git. There's an audit log, with no sensitive values in it.
 - Comply with the **Privacy Act 1988** (APPs) and the **Tax Agent Services Act 2009 / TPB Code**.

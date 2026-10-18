@@ -86,8 +86,8 @@ Sawnx does everything below by clicking instead of typing commands. It opens in 
 
 | Screen | What it does |
 |---|---|
-| Clients | Every client and income year, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. **New client** sets one up. |
-| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. |
+| Clients | Every client by **name** (with its code), sorted by name, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. Search by name or code. **New client** asks for the name and suggests a code from the surname (Jane Citizen → CITI01). |
+| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. |
 | Figures | Tick each figure once you've checked it against its source, which shows beside the table. Fix a label or amount, or add a figure by hand. Changes save to `figures.csv` straight away. |
 | Prepare | Prepares the return (as `tra prepare`), shows the estimate and both calculations side by side, and lists every workpaper to download. |
 | Review notes | Each note with a response box and a Resolved tick. Responses go into the Response column of the next workpaper. **Mark reviewed** once every High note is resolved. |
@@ -246,7 +246,7 @@ The tool is built so that sensitive identifiers can't end up in anything it crea
 | Redact before processing | Text is redacted as it is read, before classification, extraction or logging. TFNs are detected by check digit *and* by the words "TFN" / "tax file number" (so a mistyped TFN is still caught). Medicare by check digit and keyword, cards by Luhn, BSB, account, licence and passport by format and keyword. The rest of the code accepts only redacted text. |
 | Output guard | Every file the tool writes (CSV, JSON, the workpaper, the index, logs, filenames) is scanned before writing. If anything looks like an identifier, the write is refused and a `guard_blocked` entry (place and type, never the value) goes in the audit log. |
 | No values in logs | Log lines are redacted. The audit log records who did what and when, by client code and document ID, with redaction *counts*, never values or original filenames. |
-| Client codes only | Names never appear in filenames, logs or the audit log |
+| Client codes in files | Every file, folder, filename, log, audit entry and workpaper uses the client code. Names appear only on Sawnx's screens and in `TRA_HOME\clients.json`, written through the output guard (for the privacy officer to confirm). |
 | Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. The AI reader is built in but **switched off**; it can only be switched on in Sawnx Settings with the approver's name and date, and then sends only redacted text to Anthropic's Claude service (APP 8 applies). `TRA_HOME` may not be in a cloud-synced folder (OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive, iCloud). |
 | Sawnx website | Listens on 127.0.0.1 only. Every request needs the random key made each time it starts; requests from other sites or host names are refused; pages are never cached. Uploads are saved under a random name, used and deleted; original filenames are never recorded. |
 | Secrets | Xero and FYI credentials live in Windows user environment variables. The Xero token is kept in Windows Credential Manager. Nothing secret is in the code, config or repository (see `.env.example` for the names). |
@@ -304,7 +304,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 405 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 419 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.

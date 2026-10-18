@@ -15,6 +15,7 @@ from ...filing.index import DocumentIndex
 from ...labels import load_labels
 from ...settings import Settings, validate_client_code
 from ...workspace import Workspace
+from ..client_names import load_names
 from ..status import job_status
 from .prepare import load_summary
 
@@ -24,6 +25,7 @@ _FY = re.compile(r"^FY(\d{4})$")
 @dataclass
 class ClientRow:
     code: str
+    name: str | None
     income_year: int
     status: str
     documents: int
@@ -40,10 +42,10 @@ def _last_change(ws: Workspace) -> datetime:
     return datetime.fromtimestamp(max(times, default=0.0))
 
 
-def client_row(ws: Workspace) -> ClientRow:
+def client_row(ws: Workspace, name: str | None = None) -> ClientRow:
     figures, _errors = read_figures(ws.figures_csv, load_labels())
     summary = load_summary(ws)
-    return ClientRow(code=ws.client_code, income_year=ws.income_year, status=job_status(ws),
+    return ClientRow(code=ws.client_code, name=name, income_year=ws.income_year, status=job_status(ws),
                      documents=len(DocumentIndex(ws.index_csv).load()),
                      to_confirm=sum(1 for f in figures if not f.confirmed and f.notes != "prefill"),
                      high_notes=sum(n.risk == "High" for n in summary.notes) if summary else None,
@@ -52,12 +54,14 @@ def client_row(ws: Workspace) -> ClientRow:
 
 def list_clients(tra_home: Path) -> list[ClientRow]:
     rows = []
+    names = load_names(tra_home)
     work = Path(tra_home) / "Work"
     for state in sorted(work.glob("*/FY*/state.json")) if work.is_dir() else []:
         m = _FY.match(state.parent.name)
         if m:
-            rows.append(client_row(Workspace(tra_home, state.parent.parent.name, int(m.group(1)))))
-    return sorted(rows, key=lambda r: r.last_change, reverse=True)
+            code = state.parent.parent.name
+            rows.append(client_row(Workspace(tra_home, code, int(m.group(1))), names.get(code)))
+    return sorted(rows, key=lambda r: ((r.name or r.code).lower(), -r.income_year))
 
 
 def workspace_for(settings: Settings, code: str, fy: int) -> Workspace:

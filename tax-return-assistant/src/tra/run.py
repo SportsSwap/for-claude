@@ -20,6 +20,8 @@ from .labels import load_labels
 from .models import ReviewNote
 from .notes_store import read_notes
 from .prepare_summary import save_summary
+from .doc_notes import load_doc_notes
+from .doc_summary import summaries
 from .review_store import responses_by_key
 from .privacy.audit import AuditLog
 from .privacy.guard import atomic_write_text, check_value
@@ -86,7 +88,8 @@ def prepare_client(ws: Workspace, audit: AuditLog, prepared_by: str) -> PrepareR
         figures=[f for f in figures if f.confirmed], draft=draft, rates=rates, calc_a=calc_a, calc_b=calc_b,
         notes=notes, prefill=prefill_totals, prior_year=prior, labels=labels, prepared_by=prepared_by,
         tool_version=__version__, cgt_events=events, citations=ctx.citations,
-        responses=responses_by_key(ws)))
+        responses=responses_by_key(ws), doc_summaries=summaries(ws),
+        doc_descriptions={k: v["text"] for k, v in load_doc_notes(ws).items()}))
 
     last_return = {key: str(line.amount) for key, line in draft.lines.items()}
     check_value(last_return, "last_return.json")

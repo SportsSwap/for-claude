@@ -1,18 +1,28 @@
 {% extends "base.html" %}
-{% block title %}{{ client.code }}{% endblock %}
+{% block title %}{{ client.name or client.code }}{% endblock %}
 {% block content %}
 {% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
 <div class="heading">
   <div>
     <a class="back" href="/">← Clients</a>
     <div class="title-row">
-      <h1 class="mono">{{ client.code }}</h1>
+      <h1 class="{{ '' if client.name else 'mono' }}">{{ client.name or client.code }}</h1>
+      {% if client.name %}<span class="badge mono">{{ client.code }}</span>{% endif %}
       <span class="badge">Individual · FY{{ client.fy }}</span>
       <span class="badge"><span class="dot s-{{ client.status|lower|replace(' ', '-') }}"></span>{{ client.status }}</span>
     </div>
   </div>
   <div class="actions">{% block actions %}{% endblock %}</div>
 </div>
+<details class="rename">
+  <summary class="muted small">{{ 'Edit name' if client.name else "Add the client's name" }}</summary>
+  <form class="actions" method="post" action="/c/{{ client.code }}/name">
+    <input type="hidden" name="fy" value="{{ client.fy }}">
+    <label class="visually-hidden" for="client-name">Client's name</label>
+    <input id="client-name" type="text" name="name" maxlength="80" value="{{ client.name or '' }}" required>
+    <button class="btn-ghost" type="submit">Save name</button>
+  </form>
+</details>
 <nav class="tabs" aria-label="Client sections">
   <a href="{{ base }}/files" class="{{ 'on' if client.tab == 'files' }}" {{ 'aria-current=page' if client.tab == 'files' }}>Files</a>
   <a href="{{ base }}/figures" class="{{ 'on' if client.tab == 'figures' }}" {{ 'aria-current=page' if client.tab == 'figures' }}>Figures</a>

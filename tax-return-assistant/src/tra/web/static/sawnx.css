@@ -184,3 +184,5 @@ table.calc { min-width: 560px; }
   .col-narrow > form { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
   .col-narrow > form .field { flex: 1 1 200px; }
 }
+.rename form { margin-top: 8px; max-width: 520px; }
+.rename input { flex: 1 1 240px; width: auto; }
