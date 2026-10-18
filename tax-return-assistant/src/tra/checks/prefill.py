@@ -6,7 +6,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from ..models import ReviewNote
-from ..money import ZERO
+from ..money import ZERO, format_dollars
 from . import label_name
 from .context import CheckContext
 
@@ -33,15 +33,16 @@ def check_prefill(ctx: CheckContext) -> list[ReviewNote]:
         present = [k for k in targets if k in ctx.draft.lines]
         name = label_name(ctx.labels, key)
         if not present:  # P2
-            notes.append(ReviewNote("High", "P2", f"Pre-fill shows {name} of ${prefill_total:,} from "
+            notes.append(ReviewNote("High", "P2", f"Pre-fill shows {name} of {format_dollars(prefill_total)} from "
                                     f"{', '.join(payers[key])}, but the return has nothing for it. Find the source "
                                     "document or confirm with the client why it is excluded.", prefill_total, "preparer",
                                     "confirm", label_key=key))
             continue
         ours = sum((ctx.draft.amount(k) for k in targets), ZERO)
         if abs(ours - prefill_total) > tolerance:  # P1
-            notes.append(ReviewNote("High", "P1", f"{name}: return ${ours:,} vs pre-fill ${prefill_total:,} "
-                                    f"(difference ${ours - prefill_total:,}). Payers on pre-fill: "
+            notes.append(ReviewNote("High", "P1", f"{name}: return {format_dollars(ours)} vs pre-fill "
+                                    f"{format_dollars(prefill_total)} (difference "
+                                    f"{format_dollars(ours - prefill_total)}). Payers on pre-fill: "
                                     f"{', '.join(payers[key])}.", abs(ours - prefill_total), "preparer", "confirm",
                                     label_key=key))
 

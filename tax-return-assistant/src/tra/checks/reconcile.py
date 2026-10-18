@@ -6,7 +6,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from ..models import ReviewNote
-from ..money import ZERO
+from ..money import ZERO, format_dollars
 from . import label_name
 from .context import CheckContext
 
@@ -19,7 +19,8 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
     for f in confirmed:  # R1
         where = label_name(ctx.labels, f.label_key)
         if not f.doc_id:
-            msg = f"{f.figure_id} ({where}, ${f.amount:,}) has no source document. Attach the source or confirm it with the client."
+            msg = (f"{f.figure_id} ({where}, {format_dollars(f.amount)}) has no source document. Attach the source or "
+                   "confirm it with the client.")
         elif f.doc_id not in known_docs:
             msg = f"{f.figure_id} ({where}) cites {f.doc_id}, which is not in the document index."
         else:
@@ -34,8 +35,9 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
         if ctx.labels[key].computed:
             continue
         if line.amount != sums.get(key, ZERO):
-            notes.append(ReviewNote("High", "R2", f"{label_name(ctx.labels, key)}: return shows ${line.amount:,} but its "
-                                    f"figures add up to ${sums.get(key, ZERO):,}.", abs(line.amount - sums.get(key, ZERO)),
+            notes.append(ReviewNote("High", "R2", f"{label_name(ctx.labels, key)}: return shows "
+                                    f"{format_dollars(line.amount)} but its figures add up to "
+                                    f"{format_dollars(sums.get(key, ZERO))}.", abs(line.amount - sums.get(key, ZERO)),
                                     "reviewer", "confirm", label_key=key, figure_ids=line.figure_ids))
 
     pending = [f for f in ctx.figures if not f.confirmed and f.notes != "prefill"]  # R3
@@ -52,7 +54,8 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
             if o.label_key == p.label_key and abs(o.amount - p.amount) <= tolerance:
                 notes.append(ReviewNote(
                     "High", "R4", f"{label_name(ctx.labels, p.label_key)} may be counted twice: {p.figure_id} (pre-fill) "
-                    f"and {o.figure_id} (source document) are both confirmed for ${p.amount:,}. Confirm only one.",
+                    f"and {o.figure_id} (source document) are both confirmed for {format_dollars(p.amount)}. "
+                    "Confirm only one.",
                     p.amount, "preparer", "confirm", label_key=p.label_key, figure_ids=(p.figure_id, o.figure_id)))
                 break
 
@@ -66,7 +69,8 @@ def check_reconcile(ctx: CheckContext) -> list[ReviewNote]:
         elif first.doc_id != f.doc_id and key[2] is not None:
             notes.append(ReviewNote(
                 "High", "R5", f"{label_name(ctx.labels, f.label_key)}: {first.doc_id} and {f.doc_id} are both {key[2]} "
-                f"documents showing ${f.amount:,}. Check they aren't the same document sent twice.", f.amount,
+                f"documents showing {format_dollars(f.amount)}. Check they aren't the same document sent twice.",
+                f.amount,
                 "preparer", "confirm", label_key=f.label_key, figure_ids=(first.figure_id, f.figure_id),
                 doc_ids=(first.doc_id, f.doc_id)))
     return notes

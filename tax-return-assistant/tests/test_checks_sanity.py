@@ -47,6 +47,11 @@ def test_s4_substantiation():
     assert ids(run(fig("F1", "ded.d5", 520, substantiated=True)), "S4") == []
 
 
+def test_s4_total_shows_cents_however_typed():
+    [note] = ids(run(fig("F1", "ded.d5", 1499), fig("F2", "ded.d5", "520.5")), "S4")
+    assert "Work-related claims total $2,019.50 (over $300)" in note.message
+
+
 def test_s5_car_cap():
     [note] = ids(run(fig("F1", "ded.d1", 4500, substantiated=True)), "S5")
     assert note.citation_id == "itaa97_s28_25" and note.risk == "High"

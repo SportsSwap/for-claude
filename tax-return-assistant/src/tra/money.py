@@ -38,3 +38,9 @@ def round_cents(d: Decimal) -> Decimal:
 def truncate_dollars(d: Decimal) -> Decimal:
     """ATO practice: cents are dropped from taxable income."""
     return d.quantize(DOLLAR, rounding=ROUND_DOWN)
+
+
+def format_dollars(d: Decimal) -> str:
+    """'$2,019.50' or '-$12.35', however the amount was typed (Excel saves 2019.00 as 2019)."""
+    cents = round_cents(d)
+    return f"{'-' if cents < 0 else ''}${abs(cents):,}"

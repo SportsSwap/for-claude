@@ -9,7 +9,7 @@ from decimal import Decimal
 
 from ..dates import days_in_fy
 from ..models import ReviewNote
-from ..money import ZERO
+from ..money import ZERO, format_dollars
 from ..return_.cgt import anniversary, discount_eligible
 from .context import CheckContext
 
@@ -48,10 +48,11 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
     # S1 deductions unusually high
     work = sum((d(k) for k in WORK_RELATED), ZERO)
     if a.total_income > 0 and a.deductions > Decimal(str(cfg["deductions_to_income_max"])) * a.total_income:
-        notes.append(_note("Medium", "S1", f"Deductions of ${a.deductions:,} are {a.deductions / a.total_income:.0%} of "
-                           f"total income (${a.total_income:,}). Check each claim is supported.", a.deductions))
+        notes.append(_note("Medium", "S1", f"Deductions of {format_dollars(a.deductions)} are "
+                           f"{a.deductions / a.total_income:.0%} of total income ({format_dollars(a.total_income)}). "
+                           "Check each claim is supported.", a.deductions))
     elif d("income.salary") > 0 and work > Decimal(str(cfg["work_related_to_salary_max"])) * d("income.salary"):
-        notes.append(_note("Medium", "S1", f"Work-related deductions (D1-D5) of ${work:,} are "
+        notes.append(_note("Medium", "S1", f"Work-related deductions (D1-D5) of {format_dollars(work)} are "
                            f"{work / d('income.salary'):.0%} of salary. Check each claim is supported.", work))
 
     # S2 income with no supporting document
@@ -79,8 +80,8 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
     work_figs = _confirmed(ctx, *WORK_RELATED)
     unsupported = [f for f in work_figs if f.substantiated is not True]
     if work > Decimal(str(cfg["substantiation_threshold"])) and unsupported:
-        notes.append(_note("High", "S4", f"Work-related claims total ${work:,} (over $300), so written evidence is "
-                           f"required for every claim. Not marked substantiated: "
+        notes.append(_note("High", "S4", f"Work-related claims total {format_dollars(work)} (over $300), so written "
+                           f"evidence is required for every claim. Not marked substantiated: "
                            f"{', '.join(f.figure_id for f in unsupported)}.",
                            sum((f.amount for f in unsupported), ZERO), audience="preparer", label_key="ded.d5",
                            citation="itaa97_s900_35", figures=unsupported))
@@ -89,9 +90,10 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
     cap = ctx.rates.car.rate * ctx.rates.car.km_cap
     car = _confirmed(ctx, "ded.d1")
     if d("ded.d1") > cap and not any("logbook" in f.notes.lower() for f in car):
-        notes.append(_note("High", "S5", f"Car expenses of ${d('ded.d1'):,} exceed the cents-per-km maximum of "
-                           f"${cap:,.2f} ({ctx.rates.car.km_cap:,.0f} km x {ctx.rates.car.rate * 100:.0f}c). A logbook "
-                           "is needed for a larger claim; note 'logbook' on the figure if one exists.",
+        notes.append(_note("High", "S5", f"Car expenses of {format_dollars(d('ded.d1'))} exceed the cents-per-km "
+                           f"maximum of {format_dollars(cap)} ({ctx.rates.car.km_cap:,.0f} km x "
+                           f"{ctx.rates.car.rate * 100:.0f}c). A logbook is needed for a larger claim; note 'logbook' "
+                           "on the figure if one exists.",
                            d("ded.d1") - cap, label_key="ded.d1", citation="itaa97_s28_25", figures=car))
 
     # S6 conventional clothing
@@ -132,14 +134,15 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
     if a.mls_income > threshold:
         cover = ctx.state.hospital_cover_days
         if cover is None:
-            notes.append(_note("Medium", "S9", f"Income for MLS purposes (${a.mls_income:,}) is over ${threshold:,}. "
-                               "Assumed the client held private hospital cover all year; confirm, or the Medicare "
-                               "levy surcharge applies.", None, audience="client", action="assumption",
-                               citation="mla1986"))
+            notes.append(_note("Medium", "S9", f"Income for MLS purposes ({format_dollars(a.mls_income)}) is over "
+                               f"{format_dollars(threshold)}. Assumed the client held private hospital cover all year; "
+                               "confirm, or the Medicare levy surcharge applies.", None, audience="client",
+                               action="assumption", citation="mla1986"))
         elif cover < days:
             notes.append(_note("Medium", "S9", f"No private hospital cover for {days - cover} day(s) with income for MLS "
-                               f"purposes of ${a.mls_income:,}: Medicare levy surcharge of ${a.mls:,} included. "
-                               "Confirm the cover dates with the client.", a.mls, audience="client", action="question",
+                               f"purposes of {format_dollars(a.mls_income)}: Medicare levy surcharge of "
+                               f"{format_dollars(a.mls)} included. Confirm the cover dates with the client.", a.mls,
+                               audience="client", action="question",
                                citation="mla1986"))
 
     # S10 interest on a redraw or line of credit
@@ -192,8 +195,8 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
     limit = Decimal(str(cfg["asset_threshold"]))
     for f in work_figs:
         if f.amount > limit and _matches(f.description, cfg["asset_keywords"]):
-            notes.append(_note("Medium", "S13", f"{f.figure_id} '{f.description}' (${f.amount:,}) looks like a "
-                               "depreciating asset. Only items costing $300 or less can be claimed outright; claim "
-                               "decline in value instead.", f.amount, label_key=f.label_key, citation="itaa97_s40_80",
-                               figures=[f]))
+            notes.append(_note("Medium", "S13", f"{f.figure_id} '{f.description}' ({format_dollars(f.amount)}) looks "
+                               "like a depreciating asset. Only items costing $300 or less can be claimed outright; "
+                               "claim decline in value instead.", f.amount, label_key=f.label_key,
+                               citation="itaa97_s40_80", figures=[f]))
     return notes

@@ -4,7 +4,7 @@ from decimal import Decimal
 import pytest
 
 from tra.dates import days_in_fy, find_doc_date, fy_bounds, fy_label, parse_date
-from tra.money import parse_amount, round_cents, truncate_dollars
+from tra.money import format_dollars, parse_amount, round_cents, truncate_dollars
 
 
 @pytest.mark.parametrize(
@@ -34,6 +34,23 @@ def test_round_and_truncate():
     assert round_cents(Decimal("2.344")) == Decimal("2.34")
     assert truncate_dollars(Decimal("45000.99")) == Decimal("45000")
     assert truncate_dollars(Decimal("-10.5")) == Decimal("-10")
+
+
+@pytest.mark.parametrize(
+    "amount,expected",
+    [
+        ("2019", "$2,019.00"),
+        ("2019.5", "$2,019.50"),
+        ("2019.50", "$2,019.50"),
+        ("1234567.891", "$1,234,567.89"),
+        ("0.005", "$0.01"),
+        ("0", "$0.00"),
+        ("-12.35", "-$12.35"),
+        ("-0.001", "$0.00"),
+    ],
+)
+def test_format_dollars(amount, expected):
+    assert format_dollars(Decimal(amount)) == expected
 
 
 @pytest.mark.parametrize(
