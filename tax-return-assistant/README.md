@@ -196,7 +196,7 @@ Running it again writes `_v2`; earlier versions are never overwritten. It prints
 
 ### 5. Review and key in
 
-Work through the **Review Notes** tab. Key the return into Xero Tax, using the Summary tab in ATO item order. Then compare Xero Tax's estimate with the Tax Calc tab. The registered agent reviews the workpaper and signs the Cover tab.
+Work through the **Review Notes** tab. Key the return into Xero Tax, using the B01 Summary tab in ATO item order. Then compare Xero Tax's estimate with the Tax Calc tab. The registered agent reviews the workpaper and signs the Cover tab.
 
 ---
 
@@ -204,16 +204,15 @@ Work through the **Review Notes** tab. Key the return into Xero Tax, using the S
 
 | Tab | Contents |
 |---|---|
-| **Cover** | DRAFT – NOT FOR LODGMENT banner, client code, year, preparer, rates status, estimated result, sign-off boxes |
-| **Summary** | Lead schedule: every return label in ATO order. Columns: this year (formula), pre-fill, difference, prior year, movement %, review note count. |
-| **One tab per category** | Salary & Wages, Interest, Dividends, Rental, D1–D15, Private Health and so on. Each row has its source document (a link to the filed file) and page, with a subtotal per return label. The Rental tab also shows net rent. |
-| **Capital Gains** | Only when there are CGT events. The event schedule and the s102-5 method statement, as formulas. |
+| **Cover** | DRAFT – NOT FOR LODGMENT banner, client code, year, partner, manager, reviewer and preparer, rates status, estimated result, sign-off boxes, and a link to start at B01 Summary |
+| **B01 Summary** | The hub, like the firm's B01. A tax summary box (total income, deductions, taxable income, tax, payable or refundable), then every return item the client has, in ATO order: item, code, a **Go to** link to its tab, amount, tax credits, pre-fill, difference, prior year, movement %, review notes. |
+| **Item tabs** | Named and numbered like the firm's workpapers: 01 Salaries and Wages, 10 Interest Received, 11 Dividends Received, 15 Business Professional, 24 Other Income, C15 Losses, M03 Capital Gains, M25 Rental Property, D01 MV Expenses … D10 Cost Managing Tax, D07 Int Div Deductions (D7 and D8), D15 D11 - D15 Deductions (D12 and D15), PHI Private Health. **Only the tabs the client needs appear.** Each has the same header (client code, year ended, workpaper, prepared by, reviewed by), a "↩ B01 Summary" link and a blue "i  The purpose of this worksheet is…" line. Each return item has its own section: **ATO pre-fill** and **Client documents and adjustments** separately, each figure linked to its source document and page, a total, and **Transferred to: Item 10 L**, a link to that line of B01 Summary. The rental tab also shows net rent; M03 has the CGT events and the s102-5 method statement. |
 | **Tax Calc** | Taxable income through to refund or payable, all as formulas. Beside them, the tool's independent calculation and a difference column that turns red if they disagree. |
 | **Rates** | The year's rates copied in, so the file stands alone, with their verification status |
 | **Sources** | Every filed document: type, date, pages, what was redacted |
 | **Review Notes** | Every flag, assumption and client question, ranked by risk, then by dollar impact, with citations and a response column |
 
-Typed-in numbers (figures and rates) are **blue**. Everything else is a formula, so the working can be followed in Excel.
+The look follows the firm's workpapers: Calibri 10, dark grey text, no gridlines, light-blue link boxes and the accounting number format. Typed-in numbers (figures and rates) are **blue**. Everything else is a formula, so the working can be followed in Excel. Headers show the client **code**, not the name (the privacy rule).
 
 ## The self-checks
 
@@ -299,7 +298,7 @@ With FYI set, `ingest` files into FYI. If FYI is unavailable it files locally an
 
 ## Changing the workpaper layout
 
-All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.py`. To match the firm's template, change that file. `build.py` decides what goes where; `layout.py` decides how it looks.
+The workpaper follows the firm's individual tax workpapers (B01 Summary as the hub, numbered item tabs, the same header on every tab). All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.py`; tab names are the `tab:` entries in `config/labels.yaml`. `build.py` decides what goes where; `layout.py` decides how it looks.
 
 ---
 
@@ -310,7 +309,7 @@ All fonts, colours, widths and number formats are in `src/tra/workpaper/layout.p
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 459 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 464 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.

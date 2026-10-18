@@ -1,3 +1,4 @@
+import re
 import shutil
 import subprocess
 from decimal import Decimal
@@ -9,6 +10,14 @@ from wpctx import demo_context
 from tra.privacy.guard import FileLockedError, SensitiveDataBlocked
 from tra.workpaper.build import build_workpaper
 
+SUMMARY = "B01 Summary"
+ITEM_TABS = ("01 Salaries and Wages", "10 Interest Received", "11 Dividends Received", "M25 Rental Property",
+             "D05 Other Work Deductions", "PHI Private Health")
+# Item tab columns (the firm's layout starts in column B): B ref, E source, F page, I amount, J key (hidden).
+REF, SOURCE, PAGE, DETAIL, AMOUNT, KEY = 2, 5, 6, 4, 9, 10
+# Summary columns: E go-to link, F amount, G tax credits, M key (hidden).
+GO, S_AMOUNT, S_CREDITS, S_KEY = 5, 6, 7, 13
+
 
 @pytest.fixture
 def built(tmp_path):
@@ -18,13 +27,18 @@ def built(tmp_path):
     return path, wp_map, ctx
 
 
+def _summary_rows(ws):
+    return {ws.cell(row=r, column=S_KEY).value: r for r in range(1, ws.max_row + 1) if ws.cell(row=r, column=S_KEY).value}
+
+
 def test_tabs_present(built):
     path, _, _ = built
     names = openpyxl.load_workbook(path).sheetnames
-    for tab in ("Cover", "Summary", "Salary & Wages", "Interest", "Dividends", "Rental", "D5 Other work-related",
-                "Private Health", "Tax Calc", "Rates", "Sources", "Review Notes"):
+    for tab in ("Cover", SUMMARY, *ITEM_TABS, "Tax Calc", "Rates", "Sources", "Review Notes"):
         assert tab in names
-    assert names[0] == "Cover" and names[-1] == "Review Notes"
+    assert names[:2] == ["Cover", SUMMARY]
+    assert names[-4:] == ["Tax Calc", "Rates", "Sources", "Review Notes"]
+    assert "D01 MV Expenses" not in names and "M03 Capital Gains" not in names  # only the tabs this client needs
 
 
 def test_totals_are_formulas(built):
@@ -39,19 +53,94 @@ def test_totals_are_formulas(built):
         assert isinstance(value, str) and value.startswith("="), ref
 
 
+def test_item_tabs_follow_the_firm_layout(built):
+    path, _, _ = built
+    wb = openpyxl.load_workbook(path)
+    for tab in ITEM_TABS:
+        ws = wb[tab]
+        assert ws.sheet_view.showGridLines is False, tab
+        top = [c for row in ws.iter_rows(max_row=9) for c in row]
+        texts = {c.value for c in top if isinstance(c.value, str)}
+        assert {"Client code", "DEMO01", "Year ended", "Workpaper", "Prepared by", "Reviewed by"} <= texts, tab
+        assert any(t.startswith("i  The purpose of this worksheet") for t in texts), tab
+        assert [c.hyperlink.location for c in top if c.hyperlink is not None] == [f"'{SUMMARY}'!A1"], tab
+        fonts = {(c.font.name, c.font.sz) for row in ws.iter_rows(min_row=10) for c in row if c.value is not None}
+        assert fonts <= {("Calibri", 10)}, (tab, fonts)
+
+
+def test_transferred_to_links_land_on_the_summary_row(built):
+    path, _, _ = built
+    wb = openpyxl.load_workbook(path)
+    summary = wb[SUMMARY]
+    for tab in ITEM_TABS:
+        ws = wb[tab]
+        rows = [r for r in range(1, ws.max_row + 1) if ws.cell(row=r, column=AMOUNT - 1).value == "Transferred to:"]
+        assert rows, tab
+        for r in rows:
+            link = ws.cell(row=r, column=AMOUNT)
+            sheet, cell = link.hyperlink.location.rsplit("!", 1)
+            assert sheet == f"'{SUMMARY}'"
+            section_key = next(ws.cell(row=x, column=KEY).value for x in range(r, 0, -1) if ws.cell(row=x, column=KEY).value)
+            assert summary.cell(row=int(re.sub(r"\D", "", cell)), column=S_KEY).value == section_key, (tab, r)
+            assert link.value  # 'Item 10 L', or 'PHI' for private health
+
+
+def test_summary_is_the_hub(built):
+    path, _, ctx = built
+    wb = openpyxl.load_workbook(path)
+    ws = wb[SUMMARY]
+    rows = _summary_rows(ws)
+    assert "income.interest" in rows and "ded.d5" in rows
+    assert "ded.d1" not in rows  # nothing at D1, so no line for it
+    assert ws.column_dimensions["M"].hidden
+    with_figures = {f.label_key for f in ctx.figures}
+    for key, r in rows.items():
+        go = ws.cell(row=r, column=GO)
+        if key in with_figures:
+            assert go.hyperlink.location == f"'{wb[ctx.labels[key].tab].title}'!A1", key
+    withheld = rows["income.salary_tax_withheld"]
+    assert ws.cell(row=withheld, column=S_AMOUNT).value is None
+    assert ws.cell(row=withheld, column=S_CREDITS).value.startswith("=SUMIFS(")
+    labels = {ws.cell(row=r, column=c).value: r for r in range(1, ws.max_row + 1) for c in (2, 4)}
+    for text in ("Tax Summary", "Taxable income", "Estimated amount payable / (refundable)", "Total income",
+                 "Total deductions"):
+        assert text in labels, text
+    assert "'Tax Calc'!" in ws.cell(row=labels["Estimated amount payable / (refundable)"], column=S_AMOUNT).value
+
+
 def test_every_figure_row_has_source(built):
     path, _, ctx = built
     wb = openpyxl.load_workbook(path)
+    ids = {f.figure_id for f in ctx.figures}
     rows = 0
-    for tab in ("Salary & Wages", "Interest", "Dividends", "Rental", "D5 Other work-related", "Private Health"):
+    for tab in ITEM_TABS:
         ws = wb[tab]
-        for row in ws.iter_rows(min_row=5):
-            if row[0].value and str(row[0].value).startswith("F"):
+        for r in range(1, ws.max_row + 1):
+            if ws.cell(row=r, column=REF).value in ids:
                 rows += 1
-                assert row[4].value, (tab, row[0].value)
-                assert row[5].value, (tab, row[0].value)
-                assert row[4].hyperlink is not None
+                assert ws.cell(row=r, column=SOURCE).value, (tab, r)
+                assert ws.cell(row=r, column=PAGE).value, (tab, r)
+                assert ws.cell(row=r, column=SOURCE).hyperlink is not None
     assert rows == len(ctx.figures)
+
+
+def test_prefill_figures_have_their_own_section(tmp_path):
+    def mutate(figures):
+        for f in figures:
+            if f.notes == "prefill" and f.label_key == "income.interest":
+                f.confirmed = True
+
+    ctx = demo_context(tmp_path, mutate=mutate)
+    assert any(f.notes == "prefill" and f.label_key == "income.interest" for f in ctx.figures)
+    path = tmp_path / "wp.xlsx"
+    build_workpaper(path, ctx)
+    ws = openpyxl.load_workbook(path)["10 Interest Received"]
+    at = {ws.cell(row=r, column=DETAIL).value: r for r in range(1, ws.max_row + 1)}
+    for text in ("ATO pre-fill", "Client documents and adjustments", "Subtotal – ATO pre-fill",
+                 "Subtotal – client documents"):
+        assert text in at, text
+    total = ws.cell(row=at["Total Gross interest (Item 10 L)"], column=AMOUNT).value
+    assert total == f"=I{at['Subtotal – ATO pre-fill']}+I{at['Subtotal – client documents']}"
 
 
 def test_banner_and_rates_status(built):
@@ -155,7 +244,6 @@ def test_recalc_matches_calc_a_other_branches(tmp_path, case):
 
 
 def test_no_formula_sums_over_its_own_cell(tmp_path):
-    import re
     from openpyxl.utils import range_boundaries
     ctx = demo_context(tmp_path, cgt_rows=[["C001", "BHP shares", "2020-01-10", "2026-03-24", "15000.00", "9000.00",
                                             "D004", "1", "Y"]])
@@ -173,24 +261,40 @@ def test_no_formula_sums_over_its_own_cell(tmp_path):
 
 
 def test_no_total_mixes_different_labels(built):
-    import re
     path, _, _ = built
     wb = openpyxl.load_workbook(path)
-    for name in ("Salary & Wages", "Interest", "Dividends", "Rental", "D5 Other work-related", "Private Health"):
+    for name in ITEM_TABS:
         ws = wb[name]
         sums = 0
         for row in ws.iter_rows():
             for cell in row:
-                m = re.fullmatch(r"=SUM\(J(\d+):J(\d+)\)", str(cell.value or ""))
+                m = re.fullmatch(r"=SUM\(I(\d+):I(\d+)\)", str(cell.value or ""))
                 if m:
                     sums += 1
-                    keys = {ws.cell(row=r, column=11).value for r in range(int(m.group(1)), int(m.group(2)) + 1)} - {None}
+                    keys = {ws.cell(row=r, column=KEY).value for r in range(int(m.group(1)), int(m.group(2)) + 1)} - {None}
                     assert len(keys) == 1, f"{name}!{cell.coordinate} adds {keys}"
         assert sums >= 1, name
 
 
 def test_rental_tab_shows_net_rent(built):
-    path, _, ctx = built
-    ws = openpyxl.load_workbook(path)["Rental"]
-    labels = [ws.cell(row=r, column=3).value for r in range(1, ws.max_row + 1)]
+    path, _, _ = built
+    ws = openpyxl.load_workbook(path)["M25 Rental Property"]
+    labels = [ws.cell(row=r, column=DETAIL).value for r in range(1, ws.max_row + 1)]
     assert "Net rent" in labels
+
+
+def test_combined_tabs_keep_separate_totals(tmp_path):
+    from tra.models import Figure
+
+    def mutate(figures):
+        figures.append(Figure("F0901", "ded.d7", "Margin loan interest", Decimal("300"), None, "D002", 1, "manual",
+                              True, True, ""))
+        figures.append(Figure("F0902", "ded.d8", "Share registry fee", Decimal("40"), None, "D002", 1, "manual",
+                              True, True, ""))
+
+    ctx = demo_context(tmp_path, mutate=mutate)
+    path = tmp_path / "wp.xlsx"
+    build_workpaper(path, ctx)
+    ws = openpyxl.load_workbook(path)["D07 Int Div Deductions"]
+    texts = [ws.cell(row=r, column=DETAIL).value for r in range(1, ws.max_row + 1)]
+    assert "Total Interest deductions (Item D7 I)" in texts and "Total Dividend deductions (Item D8 H)" in texts

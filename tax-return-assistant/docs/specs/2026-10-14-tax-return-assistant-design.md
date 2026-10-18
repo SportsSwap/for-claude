@@ -407,15 +407,15 @@ Each check returns `ReviewNote`s. Thresholds live in `checks.yaml`.
 
 Each entry has `verified: true|false`. Unverified citations show "(citation to be confirmed by reviewer)" in the workpaper. All ship unverified for the same reason as the rates. Where no citation is known, a note says "reviewer to confirm treatment" rather than citing something uncertain.
 
-## 9. Stage 3: workpaper (default layout)
+## 9. Stage 3: workpaper (the firm's layout)
 
 File: `[ClientCode]_FY2026_Workpaper_DRAFT_v{n}.xlsx`. All styling lives in `workpaper/layout.py`.
 
 | Tab | Contents |
 |---|---|
 | Cover | Client code, income year, prepared by, date, reviewer, sign-off cells, tool version, rates file status. A red **DRAFT – NOT FOR LODGMENT** banner. |
-| Summary | Lead schedule: every label in ATO item order (including zero labels). Columns: Item, Label, Description, This year (formula to the category tab total), Pre-fill, Difference (formula), Prior year, Movement % (formula), Review flag. |
-| One tab per category with figures | E.g. Salary & Wages, Interest, Dividends, Rental, Capital Gains, Other Income, D1 Car, D2 Travel, … D10. Columns: Figure ID, Date, Description, Source document, Page, Method, Confirmed, Substantiated, Amount, Notes. A **SUM** total row. Source document cells link to the filed document. |
+| B01 Summary | The hub. A tax summary box linked to Tax Calc, then the labels the client has (figures, pre-fill or prior year) in ATO item order, in sections (Income, Deductions, Losses, Income tests and private health). Columns: ITR item, Code, Item, Go to (link to the item tab), Amount (formula to the item tab), Tax credits (withheld amounts), ATO pre-fill, Difference (formula), Prior year, Movement % (formula), Review notes. |
+| Item tabs, only those with figures | Named like the firm's workpapers (`tab:` in `config/labels.yaml`): 01 Salaries and Wages, 10 Interest Received, 11 Dividends Received, M03 Capital Gains, M25 Rental Property, D01 MV Expenses … D15 D11 - D15 Deductions, PHI Private Health. Header block (client code, year ended, workpaper, prepared/reviewed by), a link back to B01 Summary and a purpose line. One section per label: ATO pre-fill and client documents separately (subtotals when both), columns Ref, Date, Detail, Source document (linked), Page, Method, Substantiated, Amount, key (hidden), Comments; a **SUM** total and "Transferred to: Item 10 L" linking to the Summary line. |
 | Tax Calc | Taxable income through to refund or payable, entirely as formulas off Summary and Rates. A "Python check (calc B)" column and a difference column with conditional formatting. |
 | Rates | The rates file copied in, so the workbook stands alone, with its verification status shown. |
 | Sources | The document index: doc ID, filed name, type, date, pages, link. |

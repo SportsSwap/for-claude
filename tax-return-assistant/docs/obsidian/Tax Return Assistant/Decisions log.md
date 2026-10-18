@@ -12,7 +12,7 @@ Back to [[Tax Return Assistant]]
 | Python or something else? | **Python command-line tool** | Excel/VBA can't redact a PDF before reading it. Hubdoc and Dext receive documents unredacted. |
 | How to read PDFs? | **Local only**, with room for an AI reader later | An AI reader would send client data offshore (APP 8) and needs firm approval |
 | Tax software | **Xero Tax** | The tool works *around* Xero Tax: pre-fill, lodgment and the official estimate stay there |
-| Workpaper layout | **Default layout for now** | All styling is in one file (`layout.py`), so it can be re-skinned to the firm template |
+| Workpaper layout | **The firm's layout (18 Oct 2026)** | Copied from the firm's individual tax workpaper: B01 Summary hub, numbered item tabs, same header, "Transferred to" links. Only the layout was read, by a script on the laptop; no client details reached Claude |
 | Scans or digital? | **Mostly digital**, so no OCR yet | Scans get filed and flagged for manual entry |
 | Computers | **Windows laptops** | PowerShell setup script |
 | First version | **Stages 1–4 working; Xero and FYI built, but tested only with fake data** | No firm credentials available to test against |

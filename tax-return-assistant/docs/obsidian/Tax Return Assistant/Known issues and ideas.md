@@ -59,6 +59,6 @@ Back to [[Tax Return Assistant]]
 - **Sawnx**, a local FYI-style website instead of commands: **built 18 Oct 2026**. See [[How to run it]].
 - Company and trust returns.
 - **AI reader for documents the tool can't read** (talked about 18 Oct 2026). Only for documents its own readers can't handle (new layouts, scans). The laptop reads a scan into text, blanks out TFN, Medicare, account and other numbers as it does now, and sends only that cleaned-up text to the AI. The figures come back as unconfirmed rows in figures.csv, so a person still checks each one. **Needs the privacy officer's approval first** (and the partners'): client information would leave the laptop (APP 8), and the tool currently promises no AI or outside service. A separate FYI-style document store isn't needed: the tool already files into FYI once API access is set up.
-- Match the firm's own workpaper template (edit `layout.py`).
+- ~~Match the firm's own workpaper template~~: **done 18 Oct 2026** (B01 Summary hub, numbered tabs, same header, Transferred to links). Not copied: the vendor's buttons and macros (Refresh ATO pre-fill, roll-over) and the ITA, ICA, BAS and PAYG instalment tabs, which need data the tool doesn't have yet.
 
 Related: [[To do before real clients]], [[Decisions log]]

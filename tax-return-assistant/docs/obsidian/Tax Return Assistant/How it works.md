@@ -24,16 +24,16 @@ Documents it can't read (scans, password-protected files, unknown layouts) are s
 ## The workpaper (Excel)
 | Tab | What's on it |
 |---|---|
-| Cover | DRAFT – NOT FOR LODGMENT, estimated result, sign-off boxes |
-| Summary | Every return label: this year, pre-fill, difference, prior year, movement % |
-| One tab per category | Each figure with a link to its source document and page; a subtotal per label |
-| Capital Gains | CGT events and the net capital gain working (when there are any) |
+| Cover | DRAFT – NOT FOR LODGMENT, estimated result, partner / manager / reviewer / preparer, sign-off boxes |
+| B01 Summary | The hub, like the firm's: tax summary box, then each return item with a **Go to** link, amount, tax credits, pre-fill, difference, prior year, movement % |
+| Item tabs (only the ones needed) | Named like the firm's: 01 Salaries and Wages, 10 Interest Received, D05 Other Work Deductions, M25 Rental Property, PHI Private Health… Same header on each; ATO pre-fill and client documents shown separately; each figure links to its document and page; **Transferred to: Item 10 L** links back to the Summary line |
+| M03 Capital Gains | CGT events and the net capital gain working (when there are any) |
 | Tax Calc | Taxable income through to refund or payable, all live Excel formulas, with the second calculation beside it |
 | Rates | That year's rates, copied in |
 | Sources | Every filed document |
 | Review Notes | Every flag, ranked High / Medium / Low, with citations and a response column |
 
-Blue numbers are typed-in inputs; everything else is a formula.
+It looks like the firm's workpapers (Calibri 10, no gridlines, light-blue link boxes). Blue numbers are typed-in inputs; everything else is a formula. Headers show the client code, never the name.
 
 ## Tax years and rates
 - **Rates files:** `config/rates/fy2026.yaml` and `fy2025.yaml`. Each new year, copy the file and update the figures.

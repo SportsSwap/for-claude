@@ -1,9 +1,13 @@
-"""Build the Excel workpaper (spec §9).
+"""Build the Excel workpaper (spec §9), laid out like the firm's individual tax workpapers.
 
-Figures and rates are the only typed-in numbers; every total, the lead
-schedule and the whole tax calculation are live formulas, so the reviewer can
-follow the working in Excel. Calculation B's results sit beside the formulas
-as a check. Layout and styling come from layout.py.
+B01 Summary is the hub: every return item in ATO order with a "Go to" link to its tab. Each item tab
+(01 Salaries and Wages, 10 Interest Received, D05 Other Work Deductions, ...) appears only when the
+client has figures for it, has the same header block, shows ATO pre-fill and client documents
+separately, and ends each item with "Transferred to: Item 10 L", a link back to its Summary line.
+
+Figures and rates are the only typed-in numbers; every total, the Summary and the whole tax
+calculation are live formulas, so the reviewer can follow the working in Excel. Calculation B's
+results sit beside the formulas as a check. Layout and styling come from layout.py.
 """
 
 from __future__ import annotations
@@ -16,6 +20,7 @@ from decimal import Decimal
 from pathlib import Path
 
 from openpyxl import Workbook
+from openpyxl.worksheet.hyperlink import Hyperlink
 from openpyxl.worksheet.worksheet import Worksheet
 
 from ..checks import label_name
@@ -32,8 +37,12 @@ from ..taxcalc.result import TaxResult
 from . import layout as L
 
 BANNER = "DRAFT – NOT FOR LODGMENT"
-CGT_TAB = "Capital Gains"
-FIRST_ROW = 5  # data starts below title, subtitle, blank and header rows
+SUMMARY_TAB = "B01 Summary"
+CGT_TAB = "M03 Capital Gains"
+TAXCALC_TAB = "Tax Calc"
+FIRST_ROW = 5  # Sources and Review Notes: data starts below title, subtitle, blank and header rows
+BODY_ROW = 11  # item tabs and the Summary: the body starts below the header block
+TAXCALC_HEAD = 8
 
 TAXCALC_ROWS = [
     ("total_income", "Total income"),
@@ -54,6 +63,29 @@ TAXCALC_ROWS = [
     ("tfn_withheld", "Less: TFN amounts withheld"),
     ("net_result", "Estimated payable / (refund)"),
 ]
+
+# What each item tab is for: the blue "i" line under its header.
+PURPOSE = {
+    "01 Salaries and Wages": "record salary and wages, allowances and the income test amounts from income statements",
+    "10 Interest Received": "record details of interest received",
+    "11 Dividends Received": "record dividends received and their franking credits",
+    "15 Business Professional": "record business income and expenses (complete P8 in Xero Tax)",
+    "24 Other Income": "record other income",
+    "C15 Losses": "record tax losses of earlier income years claimed this year",
+    CGT_TAB: "record capital gains events and work out the net capital gain",
+    "M25 Rental Property": "record rental income and expenses",
+    "D01 MV Expenses": "record work-related car expenses",
+    "D02 Travel": "record work-related travel expenses",
+    "D03 Clothing": "record work-related clothing, laundry and dry-cleaning expenses",
+    "D04 Self Education": "record work-related self-education expenses",
+    "D05 Other Work Deductions": "record other work-related deductions claimed",
+    "D06 Low Value Pool": "record the low-value pool deduction",
+    "D07 Int Div Deductions": "record interest and dividend deductions",
+    "D09 Donations": "record gifts and donations claimed",
+    "D10 Cost Managing Tax": "record the cost of managing tax affairs",
+    "D15 D11 - D15 Deductions": "record personal superannuation contributions and other deductions (D11 to D15)",
+    "PHI Private Health": "record private health insurance premiums and the rebate received",
+}
 
 
 @dataclass
@@ -98,34 +130,95 @@ def _link(location: str) -> str:
     return path.as_uri() if path.is_absolute() else location
 
 
-def _title(ws: Worksheet, title: str, subtitle: str) -> None:
+def _jump(cell, sheet: str, target: str = "A1") -> None:
+    """An internal link to another tab of this workbook."""
+    cell.hyperlink = Hyperlink(ref="", location=f"{_q(sheet)}!{target}")
+
+
+def _back_link(ws: Worksheet, coordinate: str) -> None:
+    cell = ws[coordinate]
+    cell.value = f"↩ {SUMMARY_TAB}"
+    _jump(cell, SUMMARY_TAB)
+    L.style_link_box(cell)
+
+
+def _title(ws: Worksheet, title: str, subtitle: str, back: str | None = None) -> None:
     ws["A1"] = title
     L.style_title(ws["A1"])
     ws["A2"] = subtitle
     L.style_subtitle(ws["A2"])
+    if back:
+        _back_link(ws, back)
 
 
-# --- category tabs --------------------------------------------------------------------------
+def _item_ref(d: LabelDef) -> str:
+    """'Item 10 L', 'Item D5 E', 'Item 1' (no letter when the label isn't a single code)."""
+    code = f" {d.label}" if d.label and len(d.label) <= 2 else ""
+    return f"{d.item}{code}" if d.item in ("PHI", "HELP") else f"Item {d.item}{code}"
 
-FIGURE_HEADERS = ["Figure ID", "Date", "Description", "Return label", "Source document", "Page", "Method",
-                  "Confirmed", "Substantiated", "Amount", "key", "Notes"]
+
+def _sheet_header(ws: Worksheet, heading: str, workpaper: str, ctx: WorkpaperContext, *,
+                  right: tuple[str, str, str], back: str | None) -> None:
+    """The firm's header block: client and year on the left, who prepared and reviewed it on the right."""
+    ws["B2"] = heading
+    L.style_title(ws["B2"])
+    if back:
+        _back_link(ws, back)
+    _, end = fy_bounds(ctx.income_year)
+    label, value, when = right
+    for row, (left_label, left_value) in enumerate(
+            [("Client code", ctx.client_code), ("Year ended", end), ("Status", "Draft – not for lodgment")], start=4):
+        L.style_label(ws.cell(row=row, column=2, value=left_label))
+        cell = ws[f"D{row}"]
+        cell.value = left_value
+        if isinstance(left_value, date):
+            cell.number_format = L.LONG_DATE
+            L.align_left(cell)
+        if left_label == "Status":
+            L.style_draft(cell)
+    for row, (right_label, right_value, right_date) in enumerate(
+            [("Workpaper", workpaper, None), ("Prepared by", ctx.prepared_by, date.today()),
+             ("Reviewed by", "", None)], start=4):
+        L.style_label(ws[f"{label}{row}"])
+        ws[f"{label}{row}"] = right_label
+        ws[f"{value}{row}"] = right_value
+        if right_date:
+            ws[f"{when}{row}"] = right_date
+            ws[f"{when}{row}"].number_format = L.DATE
+    for coordinate in (f"{value}6", f"{when}6"):  # the reviewer fills these in
+        L.style_input(ws[coordinate], "@")
+
+
+def _purpose(ws: Worksheet, text: str, note: str) -> None:
+    ws["B8"] = f"i  The purpose of this worksheet is to {text}."
+    L.style_purpose(ws["B8"])
+    ws["B9"] = note
+    L.style_subtitle(ws["B9"])
+
+
+# --- item tabs ------------------------------------------------------------------------------
+
+# Columns B to K: ref, date, detail, source, page, method, substantiated, amount, key (hidden), comments.
+ITEM_HEADERS = ["Ref", "Date", "Detail", "Source document", "Page", "Method", "Substantiated", "Amount", "key",
+                "Comments"]
+FIRST_COL, LAST_COL = 2, 11
+AMOUNT, KEY = "I", "J"
+ITEM_NOTE = ("Confirmed figures only. Each amount links to its filed source document and page. "
+             "Blue amounts are typed in; dark grey amounts are formulas.")
 
 
 def _write_header(ws: Worksheet, row: int) -> None:
-    for col, header in enumerate(FIGURE_HEADERS, start=1):
+    for col, header in enumerate(ITEM_HEADERS, start=FIRST_COL):
         ws.cell(row=row, column=col, value=header)
-    L.style_header_row(ws, row, len(FIGURE_HEADERS))
+    L.style_header_row(ws, row, len(ITEM_HEADERS), first=FIRST_COL)
 
 
-def _write_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
-                row: int) -> int:
+def _write_rows(ws: Worksheet, figures: list[Figure], docs: dict[str, Document], row: int) -> int:
     for f in figures:
-        d = ctx.labels[f.label_key]
-        ws.cell(row=row, column=1, value=f.figure_id)
+        ws.cell(row=row, column=2, value=f.figure_id)
         if f.date:
-            ws.cell(row=row, column=2, value=f.date).number_format = L.DATE
-        ws.cell(row=row, column=3, value=f.description)
-        ws.cell(row=row, column=4, value=f"{d.item} {d.label}".strip() if len(d.label) <= 2 else d.item)
+            ws.cell(row=row, column=3, value=f.date).number_format = L.DATE
+        ws.cell(row=row, column=4, value=f.description)
         doc = docs.get(f.doc_id or "")
         source = ws.cell(row=row, column=5)
         if doc:
@@ -137,95 +230,131 @@ def _write_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, doc
             L.style_warning(source)
         ws.cell(row=row, column=6, value=f.page if f.page is not None else ("" if doc else "–"))
         ws.cell(row=row, column=7, value=f.method)
-        ws.cell(row=row, column=8, value="Y" if f.confirmed else "N")
-        ws.cell(row=row, column=9, value="" if f.substantiated is None else ("Y" if f.substantiated else "N"))
-        L.style_input(ws.cell(row=row, column=10, value=f.amount))
-        ws.cell(row=row, column=11, value=f.label_key)
-        ws.cell(row=row, column=12, value=f.notes)
+        ws.cell(row=row, column=8, value="" if f.substantiated is None else ("Y" if f.substantiated else "N"))
+        L.style_input(ws.cell(row=row, column=9, value=f.amount))
+        ws.cell(row=row, column=10, value=f.label_key)
+        ws.cell(row=row, column=11, value="" if f.notes == "prefill" else f.notes)  # its section says so
+        L.rule_rows(ws, row, row, FIRST_COL, LAST_COL)
         row += 1
     return row
 
 
-def _write_figure_rows(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
-                       start: int) -> int:
-    _write_header(ws, start - 1)
-    return _write_rows(ws, figures, ctx, docs, start)
+def _figure_groups(figures: list[Figure]) -> list[tuple[str, list[Figure], str]]:
+    """ATO pre-fill first, then the client's own documents, as the firm's workpapers show them."""
+    groups = [("ATO pre-fill", [f for f in figures if f.notes == "prefill"], "Subtotal – ATO pre-fill"),
+              ("Client documents and adjustments", [f for f in figures if f.notes != "prefill"],
+               "Subtotal – client documents")]
+    return [g for g in groups if g[1]]
 
 
 RENTAL_DEDUCTION_KEYS = ("rent.interest", "rent.capital_works", "rent.other")
 
 
-def _category_tab(ws: Worksheet, tab: str, figures: list[Figure], ctx: WorkpaperContext,
-                  docs: dict[str, Document], wp: WorkpaperMap) -> None:
-    """Figures grouped by return label, each group with its own subtotal (labels are never added together)."""
-    _title(ws, f"{tab} — {ctx.client_code} {fy_label(ctx.income_year)}",
-           "Confirmed figures only. Each amount traces to the filed source document and page.")
-    _write_header(ws, FIRST_ROW - 1)
-    row = FIRST_ROW
-    subtotals: dict[str, str] = {}
-    for key in [k for k in ctx.labels if any(f.label_key == k for f in figures)]:
+def _item_section(ws: Worksheet, row: int, d: LabelDef, figures: list[Figure], docs: dict[str, Document],
+                  transfers: list) -> tuple[int, str]:
+    """One return label: a section bar, its figures (pre-fill and client documents), the total and the
+    'Transferred to' link. Labels are never added together. Returns the next free row and the total cell."""
+    ws.cell(row=row, column=2, value=f"{_item_ref(d)}  {d.description}")
+    L.style_section(ws, row, FIRST_COL, LAST_COL)
+    _write_header(ws, row + 1)
+    row += 2
+    groups = _figure_groups(figures)
+    subtotals, start = [], row
+    for heading, items, subtotal_label in groups:
+        L.style_subheading(ws.cell(row=row, column=4, value=heading))
+        row += 1
         start = row
-        row = _write_rows(ws, [f for f in figures if f.label_key == key], ctx, docs, row)
-        ws.cell(row=row, column=3, value=f"Total {label_name(ctx.labels, key)}")
-        L.style_label(ws.cell(row=row, column=3))
-        L.style_total(ws.cell(row=row, column=10, value=f"=SUM(J{start}:J{row - 1})"))
-        wp.total_cells.append(f"{_q(tab)}!J{row}")
-        subtotals[key] = f"J{row}"
-        row += 2
-    if "rent.gross" in subtotals or any(k in subtotals for k in RENTAL_DEDUCTION_KEYS):
-        less = "".join(f"-{subtotals[k]}" for k in RENTAL_DEDUCTION_KEYS if k in subtotals)
-        ws.cell(row=row, column=3, value="Net rent")
-        L.style_label(ws.cell(row=row, column=3))
-        L.style_total(ws.cell(row=row, column=10, value=f"={subtotals.get('rent.gross', '0')}{less}"))
-        wp.total_cells.append(f"{_q(tab)}!J{row}")
-    ws.column_dimensions["K"].hidden = True
-    ws.freeze_panes = f"A{FIRST_ROW}"
-    L.set_widths(ws, L.CATEGORY_WIDTHS)
-    L.setup_print(ws, header_row=FIRST_ROW - 1)
+        row = _write_rows(ws, items, docs, row)
+        if len(groups) > 1:
+            ws.cell(row=row, column=4, value=subtotal_label)
+            L.style_label(ws.cell(row=row, column=4))
+            L.style_subtotal(ws.cell(row=row, column=9, value=f"=SUM({AMOUNT}{start}:{AMOUNT}{row - 1})"))
+            subtotals.append(f"{AMOUNT}{row}")
+            row += 1
+    ws.cell(row=row, column=4, value=f"Total {d.description} ({_item_ref(d)})")
+    L.style_label(ws.cell(row=row, column=4))
+    formula = "=" + "+".join(subtotals) if subtotals else f"=SUM({AMOUNT}{start}:{AMOUNT}{row - 1})"
+    L.style_total(ws.cell(row=row, column=9, value=formula))
+    total = f"{AMOUNT}{row}"
+    ws.cell(row=row + 1, column=8, value="Transferred to:")
+    L.style_label(ws.cell(row=row + 1, column=8))
+    link = ws.cell(row=row + 1, column=9, value=_item_ref(d))
+    L.style_link_box(link)
+    transfers.append((link, d.key))
+    return row + 4, total
+
+
+def _item_tab(ws: Worksheet, tab: str, figures: list[Figure], ctx: WorkpaperContext,
+              docs: dict[str, Document], wp: WorkpaperMap, transfers: list) -> None:
+    _sheet_header(ws, tab.split(" ", 1)[1], tab, ctx, right=("H", "I", "K"), back="K2")
+    _purpose(ws, PURPOSE.get(tab, "record the amounts for this part of the return"), ITEM_NOTE)
+    row = BODY_ROW
+    totals: dict[str, str] = {}
+    for key in [k for k in ctx.labels if any(f.label_key == k for f in figures)]:
+        row, totals[key] = _item_section(ws, row, ctx.labels[key], [f for f in figures if f.label_key == key],
+                                         docs, transfers)
+        wp.total_cells.append(f"{_q(tab)}!{totals[key]}")
+    if "rent.gross" in totals or any(k in totals for k in RENTAL_DEDUCTION_KEYS):
+        less = "".join(f"-{totals[k]}" for k in RENTAL_DEDUCTION_KEYS if k in totals)
+        ws.cell(row=row, column=4, value="Net rent")
+        L.style_label(ws.cell(row=row, column=4))
+        L.style_total(ws.cell(row=row, column=9, value=f"={totals.get('rent.gross', '0')}{less}"))
+        wp.total_cells.append(f"{_q(tab)}!{AMOUNT}{row}")
+    ws.column_dimensions[KEY].hidden = True
+    L.set_widths(ws, L.ITEM_WIDTHS)
+    L.setup_print(ws)
 
 
 def _cgt_tab(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
-             wp: WorkpaperMap) -> dict[str, str]:
+             wp: WorkpaperMap, transfers: list) -> dict[str, str]:
     """Prior-loss figures, the CGT event schedule and the s102-5 method statement, as formulas."""
-    _title(ws, f"{CGT_TAB} — {ctx.client_code} {fy_label(ctx.income_year)}",
-           "Net capital gain per the ITAA 1997 s102-5 method statement: losses reduce non-discount gains first.")
-    end = _write_figure_rows(ws, figures, ctx, docs, FIRST_ROW)
-    ws.cell(row=end, column=3, value="Capital losses brought forward")
+    _sheet_header(ws, "Capital Gains", CGT_TAB, ctx, right=("H", "I", "K"), back="K2")
+    _purpose(ws, PURPOSE[CGT_TAB],
+             "Net capital gain per the ITAA 1997 s102-5 method statement: losses reduce non-discount gains first.")
+    ws.cell(row=BODY_ROW, column=2, value="Capital losses brought forward")
+    L.style_section(ws, BODY_ROW, FIRST_COL, LAST_COL)
+    _write_header(ws, BODY_ROW + 1)
+    first = BODY_ROW + 2
+    end = _write_rows(ws, figures, docs, first)
+    ws.cell(row=end, column=4, value="Capital losses brought forward")
+    L.style_label(ws.cell(row=end, column=4))
     # No prior-loss figures: nothing to sum (a SUM over the empty range would include this cell).
-    prior_losses = ws.cell(row=end, column=10, value=f"=SUM(J{FIRST_ROW}:J{end - 1})" if end > FIRST_ROW else "=0")
+    prior_losses = ws.cell(row=end, column=9, value=f"=SUM(I{first}:I{end - 1})" if end > first else "=0")
     L.style_total(prior_losses)
-    wp.total_cells.append(f"{_q(CGT_TAB)}!J{end}")
-    ws.column_dimensions["K"].hidden = True
+    wp.total_cells.append(f"{_q(CGT_TAB)}!I{end}")
 
     head = end + 3
-    headers = ["Event", "Asset", "Acquired", "Disposed", "Proceeds", "Cost base", "Gain / (loss)",
-               "Discount eligible", "Source document", "Page"]
-    for col, h in enumerate(headers, start=1):
+    ws.cell(row=head - 1, column=2, value="CGT events")
+    L.style_section(ws, head - 1, FIRST_COL, 12)
+    # B event, C acquired, D asset, E source, F page, G disposed, H proceeds, I cost base, K gain, L discount.
+    headers = {2: "Event", 3: "Acquired", 4: "Asset", 5: "Source document", 6: "Page", 7: "Disposed",
+               8: "Proceeds", 9: "Cost base", 11: "Gain / (loss)", 12: "Discount eligible"}
+    for col, h in headers.items():
         ws.cell(row=head, column=col, value=h)
-    L.style_header_row(ws, head, len(headers))
+    L.style_header_row(ws, head, 11, first=FIRST_COL)
     row = head + 1
-    events = [e for e in ctx.cgt_events if e.confirmed]
-    for e in events:
-        ws.cell(row=row, column=1, value=e.event_id)
-        ws.cell(row=row, column=2, value=e.asset)
+    for e in [e for e in ctx.cgt_events if e.confirmed]:
+        ws.cell(row=row, column=2, value=e.event_id)
         ws.cell(row=row, column=3, value=e.acquired).number_format = L.DATE
-        ws.cell(row=row, column=4, value=e.disposed).number_format = L.DATE
-        L.style_input(ws.cell(row=row, column=5, value=e.proceeds))
-        L.style_input(ws.cell(row=row, column=6, value=e.cost_base))
-        L.style_formula(ws.cell(row=row, column=7, value=f"=E{row}-F{row}"))
-        ws.cell(row=row, column=8, value="Y" if discount_eligible(e.acquired, e.disposed) else "N")
+        ws.cell(row=row, column=4, value=e.asset)
         doc = docs.get(e.doc_id or "")
-        ws.cell(row=row, column=9, value=doc.filed_name if doc else "NO SOURCE")
-        ws.cell(row=row, column=10, value=e.page)
+        ws.cell(row=row, column=5, value=doc.filed_name if doc else "NO SOURCE")
+        ws.cell(row=row, column=6, value=e.page)
+        ws.cell(row=row, column=7, value=e.disposed).number_format = L.DATE
+        L.style_input(ws.cell(row=row, column=8, value=e.proceeds))
+        L.style_input(ws.cell(row=row, column=9, value=e.cost_base))
+        L.style_formula(ws.cell(row=row, column=11, value=f"=H{row}-I{row}"))
+        ws.cell(row=row, column=12, value="Y" if discount_eligible(e.acquired, e.disposed) else "N")
+        L.rule_rows(ws, row, row, FIRST_COL, 12)
         row += 1
-    first, last = head + 1, max(head + 1, row - 1)
-    g, h = f"G{first}:G{last}", f"H{first}:H{last}"
+    first_event, last_event = head + 1, max(head + 1, row - 1)
+    g, h = f"K{first_event}:K{last_event}", f"L{first_event}:L{last_event}"
     half = "0.5" if ctx.state.resident else "1"
     calc = [
         ("total", "Total current year capital gains (18 H)", f'=SUMIF({g},">0")'),
         ("nd", "Gains not eligible for the discount", f'=SUMIFS({g},{g},">0",{h},"N")'),
         ("dg", "Gains eligible for the discount", f'=SUMIFS({g},{g},">0",{h},"Y")'),
-        ("losses", "Capital losses: this year plus brought forward", f'=-SUMIF({g},"<0")+J{end}'),
+        ("losses", "Capital losses: this year plus brought forward", f'=-SUMIF({g},"<0")+I{end}'),
         ("nd_after", "Non-discount gains after losses", "=MAX(0,{nd}-{losses})"),
         ("dg_after", "Discount gains after remaining losses", "=MAX(0,{dg}-MAX(0,{losses}-{nd}))"),
         ("net", f"Net capital gain (18 A){' — 50% discount applied' if ctx.state.resident else ''}",
@@ -233,73 +362,136 @@ def _cgt_tab(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: 
     ]
     refs: dict[str, str] = {}
     row += 2
+    ws.cell(row=row - 1, column=2, value="Method statement (ITAA 1997 s102-5)")
+    L.style_section(ws, row - 1, FIRST_COL, LAST_COL)
     for key, label, formula in calc:
-        refs[key] = f"J{row}"
-        ws.cell(row=row, column=3, value=label)
-        cell = ws.cell(row=row, column=10, value=formula.format(**refs))
+        refs[key] = f"I{row}"
+        ws.cell(row=row, column=4, value=label)
+        cell = ws.cell(row=row, column=9, value=formula.format(**refs))
         (L.style_total if key in ("total", "net") else L.style_formula)(cell)
-        wp.total_cells.append(f"{_q(CGT_TAB)}!J{row}")
+        wp.total_cells.append(f"{_q(CGT_TAB)}!I{row}")
+        if key in ("total", "net"):
+            link = ws.cell(row=row, column=11, value=_item_ref(ctx.labels[f"cgt.{'total_gains' if key == 'total' else 'net_gain'}"]))
+            L.style_link_box(link)
+            transfers.append((link, f"cgt.{'total_gains' if key == 'total' else 'net_gain'}"))
         row += 1
-    L.set_widths(ws, L.CATEGORY_WIDTHS)
+    ws.column_dimensions[KEY].hidden = True
+    L.set_widths(ws, {**L.ITEM_WIDTHS, "G": 11, "K": 14, "L": 11})
     L.setup_print(ws)
-    return {"cgt.total_gains": f"{_q(CGT_TAB)}!$J${refs['total'][1:]}",
-            "cgt.net_gain": f"{_q(CGT_TAB)}!$J${refs['net'][1:]}"}
+    return {"cgt.total_gains": f"{_q(CGT_TAB)}!$I${refs['total'][1:]}",
+            "cgt.net_gain": f"{_q(CGT_TAB)}!$I${refs['net'][1:]}"}
 
 
-# --- summary (lead schedule) ----------------------------------------------------------------
+# --- B01 Summary (the hub) -----------------------------------------------------------------
+
+# Columns B to M.
+SUMMARY_HEADERS = ["ITR item", "Code", "Item", "Go to", "Amount (per schedule)", "Tax credits", "ATO pre-fill",
+                   "Difference", "Prior year", "Movement", "Review notes", "key"]
+SUMMARY_LAST = 13
+SUMMARY_SECTIONS = [
+    ("Income", {"income", "franking", "withheld", "rental_income", "rental_deduction", "business_income",
+                "business_deduction", "cgt", "info"}, "total_income", "Total income"),
+    ("Deductions", {"deduction"}, "deductions", "Total deductions"),
+    ("Losses", {"loss"}, None, None),
+    ("Income tests and private health insurance", {"it", "phi"}, None, None),
+]
+TAX_SUMMARY = [("total_income", "Total income"), ("deductions", "Total deductions"),
+               ("taxable_income", "Taxable income"), ("basic_tax", "Tax on taxable income"),
+               ("net_result", "Estimated amount payable / (refundable)")]
+
+
+def _taxcalc_ref(name: str) -> str:
+    row = TAXCALC_HEAD + 1 + [n for n, _ in TAXCALC_ROWS].index(name)
+    return f"{_q(TAXCALC_TAB)}!$B${row}"
+
 
 def _summary(ws: Worksheet, ctx: WorkpaperContext, tab_of: dict[str, str], cgt_refs: dict[str, str],
-             wp: WorkpaperMap) -> dict[str, str]:
-    _title(ws, f"Lead schedule — {ctx.client_code} {fy_label(ctx.income_year)}",
-           "Every return label in ATO item order. This year links to the working tabs; pre-fill and prior year are inputs.")
-    headers = ["Item", "Label", "Description", "This year", "Pre-fill", "Difference", "Prior year", "Movement",
-               "Review notes", "key"]
-    for col, h in enumerate(headers, start=1):
-        ws.cell(row=FIRST_ROW - 1, column=col, value=h)
-    L.style_header_row(ws, FIRST_ROW - 1, len(headers))
+             wp: WorkpaperMap) -> tuple[dict[str, str], dict[str, str]]:
+    """Returns where each label's amount is (for the tax calculation) and where to land a 'Transferred to' link."""
+    _sheet_header(ws, "Summary", SUMMARY_TAB, ctx, right=("I", "J", "L"), back=None)
+    _purpose(ws, "summarise the amounts for the income tax return. Totals come from the supporting "
+                 "worksheets; use Go to to see the working",
+             "Blue = typed in (pre-fill, prior year). Difference compares this year with the ATO pre-fill. "
+             "The tax figures are worked out on the Tax Calc tab.")
+    row = BODY_ROW
+    ws.cell(row=row, column=2, value="Tax Summary")
+    L.style_section(ws, row, 2, SUMMARY_LAST - 1)
+    row += 1
+    for name, text in TAX_SUMMARY:
+        ws.cell(row=row, column=4, value=text)
+        cell = ws.cell(row=row, column=6, value=f"={_taxcalc_ref(name)}")
+        (L.style_total if name == "net_result" else L.style_formula)(cell)
+        L.rule_rows(ws, row, row, 2, 7)
+        row += 1
+    row += 1
+
     per_label = defaultdict(Counter)
     for n in ctx.notes:
         if n.label_key:
             per_label[n.label_key][n.risk] += 1
     refs: dict[str, str] = {}
-    row = FIRST_ROW
-    for key, d in ctx.labels.items():
-        if d.role == "info" and not d.computed:
+    landing: dict[str, str] = {}
+    for title, roles, total_name, total_text in SUMMARY_SECTIONS:
+        keys = [k for k, d in ctx.labels.items() if d.role in roles and not (d.role == "info" and not d.computed)
+                and (k in tab_of or k in cgt_refs or k in ctx.prefill or k in ctx.prior_year)]
+        if not keys:
             continue
-        ws.cell(row=row, column=1, value=d.item)
-        ws.cell(row=row, column=2, value=d.label if len(d.label) <= 2 else "")
-        ws.cell(row=row, column=3, value=d.description)
-        this_year = ws.cell(row=row, column=4)
-        if key in cgt_refs:
-            this_year.value = f"={cgt_refs[key]}"
-        elif key in tab_of:
-            tab = _q(tab_of[key])
-            this_year.value = f'=SUMIFS({tab}!$J:$J,{tab}!$K:$K,"{key}")'
-        else:
-            this_year.value = 0
-        if isinstance(this_year.value, str):
-            L.style_formula(this_year)
-            wp.summary_cells[key] = f"Summary!D{row}"
-        else:
-            L.style_input(this_year)
-        if key in ctx.prefill:
-            L.style_input(ws.cell(row=row, column=5, value=ctx.prefill[key]))
-        L.style_formula(ws.cell(row=row, column=6, value=f'=IF(E{row}="","",D{row}-E{row})'))
-        if key in ctx.prior_year:
-            L.style_input(ws.cell(row=row, column=7, value=ctx.prior_year[key]))
-        L.style_formula(ws.cell(row=row, column=8, value=f'=IF(OR(G{row}="",G{row}=0),"",(D{row}-G{row})/G{row})'),
-                        L.PERCENT)
-        counts = per_label.get(key)
-        if counts:
-            ws.cell(row=row, column=9, value=", ".join(f"{counts[r]} {r}" for r in ("High", "Medium", "Low") if counts[r]))
-        ws.cell(row=row, column=10, value=key)
-        refs[key] = f"Summary!$D${row}"
+        ws.cell(row=row, column=2, value=title)
+        L.style_section(ws, row, 2, SUMMARY_LAST - 1)
+        for col, h in enumerate(SUMMARY_HEADERS, start=2):
+            ws.cell(row=row + 1, column=col, value=h)
+        L.style_header_row(ws, row + 1, len(SUMMARY_HEADERS) - 1, first=2)
+        row += 2
+        for key in keys:
+            d = ctx.labels[key]
+            col = 7 if d.role == "withheld" else 6
+            ws.cell(row=row, column=2, value=f"Item {d.item}" if d.item not in ("PHI", "HELP") else d.item)
+            ws.cell(row=row, column=3, value=d.label if len(d.label) <= 2 else "")
+            ws.cell(row=row, column=4, value=d.description)
+            tab = CGT_TAB if key in cgt_refs else tab_of.get(key)
+            if tab:
+                go = ws.cell(row=row, column=5, value="Go to")
+                _jump(go, tab)
+                L.style_link_box(go)
+            amount = ws.cell(row=row, column=col)
+            if key in cgt_refs:
+                amount.value = f"={cgt_refs[key]}"
+            elif key in tab_of:
+                t = _q(tab_of[key])
+                amount.value = f'=SUMIFS({t}!${AMOUNT}:${AMOUNT},{t}!${KEY}:${KEY},"{key}")'
+            else:
+                amount.value = 0
+            letter = L.letter(col)
+            if isinstance(amount.value, str):
+                L.style_formula(amount)
+                wp.summary_cells[key] = f"{_q(SUMMARY_TAB)}!{letter}{row}"
+            else:
+                L.style_input(amount)
+            if key in ctx.prefill:
+                L.style_input(ws.cell(row=row, column=8, value=ctx.prefill[key]))
+            L.style_formula(ws.cell(row=row, column=9, value=f'=IF(H{row}="","",F{row}+G{row}-H{row})'))
+            if key in ctx.prior_year:
+                L.style_input(ws.cell(row=row, column=10, value=ctx.prior_year[key]))
+            L.style_formula(ws.cell(row=row, column=11,
+                                    value=f'=IF(OR(J{row}="",J{row}=0),"",(F{row}+G{row}-J{row})/J{row})'), L.PERCENT)
+            counts = per_label.get(key)
+            if counts:
+                ws.cell(row=row, column=12, value=", ".join(f"{counts[r]} {r}" for r in ("High", "Medium", "Low") if counts[r]))
+            ws.cell(row=row, column=13, value=key)
+            L.rule_rows(ws, row, row, 2, SUMMARY_LAST - 1)
+            refs[key] = f"{_q(SUMMARY_TAB)}!${letter}${row}"
+            landing[key] = f"{letter}{row}"
+            row += 1
+        if total_name:
+            ws.cell(row=row, column=4, value=total_text)
+            L.style_label(ws.cell(row=row, column=4))
+            L.style_total(ws.cell(row=row, column=6, value=f"={_taxcalc_ref(total_name)}"))
+            row += 1
         row += 1
-    ws.column_dimensions["J"].hidden = True
-    ws.freeze_panes = f"A{FIRST_ROW}"
+    ws.column_dimensions["M"].hidden = True
     L.set_widths(ws, L.SUMMARY_WIDTHS)
-    L.setup_print(ws, header_row=FIRST_ROW - 1)
-    return refs
+    L.setup_print(ws, landscape=True)
+    return refs, landing
 
 
 # --- rates ---------------------------------------------------------------------------------
@@ -313,12 +505,13 @@ class _Block:
     def heading(self, text: str) -> None:
         self.row += 1
         self.ws.cell(row=self.row, column=1, value=text)
-        L.style_label(self.ws.cell(row=self.row, column=1))
+        L.style_section(self.ws, self.row, 1, 5)
         self.row += 1
 
     def value(self, name: str, label: str, value, fmt: str = L.NUMBER) -> None:
         self.ws.cell(row=self.row, column=1, value=label)
         L.style_input(self.ws.cell(row=self.row, column=2, value=value), fmt)
+        L.rule_rows(self.ws, self.row, self.row, 1, 2)
         self.refs[name] = f"Rates!$B${self.row}"
         self.row += 1
 
@@ -331,6 +524,7 @@ class _Block:
             self.row += 1
             for col, (v, fmt) in enumerate(zip(values, fmts), start=1):
                 L.style_input(self.ws.cell(row=self.row, column=col, value=v), fmt)
+            L.rule_rows(self.ws, self.row, self.row, 1, len(headers))
         last = self.row
         for col in range(1, len(headers) + 1):
             letter = chr(ord("A") + col - 1)
@@ -342,7 +536,7 @@ class _Block:
 def _rates(ws: Worksheet, ctx: WorkpaperContext) -> dict[str, str]:
     r, st = ctx.rates, ctx.state
     _title(ws, f"Rates and thresholds — FY{r.income_year}",
-           "Copied from config/rates so this workbook stands alone. Blue = input.")
+           "Copied from config/rates so this workbook stands alone. Blue = input.", back="E1")
     status = ws.cell(row=3, column=1, value=(
         f"Status: {r.status}" + (f" (verified by {r.verified_by} on {r.verified_on})" if r.status == "verified"
                                  else " — every figure must be checked against ato.gov.au by a registered agent")))
@@ -412,7 +606,7 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
     st = ctx.state
     _title(ws, f"Estimated tax — {ctx.client_code} {fy_label(ctx.income_year)}",
            "Column B is worked out by the formulas below. Column C is the tool's independent calculation B. "
-           "Any difference is highlighted and raised as a High review note.")
+           "Any difference is highlighted and raised as a High review note.", back="E1")
     ws["A4"], ws["A5"], ws["A6"] = "Days in income year", "Days without private hospital cover", "HELP debt"
     L.style_input(ws.cell(row=4, column=2, value=days_in_fy(ctx.income_year)), L.WHOLE)
     uncovered = 0 if st.hospital_cover_days is None else max(0, days_in_fy(ctx.income_year) - st.hospital_cover_days)
@@ -422,7 +616,7 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
     ws.cell(row=6, column=2, value="Yes" if st.help_debt else "No")
     days, days_uncovered = "$B$4", "$B$5"
 
-    head = 8
+    head = TAXCALC_HEAD
     for col, h in enumerate(["Component", "Workpaper (formula)", "Python check (calc B)", "Difference",
                              "How it's worked out"], start=1):
         ws.cell(row=head, column=col, value=h)
@@ -431,7 +625,7 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
     c = {name: f"$B${row}" for name, row in row_of.items()}
 
     def S(key: str) -> str:
-        return s[key]
+        return s.get(key, "0")  # a label with nothing this year has no Summary line
 
     rent = f"({S('rent.gross')}-{S('rent.interest')}-{S('rent.capital_works')}-{S('rent.other')})"
     income = "+".join(S(k) for k in ("income.salary", "income.allowances", "income.interest", "income.div_unfranked",
@@ -467,8 +661,8 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
 
     formulas = {
         "total_income": (f"={income}+{rent}+{S('income.business_income')}-{S('income.business_expenses')}",
-                         "Income labels + net rent + net capital gain + business net (Summary)"),
-        "deductions": ("=" + "+".join(S(k) for k in DEDUCTION_KEYS), "D1–D10, D12, D15 (Summary)"),
+                         "Income labels + net rent + net capital gain + business net (B01 Summary)"),
+        "deductions": ("=" + "+".join(S(k) for k in DEDUCTION_KEYS), "D1–D10, D12, D15 (B01 Summary)"),
         "taxable_income": (f"=MAX(0,ROUNDDOWN({c['total_income']}-{c['deductions']}-{S('loss.l1')},0))",
                            "Total income − deductions − prior-year losses; cents dropped"),
         "basic_tax": (f"=ROUND(LOOKUP({ti},{bf},{bb})+({ti}-LOOKUP({ti},{bf},{bf}))*LOOKUP({ti},{bf},{br}),2)",
@@ -506,7 +700,8 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
         L.style_input(ws.cell(row=row, column=3, value=b_values[name]))
         L.style_formula(ws.cell(row=row, column=4, value=f"=B{row}-C{row}"))
         ws.cell(row=row, column=5, value=how)
-        wp.taxcalc_cells[name] = f"{_q('Tax Calc')}!B{row}"
+        L.rule_rows(ws, row, row, 1, 5)
+        wp.taxcalc_cells[name] = f"{_q(TAXCALC_TAB)}!B{row}"
     L.flag_nonzero(ws, f"D{head + 1}:D{head + len(TAXCALC_ROWS)}")
     note_row = head + len(TAXCALC_ROWS) + 2
     ws.cell(row=note_row, column=1, value="Estimate only. Xero Tax produces the figure that is lodged; use this to "
@@ -514,14 +709,14 @@ def _tax_calc(ws: Worksheet, ctx: WorkpaperContext, s: dict[str, str], r: dict[s
     L.style_subtitle(ws.cell(row=note_row, column=1))
     L.set_widths(ws, L.TAXCALC_WIDTHS)
     L.setup_print(ws)
-    return f"{_q('Tax Calc')}!$B${row_of['net_result']}"
+    return f"{_q(TAXCALC_TAB)}!$B${row_of['net_result']}"
 
 
 # --- sources, review notes, cover ------------------------------------------------------------
 
 def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
     _title(ws, f"Source documents — {ctx.client_code} {fy_label(ctx.income_year)}",
-           "Every filed document. Originals are filed unchanged; the tool keeps no copy of their text.")
+           "Every filed document. Originals are filed unchanged; the tool keeps no copy of their text.", back="L1")
     headers = ["Doc ID", "Filed name", "Type", "Category", "Document date", "Date found", "Pages", "Parse status",
                "Store", "Redacted on read", "SHA-256 (first 16)", "Summary", "Description"]
     for col, h in enumerate(headers, start=1):
@@ -543,6 +738,7 @@ def _sources(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=11, value=d.sha256[:16])
         L.style_wrap(ws.cell(row=row, column=12, value=ctx.doc_summaries.get(d.doc_id, "")))
         L.style_wrap(ws.cell(row=row, column=13, value=ctx.doc_descriptions.get(d.doc_id, "")))
+        L.rule_rows(ws, row, row, 1, len(headers))
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.SOURCES_WIDTHS)
     L.setup_print(ws, header_row=FIRST_ROW - 1)
@@ -563,7 +759,8 @@ def citation_text(citations: dict, citation_id: str | None) -> str:
 
 def _review_notes(ws: Worksheet, ctx: WorkpaperContext) -> None:
     _title(ws, f"Review notes — {ctx.client_code} {fy_label(ctx.income_year)}",
-           "Every flag, assumption and client question, ranked by risk then dollar impact. Respond in column J.")
+           "Every flag, assumption and client question, ranked by risk then dollar impact. Respond in column J.",
+           back="J1")
     headers = ["#", "Risk", "Area", "Note", "$ impact", "For", "Action", "Citation", "Refs", "Response"]
     for col, h in enumerate(headers, start=1):
         ws.cell(row=FIRST_ROW - 1, column=col, value=h)
@@ -583,6 +780,7 @@ def _review_notes(ws: Worksheet, ctx: WorkpaperContext) -> None:
         ws.cell(row=row, column=9, value=", ".join(n.figure_ids + n.doc_ids))
         if note_key(n) in ctx.responses:
             L.style_wrap(ws.cell(row=row, column=10, value=ctx.responses[note_key(n)]))
+        L.rule_rows(ws, row, row, 1, len(headers))
     ws.freeze_panes = f"A{FIRST_ROW}"
     L.set_widths(ws, L.NOTES_WIDTHS)
     L.setup_print(ws, header_row=FIRST_ROW - 1)
@@ -593,28 +791,40 @@ def _cover(ws: Worksheet, ctx: WorkpaperContext, net_ref: str) -> None:
     ws["A1"] = BANNER
     L.style_banner(ws["A1"])
     start, end = fy_bounds(ctx.income_year)
+    for row, text, size in ((4, ctx.client_code, 18), (5, "Individual Tax Return", 14),
+                            (6, f"Year ended {end:%d %B %Y}".replace(" 0", " "), 12)):
+        L.style_cover_name(ws.cell(row=row, column=1, value=text), size)
     risks = Counter(n.risk for n in ctx.notes)
     rows = [
         ("Client code", ctx.client_code),
         ("Income year", f"{fy_label(ctx.income_year)} ({start:%d %B %Y} – {end:%d %B %Y})"),
-        ("Prepared by", ctx.prepared_by),
+        ("Partner", ""),
+        ("Manager", ""),
+        ("Reviewer (registered tax agent)", ""),
+        ("Preparer", ctx.prepared_by),
         ("Prepared on", date.today().strftime("%d/%m/%Y")),
         ("Tool version", ctx.tool_version),
         ("Rates file", f"FY{ctx.rates.income_year}: {ctx.rates.status}"),
         ("Estimated payable / (refund)", f"={net_ref}"),
         ("Review notes", f"{risks['High']} High, {risks['Medium']} Medium, {risks['Low']} Low"),
-        ("Reviewed by (registered tax agent)", ""),
         ("Review date", ""),
         ("Sign-off", ""),
     ]
-    for i, (label, value) in enumerate(rows, start=4):
+    first = 8
+    for i, (label, value) in enumerate(rows, start=first):
         L.style_label(ws.cell(row=i, column=1, value=label))
         cell = ws.cell(row=i, column=2, value=value)
         if isinstance(value, str) and value.startswith("="):
             L.style_total(cell)
+        elif value == "":
+            L.style_input(cell, "@")
         if label == "Rates file" and ctx.rates.status != "verified":
             L.style_warning(cell)
-    text_row = 4 + len(rows) + 1
+    L.rule_rows(ws, first, first + len(rows) - 1, 1, 2)
+    contents = ws.cell(row=first + len(rows) + 1, column=1, value=f"→ Start at {SUMMARY_TAB}")
+    _jump(contents, SUMMARY_TAB)
+    L.style_link_box(contents)
+    text_row = first + len(rows) + 3
     for line in (
         "Prepared by the Tax Return Assistant from documents supplied by the client.",
         "This is a draft. It must be reviewed and signed off by a registered tax agent before anything is lodged.",
@@ -643,29 +853,35 @@ def build_workpaper(path: Path, ctx: WorkpaperContext) -> WorkpaperMap:
     wb = Workbook()
     cover = wb.active
     cover.title = "Cover"
-    summary = wb.create_sheet("Summary")
+    summary = wb.create_sheet(SUMMARY_TAB)
     tab_sheets = {tab: wb.create_sheet(tab) for tab in tab_order}
-    tax_calc = wb.create_sheet("Tax Calc")
+    tax_calc = wb.create_sheet(TAXCALC_TAB)
     rates = wb.create_sheet("Rates")
     sources = wb.create_sheet("Sources")
     notes = wb.create_sheet("Review Notes")
 
     cgt_refs: dict[str, str] = {}
     tab_of: dict[str, str] = {}
+    transfers: list = []
     for tab in tab_order:
         figures = by_tab.get(tab, [])
         if tab == CGT_TAB:
-            cgt_refs = _cgt_tab(tab_sheets[tab], figures, ctx, docs, wp)
+            cgt_refs = _cgt_tab(tab_sheets[tab], figures, ctx, docs, wp, transfers)
         else:
-            _category_tab(tab_sheets[tab], tab, figures, ctx, docs, wp)
+            _item_tab(tab_sheets[tab], tab, figures, ctx, docs, wp, transfers)
         for f in figures:
             tab_of[f.label_key] = tab
-    summary_refs = _summary(summary, ctx, tab_of, cgt_refs, wp)
+    summary_refs, landing = _summary(summary, ctx, tab_of, cgt_refs, wp)
+    for cell, key in transfers:  # "Transferred to: Item 10 L" lands on that line of the Summary
+        if key in landing:
+            _jump(cell, SUMMARY_TAB, landing[key])
     rate_refs = _rates(rates, ctx)
     net_ref = _tax_calc(tax_calc, ctx, summary_refs, rate_refs, wp)
     _sources(sources, ctx)
     _review_notes(notes, ctx)
     _cover(cover, ctx, net_ref)
+    for ws in wb.worksheets:
+        L.finish_sheet(ws)
 
     check_workbook(wb, path.name)
     path.parent.mkdir(parents=True, exist_ok=True)
