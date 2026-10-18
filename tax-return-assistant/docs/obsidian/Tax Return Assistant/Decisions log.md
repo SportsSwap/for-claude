@@ -42,4 +42,12 @@ A second Claude reviewed everything.
 - **Commands start with `.\tra`** (a small `tra.cmd` file) instead of activating the tool first. Windows blocks `Activate.ps1` by default, and firm laptops may not let me change that.
 - **The tool finds `TRA_HOME` from my Windows account** when the PowerShell window doesn't have it, so it works straight after setup.
 
+## Sawnx website (18 Oct 2026)
+- **Sawnx**: an FYI-style website for the tool, with a black background. It runs **only on my laptop** (opens in the browser, not on the internet), so client documents stay in `C:\TaxAssistant` or FYI.
+- First version: client list with job status (Docs in, Figures confirmed, Prepared, Reviewed), each client's files in folders (standard ones plus my own) and my own file notes, import where I pick the return type (Individual for now) and choose per file "Read for the return" or "Store only", confirm figures on screen, a Prepare button with the workpaper to download, and review notes with responses.
+- **Sensitive numbers:** blanked out the moment a document is read, so nothing the tool makes ever holds them. The stored original stays unchanged as the firm's record, like FYI.
+- **AI reader built in but switched off** until the privacy officer approves. It would only get blanked-out text, only for documents the tool can't read.
+- Built as a small web server inside the tool (Flask), using the tool's existing code. No new database.
+- Design written: `docs/specs/2026-10-18-sawnx-design.md`. Next: my review, a Claude Design mockup, then the build.
+
 Related: [[How it works]], [[Privacy rules]]

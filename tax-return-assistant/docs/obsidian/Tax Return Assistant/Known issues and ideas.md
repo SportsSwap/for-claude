@@ -41,13 +41,15 @@ Back to [[Tax Return Assistant]]
 - **Fixed:** Windows blocked `Activate.ps1` on a fresh PC. Commands now start with `.\tra`, which needs no activating and no change to Windows settings.
 - **Fixed:** in the window setup ran in, the tool said `TRA_HOME is not set`. It now finds the folder setup saved.
 - **Fixed:** the README's list of demo review notes was missing the residency note (S14).
+- **Fixed (17 Oct 2026):** after Excel saved figures.csv, review notes lost their cents ("$2,019" instead of "$2,019.00"). Every dollar amount in the notes now shows two decimals. The tax figures were never affected.
+- **Accuracy test client TEST01** (18 Oct 2026): four made-up documents in `C:\TaxAssistant\Inbox\TEST01` (salary, interest, a franked dividend, a membership receipt). Claude's trial run matched a hand calculation to the cent. Still to do: run it myself and compare with my own calculation.
 - Not yet tried on a firm laptop.
 
 ## Ideas
 - **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it. (`.\tra` already removed the activate step.)
-- Simple local web page instead of commands.
+- **Sawnx**, a local FYI-style website instead of commands: being designed (18 Oct 2026). See [[Decisions log]].
 - Company and trust returns.
-- An AI reader for messy documents, on redacted text, once the firm approves.
+- **AI reader for documents the tool can't read** (talked about 18 Oct 2026). Only for documents its own readers can't handle (new layouts, scans). The laptop reads a scan into text, blanks out TFN, Medicare, account and other numbers as it does now, and sends only that cleaned-up text to the AI. The figures come back as unconfirmed rows in figures.csv, so a person still checks each one. **Needs the privacy officer's approval first** (and the partners'): client information would leave the laptop (APP 8), and the tool currently promises no AI or outside service. A separate FYI-style document store isn't needed: the tool already files into FYI once API access is set up.
 - Match the firm's own workpaper template (edit `layout.py`).
 
 Related: [[To do before real clients]], [[Decisions log]]

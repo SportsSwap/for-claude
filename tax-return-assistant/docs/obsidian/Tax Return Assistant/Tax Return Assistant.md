@@ -13,11 +13,12 @@ It **never lodges anything.** The return is still done in Xero Tax and signed of
 
 ## Where things are
 - **Code:** GitHub `SportsSwap/for-claude`, branch `claude/tax-return-assistant-sstpuw`, folder `tax-return-assistant`
+- **Tool folder on my PC:** `C:\Users\Nicho\Claude code\tax-return-assistant\tax-return-assistant` (next to this vault, not inside it, so Obsidian doesn't show it). Run commands from there in PowerShell. Kept out of the vault on purpose: Obsidian Sync is on, and moving it would break the tool until setup is re-run.
 - **Client data when it runs:** `C:\TaxAssistant` on the laptop. Never in OneDrive, never in GitHub.
 - **Built in:** Claude Code session <https://claude.ai/code/session_01N2pEC5oyPFnAavBcEamEbT>
 
 ## Status (17 Oct 2026)
-- All six stages built, with 304 automated tests passing
+- All six stages built, with 318 automated tests (315 pass on Windows; 3 need LibreOffice)
 - The demo client works end to end: estimated payable $5,697.11
 - Tested on Windows (17 Oct 2026, my personal Windows 10 PC): setup, the demo and the tests all work. Still to try on a firm laptop.
 - **Not ready for real clients yet.** See [[To do before real clients]].
