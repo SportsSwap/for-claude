@@ -37,6 +37,31 @@ Label keys:
 {labels}"""
 
 
+def figures_from_items(items: list, keys: list[str], doc_id: str, page_count: int,
+                       reader: str) -> tuple[list[Figure], list[str]]:
+    """Unconfirmed figures from a reader's answer, and a line for each item that couldn't be used.
+    A page outside the document is left blank by the AI reader; Claude in chat (strict) is told."""
+    figures, problems = [], []
+    for n, item in enumerate(items[:MAX_FIGURES], start=1):
+        try:
+            key = item["label_key"]
+            if key not in keys:
+                raise ValueError(f"{key!r} isn't a label a figure can have")
+            amount: Decimal = parse_amount(str(item["amount"]))
+            page = item.get("page")
+            if not (isinstance(page, int) and 1 <= page <= page_count):
+                if reader != "AI":
+                    raise ValueError(f"page {page!r} isn't in the document (it has {page_count})")
+                page = None
+            description = str(item.get("description") or "").strip()[:120]
+        except (ValueError, TypeError, KeyError) as exc:
+            problems.append(f"figure {n}: {exc}")
+            continue
+        figures.append(Figure(figure_id="", label_key=key, description=f"{reader}: {description}", amount=amount,
+                              date=None, doc_id=doc_id, page=page, method="ai", confirmed=False, substantiated=None))
+    return figures, problems
+
+
 def _note(risk: str, check_id: str, message: str, doc_id: str) -> ReviewNote:
     return ReviewNote(risk, check_id, message, None, "preparer", "confirm", doc_ids=(doc_id,))
 
@@ -83,23 +108,9 @@ class AiReader:
             items = json.loads(raw)["figures"] if raw else None
         except (ValueError, TypeError, KeyError):
             items = None
-        unusable = items is None
-        for item in (items or [])[:MAX_FIGURES]:
-            try:
-                key = item["label_key"]
-                if key not in self.keys:
-                    raise ValueError(key)
-                amount: Decimal = parse_amount(str(item["amount"]))
-                page = item.get("page")
-                page = page if isinstance(page, int) and 1 <= page <= len(rt.pages) else None
-                description = str(item.get("description") or "").strip()[:120]
-            except (ValueError, TypeError, KeyError):
-                unusable = True
-                continue
-            result.figures.append(Figure(figure_id="", label_key=key, description=f"AI: {description}",
-                                         amount=amount, date=None, doc_id=doc_id, page=page, method="ai",
-                                         confirmed=False, substantiated=None))
-        if unusable:
+        figures, problems = figures_from_items(items or [], self.keys, doc_id, len(rt.pages), "AI")
+        result.figures.extend(figures)
+        if items is None or problems:
             result.notes.append(_note("Medium", "A3", "The AI reader couldn't give a usable answer for some or all "
                                       "of this document. Enter anything missing by hand.", doc_id))
         result.parse_status = "partial" if result.figures else "manual_needed"
@@ -111,12 +122,18 @@ class AiReaderUnavailable(Exception):
 
 
 def ai_reader_from_settings(tra_home: Path, env: Mapping[str, str], client=None) -> AiReader | None:
-    """An AiReader only when Sawnx's setting is on and ANTHROPIC_API_KEY is set; otherwise None."""
+    """An AiReader when Sawnx's setting is on, otherwise None. The key comes from the environment or, like
+    TRA_HOME, from the value saved for the Windows account; switched on without a key says so."""
+    from ... import settings as tra_settings
     from ...web.app_settings import load_app_settings
 
-    key = (env.get("ANTHROPIC_API_KEY") or "").strip()
-    if not load_app_settings(tra_home).ai_reader or not key:
+    if not load_app_settings(tra_home).ai_reader:
         return None
+    key = (env.get("ANTHROPIC_API_KEY") or "").strip() or tra_settings.saved_user_variable("ANTHROPIC_API_KEY").strip()
+    if not key:
+        raise AiReaderUnavailable("The AI reader is switched on, but there's no ANTHROPIC_API_KEY saved for this "
+                                  "Windows account, so it didn't read anything. Set it (see the README), then import "
+                                  "again.")
     if client is None:
         try:
             import anthropic

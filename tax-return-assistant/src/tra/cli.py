@@ -96,6 +96,10 @@ def _counts(counts: dict) -> str:
 @click.version_option(__version__, prog_name="tra")
 def main() -> None:
     """Tax Return Assistant: prepares DRAFT returns for review by a registered tax agent. Never lodges."""
+    # Output piped on Windows can use an old encoding without characters like "→"; never crash on printing.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
 
 
 @main.command()
@@ -205,6 +209,51 @@ def figures(code, fy, no_open):
             os.startfile(ws.figures_csv)  # noqa: S606 - Windows only
         else:
             click.echo(str(ws.figures_csv))
+
+
+@main.command("ai-text")
+@click.argument("code")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+@click.option("--doc", "doc_id", default=None, help="One document, e.g. D002 (default: every one the readers couldn't read).")
+@_friendly
+def ai_text(code, fy, doc_id):
+    """Show Claude, in a chat, the blanked-out text of documents the built-in readers couldn't read."""
+    from .claude_reads import document_text, label_keys, unread_documents
+
+    _s, ws, audit = _workspace(code, fy)
+    docs = unread_documents(ws, doc_id)
+    if not docs:
+        click.echo("Nothing to read: the built-in readers read every document, or they're stored only.")
+        return
+    click.echo("Blanked-out text only. Give each figure one of these label keys: " + ", ".join(label_keys()))
+    click.echo("Then: tra ai-add CODE DOC_ID '{\"figures\": [{\"label_key\", \"description\", \"amount\", \"page\"}]}'")
+    for doc in docs:
+        click.echo(f"\n== {doc.doc_id} · {doc.doc_type} · {doc.pages} page(s) · dated {doc.doc_date:%d/%m/%Y}")
+        try:
+            rt = document_text(ws, doc, audit)
+        except ValueError as exc:
+            click.echo(f"Not shown: {exc}")
+            continue
+        for n, page in enumerate(rt.pages, start=1):
+            click.echo(f"--- Page {n} ---\n{page}")
+
+
+@main.command("ai-add")
+@click.argument("code")
+@click.argument("doc_id")
+@click.argument("answer")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+@_friendly
+def ai_add(code, doc_id, answer, fy):
+    """Add the figures Claude read from a document, unconfirmed (ANSWER is JSON, or - to read it from stdin)."""
+    from .claude_reads import add_claude_figures
+
+    _s, ws, audit = _workspace(code, fy)
+    added = add_claude_figures(ws, doc_id, sys.stdin.read() if answer == "-" else answer, audit)
+    for f in added:
+        click.echo(f"{f.figure_id} {f.label_key} ${f.amount:,.2f} (page {f.page}) {f.description}")
+    click.echo(f"{len(added)} figure(s) added to {doc_id}, unconfirmed. Check each against the document and "
+               "confirm it on the Figures tab.")
 
 
 @main.command()

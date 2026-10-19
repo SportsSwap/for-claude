@@ -12,7 +12,7 @@ from tra.checks.reconcile import check_reconcile
 from tra.demo import _write_pdf
 from tra.filing.local_store import LocalStore
 from tra.ingest.classify import load_doc_types
-from tra.ingest.extractors.ai_reader import DEFAULT_MODEL, AiReader, ai_reader_from_settings
+from tra.ingest.extractors.ai_reader import DEFAULT_MODEL, AiReader, AiReaderUnavailable, ai_reader_from_settings
 from tra.ingest.pipeline import ingest_file
 from tra.privacy.audit import AuditLog
 from tra.privacy.detectors import find_sensitive
@@ -52,9 +52,17 @@ def test_off_by_default(tmp_path, monkeypatch):
     _app, _client, settings = make_client(tmp_path, monkeypatch)
     assert ai_reader_from_settings(settings.tra_home, {"ANTHROPIC_API_KEY": "x"}) is None
     enable_ai_reader(settings.tra_home, "Privacy Officer", date(2026, 10, 20), AuditLog(tmp_path / "a.jsonl"))
-    assert ai_reader_from_settings(settings.tra_home, {}) is None  # on, but no key
+    with pytest.raises(AiReaderUnavailable, match="ANTHROPIC_API_KEY"):
+        ai_reader_from_settings(settings.tra_home, {})  # on, but no key: say so rather than skip it quietly
     reader = ai_reader_from_settings(settings.tra_home, {"ANTHROPIC_API_KEY": "x"}, client=FakeClient())
     assert isinstance(reader, AiReader) and reader.model == DEFAULT_MODEL == "claude-opus-5-5"
+
+
+def test_key_saved_for_the_windows_account_is_used(tmp_path, monkeypatch):
+    _app, _client, settings = make_client(tmp_path, monkeypatch)
+    enable_ai_reader(settings.tra_home, "Privacy Officer", date(2026, 10, 20), AuditLog(tmp_path / "a.jsonl"))
+    monkeypatch.setattr("tra.settings.saved_user_variable", lambda name: "x" if name == "ANTHROPIC_API_KEY" else "")
+    assert isinstance(ai_reader_from_settings(settings.tra_home, {}, client=FakeClient()), AiReader)
 
 
 def test_never_called_when_off(tmp_path, monkeypatch):
