@@ -150,7 +150,7 @@ Ingesting the same file twice is detected and skipped. If a document can't be re
 - the ATO pre-fill report;
 - income statements;
 - bank and interest statements;
-- dividend statements;
+- dividend statements, either one amount per line or the share registries' table (Link/MUFG, Computershare). A table is used only if it adds up; otherwise it's left for you to enter;
 - property manager statements;
 - private health insurance statements;
 - receipts;
@@ -309,7 +309,7 @@ The workpaper follows the firm's individual tax workpapers (B01 Summary as the h
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 464 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 468 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.

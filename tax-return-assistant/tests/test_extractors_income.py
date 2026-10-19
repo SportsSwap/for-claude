@@ -83,6 +83,71 @@ def test_dividends(demo):
     assert all(f.date == date(2026, 3, 24) for f in result.figures)
 
 
+# Share registries (Link/MUFG, Computershare) set the amounts out as a table. Invented companies and amounts.
+REGISTRY_TABLE = [
+    "Payment Advice",
+    "All Registry communications to:",
+    "SAMPLE MINING LIMITED",
+    "DIVIDEND STATEMENT",
+    "Payment Date: 20 March 2026",
+    "Record Date: 20 February 2026",
+    "Security Description Dividend Rate Participating Unfranked Franked Total Franking",
+    "per Share Shares Amount Amount Payment Credit",
+    "SMX - FULLY PAID ORDINARY SHARES $0.12 1,500 $30.00 $150.00 $180.00 $64.29",
+    "Less Withholding Tax $0.00",
+    "Net Amount AUD 180.00",
+    "FRANKING INFORMATION Franked Rate per Share $0.10",
+    "Franking Percentage 83.33%",
+    "Company Tax Rate 30%",
+]
+
+
+def _dividends(lines):
+    return get_extractor("DIVSTMT").extract(redact_pages(["\n".join(lines)]), "D001")
+
+
+def test_dividends_registry_table():
+    result = _dividends(REGISTRY_TABLE)
+    assert _totals(result.figures) == {
+        "income.div_unfranked": Decimal("30.00"),
+        "income.div_franked": Decimal("150.00"),
+        "income.franking_credit": Decimal("64.29"),
+    }
+    assert result.parse_status == "parsed"
+    assert result.doc_date == date(2026, 3, 20)
+    assert all(f.description.startswith("SAMPLE MINING LIMITED") for f in result.figures)
+
+
+def test_dividends_table_columns_in_another_order():
+    result = _dividends([
+        "ACME RESOURCES LTD",
+        "Dividend Statement",
+        "Payment date 15 April 2026",
+        "Class Description Amount per Security Number of Securities Franked Amount Unfranked Amount Gross Payment",
+        "Ordinary Shares 50 cents 1,000 $500.00 $0.00 $500.00",
+        "Net Payment $500.00",
+        "Franking Credit $214.29",
+    ])
+    assert _totals(result.figures) == {
+        "income.div_franked": Decimal("500.00"),
+        "income.franking_credit": Decimal("214.29"),
+    }
+    assert result.parse_status == "parsed"
+
+
+def test_dividends_table_that_does_not_add_up_is_left_for_manual_entry():
+    lines = [line.replace("$180.00 $64.29", "$200.00 $64.29") for line in REGISTRY_TABLE]
+    result = _dividends(lines)
+    assert result.figures == []
+    assert result.parse_status == "manual_needed"
+
+
+def test_dividends_withholding_tax_is_flagged_to_confirm():
+    lines = [line.replace("Less Withholding Tax $0.00", "Less Withholding Tax $47.00") for line in REGISTRY_TABLE]
+    withheld = [f for f in _dividends(lines).figures if f.label_key == "income.div_tfn_withheld"]
+    assert [f.amount for f in withheld] == [Decimal("47.00")]
+    assert "confirm" in withheld[0].notes
+
 def test_extractor_rejects_raw_str():
     with pytest.raises(TypeError):
         get_extractor("DIVSTMT").extract("raw", "D001")

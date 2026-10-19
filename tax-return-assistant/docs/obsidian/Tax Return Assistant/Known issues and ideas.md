@@ -44,6 +44,8 @@ Back to [[Tax Return Assistant]]
 - **Fixed (17 Oct 2026):** after Excel saved figures.csv, review notes lost their cents ("$2,019" instead of "$2,019.00"). Every dollar amount in the notes now shows two decimals. The tax figures were never affected.
 - **Accuracy test client TEST01** (18 Oct 2026): four made-up documents in `C:\TaxAssistant\Inbox\TEST01` (salary, interest, a franked dividend, a membership receipt). Claude's trial run matched a hand calculation to the cent. Still to do: run it myself and compare with my own calculation.
 - Not yet tried on a firm laptop.
+- **Fixed (19 Oct 2026):** a share registry dividend statement (amounts in a table under a heading row, as Link/MUFG and Computershare do) came in as "couldn't read". The reader now reads the table, and only uses it if unfranked + franked = total and the franking credit isn't too big. 'Withholding tax' on a statement comes in as TFN withheld with a note to confirm.
+- **Ideas from the TEST02 trial:** warn when a document is dated outside the income year (the test statement was paid 28 March 2025, so it belongs in FY2025, not FY2026); a "read again" button for a document that's already filed (importing the same file again is skipped as a duplicate).
 
 ## Sawnx small issues (from the 18 Oct 2026 review, not fixed yet)
 - A folder named like a Windows device (CON, NUL, COM1) gives an unclear error.
