@@ -9,6 +9,7 @@ Back to [[Tax Return Assistant]]. These run on every return and appear on the Re
 | Code | Checks for |
 |---|---|
 | R1–R5 | A figure with no source document; label totals not adding up; unconfirmed figures; pre-fill *and* the source document both counted; the same document ingested twice |
+| R7 | A document used in the return is dated outside the income year (1 July to 30 June), so its figures may belong to another year. Fine: 30 June dates; annual statements (income statement, interest summary, managed fund, health insurance, rental) up to 120 days after 30 June; the pre-fill report dated after 30 June. A pre-fill dated earlier in the year is flagged as probably last year's |
 | P1–P4 | Differences from the ATO pre-fill (over $1); pre-fill items missing from the return; no pre-fill ingested; HELP debt mismatch |
 | C1 | The two tax calculations disagree |
 | C2 | Rates file not yet verified (shows until a registered agent checks it) |
