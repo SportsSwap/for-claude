@@ -5,7 +5,7 @@ The owner is an undergraduate accountant at a boutique Australian firm (Advisory
 ## What this is
 A local Python CLI (`tra`) that prepares **draft** individual returns: redact → file → extract → confirm in Excel → `tra prepare` (draft return, two independent tax calculations, self-checks, Excel workpaper). **It never lodges.** A registered agent signs off every return.
 
-**Sawnx** (`src/tra/web/`, `tra web`, `Sawnx.cmd`) is the same tool as a local website: Flask on 127.0.0.1 only, a per-start session key, no CDN or external fonts. Routes are thin; behaviour is in `web/services/`, which call the existing code. The AI reader (`ingest/extractors/ai_reader.py`) is built but **off** until the privacy officer approves; it only takes `RedactedText` and its tests use a stand-in client.
+**Sawnx** (`src/tra/web/`, `tra web`, `Sawnx.cmd`) is the same tool as a local website: Flask on 127.0.0.1 only, a per-start session key, no CDN or external fonts. Routes are thin; behaviour is in `web/services/`, which call the existing code. The AI reader (`ingest/extractors/ai_reader.py`) is built but **off** until the privacy officer approves; it only takes `RedactedText` and its tests use a stand-in client. The firm has no API key, so when the owner asks you to read a client's documents, run `.\tra ai-text CODE` (blanked text of the documents the readers couldn't read), read it, and add figures with `.\tra ai-add CODE DOC_ID '<json>'` (unconfirmed, method ai). Never open the original files; made-up clients only until the privacy officer says otherwise.
 
 - Design: `docs/specs/2026-10-14-tax-return-assistant-design.md` (binding) and `docs/specs/2026-10-18-sawnx-design.md`.
 - Plans: `docs/plans/2026-10-14-tax-return-assistant.md`, `docs/plans/2026-10-18-sawnx.md`.
@@ -20,7 +20,7 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact �
 ## Working on it
 ```
 python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest          # 468 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
+.venv/bin/python -m pytest          # 497 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
 .venv/bin/python -m pyflakes src tests
 ```
 - On Windows the paths are `.venv\Scripts\...`. pyflakes isn't in the `dev` extras; `pip install pyflakes` into the venv.
@@ -35,6 +35,6 @@ Built and reviewed; Sawnx built 18 Oct 2026. Not yet used on real clients. Befor
 - a test on a firm laptop (setup, the demo and the tests passed on a personal Windows 10 PC on 17 Oct 2026);
 - move to a private repo (`for-claude` is public).
 
-- privacy officer approval before the AI reader is switched on, and the firm's IT confirming a local web server on 127.0.0.1 is OK.
+- AI reader: the privacy officer approved a demo with made-up clients only (19 Oct 2026); real clients still need their approval. Names and addresses aren't blanked before text is sent. Also the firm's IT confirming a local web server on 127.0.0.1 is OK.
 
 Open ideas: company and trust returns, OCR for scans, FYI document preview in Sawnx. See `docs/obsidian/Tax Return Assistant/Known issues and ideas.md`.

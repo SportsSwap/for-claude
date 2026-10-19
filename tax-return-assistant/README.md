@@ -93,14 +93,29 @@ Sawnx does everything below by clicking instead of typing commands. It opens in 
 | Knowledge | The firm's templates, policies and procedures, in folders. Firm documents only, never client documents. |
 | Documents | Every document across all clients and years. Click a heading to sort; filter by client, year, folder or type; tick several to star, download or move them. |
 | Clients | Every client by **name** (with its code), sorted by name, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. Search by name or code. **New client** asks for the name and suggests a code from the surname (Jane Citizen → CITI01). |
-| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. **Cabinets** like FYI: *Tax return* (per year, as above), *Permanent* and *Correspondence* (per client, stored only, never read). Open a document to edit its **properties** (type, folder, date, status) and to **upload a new version**; older copies stay listed. |
+| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. **Cabinets** like FYI: *Tax return* (per year, as above), *Permanent* and *Correspondence* (per client, stored only, never read). Open a document to edit its **properties** (type, folder, date, status) and to **upload a new version**; older copies stay listed. **Delete** (on the open document, or for ticked documents) moves a document to **Deleted items** with everything read from it, so its figures come out of the return; **Restore** puts it all back, and **Delete forever** removes it for good. Deleting a document also lets you import the same file again, to have it read again. |
 | Figures | Tick each figure once you've checked it against its source, which shows beside the table. Fix a label or amount, or add a figure by hand. Changes save to `figures.csv` straight away. |
 | Prepare | Prepares the return (as `tra prepare`), shows the estimate and both calculations side by side, and lists every workpaper to download. |
 | Review notes | Each note with a response box and a Resolved tick. Responses go into the Response column of the next workpaper. **Mark reviewed** once every High note is resolved. |
 | Notes | Your own file notes about the client, and an activity list from the audit log. |
 | Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero, and **filing rules** ("if a document mentions X, suggest client Y, cabinet Z, folder W"; suggestions only). |
 
-**The AI reader is built in but switched off.** If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `ANTHROPIC_API_KEY` set for the Windows account and `.\.venv\Scripts\pip install -e ".[ai]"`.
+**The AI reader is built in but switched off.** If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `.\.venv\Scripts\pip install -e ".[ai]"` (close Sawnx first) and an API key from the firm's Anthropic Console account, saved for the Windows account by typing this in PowerShell yourself (never paste a key into a chat): `[Environment]::SetEnvironmentVariable('ANTHROPIC_API_KEY', 'your-key', 'User')`. Sawnx finds a key saved this way even if it was already running; switched on without a key, an import says so. **What leaves the laptop:** the document's text with identifier numbers blanked out. Names, addresses and amounts are not blanked, so the privacy officer's approval covers those.
+
+**Without an API key: Claude reads it in a chat.** The firm has no Anthropic API account, so instead you can ask
+Claude (Claude Code, in a chat on this laptop) to read the documents the built-in readers couldn't:
+
+```powershell
+.\tra ai-text TEST04                 # shows Claude only the blanked-out text of the unread documents
+.\tra ai-add TEST04 D002 "<answer>"  # adds what Claude read, as unconfirmed figures
+```
+
+You just say "read TEST04's documents" and Claude runs both. `ai-text` scans the text again and shows nothing if an
+identifier is left in it; `ai-add` checks every label, amount and page and refuses the whole answer if any part is
+wrong, won't read the same document twice, and records each step in the audit log by document number. The figures
+arrive unconfirmed, marked "Claude:", for you to check against the document (R6 flags them on the workpaper).
+Same privacy as the AI reader: names, addresses and amounts go to Claude under your Claude account's terms, so the
+privacy officer has approved it for **made-up clients only** (19 Oct 2026).
 
 ---
 
@@ -219,6 +234,7 @@ The look follows the firm's workpapers: Calibri 10, dark grey text, no gridlines
 | ID | Checks |
 |---|---|
 | R1–R5 | Every figure has a filed source; label totals add up; unconfirmed figures listed; pre-fill and source document not both counted; the same document not ingested twice (same type, label and amount from two documents) |
+| R7 | A document used in the return is dated outside the income year, so its figures may belong to another year. Allowed: 30 June dates; annual statements (income statement, interest summary, managed fund, health insurance, rental) dated up to 120 days after 30 June; the ATO pre-fill report dated after 30 June. A pre-fill dated earlier in the year is flagged as probably last year's. Undated documents are skipped (I2 covers them) |
 | P1–P4 | Return vs ATO pre-fill (differences over $1, items on pre-fill but missing, no pre-fill ingested, HELP mismatch) |
 | C1–C2 | The two tax calculations agree to the cent; the rates file is verified |
 | S1 | Deductions high relative to income |
@@ -309,7 +325,7 @@ The workpaper follows the firm's individual tax workpapers (B01 Summary as the h
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 468 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 497 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.

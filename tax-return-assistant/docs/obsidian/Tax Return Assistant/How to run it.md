@@ -32,6 +32,8 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - **In Tray:** drop in documents for any client; Sawnx suggests who and where (client, cabinet, folder, year). Check it, then **File**.
 - **Jobs:** every client has a tax return job each year; add your own (BAS, advice...) with due dates, tasks, comments and time. **Home** shows My Tasks, Delegated Tasks, My Time and Notifications.
 - **Knowledge:** the firm's templates and policies (never client documents). **Settings → Filing rules** teach the In Tray where documents usually go.
+- **Claude reads documents the rules can't:** import as usual, then in a Claude chat say "read TEST04's documents". Claude runs `.\tra ai-text TEST04` (sees only the blanked-out text) and `.\tra ai-add` (adds figures **unconfirmed**, marked "Claude:"). Check each on the Figures tab. Made-up clients only for now.
+- **Delete:** open a document and click **Delete** (or tick several and click Delete). It goes to **Deleted items** at the bottom of the folder list, and its figures come out of the return. **Restore** puts it back; **Delete forever** is only for mistakes (duplicates, wrong client). Prepare again afterwards.
 - **Cabinets:** each client has *Tax return* (per year), *Permanent* and *Correspondence*, like FYI. Open a document to change its type, folder, date or status, or upload a newer version (older ones are kept).
 - **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
 - **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.

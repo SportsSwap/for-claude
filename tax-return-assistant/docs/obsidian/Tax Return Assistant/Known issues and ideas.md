@@ -29,7 +29,7 @@ Back to [[Tax Return Assistant]]
 - HELP note (P4) shows when no pre-fill was ingested and the client has a HELP debt.
 - The $300 check counts car claims, which s900-35 excludes.
 - Keyword checks over-fire ("phone bill", "suitcase", "newsletter").
-- No check that dates fall in the income year.
+- ~~No check that dates fall in the income year~~: **done 19 Oct 2026** (self-check R7, see [[Self-checks]]).
 - Copied Excel rows can create duplicate figure IDs.
 - `tra scan` prints file paths.
 - Some symbols break when Windows output is redirected to a file.
@@ -45,7 +45,15 @@ Back to [[Tax Return Assistant]]
 - **Accuracy test client TEST01** (18 Oct 2026): four made-up documents in `C:\TaxAssistant\Inbox\TEST01` (salary, interest, a franked dividend, a membership receipt). Claude's trial run matched a hand calculation to the cent. Still to do: run it myself and compare with my own calculation.
 - Not yet tried on a firm laptop.
 - **Fixed (19 Oct 2026):** a share registry dividend statement (amounts in a table under a heading row, as Link/MUFG and Computershare do) came in as "couldn't read". The reader now reads the table, and only uses it if unfranked + franked = total and the franking credit isn't too big. 'Withholding tax' on a statement comes in as TFN withheld with a note to confirm.
-- **Ideas from the TEST02 trial:** warn when a document is dated outside the income year (the test statement was paid 28 March 2025, so it belongs in FY2025, not FY2026); a "read again" button for a document that's already filed (importing the same file again is skipped as a duplicate).
+- **Ideas from the TEST02 trial:** ~~warn when a document is dated outside the income year~~ (the test statement was paid 28 March 2025, so it belongs in FY2025, not FY2026): **done 19 Oct 2026** as self-check R7; a "read again" button for a document that's already filed (importing the same file again is skipped as a duplicate). For now: Delete it, then import the same file again and it's read again.
+- **Done 19 Oct 2026:** deleting documents in Sawnx (Deleted items, Restore, Delete forever).
+- **Found 19 Oct 2026, not fixed:** an account number at the end of a line can swallow the first number of the next line when it's blanked ("Account 7012 3456" then "1 July 2025" became "[ACCOUNT REDACTED] July 2025"). Too much is blanked, never too little, but a date or amount can lose a digit.
+- **Fixed 19 Oct 2026:** `tra ingest` could stop part-way when its output went to a window using an old text encoding (it printed a "→").
+- **What the date check (R7) can't see:**
+  - documents with no date found (the I2 note already says so);
+  - last year's annual statement that only shows an issue date early in this year (say 15 July 2025), because that date is inside FY2026;
+  - a monthly rental statement for July, dated within 120 days after 30 June, which passes as if it were the year's summary;
+  - a pre-fill report is allowed any date after 30 June, because it can be downloaded long after the year ends.
 
 ## Sawnx small issues (from the 18 Oct 2026 review, not fixed yet)
 - A folder named like a Windows device (CON, NUL, COM1) gives an unclear error.

@@ -15,6 +15,8 @@ Back to [[Tax Return Assistant]]
 
 ## Needs the firm
 - [ ] Privacy officer reads [[Privacy rules]] and the README's privacy section, and signs off.
+- [x] **AI reader:** the privacy officer approved trying it with **made-up clients only** and wants to see it (19 Oct 2026). Demo documents: `C:\TaxAssistant\Inbox\AIDEMO`.
+- [ ] AI reader for real clients: needs the privacy officer's approval. Point out that names, addresses and amounts are sent (only identifier numbers are blanked), and use the **firm's** Anthropic account.
 - [ ] BitLocker on for the laptop drive holding `C:\TaxAssistant`.
 - [ ] Move the code to a **private, firm-owned** GitHub repo. `for-claude` is public.
 - [ ] Show the supervising agent the demo workpaper.
