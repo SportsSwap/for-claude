@@ -42,6 +42,20 @@ def version_path(space, doc_id: str, n: int) -> Path | None:
     return path if path.is_file() and path.is_relative_to(space.clients_dir.resolve()) else None
 
 
+def forget_versions(space, doc_id: str) -> int:
+    """Delete a document's older copies for good (when the document itself is deleted forever)."""
+    data = _load(space)
+    older = data.pop(doc_id, [])
+    for entry in older:
+        path = (space.clients_dir / entry["file"]).resolve()
+        if path.is_file() and path.is_relative_to(space.clients_dir.resolve()):
+            path.unlink()
+    if older:
+        check_value(data, LOCATION)
+        atomic_write_text(_path(space), json.dumps(data, indent=2), LOCATION, prechecked=True)
+    return len(older)
+
+
 def add_version(space, doc_id: str, source: Path, by: str, audit: AuditLog) -> list[str]:
     """Make ``source`` the current copy of the document. Returns warnings for the preparer."""
     from .web.services.files import document_path, find_document

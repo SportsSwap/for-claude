@@ -38,6 +38,7 @@
       <label class="visually-hidden" for="mvto">Move to folder</label>
       <select id="mvto" name="folder">{% for f in folders_for_move %}<option>{{ f }}</option>{% endfor %}</select>
       <button class="btn-ghost" type="submit" formaction="/move">Move</button>
+      <button class="btn-ghost btn-danger" type="submit" formaction="/delete" data-confirm="Delete the ticked documents? Anything read from them comes out of the return. You can restore them from Deleted items.">Delete</button>
       {% endif %}
     </div>
     <div class="tblwrap card">

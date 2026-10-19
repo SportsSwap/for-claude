@@ -15,6 +15,7 @@
       {% for f in folders %}
       <a class="folder {{ 'on' if folder == f.name }}" href="{{ base }}/files?{{ cabq }}folder={{ f.name|urlencode }}"><span>{{ f.name }}</span><span class="mono muted">{{ f.count }}</span></a>
       {% endfor %}
+      <a class="folder" href="{{ base }}/deleted{{ '?cab=' ~ cab if cab }}"><span>Deleted items</span><span class="mono muted">{{ deleted_count }}</span></a>
     </div>
     <form class="stack" method="post" action="{{ base }}/folders">
       {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}

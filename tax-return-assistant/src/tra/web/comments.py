@@ -52,6 +52,15 @@ def add_comment(tra_home: Path, code: str, target: str, text: str, by: str, audi
     return comment
 
 
+def forget_comments(tra_home: Path, code: str, target: str) -> None:
+    """Remove the comments on one document (when it is deleted forever)."""
+    comments = _load(tra_home, code)
+    kept = [c for c in comments if c["target"] != target]
+    if len(kept) != len(comments):
+        check_value(kept, LOCATION)
+        atomic_write_text(_path(tra_home, code), json.dumps(kept, indent=2), LOCATION, prechecked=True)
+
+
 def list_comments(tra_home: Path, code: str, target: str | None = None) -> list[dict]:
     return [c for c in _load(tra_home, code) if target is None or c["target"] == target]
 

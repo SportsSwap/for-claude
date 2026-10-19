@@ -176,6 +176,38 @@ def append_figures(path: Path, new: list[Figure]) -> list[Figure]:
     return assigned
 
 
+def take_rows(path: Path, columns: list[str], doc_id: str) -> list[dict[str, str]]:
+    """Take the rows that came from one document out of figures.csv or cgt_events.csv, exactly as they were.
+    The other rows are kept as the user left them."""
+    rows = _rows(path)
+    taken = [i for i, r in enumerate(rows) if (r.get("doc_id") or "").strip() == doc_id]
+    if taken:
+        _write_csv(path, columns, [[r.get(c, "") or "" for c in columns] for i, r in enumerate(rows) if i not in taken],
+                   path.name)
+    return [{c: rows[i].get(c, "") or "" for c in columns} for i in taken]
+
+
+def put_back_rows(path: Path, columns: list[str], rows: list[dict[str, str]], id_column: str, prefix: str) -> None:
+    """Add back rows take_rows took out. An id someone else now has gets the next free one."""
+    if not rows:
+        return
+    existing = _rows(path)
+    used = {(r.get(id_column) or "").strip() for r in existing}
+    pattern = re.compile(rf"^{prefix}(\d+)$")
+    numbers = [int(m.group(1)) for i in used if (m := pattern.match(i))]
+    next_n = max(numbers, default=0) + 1
+    width = 4 if prefix == "F" else 3
+    restored = []
+    for r in rows:
+        r = dict(r)
+        if r.get(id_column) and r[id_column] in used:
+            r[id_column] = f"{prefix}{next_n:0{width}d}"
+            next_n += 1
+        used.add(r.get(id_column, ""))
+        restored.append([r.get(c, "") or "" for c in columns])
+    _write_csv(path, columns, [[r.get(c, "") or "" for c in columns] for r in existing] + restored, path.name)
+
+
 # --- cgt_events.csv ------------------------------------------------------------------
 
 def read_cgt(path: Path) -> tuple[list[CgtEvent], list[str]]:

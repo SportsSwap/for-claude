@@ -75,7 +75,7 @@ def file_document(source: Path, ws: Workspace, store: DocumentStore, *, doc_type
 
 
 @contextmanager
-def _restore_on_error(*paths: Path):
+def restore_on_error(*paths: Path):
     """If anything fails, put these files back as they were, so a re-run starts clean."""
     saved = {p: p.read_bytes() if p.exists() else None for p in paths}
     try:
@@ -154,7 +154,7 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
 
     # Figures first, the index row last: if any step fails, everything is rolled back and
     # the file is not marked as ingested, so running the command again does the whole job.
-    with _restore_on_error(ws.figures_csv, ws.prefill_json):
+    with restore_on_error(ws.figures_csv, ws.prefill_json):
         added = append_figures(ws.figures_csv, result.figures) if result.figures else []
         if result.prefill:
             append_prefill(ws.prefill_json, result.prefill)

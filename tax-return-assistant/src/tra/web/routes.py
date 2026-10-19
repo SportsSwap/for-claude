@@ -166,9 +166,11 @@ def register(app: Flask) -> None:
 
     from .client_routes import register_client_routes
     from .home_routes import register_home_routes, register_intray_routes
+    from .trash_routes import register_trash_routes
     from .work_routes import register_work_routes
 
     register_client_routes(app)
     register_home_routes(app)
     register_intray_routes(app)
     register_work_routes(app)
+    register_trash_routes(app)

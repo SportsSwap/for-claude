@@ -11,6 +11,10 @@
         <select id="move-to" name="folder">{% for n in folder_names %}<option {{ 'selected' if n == view.category }}>{{ n }}</option>{% endfor %}</select>
         <button class="btn-ghost" type="submit">Move</button>
       </form>
+      <form method="post" action="{{ base }}/doc/{{ view.doc_id }}/delete">
+        {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+        <button class="btn-ghost btn-danger" type="submit" data-confirm="Delete {{ view.filed_name }}? Anything read from it comes out of the return. You can restore it from Deleted items.">Delete</button>
+      </form>
       {% endif %}
     </div>
   </div>

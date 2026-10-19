@@ -24,6 +24,7 @@ from ..workspace import Workspace
 from ..cabinets import CABINET_BY_CODE, CabinetSpace
 from ..doc_notes import STATUSES, load_doc_notes, save_doc_note
 from ..doc_props import set_properties
+from ..trash import deleted_documents
 from ..versions import add_version, list_versions, version_path
 from ..doc_summary import summaries
 from .client_names import load_names, set_name
@@ -84,6 +85,7 @@ def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=N
                            descriptions=load_doc_notes(space), total=len(rows), folders_for_move=names,
                            space=space, cabinet=getattr(space, "cabinet", "Tax return"), cabq=cab_q(space),
                            cab=getattr(space, "code", ""), statuses=STATUSES,
+                           deleted_count=len(deleted_documents(space)),
                            versions=list_versions(space, view_id) if view_id else [],
                            doc_key=f"{ws.client_code}/{getattr(space, 'code', None) or ws.income_year}/{view_id}",
                            doc_comments=list_comments(ws.tra_home, ws.client_code,

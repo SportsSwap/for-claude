@@ -1,0 +1,40 @@
+{% extends "client_base.html" %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% block tab %}
+<nav class="cabinets" aria-label="Cabinets">
+  <a href="{{ base }}/deleted" class="{{ 'on' if not cab }}" {{ 'aria-current=page' if not cab }}>Tax return FY{{ client.fy }}</a>
+  <a href="{{ base }}/deleted?cab=PERM" class="{{ 'on' if cab == 'PERM' }}" {{ 'aria-current=page' if cab == 'PERM' }}>Permanent</a>
+  <a href="{{ base }}/deleted?cab=CORR" class="{{ 'on' if cab == 'CORR' }}" {{ 'aria-current=page' if cab == 'CORR' }}>Correspondence</a>
+</nav>
+<a class="back" href="{{ files_url }}">← {{ cabinet }} files</a>
+<section class="card" aria-labelledby="del-title">
+  <div class="card-head"><h2 id="del-title">Deleted items · {{ cabinet }}</h2></div>
+  <p class="pad-inner muted small">Deleted documents stay here until you delete them forever. <strong>Restore</strong> puts a document back in its folder with its figures. <strong>Delete forever</strong> can't be undone; use it only for mistakes such as duplicates or a document filed under the wrong client.</p>
+  {% if items %}
+  <div class="tblwrap">
+    <table class="docs">
+      <thead><tr><th>Name</th><th>Folder</th><th>Deleted</th><th class="num">Figures</th><th><span class="visually-hidden">Actions</span></th></tr></thead>
+      <tbody>
+      {% for i in items %}
+        <tr>
+          <td class="namecell"><span class="fileicon ext-{{ i.doc.filed_name.rsplit('.', 1)[-1]|lower }}" aria-hidden="true">{{ i.doc.filed_name.rsplit('.', 1)[-1]|upper }}</span><span class="mono">{{ i.doc.filed_name }}</span></td>
+          <td>{{ i.doc.category }}</td>
+          <td class="nowrap">{{ i.deleted_at[:16]|replace('T', ' ') }} <span class="muted">by {{ i.by }}</span></td>
+          <td class="num mono">{{ i.figures }}</td>
+          <td class="nowrap">
+            <form class="actions" method="post" action="{{ base }}/deleted/{{ i.doc.doc_id }}/restore">
+              {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
+              <button class="btn-ghost" type="submit">Restore</button>
+              <button class="btn-ghost btn-danger" type="submit" formaction="{{ base }}/deleted/{{ i.doc.doc_id }}/forever" data-confirm="Delete {{ i.doc.filed_name }} forever? This can't be undone.">Delete forever</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="empty">Nothing has been deleted.</p>
+  {% endif %}
+</section>
+{% endblock %}

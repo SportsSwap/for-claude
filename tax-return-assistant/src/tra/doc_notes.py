@@ -53,3 +53,10 @@ def set_doc_status(ws, doc_id: str, status: str, by: str) -> None:
     if status not in STATUSES:
         raise ValueError("Choose a status from the list.")
     _update(ws, doc_id, by, status=status)
+
+
+def forget_doc_note(ws, doc_id: str) -> None:
+    """Remove a document's description and status (when the document is deleted forever)."""
+    notes = load_doc_notes(ws)
+    if notes.pop(doc_id, None) is not None:
+        _save(ws, notes)

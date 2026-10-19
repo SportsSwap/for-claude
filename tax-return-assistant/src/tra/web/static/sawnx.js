@@ -1,6 +1,13 @@
 // Sawnx: small conveniences only. Every action also works as a plain form without this file.
 "use strict";
 
+// Ask before deleting: any submit button with data-confirm. Without this file the button just works.
+document.addEventListener("submit", function (e) {
+  const button = e.submitter;
+  const message = button && button.dataset ? button.dataset.confirm : "";
+  if (message && !window.confirm(message)) e.preventDefault();
+});
+
 // Import: drag files onto the drop zone; one "Read for the return / Store only" choice per file.
 (function () {
   const input = document.getElementById("files");
