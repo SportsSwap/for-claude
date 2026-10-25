@@ -11,7 +11,8 @@ from ..paths import CONFIG_DIR
 from ..privacy import guard
 from ..privacy.guard import SensitiveDataBlocked, check_text
 from ..privacy.audit import AuditLog
-from ..settings import Settings, saved_user_variable, validate_client_code
+from .. import settings as tra_settings
+from ..settings import Settings, validate_client_code
 from .client_names import set_name, suggest_code
 from .messages import GUARD_MESSAGE
 from .services.clients import list_clients
@@ -66,6 +67,12 @@ def _client_options(form) -> tuple[dict, list[str]]:
     return dict(help_debt="help_debt" in form, sole_trader="sole_trader" in form, age_band=age_band,
                 sapto_status=sapto, has_spouse="spouse" in form, dependants=dependants, hospital_cover_days=days,
                 resident="non_resident" not in form), errors
+
+
+def _ai_model_name() -> str:
+    from ..ingest.extractors.ai_reader import DEFAULT_MODEL, MODEL_NAMES
+
+    return MODEL_NAMES.get(DEFAULT_MODEL, DEFAULT_MODEL)
 
 
 def register(app: Flask) -> None:
@@ -125,6 +132,22 @@ def register(app: Flask) -> None:
         return render_template("client_new.html", form=form, errors=errors, years=years, age_bands=AGE_BANDS,
                                sapto=SAPTO), 200
 
+    @app.get("/layouts")
+    def layouts_page():
+        from ..ingest.classify import load_doc_types
+        from ..ingest.layouts import load_layouts
+        from ..reread import all_waiting, layout_counts
+        from .client_names import load_names
+
+        tra_home = settings().tra_home
+        learned, problems = load_layouts()
+        counts = layout_counts(tra_home)
+        names = load_names(tra_home)
+        waiting = [{"code": ws.client_code, "fy": ws.income_year, "name": names.get(ws.client_code), "doc": d}
+                   for ws, d in all_waiting(tra_home)]
+        return render_template("layouts.html", nav="settings", learned=learned, problems=problems, counts=counts,
+                               waiting=waiting, doc_types=load_doc_types())
+
     @app.get("/settings")
     def settings_page():
         from .app_settings import load_app_settings
@@ -133,13 +156,15 @@ def register(app: Flask) -> None:
 
         s = settings()
         env = os.environ
-        fyi_ready = all((env.get(n) or saved_user_variable(n)).strip() for n in
+        fyi_ready = all((env.get(n) or tra_settings.saved_user_variable(n)).strip() for n in
                         ("FYI_BASE_URL", "FYI_ACCESS_ID", "FYI_ACCESS_SECRET", "FYI_APP_ID"))
         years = income_years()
         return render_template("settings.html", nav="settings", app_settings=load_app_settings(s.tra_home),
                                store=s.store, fyi_ready=fyi_ready, xero_ready=bool(env.get("XERO_CLIENT_ID")
-                                                                                  or saved_user_variable("XERO_CLIENT_ID")),
-                               key_set=bool((env.get("ANTHROPIC_API_KEY") or "").strip()), years=years,
+                                                                                  or tra_settings.saved_user_variable("XERO_CLIENT_ID")),
+                               key_set=bool((env.get("ANTHROPIC_API_KEY") or "").strip()
+                                            or tra_settings.saved_user_variable("ANTHROPIC_API_KEY").strip()),
+                               ai_model=_ai_model_name(), years=years,
                                unverified=unverified_years(years), port=current_app.config["SAWNX"]["port"],
                                **rules_context(s.tra_home))
 
@@ -147,7 +172,7 @@ def register(app: Flask) -> None:
     def settings_ai_reader():
         from datetime import date
 
-        from .app_settings import disable_ai_reader, enable_ai_reader
+        from .app_settings import disable_ai_reader, enable_ai_reader, load_app_settings
         from .messages import problem_text
 
         audit = audit_for(None)
@@ -156,10 +181,37 @@ def register(app: Flask) -> None:
                 raw = (request.form.get("approved_on") or "").strip()
                 enable_ai_reader(settings().tra_home, request.form.get("approved_by") or "",
                                  date.fromisoformat(raw) if raw else None, audit)
-                flash("AI reader switched on. It only receives blanked-out text.", "ok")
+                if load_app_settings(settings().tra_home).page_images_in_use:  # switched on again while on
+                    flash("AI reader switched on. It receives blanked-out text, and pictures of scanned pages, "
+                          "which aren't blanked out (page images are on).", "ok")
+                else:
+                    flash("AI reader switched on. It only receives blanked-out text.", "ok")
             else:
+                images_were_on = load_app_settings(settings().tra_home).ai_page_images
                 disable_ai_reader(settings().tra_home, audit)
-                flash("AI reader switched off.", "ok")
+                flash("AI reader switched off." + (" Page images are off too." if images_were_on else ""), "ok")
+        except (ValueError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        return redirect("/settings")
+
+    @app.post("/settings/ai-page-images")
+    def settings_ai_page_images():
+        from datetime import date
+
+        from .app_settings import disable_ai_page_images, enable_ai_page_images
+        from .messages import problem_text
+
+        audit = audit_for(None)
+        try:
+            if request.form.get("action") == "on":
+                raw = (request.form.get("approved_on") or "").strip()
+                enable_ai_page_images(settings().tra_home, request.form.get("approved_by") or "",
+                                      date.fromisoformat(raw) if raw else None, audit)
+                flash("Page images switched on. Scanned pages go to Anthropic as pictures, which aren't blanked "
+                      "out.", "ok")
+            else:
+                disable_ai_page_images(settings().tra_home, audit)
+                flash("Page images switched off. Only blanked-out text is sent.", "ok")
         except (ValueError, OSError) as exc:
             flash(problem_text(exc), "error")
         return redirect("/settings")

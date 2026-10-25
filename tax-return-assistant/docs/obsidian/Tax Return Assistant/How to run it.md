@@ -24,7 +24,8 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - `.\tra doctor` checks the setup.
 
 ## Sawnx: click instead of typing (built 18 Oct 2026)
-- **Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in the tool folder, or type `.\tra web`. A black window opens and Sawnx opens in the browser. Close the black window to stop it.
+- **Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in the tool folder, or type `.\tra web`. A black window opens and Sawnx opens in **its own Chrome window** (no tabs or address bar, like an app; Edge if there's no Chrome). Close the black window to stop it.
+- **Bookmarks don't work:** each start makes a new secret key, so always start from the shortcut. `.	ra web --no-open` prints the address to paste into any browser instead.
 - It runs **only on this laptop**. Other computers can't reach it and nothing goes on the internet.
 - **Looks like FYI:** a dark top bar (Home, Clients, Documents, Settings), search, and the green **+** for a new client.
 - **Home:** My Recent and My Starred documents. **Documents:** everything, sortable and filterable; tick several to star, download or move.
@@ -36,6 +37,15 @@ It doesn't run inside Excel. It's a small program run from **PowerShell** (the b
 - **Delete:** open a document and click **Delete** (or tick several and click Delete). It goes to **Deleted items** at the bottom of the folder list, and its figures come out of the return. **Restore** puts it back; **Delete forever** is only for mistakes (duplicates, wrong client). Prepare again afterwards.
 - **Cabinets:** each client has *Tax return* (per year), *Permanent* and *Correspondence*, like FYI. Open a document to change its type, folder, date or status, or upload a newer version (older ones are kept).
 - **Files:** folders, and **Import**: pick Individual, then for each file **Read for the return** or **Store only**.
+- **Emails (25 Oct 2026):** in Outlook drag the email onto the desktop (makes a `.msg`), then Import it with **Read for the return**. The email and each attachment become documents; lines like "Donations: $500" become unconfirmed figures with a suggested label. In the **In Tray** an email is suggested for Correspondence; choose *Tax return* and **Read for the return** to have it read.
+  - **Once, on a laptop set up before 25 Oct 2026:** close Sawnx, then in PowerShell in the tool folder run `.\.venv\Scripts\pip install -e .` (adds `olefile`, needed for `.msg`). `.eml` works without it.
+- **Client spreadsheets:** Import the `.xlsx` or `.csv` the same way. Rows with words Sawnx knows become figures with a suggested label; anything else is listed in Things to check.
+- **Progress bar:** importing several files shows "Reading 3 of 8 · about 1 min left", then "Done". Click **Show the documents** afterwards.
+- **Things to check:** open a document: the yellow box above **Open** lists what to look at before downloading it or confirming its figures. The Figures tab shows a line under each figure that needs a look.
+- **Recent searches:** click in the search box at the top to see the last 5 clients I found by search.
+- **Teach Sawnx new layouts:** anything not read is on **Settings → Layouts**. In a Claude chat say "teach Sawnx the new layouts"; Claude writes and proves a layout for each, reads them again, and tells me what it learned. Check the figures as usual.
+- **Read again:** button on a document (or `.\tra reread SMIT01 --waiting`) after Sawnx has learned something new.
+- **Make info request:** on the client's Files tab, click **Make info request**. It files a Word checklist in Correspondence > Letters and opens it; click **Open**, type the client's name in Word, and send it.
 - **Figures:** tick Confirmed (and Substantiated for deductions) beside the source document. It saves straight away.
 - **Prepare:** one button; shows the refund or payable and both calculations; download the workpaper.
 - **Review notes:** a response and a Resolved tick for each note, then **Mark reviewed**.

@@ -181,6 +181,10 @@ def ingest(code, paths, fy, override_type):
                    f"(redacted: {_counts(d.redaction_counts)}) → {d.filed_name}")
         for note in report.notes:
             click.echo(f"      {note.risk}: {note.message}")
+        for number, a in report.attachments:
+            what = "already filed; skipped" if a.duplicate else (
+                f"{a.doc.doc_type} {a.doc.parse_status} {a.figures_added} figures → {a.doc.filed_name}")
+            click.echo(f"      attachment {number}: {a.doc.doc_id} {what}")
     click.echo(f"\nNext: tra figures {code}   (check and confirm the figures)")
     if failed:
         raise SystemExit(1)
@@ -254,6 +258,91 @@ def ai_add(code, doc_id, answer, fy):
         click.echo(f"{f.figure_id} {f.label_key} ${f.amount:,.2f} (page {f.page}) {f.description}")
     click.echo(f"{len(added)} figure(s) added to {doc_id}, unconfirmed. Check each against the document and "
                "confirm it on the Figures tab.")
+
+
+@main.command()
+@click.argument("code")
+@click.argument("doc_ids", nargs=-1)
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+@click.option("--waiting", is_flag=True, help="Every document the readers couldn't read, or only partly.")
+@_friendly
+def reread(code, doc_ids, fy, waiting):
+    """Read filed documents again with today's rules (e.g. after Sawnx learned a layout). Confirmed and typed-in
+    figures are never changed."""
+    from .reread import reread_document, waiting_documents
+
+    _s, ws, audit = _workspace(code, fy)
+    ids = list(doc_ids) + ([d.doc_id for d in waiting_documents(ws)] if waiting else [])
+    if not ids:
+        click.echo("Nothing to read again. Give document numbers (e.g. D007) or --waiting.")
+        return
+    for doc_id in dict.fromkeys(ids):
+        try:
+            r = reread_document(ws, doc_id, audit)
+        except ValueError as exc:
+            click.echo(f"{doc_id}: {exc}")
+            continue
+        how = f" by layout {r.layout}" if r.layout else ""
+        click.echo(f"{doc_id} read again{how}: {r.added} figure{'' if r.added == 1 else 's'} added, "
+                   f"{r.removed} replaced → {r.status}" + (f". {r.note}" if r.note else ""))
+
+
+@main.group()
+def layouts():
+    """Teach Sawnx new document layouts (config/layouts), so fewer documents need the AI."""
+
+
+@layouts.command("todo")
+@click.argument("code", required=False)
+@_friendly
+def layouts_todo(code):
+    """What's waiting to be taught: documents read only partly or not at all (no document text is shown)."""
+    from .ingest.layouts import LAYOUTS_DIR, load_layouts
+    from .reread import all_waiting
+
+    settings = _settings()
+    learned, problems = load_layouts()
+    click.echo(f"Layouts learned: {len(learned)} (in {LAYOUTS_DIR})")
+    for layout in learned:
+        click.echo(f"  {layout.slug}: {layout.name} → {layout.doc_type}")
+    for problem in problems:
+        click.echo(f"  PROBLEM {problem} (skipped until it's fixed)")
+    waiting = all_waiting(settings.tra_home, code)
+    click.echo(f"\nWaiting to be read: {len(waiting)}")
+    for ws, d in waiting:
+        click.echo(f"  {ws.client_code} FY{ws.income_year} {d.doc_id} {d.doc_type} {d.parse_status} {d.pages} page(s)")
+    if waiting:
+        click.echo("\nNext, for one document per layout: tra ai-text CODE --fy YEAR --doc D00N (blanked text only), "
+                   "write config/layouts/<name>.yaml and tests/layout_samples/<name>.yaml, then "
+                   "tra layouts try config/layouts/<name>.yaml CODE D00N")
+
+
+@layouts.command("try")
+@click.argument("layout_file", type=click.Path(exists=True, dir_okay=False))
+@click.argument("code")
+@click.argument("doc_id")
+@click.option("--fy", default=DEFAULT_FY, show_default=True)
+@_friendly
+def layouts_try(layout_file, code, doc_id, fy):
+    """Show what a layout file would read from a filed document. Writes nothing (the audit log notes the try)."""
+    from .claude_reads import document_text
+    from .ingest.layouts import load_layout, match_layout, read_with_layout
+    from .web.services.files import find_document
+
+    _s, ws, audit = _workspace(code, fy)
+    layout = load_layout(Path(layout_file))
+    doc = find_document(ws, doc_id)
+    if doc is None:
+        raise ValueError(f"There's no document {doc_id}.")
+    rt = document_text(ws, doc, audit)
+    audit.record("layout_tried", client=code, doc_id=doc_id, layout=layout.slug)
+    click.echo(f"Recognised: {'yes' if match_layout(rt, [layout]) else 'no (its match words are not all in it)'}")
+    result = read_with_layout(rt, layout, doc_id)
+    for f in result.figures:
+        click.echo(f"  {f.label_key} ${f.amount:,.2f} (page {f.page}) {f.description}")
+    for doubt in result.doubts:
+        click.echo(f"  {doubt}")
+    click.echo(f"Would be: {result.parse_status}, {len(result.figures)} figure(s). Nothing was written.")
 
 
 @main.command()

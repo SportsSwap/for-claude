@@ -7,7 +7,6 @@ call it "File 1", "File 2"...
 
 from __future__ import annotations
 
-import hashlib
 import secrets
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -17,18 +16,19 @@ from werkzeug.datastructures import FileStorage
 from ...filing.index import DocumentIndex
 from ...filing.store import DocumentStore
 from ...ingest.classify import DocType
-from ...ingest.pipeline import IngestError, file_document, ingest_file
+from ...ingest.pipeline import STORE_ONLY_TYPES, IngestError, IngestReport, ingest_file, store_document
 from ...models import Document, ReviewNote
 from ...privacy.audit import AuditLog
 from ...privacy.guard import FileLockedError, SensitiveDataBlocked
+from ...to_check import CheckItem, things_to_check
 from ...workspace import Workspace
 from ..messages import problem_text
 from .files import folder_names
 
 RETURN_TYPES = {"individual": "Individual", "company": "Company", "trust": "Trust"}
 ENABLED_RETURN_TYPES = frozenset({"individual"})
-READ_TYPES = (".pdf", ".csv", ".xlsx", ".json")
-STORE_TYPES = READ_TYPES + (".docx", ".jpg", ".jpeg", ".png", ".eml", ".msg")
+READ_TYPES = (".pdf", ".csv", ".xlsx", ".json", ".eml", ".msg")
+STORE_TYPES = READ_TYPES + STORE_ONLY_TYPES
 MODES = ("read", "store")
 
 
@@ -40,6 +40,17 @@ class ImportOutcome:
     notes: list[ReviewNote] = field(default_factory=list)
     duplicate: bool = False
     error: str | None = None
+    to_check: list[CheckItem] = field(default_factory=list)
+    attachments: list["ImportOutcome"] = field(default_factory=list)  # an email's attachments, each read on its own
+
+
+def _outcome(ws: Workspace, label: str, report: IngestReport) -> ImportOutcome:
+    outcome = ImportOutcome(label=label, doc=report.doc, figures_added=report.figures_added, notes=report.notes,
+                            duplicate=report.duplicate)
+    if not report.duplicate:
+        outcome.to_check = things_to_check(ws, report.doc.doc_id)
+    outcome.attachments = [_outcome(ws, f"Attachment {n}", a) for n, a in report.attachments]
+    return outcome
 
 
 def _check(suffix: str, mode: str, folder: str | None, return_type: str, ws: Workspace) -> str | None:
@@ -60,16 +71,8 @@ def _check(suffix: str, mode: str, folder: str | None, return_type: str, ws: Wor
 
 def _store_only(path: Path, ws: Workspace, store: DocumentStore, folder: str, audit: AuditLog,
                 outcome: ImportOutcome) -> ImportOutcome:
-    sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
-    duplicate = DocumentIndex(ws.index_csv).find_by_sha(sha256)
-    if duplicate:
-        outcome.doc, outcome.duplicate = duplicate, True
-        return outcome
-    doc, notes = file_document(path, ws, store, doc_type="OTHER", category=folder, doc_date=None, sha256=sha256,
-                               pages=0, redaction_counts={}, parse_status="stored", audit=audit)
-    audit.record("document_stored", client=ws.client_code, doc_id=doc.doc_id, filed_name=doc.filed_name,
-                 folder=folder, store=doc.store)
-    outcome.doc, outcome.notes = doc, [n for n in notes if n.check_id != "I2"]
+    report = store_document(path, ws, store, folder, audit)
+    outcome.doc, outcome.notes, outcome.duplicate = report.doc, report.notes, report.duplicate
     return outcome
 
 
@@ -90,9 +93,7 @@ def import_file(ws: Workspace, store: DocumentStore, doc_types: dict[str, DocTyp
             return _store_only(path, ws, store, folder, audit, outcome)
         extra = {"ai_reader": ai_reader} if ai_reader is not None else {}
         report = ingest_file(path, ws, store, doc_types, audit, **extra)
-        outcome.doc, outcome.figures_added = report.doc, report.figures_added
-        outcome.notes, outcome.duplicate = report.notes, report.duplicate
-        return outcome
+        return _outcome(ws, outcome.label, report)
     except (IngestError, SensitiveDataBlocked, FileLockedError, ValueError, OSError) as exc:
         outcome.error = problem_text(exc)
         return outcome

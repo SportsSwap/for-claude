@@ -25,7 +25,13 @@
   <form class="topsearch" method="get" action="/search" role="search">
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
     <label for="topq" class="visually-hidden">Search clients or documents</label>
-    <input id="topq" name="q" type="search" placeholder="Search clients or documents" value="{{ q if q is defined else '' }}">
+    <input id="topq" name="q" type="search" placeholder="Search clients or documents" value="{{ q if q is defined else '' }}" autocomplete="off"{% if recent_clients %} aria-controls="recent-menu"{% endif %}>
+    {% if recent_clients %}
+    <div id="recent-menu" class="recent-menu" hidden>
+      <span class="muted small">Recent searches</span>
+      {% for c in recent_clients %}<a href="/c/{{ c.code }}/{{ c.fy }}/files">{{ c.name or c.code }}{% if c.name %} <span class="mono muted small">{{ c.code }}</span>{% endif %}</a>{% endfor %}
+    </div>
+    {% endif %}
   </form>
   <div class="topactions">
     <details class="plus">

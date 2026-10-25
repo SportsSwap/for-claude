@@ -36,6 +36,8 @@ def summarize(doc: Document, figures: list[Figure], labels: dict[str, LabelDef],
         return "Stored only, not read."
     mine = [f for f in figures if f.doc_id == doc.doc_id]
     kind = doc_types[doc.doc_type].description if doc.doc_type in doc_types else doc.doc_type
+    if not mine and doc.doc_type == "EMAIL" and doc.parse_status == "parsed":
+        return f"{kind} · no amounts in its text"
     if not mine:
         return f"{kind} · Couldn't read this document's figures; add a description and enter them by hand."
     parts = [kind]

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Layouts{% endblock %}
+{% block content %}
+<h1>Layouts</h1>
+<p class="muted">Layouts Sawnx has learned to read with its own rules, without the AI. To teach it more, say "teach Sawnx the new layouts" in a Claude chat: Claude reads only the blanked-out text of the documents below, writes a layout file and a made-up copy to prove it, then reads them again. Made-up clients only until the privacy officer approves.</p>
+
+<section class="card" aria-labelledby="learned-title">
+  <div class="card-head"><h2 id="learned-title">Learned</h2><span class="muted small">{{ learned|length }} layout{{ '' if learned|length == 1 else 's' }}</span></div>
+  {% for layout in learned %}
+  <div class="result"><span><strong>{{ layout.name }}</strong> → {{ doc_types[layout.doc_type].description if layout.doc_type in doc_types else layout.doc_type }}</span>
+    <span class="muted small mono">{{ layout.slug }}.yaml · read {{ counts.get(layout.slug, 0) }} document{{ '' if counts.get(layout.slug, 0) == 1 else 's' }}{{ ' · ' ~ layout.added if layout.added }}</span></div>
+  {% else %}
+  <p class="empty">None yet.</p>
+  {% endfor %}
+  {% for problem in problems %}
+  <div class="result"><span class="high">{{ problem }}</span><span class="muted small">This file is skipped until it's fixed.</span></div>
+  {% endfor %}
+</section>
+
+<section class="card" aria-labelledby="waiting-title">
+  <div class="card-head"><h2 id="waiting-title">Not read yet</h2><span class="muted small">{{ waiting|length }} document{{ '' if waiting|length == 1 else 's' }} needing manual entry or read only partly</span></div>
+  {% for w in waiting %}
+  <div class="result"><a href="/c/{{ w.code }}/{{ w.fy }}/files?view={{ w.doc.doc_id }}">{{ w.name or w.code }} · {{ w.doc.doc_id }}</a>
+    <span class="muted small">{{ w.code }} · FY{{ w.fy }} · {{ doc_types[w.doc.doc_type].description if w.doc.doc_type in doc_types else w.doc.doc_type }} · {{ 'not read' if w.doc.parse_status == 'manual_needed' else 'partly read' }} · {{ w.doc.pages }} page{{ '' if w.doc.pages == 1 else 's' }}</span></div>
+  {% else %}
+  <p class="empty">Nothing waiting: every document was read.</p>
+  {% endfor %}
+</section>
+{% endblock %}

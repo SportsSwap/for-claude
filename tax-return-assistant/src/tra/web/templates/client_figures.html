@@ -15,6 +15,27 @@
       <span><span class="mono">{{ to_check }}</span> to check</span>
       <span class="small">Only confirmed figures go into the return. Each change is saved straight away.</span>
     </div>
+    {% if by_document %}
+    <div class="card pad stack bydoc" aria-labelledby="bydoc-title">
+      <h2 id="bydoc-title">By document</h2>
+      <p class="small muted">Check each figure against its document first. Pre-fill rows are left for you to decide.</p>
+      <ul class="bydoc-list">
+        {% for d in by_document %}
+        {% set nf = d.count ~ ' figure' ~ ('' if d.count == 1 else 's') %}
+        <li>
+          <a class="mono" href="{{ base }}/files?view={{ d.doc_id }}">{{ d.doc_id }}</a>
+          <span>{{ d.kind }}</span>
+          <span class="muted small">{{ d.count }} to confirm</span>
+          <form method="post" action="{{ base }}/doc/{{ d.doc_id }}/confirm-all">
+            <input type="hidden" name="next" value="{{ base }}/figures">
+            {% for fid in d.ids %}<input type="hidden" name="figure_id" value="{{ fid }}">{% endfor %}
+            <button class="btn-ghost" type="submit" data-confirm="Confirm all {{ nf }} from {{ d.doc_id }}? Only do this after you've checked each one against the document.">Confirm all {{ nf }}</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
     <div class="card tblwrap">
       {% if rows %}
       <table class="figs">
@@ -27,7 +48,7 @@
               <select id="l-{{ f.figure_id }}" name="label_key" form="f-{{ f.figure_id }}" data-autosave>
                 {% for key, name in labels %}<option value="{{ key }}" {{ 'selected' if key == f.label_key }}>{{ name }}</option>{% endfor %}
               </select></td>
-            <td class="wrap">{{ f.description }}{% if f.notes == 'prefill' %}<div class="small high">Pre-fill row. Leave unconfirmed if another document supports this, or it's counted twice (R4).</div>{% elif f.method == 'ai' %}<div class="small">Read by the AI reader. Check it against the source.</div>{% endif %}</td>
+            <td class="wrap">{{ f.description }}{% if f.notes == 'prefill' %}<div class="small high">Pre-fill row. Leave unconfirmed if another document supports this, or it's counted twice (R4).</div>{% elif f.method == 'ai' %}<div class="small">Read by the AI reader. Check it against the source.</div>{% endif %}{% for line in checks.get(f.figure_id, []) %}<div class="small tocheck-line">{{ line }}</div>{% endfor %}</td>
             <td class="num"><label class="visually-hidden" for="a-{{ f.figure_id }}">Amount for {{ f.figure_id }}</label>
               <input id="a-{{ f.figure_id }}" class="mono num-input" type="text" name="amount" form="f-{{ f.figure_id }}" value="{{ f.amount }}" inputmode="decimal"></td>
             <td class="mono">{% if f.doc_id %}<a href="{{ base }}/figures?view={{ f.figure_id }}#{{ f.figure_id }}">{{ f.doc_id }}{{ ' p' ~ f.page if f.page }}</a>{% else %}<span class="high">none</span>{% endif %}</td>

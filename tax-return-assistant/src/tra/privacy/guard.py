@@ -94,6 +94,21 @@ def check_workbook(wb: openpyxl.Workbook, location: str) -> None:
                 _check_scalar(value, f"{ws.title}!{cell.coordinate}")
 
 
+def atomic_write_bytes(path: Path, data: bytes, location: str, *, texts: Iterable[str]) -> None:
+    """For a file whose text can't be scanned as it is written (a Word file is zipped XML): ``texts`` is
+    every piece of text the caller put in it, checked first; then the bytes are swapped in like
+    atomic_write_text."""
+    check_value(list(texts), location)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_bytes(data)
+    try:
+        os.replace(tmp, path)
+    except PermissionError:
+        tmp.unlink(missing_ok=True)
+        raise FileLockedError(path) from None
+
+
 def atomic_write_text(path: Path, text: str, location: str, *, prechecked: bool = False,
                       encoding: str = "utf-8") -> None:
     """Guard, write to a temp file beside the target, then swap it in.

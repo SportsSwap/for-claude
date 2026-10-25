@@ -4,11 +4,17 @@ It is only ever given RedactedText, and the text is scanned again before
 anything is sent. Every figure it returns is unconfirmed, with method "ai",
 so a person checks each one, and R6 flags them on the workpaper. Switching it
 on (Sawnx Settings) needs the privacy officer's approval, because the
-redacted text leaves the laptop.
+redacted text leaves the laptop. It also says what the document is (doc_type),
+which the pipeline uses unless the type was forced or known for sure.
+
+Pictures of scanned pages (ingest/page_images.py) are the one exception to
+"redacted text only": they can't be blanked, so they're only passed in when
+their own Settings switch is on, with its own approval.
 """
 
 from __future__ import annotations
 
+import base64
 import json
 from collections.abc import Mapping
 from decimal import Decimal
@@ -19,11 +25,17 @@ from ...labels import figure_allowed, load_labels
 from ...models import Figure, ReviewNote
 from ...money import parse_amount
 from ...privacy.detectors import find_sensitive
-from ...privacy.redact import RedactedText
+from ...privacy.redact import RedactedText, RedactionError, redact_text
+from ..classify import load_doc_types
 from .base import ExtractResult, require_redacted
 
-DEFAULT_MODEL = "claude-opus-5-5"
+# Claude Haiku 5.5: the owner chose it (25 Oct 2026) - fast and low-cost, and reading figures off a document is the
+# extraction work it suits. It has no server-side fallback, so a declined document comes back as an A3 note.
+DEFAULT_MODEL = "claude-haiku-5-5"
+MODEL_NAMES = {"claude-haiku-5-5": "Claude Haiku 5.5", "claude-opus-5-5": "Claude Opus 5.5",
+               "claude-sonnet-5-5": "Claude Sonnet 5.5"}
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
+FALLBACK_MODELS = frozenset({"claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-1"})  # "fallbacks" accepted
 MAX_FIGURES = 60
 
 SYSTEM = """You read Australian tax source documents for a tax agent's draft workpaper.
@@ -31,10 +43,23 @@ Identifiers in the text have already been replaced with markers such as [TFN RED
 Return only amounts that are printed in the text, exactly as printed. Never calculate, total, guess or infer an amount.
 Give each figure the label key from the list that it belongs to, a short description of where it came from
 (payer or issuer and what the amount is), and the page it is on. If nothing in the text matches a label, return
-an empty list.
+an empty list. Never copy account numbers, BSBs, TFNs, card or licence numbers into a description.
+Also give doc_type: the code from the list of document types that describes the whole document (for example, a
+property manager's statement is RENTSTMT). Use OTHER if none fits.{pictures}
 
 Label keys:
-{labels}"""
+{labels}
+
+Document types:
+{doc_types}"""
+PICTURES = """
+Some pages are also sent as pictures, each after a line naming its page. Read amounts printed in a picture the
+same way, and give that page number. A picture is not blanked out: never copy account numbers, BSBs, TFNs, card
+or licence numbers from it into a description."""
+# Sawnx's own letter, the types the pipeline sets, and types with readers of their own whose figures mean something
+# special (the ATO's pre-fill report and prior-year return, Xero's reports): the AI reader can't give any of them.
+NOT_AI_TYPES = frozenset({"INFOREQ", "EMAIL", "CLIENTXLS", "PREFILL", "PRIOR", "XEROPL", "XEROBS", "XEROBANK",
+                          "XEROCOA"})
 
 
 def figures_from_items(items: list, keys: list[str], doc_id: str, page_count: int,
@@ -54,12 +79,35 @@ def figures_from_items(items: list, keys: list[str], doc_id: str, page_count: in
                     raise ValueError(f"page {page!r} isn't in the document (it has {page_count})")
                 page = None
             description = str(item.get("description") or "").strip()[:120]
+            if reader == "AI" and find_sensitive(description):
+                description = _blanked(description)  # the model copied an identifier (from a picture, say)
         except (ValueError, TypeError, KeyError) as exc:
             problems.append(f"figure {n}: {exc}")
             continue
         figures.append(Figure(figure_id="", label_key=key, description=f"{reader}: {description}", amount=amount,
                               date=None, doc_id=doc_id, page=page, method="ai", confirmed=False, substantiated=None))
     return figures, problems
+
+
+def _blanked(description: str) -> str:
+    """The description with its identifiers replaced by markers, or nothing if that fails (it fails closed)."""
+    try:
+        return redact_text(description)
+    except RedactionError:
+        return ""
+
+
+def _api_errors() -> tuple[type[BaseException], ...]:
+    """The SDK's errors (a refused key, a timeout, no connection). Without the SDK only a stand-in client exists."""
+    try:
+        import anthropic
+    except ImportError:
+        return ()
+    return (anthropic.APIError,)
+
+
+def _pages(numbers) -> str:
+    return ", ".join(map(str, numbers))
 
 
 def _note(risk: str, check_id: str, message: str, doc_id: str) -> ReviewNote:
@@ -69,11 +117,15 @@ def _note(risk: str, check_id: str, message: str, doc_id: str) -> ReviewNote:
 class AiReader:
     doc_types: frozenset[str] = frozenset()
 
-    def __init__(self, client, *, model: str = DEFAULT_MODEL, labels=None):
+    def __init__(self, client, *, model: str = DEFAULT_MODEL, labels=None, doc_types=None,
+                 page_images: bool = False):
+        """``page_images`` (its own Settings switch) lets the pipeline send pictures of a PDF's scanned pages."""
         self.client = client
         self.model = model
+        self.page_images = page_images
         self.labels = labels or load_labels()
         self.keys = [d.key for d in sorted(self.labels.values(), key=lambda d: d.order) if figure_allowed(d)]
+        self.type_choices = {code: t for code, t in (doc_types or load_doc_types()).items() if code not in NOT_AI_TYPES}
 
     def _schema(self) -> dict:
         item = {"type": "object", "additionalProperties": False,
@@ -81,21 +133,43 @@ class AiReader:
                 "properties": {"label_key": {"type": "string", "enum": self.keys},
                                "description": {"type": "string"}, "amount": {"type": "string"},
                                "page": {"type": "integer"}}}
-        return {"type": "object", "additionalProperties": False, "required": ["figures"],
-                "properties": {"figures": {"type": "array", "items": item}}}
+        return {"type": "object", "additionalProperties": False, "required": ["doc_type", "figures"],
+                "properties": {"doc_type": {"type": "string", "enum": list(self.type_choices)},
+                               "figures": {"type": "array", "items": item}}}
 
-    def _ask(self, rt: RedactedText) -> str | None:
+    def _ask(self, rt: RedactedText, images) -> str | None:
         text = "\n\n".join(f"--- Page {i} ---\n{page}" for i, page in enumerate(rt.pages, start=1))
         labels = "\n".join(f"{k}: {label_name(self.labels, k)}" for k in self.keys)
-        response = self.client.beta.messages.create(
-            model=self.model, max_tokens=16000, betas=[FALLBACK_BETA], fallbacks="default",
-            output_config={"effort": "medium", "format": {"type": "json_schema", "schema": self._schema()}},
-            system=SYSTEM.format(labels=labels), messages=[{"role": "user", "content": text}])
+        types = "\n".join(f"{code}: {t.description}" for code, t in self.type_choices.items())
+        content: str | list = text
+        if images:  # each picture after a line naming its page, and the blanked-out text last
+            content = []
+            for page, jpeg in images:
+                content.append({"type": "text", "text": f"--- Page {page} (picture; not blanked) ---"})
+                content.append({"type": "image", "source": {"type": "base64", "media_type": "image/jpeg",
+                                                            "data": base64.b64encode(jpeg).decode("ascii")}})
+            content.append({"type": "text", "text": text})
+        request = dict(model=self.model, max_tokens=16000,
+                       output_config={"effort": "medium", "format": {"type": "json_schema", "schema": self._schema()}},
+                       system=SYSTEM.format(labels=labels, doc_types=types, pictures=PICTURES if images else ""),
+                       messages=[{"role": "user", "content": content}])
+        if self.model in FALLBACK_MODELS:  # re-run on another model if this one declines
+            response = self.client.beta.messages.create(**request, betas=[FALLBACK_BETA], fallbacks="default")
+        else:
+            response = self.client.messages.create(**request)
         if response.stop_reason == "refusal":
             return None
         return next((b.text for b in response.content if b.type == "text"), None)
 
-    def extract(self, rt: RedactedText, doc_id: str) -> ExtractResult:
+    def extract(self, rt: RedactedText, doc_id: str, images: list[tuple[int, bytes]] | None = None, *,
+                on_send=None) -> ExtractResult:
+        """``images`` are (page number, JPEG bytes) of scanned pages, only when Settings allows them; they can't be
+        blanked out, so they're dropped unless this reader was made with ``page_images``. ``on_send`` is called with
+        their page numbers just before they are sent (for the audit log).
+
+        The AI never stops an import: if the request with pictures fails it asks again with the text only, and if
+        that fails too the document is left for entering by hand (A3). ``facts["ai_picture_pages"]`` lists the
+        pages it read as pictures."""
         rt = require_redacted(rt)
         result = ExtractResult()
         if find_sensitive(rt.text):
@@ -103,11 +177,33 @@ class AiReader:
                                       "nothing. Enter this document's figures by hand and tell the privacy "
                                       "officer.", doc_id))
             return result
-        raw = self._ask(rt)
+        if not self.page_images:
+            images = None  # defence in depth: the switch is checked here as well as in the pipeline
+        pictures = [page for page, _jpeg in images] if images else []
+        if pictures and on_send is not None:
+            on_send(pictures)
+        raw, errors = None, _api_errors()
         try:
-            items = json.loads(raw)["figures"] if raw else None
+            raw = self._ask(rt, images)
+        except errors:
+            if pictures:
+                result.doubts.append(f"Page(s) {_pages(pictures)} went to the AI reader as pictures, but it couldn't "
+                                     "take them, so it read the text only. Enter those pages' figures by hand.")
+                pictures = []
+                try:
+                    raw = self._ask(rt, None)
+                except errors:
+                    raw = None
+        if pictures:
+            result.facts["ai_picture_pages"] = pictures
+        try:
+            answer = json.loads(raw) if raw else None
+            items = answer["figures"] if answer is not None else None
         except (ValueError, TypeError, KeyError):
-            items = None
+            answer, items = None, None
+        doc_type = answer.get("doc_type") if isinstance(answer, dict) else None
+        if isinstance(doc_type, str) and doc_type in self.type_choices:
+            result.facts["ai_doc_type"] = doc_type
         figures, problems = figures_from_items(items or [], self.keys, doc_id, len(rt.pages), "AI")
         result.figures.extend(figures)
         if items is None or problems:
@@ -127,7 +223,8 @@ def ai_reader_from_settings(tra_home: Path, env: Mapping[str, str], client=None)
     from ... import settings as tra_settings
     from ...web.app_settings import load_app_settings
 
-    if not load_app_settings(tra_home).ai_reader:
+    app = load_app_settings(tra_home)
+    if not app.ai_reader:
         return None
     key = (env.get("ANTHROPIC_API_KEY") or "").strip() or tra_settings.saved_user_variable("ANTHROPIC_API_KEY").strip()
     if not key:
@@ -140,5 +237,6 @@ def ai_reader_from_settings(tra_home: Path, env: Mapping[str, str], client=None)
         except ImportError:
             raise AiReaderUnavailable("The AI reader is switched on but its library isn't installed. Run: "
                                       ".venv\\Scripts\\pip install -e \".[ai]\"") from None
-        client = anthropic.Anthropic(api_key=key)
-    return AiReader(client)
+        # Two minutes a request and one retry, so a slow or unreachable service holds an import up only briefly.
+        client = anthropic.Anthropic(api_key=key, timeout=120, max_retries=1)
+    return AiReader(client, page_images=app.page_images_in_use)

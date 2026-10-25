@@ -1,0 +1,88 @@
+# The information request Sawnx makes from last year's return (Make info request, on a client's Files tab).
+# Change the wording freely. Keep the names in braces: {year} is the income year being asked about,
+# {start} and {end} its first and last days, {payers} who paid or issued the item last year (names only,
+# never amounts). Sawnx never writes the client's name: you type it in Word.
+title: "Information request: {year} income year ({start} – {end})"
+greeting: "Dear [client's name],"
+intro: >-
+  To prepare your {year} tax return, please send us the documents below. The list is based on what was in
+  your return last year, so you know what to look for. Tick each one off as you find it, and tell us if
+  anything has stopped or changed.
+intro_standard: >-
+  To prepare your {year} tax return, please send us the documents below that apply to you. This is our
+  standard list, because we don't have last year's return in our system.
+closing: "If something on this list doesn't apply to you any more, just let us know. Thank you."
+
+# Each section is used when last year's return had any of its labels (or, for "cgt", any share sales).
+# "item" is used when last year's documents named who paid it; "item_no_payers" when they didn't.
+# A section marked "standard" is also in the standard list, using "item_no_payers" (or "standard_items").
+sections:
+  - heading: Income
+    labels: [income.salary, income.salary_tax_withheld, income.allowances, it.rfb, it.resc]
+    item: "Income statement (or PAYG payment summary) from {payers}, and from any new employer"
+    item_no_payers: "An income statement (or PAYG payment summary) from each employer"
+    standard: true
+  - heading: Interest
+    labels: [income.interest, income.interest_tfn_withheld]
+    item: "Interest statements (or bank statements showing the interest) from {payers}"
+    item_no_payers: "Interest statements from each bank, and for any term deposits"
+    standard: true
+  - heading: Dividends
+    labels: [income.div_unfranked, income.div_franked, income.franking_credit, income.div_tfn_withheld]
+    item: "Dividend statements from {payers}, and from any shares you bought this year"
+    item_no_payers: "Dividend statements for every shareholding"
+    standard: true
+  - heading: Things you sold
+    cgt: true
+    item: >-
+      Last year you sold {payers}. If you sold any shares, units, crypto or property this year, send the
+      buy and sell contract notes (or a capital gains report from your broker)
+    item_no_payers: >-
+      If you sold any shares, units, crypto or property, the buy and sell contract notes (or a capital gains
+      report from your broker)
+    standard: true
+  - heading: Rental property
+    labels: [rent.gross, rent.interest, rent.capital_works, rent.other]
+    items:
+      - "The property manager's annual statement"
+      - "The loan interest statement for the property"
+      - "Receipts for rates, insurance, strata, repairs and anything else you paid yourself"
+      - "Any new depreciation (quantity surveyor) report"
+  - heading: Deductions you claimed last year
+    per_label:
+      ded.d1: "Work-related car expenses: your logbook, or the work kilometres you drove, and receipts"
+      ded.d2: "Work-related travel: receipts for flights, accommodation and meals while away for work"
+      ded.d3: "Work clothing, uniforms and laundry: receipts"
+      ded.d4: "Self-education: course fees, textbooks and other receipts"
+      ded.d5: "Other work-related expenses (union fees, phone, internet, tools, home office): receipts and your work-use share"
+      ded.d6: "Low-value pool: receipts for any new tools or equipment under $1,000"
+      ded.d7: "Interest on money borrowed to invest: the loan statements"
+      ded.d8: "Costs of earning dividends: receipts"
+      ded.d9: "Donations of $2 or more to registered charities: receipts"
+      ded.d10: "The cost of managing your tax affairs (last year's tax agent fee is in our records)"
+      ded.d12: "Personal super contributions you'll claim: your fund's acknowledgement of your notice of intent"
+      ded.d15: "Other deductions (such as income protection insurance): statements or receipts"
+    standard_heading: Deductions
+    standard_items:
+      - "Receipts for work-related expenses: car, travel, clothing, self-education, tools, phone and internet"
+      - "Receipts for donations of $2 or more to registered charities"
+      - "Income protection insurance statement, if you have it"
+  - heading: Private health insurance
+    labels: [phi.premiums_p1, phi.rebate_p1, phi.premiums_p2, phi.rebate_p2]
+    item: "Private health insurance tax statement from {payers}"
+    item_no_payers: "Your private health insurance tax statement"
+    standard: true
+  - heading: Business
+    labels: [income.business_income, income.business_expenses]
+    item: "Your business's profit and loss for the year (from {payers}), or access to it in Xero"
+    item_no_payers: "Your business's profit and loss for the year, or access to it in Xero"
+
+new_this_year:
+  heading: Anything new this year?
+  items:
+    - "A new job, a second job, or a job that ended"
+    - "New bank accounts, shares, managed funds or crypto"
+    - "Anything you sold: shares, crypto, property or business assets"
+    - "Family changes: marriage or separation, a new child, dependants"
+    - "A study or training loan (HELP), or private health insurance you started or stopped"
+    - "Other income: government payments, foreign income, or distributions from a trust or partnership"

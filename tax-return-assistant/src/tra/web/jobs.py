@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import json
 import re
-import secrets
 from dataclasses import asdict, dataclass
 from datetime import date, datetime
 from pathlib import Path
@@ -17,6 +16,7 @@ from pathlib import Path
 from ..privacy.audit import AuditLog
 from ..privacy.guard import atomic_write_text, check_value
 from ..workspace import Workspace
+from .ids import new_id
 from .status import job_status
 
 LOCATION = "sawnx_jobs.json"
@@ -142,7 +142,7 @@ def add_job(tra_home: Path, code: str, name: str, *, due: str, assignee: str, no
     if code not in client_years(tra_home):
         raise ValueError("Choose a client from the list.")
     data = _load(tra_home)
-    job = {"id": f"job-{secrets.token_hex(5)}", "code": code, "name": _text(name, "job name", required=True),
+    job = {"id": f"job-{new_id(10)}", "code": code, "name": _text(name, "job name", required=True),
            "status": JOB_STATUSES[0], "due": _due(due), "assignee": _text(assignee, "assignee"),
            "notes": _text(notes, "notes"), "by": by, "created_at": _now()}
     data["jobs"].append(job)
@@ -194,7 +194,7 @@ def add_task(tra_home: Path, title: str, *, job_id: str | None, due: str, assign
             raise ValueError("There's no such job.")
         code = job.code
     data = _load(tra_home)
-    task = {"id": f"task-{secrets.token_hex(5)}", "title": _text(title, "task", required=True), "job_id": job_id or None,
+    task = {"id": f"task-{new_id(10)}", "title": _text(title, "task", required=True), "job_id": job_id or None,
             "code": code, "due": _due(due), "assignee": _text(assignee, "assignee"), "done": False, "by": by,
             "created_at": _now(), "done_at": None}
     data["tasks"].append(task)

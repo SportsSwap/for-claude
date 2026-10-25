@@ -1,0 +1,26 @@
+{# What happened to each imported file. Needs results (ImportOutcome list) and doc_types. Sawnx's progress bar
+   also asks for this alone, one file at a time. An email's attachments are listed under it. #}
+{% macro outcome(r) %}
+  <div class="result{{ ' attachment' if r.label.startswith('Attachment') }}">
+    {% if r.error %}
+      <span><strong>{{ r.label }}</strong>: <span class="high">{{ r.error }}</span></span>
+    {% elif r.duplicate %}
+      <span><strong>{{ r.label }}</strong>: already filed as <span class="mono">{{ r.doc.doc_id }}</span>, so it was skipped.</span>
+    {% else %}
+      <span><strong>{{ r.label }}</strong> → <span class="mono">{{ r.doc.filed_name }}</span></span>
+      <span class="muted small">{{ r.doc.doc_id }} · {{ doc_types[r.doc.doc_type].description if r.doc.doc_type in doc_types else r.doc.doc_type }} ·
+        {% if r.doc.parse_status == 'stored' %}stored only, not read{% else %}{{ r.figures_added }} figure{{ '' if r.figures_added == 1 else 's' }} found ·
+        {% set blanked = r.doc.redaction_counts.values()|sum %}{{ blanked }} number{{ '' if blanked == 1 else 's' }} blanked out{% endif %}</span>
+      {% if r.to_check %}
+      {% for item in r.to_check %}<span class="small{{ '' if item.counted else ' muted' }}">{% if item.risk %}<span class="risk {{ item.risk }}">{{ item.risk }}</span> {% elif item.counted %}<span class="risk Check">Check</span> {% endif %}{{ item.text }}</span>{% endfor %}
+      {% else %}
+      {% for n in r.notes %}<span class="small"><span class="risk {{ n.risk }}">{{ n.risk }}</span> {{ n.message }}</span>{% endfor %}
+      {% endif %}
+    {% endif %}
+  </div>
+  {% for a in r.attachments %}{{ outcome(a) }}{% endfor %}
+{% endmacro %}
+<section class="card" aria-label="Import results">
+  <div class="card-head"><h2>Import results</h2></div>
+  {% for r in results %}{{ outcome(r) }}{% endfor %}
+</section>

@@ -1,0 +1,35 @@
+text: |
+  Name SAMPLE PERSON
+  Australian Government ABN 12 345 678 901
+  Australian Taxation Office
+  Income statements
+  SAMPLE DEPARTMENT (Financial year 2025-26)
+  Status Tax ready
+  Employer ABN/Branch 12345 678
+  Period 01/07/2025 - 30/06/2026
+  Income
+  Salary and wages
+  Gross amount $40,100.50
+  Overtime $120.00
+  Leave payment type Other paid leave
+  Paid leave amount $1,500.25
+  Total gross amount $41,720.75
+  Tax withheld or foreign tax paid
+  Salary and wages
+  PAYGW amount $6,200.00
+  Lump sum amounts
+  Lump sum payment A $0.00
+  Lump sum payment B $250.00
+  Employer reported super
+  Employer superannuation contribution liability $4,800.00
+  ---page---
+  Other amounts
+  Reportable Employer Super Contribution $0.00
+  Reportable fringe benefits - total $0.00
+doubts:
+  - "The document shows a lump sum payment ($250.00), which this layout doesn't read. Enter it by hand."
+figures:
+  - {label: income.salary, amount: "40100.50"}
+  - {label: income.salary, amount: "120.00"}
+  - {label: income.salary, amount: "1500.25"}
+  - {label: income.salary_tax_withheld, amount: "6200.00"}

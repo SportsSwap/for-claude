@@ -1,5 +1,6 @@
-{# The open document: actions, summary, description, the viewer. Needs view, base, cab, cabq, folder_names, summaries, descriptions. #}
+{# The open document: actions, summary, description, the viewer. Needs view, base, cab, cabq, folder_names, summaries, descriptions, view_checks, view_unconfirmed (the figure ids waiting). #}
 <section class="card pad stack" aria-label="Document viewer">
+  {% include "_tocheck.html" %}
   <div class="topbar">
     <div><h2 class="mono">{{ view.filed_name }}</h2><span class="muted small">{{ view.doc_id }}{{ ' · ' ~ view.pages ~ ' page' ~ ('' if view.pages == 1 else 's') if view.pages }}</span></div>
     <div class="actions">
@@ -11,9 +12,23 @@
         <select id="move-to" name="folder">{% for n in folder_names %}<option {{ 'selected' if n == view.category }}>{{ n }}</option>{% endfor %}</select>
         <button class="btn-ghost" type="submit">Move</button>
       </form>
+      {% if not cab and view.parse_status != 'stored' and view.doc_type != 'PREFILL' %}
+      <form method="post" action="{{ base }}/doc/{{ view.doc_id }}/reread">
+        <button class="btn-ghost" type="submit">Read again</button>
+      </form>
+      {% endif %}
       <form method="post" action="{{ base }}/doc/{{ view.doc_id }}/delete">
         {% if cab %}<input type="hidden" name="cab" value="{{ cab }}">{% endif %}
         <button class="btn-ghost btn-danger" type="submit" data-confirm="Delete {{ view.filed_name }}? Anything read from it comes out of the return. You can restore it from Deleted items.">Delete</button>
+      </form>
+      {% endif %}
+      {% if not cab and view_unconfirmed %}
+      <form method="post" action="{{ base }}/doc/{{ view.doc_id }}/confirm-all">
+        <input type="hidden" name="next" value="{{ base }}/files?view={{ view.doc_id }}">
+        {% for fid in view_unconfirmed %}<input type="hidden" name="figure_id" value="{{ fid }}">{% endfor %}
+        {% set nu = view_unconfirmed|length %}
+        {% set nf = nu ~ ' figure' ~ ('' if nu == 1 else 's') %}
+        <button class="btn" type="submit" data-confirm="Confirm all {{ nf }} from {{ view.doc_id }}? Only do this after you've checked each one against the document.">Confirm all {{ nf }}</button>
       </form>
       {% endif %}
     </div>

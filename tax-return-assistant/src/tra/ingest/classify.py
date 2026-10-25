@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 import yaml
@@ -20,10 +21,18 @@ class DocType:
     description: str
     all: tuple[str, ...]
     any: tuple[str, ...]
+    short: str = ""  # in file names: "Dividend statement"
 
 
 def load_doc_types(path: Path | None = None) -> dict[str, DocType]:
-    raw = yaml.safe_load((path or CONFIG_DIR / "doc_types.yaml").read_text(encoding="utf-8"))
+    """Read once and kept until the file changes; each caller gets its own dict."""
+    path = Path(path or CONFIG_DIR / "doc_types.yaml")
+    return dict(_load_doc_types(str(path), path.stat().st_mtime_ns))
+
+
+@lru_cache(maxsize=8)
+def _load_doc_types(path: str, _mtime: int) -> dict[str, DocType]:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     return {
         code: DocType(
             code=code,
@@ -31,9 +40,13 @@ def load_doc_types(path: Path | None = None) -> dict[str, DocType]:
             description=spec.get("description", ""),
             all=tuple(k.lower() for k in spec.get("all", [])),
             any=tuple(k.lower() for k in spec.get("any", [])),
+            short=spec.get("short") or spec.get("description", code),
         )
         for code, spec in raw.items()
     }
+
+
+load_doc_types.cache_clear = _load_doc_types.cache_clear
 
 
 def classify(rt: RedactedText, doc_types: dict[str, DocType]) -> str:

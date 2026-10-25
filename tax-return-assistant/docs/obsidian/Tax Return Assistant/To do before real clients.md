@@ -16,7 +16,10 @@ Back to [[Tax Return Assistant]]
 ## Needs the firm
 - [ ] Privacy officer reads [[Privacy rules]] and the README's privacy section, and signs off.
 - [x] **AI reader:** the privacy officer approved trying it with **made-up clients only** and wants to see it (19 Oct 2026). Demo documents: `C:\TaxAssistant\Inbox\AIDEMO`.
-- [ ] AI reader for real clients: needs the privacy officer's approval. Point out that names, addresses and amounts are sent (only identifier numbers are blanked), and use the **firm's** Anthropic account.
+- [x] **AI reader for real clients:** approved by the privacy officer (25 Oct 2026). Names, addresses and amounts are sent (only identifier numbers are blanked). Claude reading in a chat (`ai-text`, teaching layouts) is still made-up clients only.
+- [x] API key saved for my Windows account (25 Oct 2026). It's on my personal Anthropic account: check with the privacy officer that's OK, or move to a firm account. **The key expires 24 Nov 2026**: make a new one before then.
+- [ ] Switch the AI reader on in Sawnx Settings with the privacy officer's name and the date.
+- [ ] **Page images for scans:** ask the privacy officer separately (pictures can't be blanked: TFNs, account numbers and names on scanned pages go to Anthropic). Only then switch it on in Settings.
 - [ ] BitLocker on for the laptop drive holding `C:\TaxAssistant`.
 - [ ] Move the code to a **private, firm-owned** GitHub repo. `for-claude` is public.
 - [ ] Show the supervising agent the demo workpaper.

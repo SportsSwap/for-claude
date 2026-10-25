@@ -1,0 +1,40 @@
+# The ATO income statement from myGov (one employer). Its "Total gross amount" line is often misread in scans
+# ("$" read as "8"), so the parts that make it up are read instead: gross amount, overtime and paid leave.
+# Allowances and lump sums aren't read: a non-zero one goes to Things to check, to enter by hand.
+name: ATO income statement (myGov)
+doc_type: INCSTMT
+match:
+  all: ["australian taxation office", "paygw amount", "employer abn"]
+issuer: ""  # the employer varies; its name is in the document
+fields:
+  - label: income.salary
+    line: "Gross amount"
+    description: salary and wages, gross amount
+    every: true
+    required: true
+  - label: income.salary
+    line: "Overtime"
+    description: salary and wages, overtime
+    every: true
+  - label: income.salary
+    line: "Paid leave amount"
+    description: salary and wages, paid leave
+    every: true
+  - label: income.salary_tax_withheld
+    line: "PAYGW amount"
+    description: tax withheld (PAYGW)
+    every: true
+    required: true
+  - label: it.rfb
+    line: "Reportable fringe benefits"
+    description: reportable fringe benefits
+  - label: it.resc
+    contains: "super contribution"
+    description: reportable employer super contributions
+  - unread: true
+    line: "Lump sum payment"
+    description: a lump sum payment
+  - unread: true
+    line: "Allowances"
+    description: allowances
+added: "Claude, 25 Oct 2026, from the owner's sample (made-up copy in tests)"

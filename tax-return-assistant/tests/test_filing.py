@@ -5,7 +5,7 @@ import pytest
 
 from tra.filing.index import DocumentIndex
 from tra.filing.local_store import LocalStore
-from tra.filing.naming import filed_name
+from tra.filing.naming import clean_issuer, filed_name
 from tra.filing.store import FallbackStore, FiledRef, FilingRequest
 from tra.models import Document
 from tra.privacy.guard import SensitiveDataBlocked
@@ -22,13 +22,56 @@ def _doc(doc_id="D001", sha="a" * 64, **kw):
 
 
 def test_filed_name():
-    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".pdf", set()) == \
-        "SMIT01_FY2026_DIVSTMT_2026-03-24.pdf"
-    existing = {"SMIT01_FY2026_DIVSTMT_2026-03-24.pdf"}
-    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".PDF", existing) == \
-        "SMIT01_FY2026_DIVSTMT_2026-03-24_02.pdf"
-    existing.add("SMIT01_FY2026_DIVSTMT_2026-03-24_02.pdf")
-    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".pdf", existing).endswith("_03.pdf")
+    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".pdf", set()) ==         "SMIT01 2026-03-24 Dividend statement.pdf"
+    existing = {"SMIT01 2026-03-24 Dividend statement.pdf"}
+    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".PDF", existing) ==         "SMIT01 2026-03-24 Dividend statement (2).pdf"
+    existing.add("SMIT01 2026-03-24 Dividend statement (2).pdf")
+    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".pdf", existing).endswith("(3).pdf")
+
+
+def test_filed_name_with_issuer():
+    assert filed_name("SMIT01", 2026, "DIVSTMT", date(2026, 3, 24), ".pdf", set(), issuer="SAMPLE MINING LTD") ==         "SMIT01 2026-03-24 Dividend statement - SAMPLE MINING LTD.pdf"
+
+
+@pytest.mark.parametrize("issuer, shown", [
+    ('SAMPLE: BANK/"Ltd" 062', " - SAMPLE BANK Ltd"),
+    ("SAMPLE BANK [ACCOUNT REDACTED]", ""),
+    ("JANE CITIZEN", ""),
+    ("12345", ""),
+    ("A VERY LONG SAMPLE ISSUER NAME THAT GOES ON AND ON AND ON", " - A VERY LONG SAMPLE ISSUER NAME THAT GOES"),
+])
+def test_issuer_is_cleaned_or_left_out(issuer, shown):
+    name = filed_name("SMIT01", 2026, "INTSTMT", date(2026, 6, 30), ".pdf", set(), issuer=issuer,
+                      client_name="Jane Citizen")
+    assert name == f"SMIT01 2026-06-30 Interest statement{shown}.pdf"
+
+
+@pytest.mark.parametrize("issuer", [
+    "MR J SMITH", "SMITH FAMILY", "J & J Smith", "john", "Dr John S", "smith-jones",
+])
+def test_issuer_with_part_of_the_clients_name_is_left_out(issuer):
+    assert clean_issuer(issuer, "John Smith") == ""
+
+
+def test_short_name_words_only_count_all_together():
+    assert clean_issuer("JO LI", "Jo Li") == ""
+    assert clean_issuer("JO SAMPLE BANK", "Jo Li") == "JO SAMPLE BANK"  # "jo" alone is too short to tell
+
+
+@pytest.mark.parametrize("issuer", [
+    "12 SAMPLE STREET", "4 Sample St", "Sample Road", "1 Sample Rd", "Sample Avenue", "Sample Ave", "Sample Lane",
+    "Sample Drive", "2 Sample Dr", "Sample Court", "Sample Ct", "Sample Place", "Sample Pl", "Sample Crescent",
+    "Unit 3", "PO BOX 123", "Locked Box 9", "SAMPLETOWN NSW 2000", "VIC 3000 SAMPLEVILLE", "Sampleton QLD 4000",
+])
+def test_issuer_that_looks_like_an_address_is_left_out(issuer):
+    assert clean_issuer(issuer, "Jane Citizen") == ""
+
+
+@pytest.mark.parametrize("issuer", [
+    "SAMPLE MINING LTD", "Bupa", "NSW school", "SAMPLE BANK SA", "Smithson Ltd", "Johnsonville Fund", "ACT Sample Co",
+])
+def test_ordinary_issuers_are_kept(issuer):
+    assert clean_issuer(issuer, "John Smith") == issuer
 
 
 def test_local_store_copies_unchanged(tmp_path):

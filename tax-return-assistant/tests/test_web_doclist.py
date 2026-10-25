@@ -46,7 +46,7 @@ def test_home_shows_recent_documents_and_counts(tmp_path, monkeypatch):
     client, _settings = _two_clients(tmp_path, monkeypatch)
     page = html.unescape(client.get("/").get_data(as_text=True))
     assert "My Recent" in page and "My Starred" in page and "6 rows" in page
-    assert "Sam Sample" in page and "TEST01_FY2026_INCSTMT_2026-06-30.pdf" in page
+    assert "Sam Sample" in page and "TEST01 2026-06-30 Income statement" in page
 
 
 def test_star_and_starred_tab(tmp_path, monkeypatch):
@@ -56,7 +56,7 @@ def test_star_and_starred_tab(tmp_path, monkeypatch):
     assert resp.status_code == 302 and resp.headers["Location"].endswith("/?tab=starred")
     assert load_stars(settings.tra_home) == {row.key}
     page = client.get("/?tab=starred").get_data(as_text=True)
-    assert "INCSTMT" in page and "1 row" in page and "6 rows" not in page
+    assert "Income statement" in page and "1 row" in page and "6 rows" not in page
     set_stars(settings.tra_home, [row.key], False)
     assert load_stars(settings.tra_home) == set()
     assert client.post("/stars", data={"key": ["../../x"], "action": "star", "next": "/"}).status_code == 400
@@ -65,7 +65,7 @@ def test_star_and_starred_tab(tmp_path, monkeypatch):
 def test_documents_page_filters_by_query_string(tmp_path, monkeypatch):
     client, _settings = _two_clients(tmp_path, monkeypatch)
     page = client.get("/documents?client=DEMO01&sort=name").get_data(as_text=True)
-    assert "DEMO01_FY2026_RENTSTMT" in page and "TEST01_FY2026_INCSTMT" not in page
+    assert "DEMO01 2026-06-30 Rental statement" in page and "TEST01 2026-06-30 Income statement" not in page
 
 
 def test_bulk_download_zip(tmp_path, monkeypatch):
@@ -74,7 +74,7 @@ def test_bulk_download_zip(tmp_path, monkeypatch):
     resp = client.post("/download", data={"key": keys})
     assert resp.status_code == 200 and resp.mimetype == "application/zip"
     names = zipfile.ZipFile(io.BytesIO(resp.data)).namelist()
-    assert len(names) == 2 and all(n.startswith("TEST01_FY2026_") for n in names)
+    assert len(names) == 2 and all(n.startswith("TEST01 2026-") for n in names)
     assert client.post("/download", data={"key": ["TEST01/2026/D999"]}).status_code == 400
 
 

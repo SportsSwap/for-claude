@@ -1,0 +1,16 @@
+# A NSW government school's payment receipt (one or more receipts in the file, one figure each). What was paid
+# for varies (a staff uniform, a child's excursion), so the label is only a suggestion: check each one.
+name: NSW government school receipt
+doc_type: RECEIPT
+match:
+  all: ["transaction amount", "transaction type", "item name"]
+issuer: NSW school
+fields:
+  - label: ded.d5
+    line: "Transaction amount"
+    amount: first
+    every: true
+    suggested: true
+    description: school payment (check what it was for)
+    required: true
+added: "Claude, 25 Oct 2026, from the owner's sample (made-up copy in tests)"

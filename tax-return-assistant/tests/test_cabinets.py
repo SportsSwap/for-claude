@@ -33,7 +33,7 @@ def test_store_in_permanent(tmp_path, monkeypatch):
     src = tmp_path / "upload.pdf"
     src.write_bytes(b"%PDF-1.4 engagement letter")
     doc = store_in_cabinet(space, src, "Engagement", AuditLog(space.audit_path))
-    assert doc.filed_name == f"TEST01_PERM_OTHER_{date.today().isoformat()}.pdf"
+    assert doc.filed_name == f"TEST01 {date.today().isoformat()} Document.pdf"
     assert doc.category == "Engagement" and doc.parse_status == "stored"
     assert document_path(space, doc.doc_id) == (space.clients_dir / "Engagement" / doc.filed_name).resolve()
     assert space.clients_dir == settings.tra_home / "Clients" / "TEST01" / "Permanent"

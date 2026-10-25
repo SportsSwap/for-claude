@@ -1,0 +1,16 @@
+text: |
+  Statement print date: 01 Jul 2026
+  Private Health Insurance Statement 1 July 2025 to 30 June 2026
+  SAMPLE PERSON
+  Australian Government Rebate on private health insurance
+  Your premiums eligible for Australian Government Benefit beneficiaries for
+  Insurer ID Number Government rebate rebate received code the policy
+  BUP 12345 $1500 $360 30 Sample Person
+  BUP 12345 $500 $118 31 Sample Person
+  Number of days this policy provided an appropriate level of private patient hospital cover 365
+  Bupa HI Pty Ltd
+figures:
+  - {label: phi.premiums_p1, amount: "1500.00"}
+  - {label: phi.rebate_p1, amount: "360.00"}
+  - {label: phi.premiums_p2, amount: "500.00"}
+  - {label: phi.rebate_p2, amount: "118.00"}

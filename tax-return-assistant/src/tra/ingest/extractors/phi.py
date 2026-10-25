@@ -9,10 +9,14 @@ from .base import AMOUNT, ExtractResult, amount, doc_date, figure, lines, requir
 _P1 = r"1 July\s*-\s*31 March"
 _P2 = r"1 April\s*-\s*30 June"
 _FIELDS = [
-    (rf"^Premiums eligible for rebate {_P1}\s+({AMOUNT})$", "phi.premiums_p1", "premiums 1 Jul–31 Mar"),
-    (rf"^Rebate received {_P1}\s+({AMOUNT})$", "phi.rebate_p1", "rebate received 1 Jul–31 Mar"),
-    (rf"^Premiums eligible for rebate {_P2}\s+({AMOUNT})$", "phi.premiums_p2", "premiums 1 Apr–30 Jun"),
-    (rf"^Rebate received {_P2}\s+({AMOUNT})$", "phi.rebate_p2", "rebate received 1 Apr–30 Jun"),
+    (rf"^Premiums eligible for rebate {_P1}\s+({AMOUNT})$", "phi.premiums_p1", "premiums 1 Jul–31 Mar",
+     "premiums for 1 Jul–31 Mar"),
+    (rf"^Rebate received {_P1}\s+({AMOUNT})$", "phi.rebate_p1", "rebate received 1 Jul–31 Mar",
+     "rebate received for 1 Jul–31 Mar"),
+    (rf"^Premiums eligible for rebate {_P2}\s+({AMOUNT})$", "phi.premiums_p2", "premiums 1 Apr–30 Jun",
+     "premiums for 1 Apr–30 Jun"),
+    (rf"^Rebate received {_P2}\s+({AMOUNT})$", "phi.rebate_p2", "rebate received 1 Apr–30 Jun",
+     "rebate received for 1 Apr–30 Jun"),
 ]
 
 
@@ -27,9 +31,11 @@ class PhiExtractor:
         notes = f"benefit code {code[1].group(1)}" if code else ""
         result = ExtractResult(doc_date=when)
         found = 0
-        for pattern, key, label in _FIELDS:
+        for pattern, key, label, missing in _FIELDS:
             hit = search(rt, pattern)
-            if hit:
+            if not hit:
+                result.doubts.append(f"Didn't find the {missing}.")
+            else:
                 found += 1
                 result.figures.append(figure(key, f"{fund} – {label}", amount(hit[1].group(1)), doc_id, hit[0],
                                              when, notes=notes))

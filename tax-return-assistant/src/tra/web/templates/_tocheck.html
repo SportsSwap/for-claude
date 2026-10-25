@@ -1,0 +1,13 @@
+{# Things to check for the open document. Needs view_checks (CheckItem list). #}
+{% set counted = view_checks|selectattr('counted')|list %}
+{% if counted %}
+<div class="tocheck-box" role="note" aria-label="Things to check">
+  <h3>Things to check ({{ counted|length }})</h3>
+  <p class="small muted">What the reader wasn't sure about. Look at these before you download the document or confirm its figures.</p>
+  <ul>
+    {% for item in view_checks %}<li class="small">{% if item.risk %}<span class="risk {{ item.risk }}">{{ item.risk }}</span> {% endif %}{% if item.figure_id %}<a href="{{ base }}/figures?view={{ item.figure_id }}#{{ item.figure_id }}">{{ item.text }}</a>{% else %}{{ item.text }}{% endif %}</li>{% endfor %}
+  </ul>
+</div>
+{% elif view_checks %}
+{% for item in view_checks %}<p class="small muted">{{ item.text }}</p>{% endfor %}
+{% endif %}

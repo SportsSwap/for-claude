@@ -49,6 +49,7 @@ Back to [[Tax Return Assistant]]
 - **Done 19 Oct 2026:** deleting documents in Sawnx (Deleted items, Restore, Delete forever).
 - **Found 19 Oct 2026, not fixed:** an account number at the end of a line can swallow the first number of the next line when it's blanked ("Account 7012 3456" then "1 July 2025" became "[ACCOUNT REDACTED] July 2025"). Too much is blanked, never too little, but a date or amount can lose a digit.
 - **Fixed 19 Oct 2026:** `tra ingest` could stop part-way when its output went to a window using an old text encoding (it printed a "→").
+- **Fixed 19 Oct 2026:** about 1 time in 220, Sawnx refused to save a file note, comment, time entry, job, task, rule or In Tray document with "looks like a TFN". The cause was Sawnx's own random record ID, which sometimes held 8 digits that happen to pass the TFN check. IDs are now letters only, so they can never look like a TFN, Medicare, card or account number. The privacy check itself is unchanged.
 - **What the date check (R7) can't see:**
   - documents with no date found (the I2 note already says so);
   - last year's annual statement that only shows an issue date early in this year (say 15 July 2025), because that date is inside FY2026;
@@ -62,8 +63,31 @@ Back to [[Tax Return Assistant]]
 - The Activity list reads the whole audit log each time; fine now, slower after years.
 - If Sawnx is killed in the middle of an import, the temporary copy can stay in the client's `_uploads` folder.
 
+## From the six Sawnx additions (25 Oct 2026)
+- **Forwarded emails:** the part of an email after "From:" or "On ... wrote:" isn't read for figures, so a forwarded bank email's amounts are listed in Things to check for me to enter.
+- **An email attached inside an Outlook .msg** can't be read: save it from Outlook on its own and import it.
+- **Client spreadsheets:** the word list is deliberately short; rows it doesn't know go to Things to check. A list of share sales isn't turned into CGT events yet.
+- **Progress bar:** only on the client's Import panel, not In Tray's Add. The time left is an average, so it's rough for the first file or two.
+- **Things to check** stays on a document after I've dealt with a document-level item (for example "Didn't find the franking credit"); only figure items drop off when confirmed. Idea: a "done" tick per item.
+- **Info request** uses last year's confirmed figures in Sawnx. For a new client with only last year's notice of assessment, fill in `prior_year.csv` first, or it's the standard list.
+- Still no OCR: scanned emails or photo attachments need manual entry.
+- **My own sample documents (25 Oct 2026):** 6 of 7 came in as manual entry. The built-in readers are rules made for the demo layouts, so real wording ("Total incl. GST", interest month by month) doesn't match. Options: add readers for the layouts I see most (needs a fake-data copy of each), and use the AI (Claude in chat now; the AI reader with an API key once the privacy officer approves) for everything else. Scanned pages need OCR either way.
+- **Bank statement exports** (with a balance, or debit and credit columns) aren't read as client lists: Things to check asks me to pick the rows.
+- Small things left from the final review: the progress bar can repeat a warning once per file; In Tray's "filed" message doesn't mention an email's attachments; spreadsheets filed before 25 Oct count as one page; an email's Things to check drops a minus sign.
+- **R7 and emails:** an email sent more than 120 days after 30 June raises the date note. Idea: don't date-check emails, since the sent date isn't the period the figures cover.
+
+## From trying the AI reader (25 Oct 2026)
+- Page images are only sent when Sawnx's own readers found no figures, so a scanned page inside a document that's partly readable isn't sent.
+- Idea: let me pick the AI model in Settings (Sonnet 5.5 reads tables better than Haiku 5.5, still cheaply).
+
+## From teaching layouts (25 Oct 2026)
+- Scans with garbled text (my tax agent's invoice, AustralianSuper statement, property manager bundles) can't be taught: they need OCR or the AI.
+- A layout doesn't fix a document's date when the scan garbles it (my income statement and Bupa samples got the import date).
+- The Bupa layout doesn't read hospital cover days yet; the ATO income statement layout doesn't read allowances or lump sums.
+- Idea: a "teach this one" button on a document that tells Claude which one to look at first.
+
 ## Ideas
-- **Sawnx like FYI:** all five stages are built (18 Oct 2026). Ideas from here: sharing Sawnx across the firm (needs IT and the privacy officer), email capture into the In Tray, approvals.
+- **Sawnx like FYI:** all five stages are built (18 Oct 2026). Ideas from here: sharing Sawnx across the firm (needs IT and the privacy officer), email capture into the In Tray (emails can now be dropped in and read, 25 Oct 2026; capturing straight from Outlook would be next), approvals.
 - In Tray suggestions only offer the standard folders, not folders I've added for a client.
 - **Double-click launcher**, so there's no typing in PowerShell. Claude offered to build it. (`.\tra` already removed the activate step.)
 - **Sawnx**, a local FYI-style website instead of commands: **built 18 Oct 2026**. See [[How to run it]].

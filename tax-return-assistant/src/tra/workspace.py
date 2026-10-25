@@ -56,6 +56,10 @@ class Workspace:
         return self.work_dir / "ingest_notes.json"
 
     @property
+    def reading_notes_json(self) -> Path:
+        return self.work_dir / "reading_notes.json"
+
+    @property
     def state_json(self) -> Path:
         return self.work_dir / "state.json"
 

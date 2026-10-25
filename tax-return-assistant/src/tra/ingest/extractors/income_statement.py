@@ -29,6 +29,8 @@ class IncomeStatementExtractor:
         for pattern, key, label, required in _FIELDS:
             hit = search(rt, pattern)
             if not hit:
+                if required:
+                    result.doubts.append(f"Didn't find the {label}.")
                 continue
             page, m = hit
             any_found += 1

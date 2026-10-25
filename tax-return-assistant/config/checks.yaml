@@ -2,7 +2,7 @@
 prefill_tolerance: 1.00            # P1: pre-fill vs return difference that raises a note ($)
 double_count_tolerance: 1.00       # R4: same label, same amount within this ($)
 annual_statement_days: 120         # R7: an annual statement dated up to this many days after 30 June is this year's ...
-annual_statement_types: [INCSTMT, INTSTMT, MFUND, PHI, RENTSTMT]  # R7: ... if it is one of these types
+annual_statement_types: [INCSTMT, INTSTMT, MFUND, PHI, RENTSTMT, CLIENTXLS, EMAIL]  # R7: ... if it is one of these types
 deductions_to_income_max: 0.30     # S1: total deductions over this share of total income
 work_related_to_salary_max: 0.15   # S1: D1-D5 over this share of salary
 substantiation_threshold: 300      # S4: ITAA 1997 s900-35 small-claims limit ($)

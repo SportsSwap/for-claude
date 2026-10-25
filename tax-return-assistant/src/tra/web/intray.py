@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import secrets
 from dataclasses import asdict, dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -21,6 +20,7 @@ from ..cabinets import CABINETS, CODES, CabinetSpace, store_in_cabinet
 from ..dates import find_doc_date
 from ..filing.fyi_store import make_store
 from ..ingest.classify import classify, load_doc_types
+from ..ingest.emails import EMAIL_TYPES
 from ..ingest.pipeline import IngestError, ingest_file
 from ..ingest.readers import load
 from ..privacy.audit import AuditLog
@@ -28,8 +28,9 @@ from ..privacy.guard import atomic_write_text, check_value
 from ..settings import Settings, validate_client_code
 from ..workspace import Workspace
 from .client_names import load_names
+from .ids import new_id
 from .rules import match_rule
-from .services.imports import READ_TYPES, STORE_TYPES, ImportOutcome, _store_only
+from .services.imports import READ_TYPES, STORE_TYPES, ImportOutcome, _outcome, _store_only
 
 LOCATION = "tray.json"
 PREVIEW_LINES = 4
@@ -126,6 +127,10 @@ def _suggest(path: Path, tra_home: Path) -> tuple[bool, list[str], dict]:
     preview = [line.strip()[:120] for line in text.splitlines() if line.strip()][:PREVIEW_LINES]
     suggestion = {"code": code, "cabinet": "Tax return", "year": year, "folder": doc_types[doc_type].category,
                   "doc_type": doc_type, "mode": "store" if doc_type == "OTHER" else "read"}
+    if ext in EMAIL_TYPES:
+        # Most emails are correspondence. To have one read for the return (with its attachments),
+        # the preparer files it in the Tax return cabinet with Read for the return.
+        suggestion.update(cabinet="Correspondence", folder="Emails", doc_type="EMAIL", mode="store")
     rule = match_rule(tra_home, text)
     if rule:
         suggestion.update(code=rule["code"], cabinet=rule["cabinet"], folder=rule["folder"])
@@ -146,7 +151,7 @@ def add_to_tray(tra_home: Path, source: Path, by: str, audit: AuditLog) -> TrayI
     existing = next((i for i in items if i.sha256 == sha256), None)
     if existing:
         return existing
-    item_id = secrets.token_hex(8)
+    item_id = new_id(16)
     target = tray_dir(tra_home) / f"{item_id}{ext}"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(source.read_bytes())
@@ -199,13 +204,13 @@ def file_item(settings: Settings, item_id: str, *, code: str, cabinet: str, year
         ws = Workspace(tra_home, code, year)
         if mode == "read":
             if path.suffix.lower() not in READ_TYPES:
-                raise ValueError("Only PDF, Excel, CSV and JSON files can be read for the return. Choose Store only.")
+                raise ValueError("Only PDF, Excel, CSV, JSON and email files can be read for the return. "
+                                 "Choose Store only.")
             try:
                 report = ingest_file(path, ws, make_store(settings), load_doc_types(), audit)
             except IngestError as exc:
                 raise ValueError(str(exc)) from None
-            outcome.doc, outcome.figures_added = report.doc, report.figures_added
-            outcome.notes, outcome.duplicate = report.notes, report.duplicate
+            outcome = _outcome(ws, outcome.label, report)
         else:
             from .services.files import folder_names
 

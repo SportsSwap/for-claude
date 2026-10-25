@@ -1,0 +1,30 @@
+# Words that suggest a label for a row in a client's spreadsheet or a line in an email they sent.
+# A row whose words match exactly one label gets that label as a suggestion (unconfirmed, "suggested
+# label"); no match, or more than one, goes to Things to check instead and is never guessed.
+# Matching ignores case and a trailing "s", and a longer phrase beats a shorter one inside it, so
+# "bank interest" is interest income but "interest" on its own could be several things.
+# Add words freely; keep a word out if it could mean more than one label.
+
+_private: [gym, fine, penalty, personal, private, grocery, groceries, holiday, school fee, speeding]
+
+income.salary: [salary, wages, gross pay]
+income.interest: [interest, bank interest, interest earned, interest received, interest income, term deposit]
+income.div_franked: [dividend, franked dividend]
+income.div_unfranked: [dividend, unfranked dividend]
+income.franking_credit: [franking credit, imputation credit]
+
+ded.d1: [car expense, fuel, petrol, logbook, log book, work kilometre]
+ded.d2: [work travel, airfare, flight, accommodation]
+ded.d3: [uniform, laundry, dry cleaning, protective clothing, safety boot, hi vis]
+ded.d4: [self education, course fee, tuition, textbook, seminar]
+ded.d5: [union, union fee, professional membership, membership fee, subscription, phone, mobile, internet,
+         stationery, tool, home office, software, computer, laptop]
+ded.d7: [interest, loan interest, mortgage interest]
+ded.d9: [donation, donated, charity, charitable]
+ded.d10: [tax agent, accountant, accounting fee, tax return fee]
+ded.d15: [income protection]
+
+rent.gross: [rent received, rental income, gross rent]
+rent.interest: [loan interest, mortgage interest]
+rent.other: [council rate, water rate, strata, body corporate, land tax, property management, letting fee,
+             landlord insurance, repair]

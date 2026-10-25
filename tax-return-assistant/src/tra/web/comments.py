@@ -4,17 +4,17 @@ from __future__ import annotations
 
 import json
 import re
-import secrets
 from datetime import datetime
 from pathlib import Path
 
 from ..privacy.audit import AuditLog
 from ..privacy.guard import atomic_write_text, check_value
+from .ids import new_id
 from .stars import KEY
 
 LOCATION = "comments.json"
 MAX_TEXT = 1000
-_JOB = re.compile(r"^(ret-[A-Z0-9]{2,12}-\d{4}|job-[0-9a-f]{10})$")
+_JOB = re.compile(r"^(ret-[A-Z0-9]{2,12}-\d{4}|job-[0-9a-z]{10})$")
 
 
 def _path(tra_home: Path, code: str) -> Path:
@@ -43,7 +43,7 @@ def add_comment(tra_home: Path, code: str, target: str, text: str, by: str, audi
     if len(text) > MAX_TEXT:
         raise ValueError(f"Keep comments to {MAX_TEXT} characters.")
     comments = _load(tra_home, code)
-    comment = {"id": secrets.token_hex(6), "target": target, "text": text, "by": by,
+    comment = {"id": new_id(), "target": target, "text": text, "by": by,
                "at": datetime.now().astimezone().isoformat(timespec="seconds")}
     data = comments + [comment]
     check_value(data, LOCATION)

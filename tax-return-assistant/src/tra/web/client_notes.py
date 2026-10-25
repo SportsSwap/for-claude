@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
-import secrets
 from datetime import datetime
 from pathlib import Path
 
 from ..privacy.guard import atomic_write_text, check_value
+from .ids import new_id
 
 LOCATION = "client_notes.json"
 
@@ -42,7 +42,7 @@ def list_notes(tra_home: Path, code: str) -> list[dict]:
 
 
 def add_note(tra_home: Path, code: str, text: str, by: str, income_year: int | None = None) -> dict:
-    note = {"id": secrets.token_hex(6), "text": _text(text), "income_year": income_year, "by": by, "at": _now(),
+    note = {"id": new_id(), "text": _text(text), "income_year": income_year, "by": by, "at": _now(),
             "edited_at": None}
     _save(tra_home, code, _load(tra_home, code) + [note])
     return note

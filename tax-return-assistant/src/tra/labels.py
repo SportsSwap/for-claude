@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 
 import yaml
@@ -27,7 +28,14 @@ class LabelDef:
 
 
 def load_labels(path: Path | None = None) -> dict[str, LabelDef]:
-    raw = yaml.safe_load((path or CONFIG_DIR / "labels.yaml").read_text(encoding="utf-8"))
+    """Read once and kept until the file changes (every page needs them); each caller gets its own dict."""
+    path = Path(path or CONFIG_DIR / "labels.yaml")
+    return dict(_load_labels(str(path), path.stat().st_mtime_ns))
+
+
+@lru_cache(maxsize=8)
+def _load_labels(path: str, _mtime: int) -> dict[str, LabelDef]:
+    raw = yaml.safe_load(Path(path).read_text(encoding="utf-8"))
     defs = [
         LabelDef(key=key, item=str(spec["item"]), label=str(spec.get("label", "")),
                  letter_verified=bool(spec.get("letter_verified", False)), description=spec["description"],
@@ -35,6 +43,9 @@ def load_labels(path: Path | None = None) -> dict[str, LabelDef]:
         for key, spec in raw.items()
     ]
     return {d.key: d for d in sorted(defs, key=lambda d: d.order)}
+
+
+load_labels.cache_clear = _load_labels.cache_clear
 
 
 def figure_allowed(label: LabelDef) -> bool:

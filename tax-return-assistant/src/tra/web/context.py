@@ -29,5 +29,14 @@ def register_context(app: Flask) -> None:
     def _common():
         from .routes import income_years
 
+        import getpass
+
+        from .recent import recent_clients
+
+        tra_home = current_app.config["SAWNX"]["settings"].tra_home
+        try:
+            recent = recent_clients(tra_home, getpass.getuser())
+        except Exception:  # never let the recent list stop a page (or the error page) showing
+            recent = []
         return {"rates_unverified": unverified_years(income_years()), "ai_reader_on": ai_reader_on(),
-                "tra_home": str(current_app.config["SAWNX"]["settings"].tra_home)}
+                "tra_home": str(tra_home), "recent_clients": recent}

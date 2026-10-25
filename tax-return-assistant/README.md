@@ -54,6 +54,11 @@ These steps need people at the firm. The tool reminds you on every workpaper unt
 
 `.\tra doctor` checks the setup at any time.
 
+**Already set up before 25 October 2026?** Reading Outlook `.msg` emails needs one small extra library, `olefile`
+(free, widely used, nothing else comes with it). Close Sawnx, then in PowerShell in the tool's folder run
+`.\.venv\Scripts\pip install -e .` once (or run `setup.ps1` again). Until then a `.msg` import says what to run, and
+`.eml` emails work anyway. For firm IT: the tool's only new dependency is `olefile>=0.46`.
+
 ---
 
 ## Try it with invented data first
@@ -82,25 +87,101 @@ The demo gives an estimated payable of $5,697.11 and these review notes:
 
 Sawnx does everything below by clicking instead of typing commands. It opens in your browser but runs **only on this laptop**: no other computer can reach it, and nothing goes on the internet. The commands keep working, and anything done in one shows up in the other.
 
-**Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in this folder, or run `.\tra web`. A black window opens and Sawnx opens in your browser. Close the black window to stop it.
+**Start it:** double-click the **Sawnx** shortcut on the desktop (setup makes it), or `Sawnx.cmd` in this folder, or run `.\tra web`. A black window opens and Sawnx opens in **its own Chrome window** (no tabs or address bar, like an app). Without Chrome it uses an Edge window, and without either your usual browser. Close the black window to stop it. Each start makes a new secret key, so a bookmark won't open Sawnx: always start it from the shortcut. `.\tra web --no-open` prints the address instead, to paste into any browser.
 
 | Screen | What it does |
 |---|---|
-| Top bar | Home, Clients, Documents, Settings; a search box for clients or documents; the green **+** for New client; **?** for help. Laid out like FYI, in Sawnx's own colours. |
+| Top bar | Home, Clients, Documents, Settings; a search box for clients or documents (click in it to see your **recent searches**); the green **+** for New client; **?** for help. Laid out like FYI, in Sawnx's own colours. |
 | In Tray | Drop in documents for any client. Sawnx reads each one (identifiers blanked first) and suggests the client (by finding a client's name in it), cabinet, folder, type and year; you check, change and **File**, or **Discard**. Nothing is filed without you. |
 | Home | **My Recent**, **My Tasks**, **Delegated Tasks**, **My Starred**, **My Time** (this week) and **Notifications** (tasks and jobs due, the In Tray, colleagues' comments). |
 | Jobs | Every client's "Individual tax return FY…" job (its status follows the return) plus jobs you add (BAS, advice...), with due dates, who it's assigned to, notes, tasks, comments and time recorded against it. |
 | Knowledge | The firm's templates, policies and procedures, in folders. Firm documents only, never client documents. |
 | Documents | Every document across all clients and years. Click a heading to sort; filter by client, year, folder or type; tick several to star, download or move them. |
 | Clients | Every client by **name** (with its code), sorted by name, with where each job is up to (New, Docs in, Figures confirmed, Prepared, Reviewed), the estimate and the High notes. Search by name or code. **New client** asks for the name and suggests a code from the surname (Jane Citizen → CITI01). |
-| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. **Cabinets** like FYI: *Tax return* (per year, as above), *Permanent* and *Correspondence* (per client, stored only, never read). Open a document to edit its **properties** (type, folder, date, status) and to **upload a new version**; older copies stay listed. **Delete** (on the open document, or for ticked documents) moves a document to **Deleted items** with everything read from it, so its figures come out of the return; **Restore** puts it all back, and **Delete forever** removes it for good. Deleting a document also lets you import the same file again, to have it read again. |
-| Figures | Tick each figure once you've checked it against its source, which shows beside the table. Fix a label or amount, or add a figure by hand. Changes save to `figures.csv` straight away. |
+| Files | The client's documents in folders (the standard ones plus any you add). **Import** asks for the return type (Individual; company and trust are coming later) and, per file, **Read for the return** or **Store only** (for letters, ID, emails). Files that are read have identifiers blanked out the moment they're read, exactly as `tra ingest` does. Each document shows a **summary** of what it is, who issued it and the figures it supports, and a box for **your own description**; both go into the workpaper's Sources tab as the evidence trail. **Cabinets** like FYI: *Tax return* (per year, as above), *Permanent* and *Correspondence* (per client, stored only, never read). Open a document to edit its **properties** (type, folder, date, status) and to **upload a new version**; older copies stay listed. **Delete** (on the open document, or for ticked documents) moves a document to **Deleted items** with everything read from it, so its figures come out of the return; **Restore** puts it all back, and **Delete forever** removes it for good. Deleting a document also lets you import the same file again, to have it read again. Emails (`.eml`, `.msg`) and clients' own spreadsheets are read too, a **progress bar** shows while files are read, each document shows **Things to check**, and **Make info request** writes this year's checklist from last year's return (see below). |
+| Figures | **Confirm all** (on a document, or per document on this tab) confirms every figure from it after you've checked them (pre-fill rows excepted). Tick each figure once you've checked it against its source, which shows beside the table. Fix a label or amount, or add a figure by hand. Changes save to `figures.csv` straight away. A line under a figure says what to check first (a suggested label, read by the AI reader or Claude, no page). |
 | Prepare | Prepares the return (as `tra prepare`), shows the estimate and both calculations side by side, and lists every workpaper to download. |
 | Review notes | Each note with a response box and a Resolved tick. Responses go into the Response column of the next workpaper. **Mark reviewed** once every High note is resolved. |
 | Notes | Your own file notes about the client, and an activity list from the audit log. |
-| Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero, and **filing rules** ("if a document mentions X, suggest client Y, cabinet Z, folder W"; suggestions only). |
+| Settings | The AI reader switch (off), the client data folder, rates status, FYI and Xero, **Layouts** (what Sawnx has learned to read, and what's waiting), and **filing rules** ("if a document mentions X, suggest client Y, cabinet Z, folder W"; suggestions only). |
 
-**The AI reader is built in but switched off.** If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `.\.venv\Scripts\pip install -e ".[ai]"` (close Sawnx first) and an API key from the firm's Anthropic Console account, saved for the Windows account by typing this in PowerShell yourself (never paste a key into a chat): `[Environment]::SetEnvironmentVariable('ANTHROPIC_API_KEY', 'your-key', 'User')`. Sawnx finds a key saved this way even if it was already running; switched on without a key, an import says so. **What leaves the laptop:** the document's text with identifier numbers blanked out. Names, addresses and amounts are not blanked, so the privacy officer's approval covers those.
+### How to: emails, client spreadsheets, Things to check, progress, recent searches, info requests
+
+**Read an email from a client.** In Outlook, drag the email onto the desktop (that saves a `.msg` file), or use
+*File → Save As*. In Sawnx open the client, **Files → Import documents**, choose the file, leave it on **Read for the
+return**, and click **Import**. Sawnx files the email itself as *Email from the client* in **Other**, and reads its
+subject, date and text (the sender and recipients aren't kept). A line such as "Donations to Red Cross: $500" becomes an
+unconfirmed figure with a *suggested label*. Lines it can't put a label on are listed in Things to check. Each attachment
+is filed and read as its own document, exactly as if you'd imported it, and its Things to check says which email it
+came in. PDFs, spreadsheets, CSV and JSON are read; Word files and photos are stored in **Other**; anything else (a
+`.zip`) isn't filed and the email's Things to check says so. Signature logos are skipped, and quoted replies ("On ...
+wrote:") aren't read, so an amount the client repeats isn't counted twice. Importing the same email again files nothing.
+In the **In Tray**, an email is suggested for *Correspondence → Emails*; to have it read, choose *Tax return*, the year
+and **Read for the return** before **File**. Emails from the command line work too: `.\tra ingest SMIT01 mail.msg`.
+
+**Read a client's own spreadsheet.** Import the `.xlsx` or `.csv` the same way. If it isn't a Xero export or another
+known layout, Sawnx reads it as the client's list: on each sheet it finds the description and amount columns (and a
+date or category column), skips totals and blank rows, and turns each row whose words it knows (donation, union fees,
+phone, uniform, course, tax agent, rent received...) into an unconfirmed figure with a suggested label, described as
+"Sheet 1 row 4: Red Cross donation". A row it can't label, or whose words could mean two things ("interest" could be
+bank interest or loan interest), isn't added; it's listed in Things to check with its row and amount, for you to enter
+by hand. A sheet that looks like share sales gives no figures and asks you to enter CGT events. The word list is
+`config/sheet_words.yaml`; anyone can add words there (keep out a word that could mean two labels).
+
+**Things to check.** Open a document (click its name on the Files tab). A yellow **Things to check** box at the top of
+the panel, above **Open**, lists what the reader wasn't sure about: amounts it didn't find, rows it couldn't label,
+pages with no text, no date found, an area the tool doesn't handle, and each unconfirmed figure with a suggested
+label or read by the AI reader or Claude. The document list shows how many each document has ("2 to check"), the import
+results list them under each file, and the **Figures** tab shows a line under each figure that needs a look. Confirming
+a figure removes its item. There are no "70% sure" scores: the built-in readers either find a line or don't, so each
+item says what was found, guessed or missed.
+
+**Progress bar.** When you import several files, Sawnx reads them one at a time and shows "Reading 3 of 8 · about
+1 min left", then "Done: 8 files in 1 min 12 s". Results appear as each file finishes. Click **Show the documents** to
+see them in the list. The time left is the average so far, so it settles after the first file or two, and it includes
+the AI reader's time when that's switched on.
+
+**Recent searches.** Click in the search box at the top: your last 5 clients found by search are listed (a client you
+opened from the search results, or a search that found just one client). Click one to open it. Sawnx keeps only client
+codes for this (never what you typed), one list per Windows user, in `TRA_HOME\sawnx_recent.json`.
+
+**Make info request.** On a client's **Files** tab (Tax return cabinet), click **Make info request**. Sawnx builds a Word
+checklist for this year from last year's return: who paid what last year (employers, banks, share registries, health
+fund), shares sold, a rental property, and one line for each kind of deduction claimed, plus "Anything new this year?".
+It never includes amounts or the client's name: the letter starts "Dear [client's name]," for you to fill in. It's filed
+in **Correspondence → Letters** as `SMIT01 <date> Information request.docx` and opened in the panel: click **Open** to edit it in
+Word, then attach it to your email. Last year means the previous year's confirmed figures in Sawnx (or
+`prior_year.csv`); with nothing from last year it's the standard checklist, and says so. The wording is in
+`config/info_request.yaml`.
+
+### How to: teach Sawnx new layouts, and Read again
+
+Sawnx's own readers are rules. When a document comes in as "manual entry needed", Sawnx can usually be **taught its
+layout**, so it reads every document like it from then on, with no AI and no cost. The more layouts it knows, the
+less the AI is needed.
+
+1. Import documents as usual. Anything not read goes on **Settings → Layouts → Not read yet** (also
+   `.\tra layouts todo`).
+2. In a Claude chat, say **"teach Sawnx the new layouts"**. Claude follows fixed steps (`.claude/skills/teach-layouts`):
+   it reads only the blanked-out text (`.\tra ai-text`), writes a small layout file in `config/layouts/` (which words
+   recognise the layout, which line holds which amount), writes a made-up copy of the layout in
+   `tests/layout_samples/` with invented names and numbers, and proves it with the tests. It checks the layout on the
+   real document with `.\tra layouts try` (writes nothing), then reads the waiting documents again.
+3. Claude tells you what each new layout reads. Check the figures on the Figures tab as usual; nothing is committed
+   without your OK.
+
+**Read again** (a button on any document, or `.\tra reread SMIT01 D007`, or `--waiting` for everything not read)
+reads a filed document with today's rules. Figures you've confirmed or typed in are never changed; unconfirmed ones
+the readers added are replaced, and the document gets its readable name.
+
+What a layout can't fix: **scanned pages** (no text, or text so garbled that amounts can't be trusted) need OCR or
+the AI. An amount that looks misread ("$24s") is never used: Things to check asks you to look at it. A layout is never
+asked to guess a return item: if a line could be two things, it's left for you.
+
+Layouts learned so far: the ATO income statement (myGov), Bupa's private health statement, and NSW government school
+receipts (labels suggested only).
+
+**The AI reader is built in but switched off.** It uses **Claude Haiku 5.5** (shown on the Settings page). When it reads a document it also says what kind it is (a rental statement, say), so a document Sawnx's word-matching filed under the wrong type goes to the right folder; Things to check says "Type set by the AI reader" so you can change it. **Send page images for scans** (Settings, off by default, needs its own privacy officer approval) also sends pictures of pages with no usable text (scans), PDFs only, at most 20 pages (and 20 MB) a document, as small greyscale pictures. Numbers in a picture can't be blanked, so those pages go to Anthropic as they are; each use is in the audit log (`ai_page_images_sent`) and no picture is saved. Switching the AI reader off switches page images off too, so they need approving again. If the AI can't answer, the document is still filed, with a note to enter it by hand; it never stops an import. It may not call a document an ATO pre-fill, prior-year return or Xero export, and any account number it copies into a description is blanked. The privacy officer approved it for real clients on 25 October 2026. If the privacy officer approves it, switching it on in Settings (with the approver's name and date, recorded in the audit log) lets Claude read documents the built-in readers can't. It only ever receives the blanked-out text, and everything it finds arrives unconfirmed for you to check (R6 flags it on the workpaper). It needs `.\.venv\Scripts\pip install -e ".[ai]"` (close Sawnx first) and an API key from the firm's Anthropic Console account, saved for the Windows account by typing this in PowerShell yourself (never paste a key into a chat): `[Environment]::SetEnvironmentVariable('ANTHROPIC_API_KEY', 'your-key', 'User')`. Sawnx finds a key saved this way even if it was already running; switched on without a key, an import says so. **What leaves the laptop:** the document's text with identifier numbers blanked out. Names, addresses and amounts are not blanked, so the privacy officer's approval covers those.
 
 **Without an API key: Claude reads it in a chat.** The firm has no Anthropic API account, so instead you can ask
 Claude (Claude Code, in a chat on this laptop) to read the documents the built-in readers couldn't:
@@ -156,7 +237,7 @@ For each file the tool:
 1. **Reads the text and redacts it straight away.** TFNs, Medicare numbers, card numbers, BSBs, account numbers, driver licence and passport numbers are replaced with `[TFN REDACTED]` and so on. Nothing else ever sees the original text.
 2. **Works out the document type** (see `config/doc_types.yaml`).
 3. **Extracts the figures it understands** into `figures.csv`, each marked *unconfirmed* with its source document and page.
-4. **Files the original, unchanged**, as `TRA_HOME\Clients\SMIT01\FY2026\<Category>\SMIT01_FY2026_<DocType>_<date>.pdf`, and lists it in `index.csv`. The original filename is never recorded, since filenames often contain names.
+4. **Files the original, unchanged**, as `TRA_HOME\Clients\SMIT01\FY2026\<Category>\SMIT01 2026-03-24 Dividend statement - SAMPLE MINING LTD.pdf` (client code, the document's date, what it is, and who issued it when the tool read that; never the client's name), and lists it in `index.csv`. Documents filed before 25 October 2026 keep their old names (`SMIT01_FY2026_DIVSTMT_2026-03-24.pdf`) until they're read again. The original filename is never recorded, since filenames often contain names.
 
 Ingesting the same file twice is detected and skipped. If a document can't be read (a scan, a password-protected or damaged PDF, or a layout the tool doesn't know), it is still filed and a note asks you to enter its figures by hand. Excel lock files (`~$...`) and hidden files in a folder are ignored.
 
@@ -169,7 +250,10 @@ Ingesting the same file twice is detected and skipped. If a document can't be re
 - property manager statements;
 - private health insurance statements;
 - receipts;
-- Xero P&L exports (CSV or XLSX).
+- Xero P&L exports (CSV or XLSX);
+- clients' own spreadsheets (XLSX or CSV): rows with words it knows become figures with a suggested label;
+- emails (`.eml`, or `.msg` from Outlook): lines with an amount become figures with a suggested label, and each
+  attachment is filed and read as its own document.
 
 Real layouts vary by bank and registry. When one isn't read correctly, enter the figures by hand, and send a **blank or fake-data** copy of the layout to whoever maintains the tool so a reader can be added. Never send a real one.
 
@@ -270,6 +354,7 @@ The tool is built so that sensitive identifiers can't end up in anything it crea
 | Client codes in files | Every file, folder, filename, log, audit entry and workpaper uses the client code. Names appear only on Sawnx's screens and in `TRA_HOME\clients.json`, written through the output guard (for the privacy officer to confirm). |
 | Local only | No client data is sent anywhere except FYI and Xero, and only when you run those commands. The AI reader is built in but **switched off**; it can only be switched on in Sawnx Settings with the approver's name and date, and then sends only redacted text to Anthropic's Claude service (APP 8 applies). `TRA_HOME` may not be in a cloud-synced folder (OneDrive, SharePoint/Teams libraries, Dropbox, Google Drive, iCloud). |
 | Sawnx website | Listens on 127.0.0.1 only. Every request needs the random key made each time it starts; requests from other sites or host names are refused; pages are never cached. Uploads are saved under a random name, used and deleted; original filenames are never recorded. |
+| Emails and spreadsheets | An email's subject, date and text are redacted like any document; its sender, recipients and attachment file names are never kept. Attachments are saved under a random name, read or stored, and deleted. Names and addresses in an email or a client's spreadsheet aren't blanked (as with PDFs). Things to check, recent searches and the info request are written through the output guard; recent searches keep client codes only, and the info request never contains amounts or the client's name. |
 | Secrets | Xero and FYI credentials live in Windows user environment variables. The Xero token is kept in Windows Credential Manager. Nothing secret is in the code, config or repository (see `.env.example` for the names). |
 | Nothing in git | `.gitignore` blocks PDFs, spreadsheets and CSVs. A test fails if any committed file contains a valid TFN, Medicare or card number. |
 | Originals | Filed unchanged in the firm's system of record, as the firm keeps them today |
@@ -325,7 +410,7 @@ The workpaper follows the firm's individual tax workpapers (B01 Summary as the h
 .\.venv\Scripts\python -m pytest
 ```
 
-There are 497 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
+There are 891 tests, all on invented data generated while the tests run. Four run only on Windows (the `tra.cmd` and `Sawnx.cmd` launchers and reading the settings saved for the Windows account). The Sawnx tests use a test browser client; none open a real browser or call the internet.
 
 - **Tax maths:** the two calculations are tested on hand-worked bracket-edge cases and on 5,000 random returns, where they must agree to the cent.
 - **Redaction:** every identifier type, plus traps such as amounts, phone numbers, ABNs and dates.
@@ -336,7 +421,7 @@ There are 497 tests, all on invented data generated while the tests run. Four ru
 config/         rates per year, labels, document types, checks, citations, Xero/FYI settings
 src/tra/
   privacy/      validators, detectors, redaction, output guard, audit log, log filter
-  ingest/       readers, classifier, extractors, pipeline
+  ingest/       readers, emails (.eml, .msg), classifier, extractors (incl. client sheets, email text), pipeline
   filing/       naming, local store, FYI store, index
   return_/      draft return, CGT
   taxcalc/      rates loader, calculation A, calculation B
@@ -348,7 +433,7 @@ src/tra/
 tests/
 ```
 
-The AI reader (`src/tra/ingest/extractors/ai_reader.py`) works on redacted text only and is off unless switched on in Sawnx Settings after the firm approves sending data to it (Privacy Act APP 8). Its tests use a stand-in client and never call the network. Sawnx's design: [`docs/specs/2026-10-18-sawnx-design.md`](docs/specs/2026-10-18-sawnx-design.md).
+The AI reader (`src/tra/ingest/extractors/ai_reader.py`) works on redacted text only and is off unless switched on in Sawnx Settings after the firm approves sending data to it (Privacy Act APP 8). Its tests use a stand-in client and never call the network. Sawnx's design: [`docs/specs/2026-10-18-sawnx-design.md`](docs/specs/2026-10-18-sawnx-design.md); emails, client spreadsheets, Things to check, the progress bar, recent searches and the info request: [`docs/specs/2026-10-25-sawnx-six-additions-design.md`](docs/specs/2026-10-25-sawnx-six-additions-design.md). The `.msg` tests build Outlook files with a small writer in `tests/msgfile.py`, so no real email is ever needed.
 
 ## Known limitations
 

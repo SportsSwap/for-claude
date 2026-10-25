@@ -16,6 +16,7 @@ dependencies = [
     "keyring>=24",
     "reportlab>=4.0",
     "flask>=3.0",
+    "olefile>=0.46",
 ]
 
 [project.optional-dependencies]

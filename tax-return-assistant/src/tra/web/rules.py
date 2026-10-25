@@ -7,13 +7,13 @@ They are matched against the redacted text, case-insensitively; the first match 
 from __future__ import annotations
 
 import json
-import secrets
 from pathlib import Path
 
 from ..cabinets import CABINETS, DEFAULT_FOLDERS
 from ..ingest.classify import CATEGORIES
 from ..privacy.audit import AuditLog
 from ..privacy.guard import atomic_write_text, check_value
+from .ids import new_id
 from .jobs import client_years
 
 LOCATION = "sawnx_rules.json"
@@ -45,7 +45,7 @@ def add_rule(tra_home: Path, phrase: str, code: str, cabinet: str, folder: str, 
         raise ValueError("Choose a client from the list.")
     if cabinet not in CABINETS or folder not in folders_for(cabinet):
         raise ValueError("Choose a cabinet and one of its folders.")
-    rule = {"id": secrets.token_hex(5), "phrase": phrase, "code": code, "cabinet": cabinet, "folder": folder}
+    rule = {"id": new_id(10), "phrase": phrase, "code": code, "cabinet": cabinet, "folder": folder}
     _save(tra_home, load_rules(tra_home) + [rule])
     audit.record("rule_added", client=code, rule=rule["id"])
     return rule

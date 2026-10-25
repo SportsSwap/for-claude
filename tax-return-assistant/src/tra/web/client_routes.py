@@ -27,6 +27,7 @@ from ..doc_props import set_properties
 from ..trash import deleted_documents
 from ..versions import add_version, list_versions, version_path
 from ..doc_summary import summaries
+from ..to_check import things_to_check, to_check_by_figure
 from .client_names import load_names, set_name
 from .comments import list_comments
 from .client_notes import add_note, delete_note, edit_note, list_notes
@@ -34,7 +35,8 @@ from .messages import problem_text
 from .routes import audit_for, settings
 from .services.clients import workspace_for
 from .services.files import add_folder, document_path, documents, find_document, folder_names, folders, move_document
-from .services.figures import FiguresFileProblem, add_figure, figure_rows, label_choices, set_figure
+from .services.figures import (FiguresFileProblem, add_figure, confirm_document_figures, figure_rows, label_choices,
+                               set_figure, waiting_by_document)
 from .services.imports import RETURN_TYPES, import_file, store_upload_in_cabinet
 from .services.activity import activity
 from .services.prepare import COMPONENTS, load_summary, run_prepare, workpapers
@@ -67,6 +69,14 @@ def cab_q(space) -> str:
     return f"cab={space.code}&" if isinstance(space, CabinetSpace) else ""
 
 
+def unconfirmed_ids(ws: Workspace, doc_id: str) -> list[str]:
+    """Figures from this Tax return document still waiting to be confirmed (pre-fill rows aside)."""
+    try:
+        return waiting_by_document(figure_rows(ws)).get(doc_id, [])
+    except FiguresFileProblem:
+        return []  # the Figures tab explains the rows to fix
+
+
 def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=None, status: int = 200, space=None):
     space = space or ws
     names = folder_names(space)
@@ -87,6 +97,8 @@ def render_files(ws: Workspace, folder: str | None, view_id: str = "", results=N
                            cab=getattr(space, "code", ""), statuses=STATUSES,
                            deleted_count=len(deleted_documents(space)),
                            versions=list_versions(space, view_id) if view_id else [],
+                           view_checks=things_to_check(space, view_id) if view_id and space is ws else [],
+                           view_unconfirmed=unconfirmed_ids(ws, view_id) if view_id and space is ws else [],
                            doc_key=f"{ws.client_code}/{getattr(space, 'code', None) or ws.income_year}/{view_id}",
                            doc_comments=list_comments(ws.tra_home, ws.client_code,
                                                       f"doc:{ws.client_code}/{getattr(space, 'code', None) or ws.income_year}/{view_id}")
@@ -148,12 +160,24 @@ def register_client_routes(app: Flask) -> None:
         if not uploads:
             flash("Choose at least one file to import.", "error")
             return redirect(f"{base_url(ws)}/files?{cab_q(space)}")
+        # The progress bar sends one file at a time and asks for just its results (fragment=1).
+        fragment = request.form.get("fragment") == "1"
+        try:
+            first = max(1, int(request.form.get("first_position") or 1))
+        except ValueError:
+            first = 1
+
+        def done(results):
+            if fragment:
+                return render_template("_import_results.html", results=results, doc_types=load_doc_types())
+            return render_files(ws, None, results=results, space=space)
+
         if isinstance(space, CabinetSpace):
             audit = audit_for(code)
             results = [store_upload_in_cabinet(space, upload, folder=request.form.get(f"folder_{i}") or "Other",
-                                               audit=audit, position=i + 1)
+                                               audit=audit, position=first + i)
                        for i, upload in enumerate(uploads)]
-            return render_files(ws, None, results=results, space=space)
+            return done(results)
         store = make_store(settings(), warn=lambda message: flash(message, "error"))
         doc_types, audit = load_doc_types(), audit_for(code)
         return_type = request.form.get("return_type") or "individual"
@@ -165,9 +189,39 @@ def register_client_routes(app: Flask) -> None:
             ai_reader = None
         results = [import_file(ws, store, doc_types, audit, upload, mode=request.form.get(f"mode_{i}") or "read",
                                folder=request.form.get(f"folder_{i}") or None, return_type=return_type,
-                               position=i + 1, ai_reader=ai_reader)
+                               position=first + i, ai_reader=ai_reader)
                    for i, upload in enumerate(uploads)]
-        return render_files(ws, None, results=results)
+        return done(results)
+
+    @app.post("/c/<code>/<int:fy>/doc/<doc_id>/reread")
+    def doc_reread(code: str, fy: int, doc_id: str):
+        from ..reread import reread_document
+
+        ws = workspace_for(settings(), code, fy)
+        try:
+            r = reread_document(ws, doc_id, audit_for(code))
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+        else:
+            how = f" with the learned layout {r.layout}" if r.layout else ""
+            flash(f"{doc_id} read again{how}: {r.added} figure{'' if r.added == 1 else 's'} added, {r.removed} "
+                  "replaced. Figures you'd confirmed or typed in weren't changed." + (f" {r.note}" if r.note else ""),
+                  "ok")
+        return redirect(f"{base_url(ws)}/files?view={doc_id}")
+
+    @app.post("/c/<code>/<int:fy>/info-request")
+    def info_request(code: str, fy: int):
+        from ..info_request import make_info_request
+
+        ws = workspace_for(settings(), code, fy)
+        try:
+            doc = make_info_request(ws, audit_for(code))
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(problem_text(exc), "error")
+            return redirect(f"{base_url(ws)}/files")
+        flash(f"Info request filed in Correspondence, Letters, as {doc.filed_name}. Use Open to edit it in Word, "
+              "type the client's name, then send it.", "ok")
+        return redirect(f"{base_url(ws)}/files?cab=CORR&view={doc.doc_id}")
 
     @app.get("/c/<code>/<int:fy>/notes")
     def notes(code: str, fy: int):
@@ -216,9 +270,38 @@ def register_client_routes(app: Flask) -> None:
             rows, problem = [], str(exc)
         selected = next((f for f in rows if f.figure_id == request.args.get("view")), None)
         source = find_document(ws, selected.doc_id) if selected and selected.doc_id else None
+        docs, doc_types = documents(ws), load_doc_types()
+        kinds = {d.doc_id: doc_types[d.doc_type].description if d.doc_type in doc_types else d.doc_type for d in docs}
+        by_document = [{"doc_id": doc_id, "kind": kinds.get(doc_id, ""), "count": len(ids), "ids": ids}
+                       for doc_id, ids in waiting_by_document(rows).items() if doc_id in kinds]
         return render_template("client_figures.html", **client_context(ws, "figures"), rows=rows, problem=problem,
-                               selected=selected, source=source, labels=label_choices(), docs=documents(ws),
-                               doc_types=load_doc_types())
+                               selected=selected, source=source, labels=label_choices(), docs=docs,
+                               doc_types=doc_types, checks=to_check_by_figure(ws) if not problem else {},
+                               by_document=by_document)
+
+    @app.post("/c/<code>/<int:fy>/doc/<doc_id>/confirm-all")
+    def doc_confirm_all(code: str, fy: int, doc_id: str):
+        from .home_routes import _safe_next
+
+        ws = workspace_for(settings(), code, fy)
+        target = _safe_next(request.form.get("next"), f"{base_url(ws)}/files?view={doc_id}")
+        # Only the figures the page showed: one that arrived since (Excel, Read again, tra ai-add) hasn't been checked.
+        shown = [i.strip() for v in request.form.getlist("figure_id") for i in v.split(",") if i.strip()]
+        try:
+            n, newer = confirm_document_figures(ws, doc_id, audit_for(code), figure_ids=shown)
+        except (ValueError, SensitiveDataBlocked, FileLockedError, OSError) as exc:
+            flash(_figures_problem(exc), "error")
+            return redirect(target)
+        s = "" if n == 1 else "s"
+        if n and newer:
+            flash(f"{n} figure{s} confirmed. {newer} more from {doc_id} arrived since you opened the page; check "
+                  "them before confirming.", "ok")
+        elif n:
+            flash(f"{n} figure{s} from {doc_id} confirmed. They'll be in the return the next time you prepare it.",
+                  "ok")
+        else:
+            flash(f"Nothing to confirm in {doc_id}.", "ok")
+        return redirect(target)
 
     @app.post("/c/<code>/<int:fy>/figures/<figure_id>")
     def figure_set(code: str, fy: int, figure_id: str):

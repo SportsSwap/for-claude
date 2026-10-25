@@ -20,6 +20,8 @@ class InterestExtractor:
             value = amount(m.group(1))
             if value != 0:
                 result.figures.append(figure("income.interest", f"{bank} – interest", value, doc_id, page, when))
+        else:
+            result.doubts.append("Didn't find the interest earned.")
         withheld = search(rt, rf"^TFN withholding\s+({AMOUNT})")
         if withheld and amount(withheld[1].group(1)) != 0:
             result.figures.append(figure("income.interest_tfn_withheld", f"{bank} – TFN withholding",

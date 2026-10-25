@@ -169,6 +169,7 @@ def restore_document(space, doc_id: str, by: str, audit: AuditLog) -> int:
 def purge_document(space, doc_id: str, audit: AuditLog) -> None:
     """Delete a document in Deleted items for good, with its older versions, description, star and comments."""
     from .doc_notes import forget_doc_note
+    from .reading_notes import forget_reading_notes
     from .versions import forget_versions
     from .web.comments import forget_comments
     from .web.stars import set_stars
@@ -189,6 +190,7 @@ def purge_document(space, doc_id: str, audit: AuditLog) -> None:
     _save(space, data)
     forget_versions(space, doc_id)
     forget_doc_note(space, doc_id)
+    forget_reading_notes(space, doc_id)
     key = _doc_key(space, doc_id)
     set_stars(space.tra_home, [key], False)
     forget_comments(space.tra_home, space.client_code, f"doc:{key}")

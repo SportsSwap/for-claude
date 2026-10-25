@@ -1,4 +1,6 @@
 /* Sawnx: light, FYI-style layout with its own colours. System fonts so nothing is fetched from the internet. */
+[hidden] { display: none !important; }
+
 :root {
   --page: #F3F5F8; --surface: #FFFFFF; --raised: #EEF2F6; --line: #DDE3EA; --line-2: #C9D2DC; --row: #EBEFF4;
   --text: #1E2A36; --muted: #57636F; --link: #1D5FA8; --link-hover: #144A85;
@@ -132,6 +134,15 @@ legend { font-size: 12px; color: var(--muted); margin-bottom: 8px; padding: 0; }
 .risk.High { background: var(--high-bg); color: var(--high); }
 .risk.Medium { background: var(--med-bg); color: var(--med); }
 .risk.Low { background: var(--low-bg); color: var(--low); }
+.risk.Check { background: var(--med-bg); color: var(--med); }
+.tocheck { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 600; padding: 1px 7px;
+  border-radius: 10px; background: var(--med-bg); color: var(--med); white-space: nowrap; }
+.tocheck-line { color: var(--med); }
+.result.attachment { margin-left: 22px; border-left: 2px solid var(--line-2); padding-left: 10px; }
+.tocheck-box { border: 1px solid var(--med); border-radius: 6px; background: var(--med-bg); padding: 10px 12px; }
+.tocheck-box h3 { margin: 0 0 4px; font-size: 14px; color: var(--med); }
+.tocheck-box ul { margin: 6px 0 0; padding-left: 18px; }
+.tocheck-box li + li { margin-top: 4px; }
 .high { color: var(--high); }
 .approval { border-color: #F0D58C; color: var(--med); background: #FFF7E0; }
 
@@ -255,3 +266,17 @@ td.summary { min-width: 320px; white-space: normal; }
 .pad-inner { padding: 14px 18px; }
 .preview { background: var(--raised); border-radius: 6px; padding: 8px 10px; color: var(--muted); }
 .trayitem .card-head { flex-wrap: wrap; }
+.progress-head { display: flex; gap: 6px; align-items: baseline; }
+#progress progress { width: 100%; height: 10px; accent-color: var(--accent); }
+.topsearch { position: relative; }
+.recent-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 20; display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 6px; padding: 6px 0;
+  box-shadow: 0 6px 18px rgba(23, 50, 77, .15); }
+.recent-menu > span { padding: 2px 12px 4px; }
+.recent-menu a { padding: 6px 12px; color: var(--text); text-decoration: none; }
+.recent-menu a:hover, .recent-menu a:focus { background: var(--row); }
+/* Figures tab: documents with figures still to confirm. */
+.bydoc-list { list-style: none; margin: 0; padding: 0; }
+.bydoc-list li { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 8px 0;
+  border-top: 1px solid var(--row); }
+.bydoc-list li > form { margin-left: auto; }

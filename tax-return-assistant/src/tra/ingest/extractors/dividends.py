@@ -125,5 +125,7 @@ class DividendExtractor:
         if hit and "income.div_tfn_withheld" not in found:
             page, m = hit
             add("income.div_tfn_withheld", "TFN withheld", amount(m.group(1)), page, notes=_WITHHOLDING_NOTE)
+            result.doubts.append(_WITHHOLDING_NOTE[0].upper() + _WITHHOLDING_NOTE[1:] + ".")
+        result.doubts += [f"Didn't find the {label}." for _, key, label in _FIELDS[:3] if key not in found]
         result.parse_status = status(len(found - {"income.div_tfn_withheld"}), 3)
         return result

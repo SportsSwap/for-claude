@@ -1,0 +1,23 @@
+text: |
+  NSW Government Schools
+  Sample High School
+  >> Tax invoice/Receipt number: R12345 <<
+  Payer name: Sample Person
+  Transaction date: 05/06/2026 02:15pm
+  Transaction type: Other Payment (Receipt)
+  Payment method: EFTPOS
+  Item name
+  Staff Uniform - Protective Clothing * $40.00
+  Transaction amount $40.00
+  includes GST of $3.64
+  ---page---
+  NSW Government Schools
+  Sample High School
+  Transaction type: Other Payment (Receipt)
+  Item name
+  Staff Uniform - 2 Polos $60.50
+  Transaction amount $60.50
+  includes GST of $5.50
+figures:
+  - {label: ded.d5, amount: "40.00"}
+  - {label: ded.d5, amount: "60.50"}

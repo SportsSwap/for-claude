@@ -16,6 +16,7 @@ from ...filing.index import DocumentIndex
 from ...ingest.classify import load_doc_types
 from ...models import Document
 from ...settings import Settings
+from ...to_check import to_check_counts
 from ...workspace import Workspace
 from ..client_names import load_names
 from ..stars import KEY, load_stars
@@ -43,6 +44,7 @@ class DocRow:
     store: str
     cabinet: str = "Tax return"
     link_year: int = 0
+    to_check: int = 0
 
     @property
     def key(self) -> str:
@@ -86,6 +88,7 @@ def _rows_for(ws, names: dict[str, str], stars: set[str], doc_types, link_year: 
     if not docs:
         return []
     sums, notes = summaries(ws), load_doc_notes(ws)
+    counts = to_check_counts(ws) if isinstance(ws, Workspace) else {}
     rows = []
     for d in docs:
         note = notes.get(d.doc_id, {})
@@ -100,7 +103,8 @@ def _rows_for(ws, names: dict[str, str], stars: set[str], doc_types, link_year: 
                            income_year=ws.income_year, doc_id=d.doc_id, filed_name=d.filed_name, folder=d.category,
                            doc_type=d.doc_type, kind=kind, summary=sums.get(d.doc_id, ""),
                            description=note.get("text", ""), last_change=changed, starred=key in stars,
-                           store=d.store, cabinet=cabinet, link_year=link_year or (ws.income_year or 0)))
+                           store=d.store, cabinet=cabinet, link_year=link_year or (ws.income_year or 0),
+                           to_check=counts.get(d.doc_id, 0)))
     return rows
 
 

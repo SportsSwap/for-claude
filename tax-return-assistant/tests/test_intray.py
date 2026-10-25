@@ -117,3 +117,40 @@ def test_in_tray_pages(tmp_path, monkeypatch, make_tfn):
     assert client.get("/intray/nope/view").status_code == 404
     entries = (tray_dir(settings.tra_home) / "tray.json").read_text(encoding="utf-8")
     assert json.loads(entries) == []
+
+
+def _client_email(tmp_path):
+    from email.message import EmailMessage
+
+    msg = EmailMessage()
+    msg["Subject"] = "Tax papers from Jane Citizen"
+    msg["Date"] = "Fri, 14 Aug 2026 09:30:00 +0000"
+    msg.set_content("Hi, Jane Citizen here.\nDonations to Red Cross: $500\n")
+    pdf = tmp_path / "src.pdf"
+    _write_pdf(pdf, ["SAMPLE MINING LTD", "Dividend statement", "Payment date 20 March 2026",
+                     "Franked amount 700.00", "Franking credit 300.00"])
+    msg.add_attachment(pdf.read_bytes(), maintype="application", subtype="pdf", filename="div.pdf")
+    path = tmp_path / "mail.eml"
+    path.write_bytes(msg.as_bytes())
+    return path
+
+
+def test_email_in_tray_has_preview_and_client(tmp_path, monkeypatch):
+    _app, _client, settings = make_client(tmp_path, monkeypatch)
+    _named_client(settings)
+    item = add_to_tray(settings.tra_home, _client_email(tmp_path), "tester", AuditLog(tmp_path / "a.jsonl"))
+    assert item.suggestion["code"] == "CITI01"
+    assert (item.suggestion["cabinet"], item.suggestion["folder"], item.suggestion["mode"]) == (
+        "Correspondence", "Emails", "store")
+    assert any("Donations to Red Cross" in line for line in item.preview)
+
+
+def test_email_filed_for_the_return_reads_attachments(tmp_path, monkeypatch):
+    _app, _client, settings = make_client(tmp_path, monkeypatch)
+    ws = _named_client(settings)
+    audit = AuditLog(ws.audit_path)
+    item = add_to_tray(settings.tra_home, _client_email(tmp_path), "tester", audit)
+    outcome = file_item(settings, item.id, code="CITI01", cabinet="Tax return", year=2026, folder="Other",
+                        mode="read", audit=audit)
+    assert outcome.doc.doc_type == "EMAIL"
+    assert [a.doc.doc_type for a in outcome.attachments] == ["DIVSTMT"]

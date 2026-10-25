@@ -28,12 +28,14 @@ class ReceiptExtractor:
         supplier = first_line(rt)
         result = ExtractResult(doc_date=when)
         total = search(rt, _TOTAL)
+        is_receipt = any(word in rt.text.lower() for word in ("tax invoice", "receipt"))
         if not total:
+            if is_receipt:  # an unrecognised document isn't expected to have a total
+                result.doubts.append("Didn't find a total.")
             return result
         item = next((m.group("desc") for _, line in lines(rt)
                      if (m := _ITEM.match(line)) and not _NOT_ITEM.match(line)), "")
         description = f"{supplier}: {item}" if item else supplier
-        is_receipt = any(word in rt.text.lower() for word in ("tax invoice", "receipt"))
         substantiated = True if (is_receipt and when and supplier) else None
         result.figures.append(figure("ded.d5", description, amount(total[1].group(1)), doc_id, total[0], when,
                                      notes="suggested label", substantiated=substantiated))

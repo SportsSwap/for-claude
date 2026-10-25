@@ -266,7 +266,8 @@ The plug-in interface is `Extractor.supports(doc_type) -> bool` plus `Extractor.
 
 ### 7.6 Filing
 
-- **Name:** `[ClientCode]_[FY]_[DocType]_[Date].ext`, e.g. `SMIT01_FY2026_DIVSTMT_2026-03-24.pdf`.
+- *AI reader exception (25 Oct 2026, owner):* the AI reader may also receive pictures of scanned pages, behind a separate Settings switch that needs its own privacy officer approval; text is still redacted first.
+- **Name:** `[ClientCode]_[FY]_[DocType]_[Date].ext`, e.g. `SMIT01_FY2026_DIVSTMT_2026-03-24.pdf`. *Changed 25 Oct 2026 at the owner's request:* `[ClientCode] [Date] [Kind] - [Issuer].ext`, e.g. `SMIT01 2026-03-24 Dividend statement - SAMPLE MINING LTD.pdf` (still led by the code; the issuer is left out if unknown, the client's own name, or a blanked number). See `2026-10-25-layout-teaching-design.md`.
   - The date is the document date; if none is found, the ingest date is used and a review note raised.
   - A collision adds `_02`, `_03`, and so on.
 - **Local store:** `TRA_HOME\Clients\[ClientCode]\[FY]\[Category]\`. The original is copied unchanged.

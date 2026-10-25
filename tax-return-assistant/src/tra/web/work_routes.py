@@ -13,6 +13,7 @@ from ..cabinets import CABINETS
 from ..privacy.guard import FileLockedError, SensitiveDataBlocked
 from .client_names import load_names
 from .comments import add_comment, list_comments
+from .home_routes import _safe_next  # the same rule as every other page
 from .jobs import (JOB_STATUSES, add_job, add_task, client_years, find_job, list_jobs, list_tasks, set_task_done,
                    update_job)
 from .knowledge import KNOWLEDGE_FOLDERS, knowledge_dir, knowledge_docs, knowledge_path, store_knowledge
@@ -24,8 +25,6 @@ from .timesheet import add_time, list_time
 PROBLEMS = (ValueError, SensitiveDataBlocked, FileLockedError, OSError)
 
 
-def _safe_next(url: str | None, default: str = "/") -> str:
-    return url if url and url.startswith("/") and not url.startswith("//") else default
 
 
 def register_work_routes(app: Flask) -> None:

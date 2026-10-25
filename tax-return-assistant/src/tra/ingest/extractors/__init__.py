@@ -8,6 +8,8 @@ later, but only on redacted text and only after firm sign-off (spec §2).
 from __future__ import annotations
 
 from .base import ExtractResult, Extractor
+from .client_sheet import ClientSheetExtractor
+from .email_body import EmailBodyExtractor
 from .dividends import DividendExtractor
 from .income_statement import IncomeStatementExtractor
 from .interest import InterestExtractor
@@ -26,6 +28,8 @@ _EXTRACTORS: list[Extractor] = [
     PhiExtractor(),
     ReceiptExtractor(),
     XeroExportExtractor(),
+    ClientSheetExtractor(),
+    EmailBodyExtractor(),
 ]
 
 _REGISTRY = {doc_type: ext for ext in _EXTRACTORS for doc_type in ext.doc_types}

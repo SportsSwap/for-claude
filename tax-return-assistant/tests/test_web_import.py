@@ -71,7 +71,7 @@ def test_store_only_files_unread(tmp_path, monkeypatch):
     resp = _post(client, [(os.urandom(500), "letter.docx", "store", "Engagement")])
     assert resp.status_code == 200
     [doc] = DocumentIndex(ws.index_csv).load()
-    assert doc.filed_name == f"TEST01_FY2026_OTHER_{date.today().isoformat()}.docx"
+    assert doc.filed_name == f"TEST01 {date.today().isoformat()} Document.docx"
     assert doc.parse_status == "stored" and doc.category == "Engagement" and doc.redaction_counts == {}
     assert read_figures(ws.figures_csv, load_labels())[0] == []
     assert not [n for n in read_notes(ws.ingest_notes_json) if n.check_id == "I2"]

@@ -2,71 +2,102 @@
 # all: every keyword must appear. any: at least one must appear (empty = no condition).
 # Matching is case-insensitive and runs on redacted text only.
 PREFILL:
+  short: ATO pre-fill report
   category: ATO
   description: ATO pre-fill report (Online services for agents)
   all: ["pre-fill report"]
 PRIOR:
+  short: Prior-year return
   category: ATO
   description: Prior-year return or notice of assessment
   all: ["tax return for individuals"]
   any: ["notice of assessment", "return summary"]
 INCSTMT:
+  short: Income statement
   category: Income
   description: Income statement / PAYG payment summary
   any: ["income statement", "payg payment summary"]
 DIVSTMT:
+  short: Dividend statement
   category: Investments
   description: Dividend statement
   all: ["dividend"]
   any: ["franking credit", "franked amount"]
 MFUND:
   # Before INTSTMT and BANKSTMT: fund statements also mention interest.
+  short: Managed fund statement
   category: Investments
   description: Managed fund / AMIT annual tax statement
   any: ["amit member annual statement", "annual tax statement"]
 INTSTMT:
+  short: Interest statement
   category: Investments
   description: Interest summary
   any: ["interest summary", "interest statement"]
 BANKSTMT:
+  short: Bank statement
   category: Investments
   description: Bank account statement
   all: ["statement"]
   any: ["opening balance", "closing balance"]
 CGT:
+  short: Capital gains report
   category: Investments
   description: Capital gains report or contract note
   any: ["capital gains report", "contract note"]
 RENTSTMT:
+  short: Rental statement
   category: Rental
   description: Rental / property manager statement
   any: ["rental statement", "property manager", "owner statement"]
 PHI:
+  short: Private health statement
   category: Health
   description: Private health insurance statement
   all: ["private health insurance statement"]
 XEROPL:
+  short: Xero profit and loss
   category: Business
   description: Xero profit and loss
   all: ["profit and loss"]
   any: ["xero", "account code"]
 XEROBS:
+  short: Xero balance sheet
   category: Business
   description: Xero balance sheet
   all: ["balance sheet"]
   any: ["xero", "account code"]
 XEROBANK:
+  short: Xero bank transactions
   category: Business
   description: Xero bank transactions
   all: ["bank transactions"]
 XEROCOA:
+  short: Xero chart of accounts
   category: Business
   description: Xero chart of accounts
   all: ["chart of accounts"]
 RECEIPT:
+  short: Receipt
   category: Deductions
   description: Receipt or tax invoice
   any: ["tax invoice", "receipt"]
+INFOREQ:
+  # Never matched by keywords: Sawnx's own information request letter (Make info request).
+  short: Information request
+  category: Other
+  description: Information request (from Sawnx)
+EMAIL:
+  # Never matched by keywords: the pipeline uses it for every .eml and .msg file it reads.
+  short: Email
+  category: Other
+  description: Email from the client
+CLIENTXLS:
+  # Never matched by keywords: the pipeline uses it for a spreadsheet nothing else recognises.
+  short: Client spreadsheet
+  category: Other
+  description: Client's spreadsheet
 OTHER:
+  short: Document
   category: Other
   description: Not recognised; manual entry needed

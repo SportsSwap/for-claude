@@ -4,11 +4,19 @@
 <h1>Search{{ ': ' ~ q if q }}</h1>
 {% if not q %}
 <p class="muted">Type a client's name or code, or words from a document, in the search box at the top.</p>
+{% if recent_clients %}
+<section class="card" aria-labelledby="rs-title">
+  <div class="card-head"><h2 id="rs-title">Recent searches</h2><span class="muted small">your last {{ recent_clients|length }}</span></div>
+  {% for c in recent_clients %}
+  <div class="result"><a href="/c/{{ c.code }}/{{ c.fy }}/files">{{ c.name or c.code }}</a><span class="muted small">{{ c.code }} · FY{{ c.fy }}</span></div>
+  {% endfor %}
+</section>
+{% endif %}
 {% else %}
 <section class="card" aria-labelledby="sc-title">
   <div class="card-head"><h2 id="sc-title">Clients</h2><span class="muted small">{{ found_clients|length }} found</span></div>
   {% for c in found_clients %}
-  <div class="result"><a href="/c/{{ c.code }}/{{ c.income_year }}/files">{{ c.name or c.code }}</a><span class="muted small">{{ c.code }} · FY{{ c.income_year }} · {{ c.status }}</span></div>
+  <div class="result"><a href="/search/open/{{ c.code }}">{{ c.name or c.code }}</a><span class="muted small">{{ c.code }} · FY{{ c.income_year }} · {{ c.status }}</span></div>
   {% else %}
   <p class="empty">No clients match.</p>
   {% endfor %}

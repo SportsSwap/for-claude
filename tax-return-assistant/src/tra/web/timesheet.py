@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import json
-import secrets
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from ..privacy.audit import AuditLog
 from ..privacy.guard import atomic_write_text, check_value
+from .ids import new_id
 from .jobs import find_job
 
 LOCATION = "sawnx_time.json"
@@ -39,7 +39,7 @@ def add_time(tra_home: Path, job_id: str, day: str, minutes: str, what: str, by:
     if not 1 <= mins <= 1440:
         raise ValueError("Enter the minutes spent (1 to 1440).")
     what = " ".join((what or "").split())[:300]
-    entry = {"id": secrets.token_hex(6), "job_id": job_id, "code": job.code, "date": when.isoformat(), "minutes": mins,
+    entry = {"id": new_id(), "job_id": job_id, "code": job.code, "date": when.isoformat(), "minutes": mins,
              "what": what, "by": by, "at": datetime.now().astimezone().isoformat(timespec="seconds")}
     data = list_time(tra_home) + [entry]
     check_value(data, LOCATION)

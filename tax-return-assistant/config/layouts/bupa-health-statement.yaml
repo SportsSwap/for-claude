@@ -1,0 +1,39 @@
+# Bupa's private health insurance tax statement. Each row of its table is one period: benefit codes ending in
+# 0 or 5 (30, 35, 40) are 1 July to 31 March, and ending in 1 or 6 (31, 36, 41) are 1 April to 30 June. In each
+# row the first $ amount is the premiums eligible for the rebate and the second the rebate received.
+# Hospital cover days aren't read from this layout yet: check them on the statement.
+name: Bupa private health insurance statement
+doc_type: PHI
+match:
+  all: ["bupa", "australian government rebate"]
+issuer: Bupa
+fields:
+  - label: phi.premiums_p1
+    line: "BUP"
+    also: ["30", "35", "40"]
+    amount: 1
+    amounts: 2
+    every: true
+    description: premiums eligible for rebate 1 Jul–31 Mar
+  - label: phi.rebate_p1
+    line: "BUP"
+    also: ["30", "35", "40"]
+    amount: 2
+    amounts: 2
+    every: true
+    description: rebate received 1 Jul–31 Mar
+  - label: phi.premiums_p2
+    line: "BUP"
+    also: ["31", "36", "41"]
+    amount: 1
+    amounts: 2
+    every: true
+    description: premiums eligible for rebate 1 Apr–30 Jun
+  - label: phi.rebate_p2
+    line: "BUP"
+    also: ["31", "36", "41"]
+    amount: 2
+    amounts: 2
+    every: true
+    description: rebate received 1 Apr–30 Jun
+added: "Claude, 25 Oct 2026, from the owner's sample (made-up copy in tests)"

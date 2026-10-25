@@ -25,9 +25,9 @@ def test_standard_and_custom_folders_listed(tmp_path, monkeypatch):
     assert next(f for f in listed if f.name == "Income").count == 1
     assert next(f for f in listed if f.name == "Engagement").standard is False
     page = client.get("/c/TEST01/2026/files").get_data(as_text=True)
-    assert "Engagement" in page and "TEST01_FY2026_INCSTMT_2026-06-30.pdf" in page
+    assert "Engagement" in page and "TEST01 2026-06-30 Income statement" in page
     only_rental = client.get("/c/TEST01/2026/files?folder=Rental").get_data(as_text=True)
-    assert "TEST01_FY2026_INCSTMT" not in only_rental
+    assert "TEST01 2026-06-30 Income statement" not in only_rental
 
 
 def test_add_folder_rejects_bad_names(tmp_path, monkeypatch, make_tfn):
@@ -65,7 +65,7 @@ def test_move_document_updates_index_and_audit(tmp_path, monkeypatch):
     resp = client.post("/c/TEST01/2026/doc/D001/move", data={"folder": "Engagement"})
     assert resp.status_code == 302
     [doc] = DocumentIndex(ws.index_csv).load()
-    assert doc.category == "Engagement" and doc.filed_name == "TEST01_FY2026_INCSTMT_2026-06-30.pdf"
+    assert doc.category == "Engagement" and doc.filed_name.startswith("TEST01 2026-06-30 Income statement")
     assert not old.exists() and document_path(ws, "D001").parent.name == "Engagement"
     actions = [json.loads(line)["action"] for line in ws.audit_path.read_text(encoding="utf-8").splitlines()]
     assert "document_moved" in actions

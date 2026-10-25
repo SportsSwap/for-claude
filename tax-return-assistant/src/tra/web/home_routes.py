@@ -10,6 +10,7 @@ from flask import Flask, abort, flash, redirect, render_template, request, send_
 
 from ..cabinets import CABINETS
 from ..privacy.guard import FileLockedError, SensitiveDataBlocked
+from ..settings import validate_client_code
 from .client_names import load_names
 from .messages import problem_text
 from .routes import audit_for, settings
@@ -22,7 +23,8 @@ FILTERS = ("q", "client", "year", "folder", "kind", "cabinet")
 
 
 def _safe_next(url: str | None, default: str = "/") -> str:
-    return url if url and url.startswith("/") and not url.startswith("//") else default
+    """A path on this site, or the default. "//x" and "/\\x" (browsers read a backslash as a slash) go elsewhere."""
+    return url if url and url.startswith("/") and url[1:2] not in ("/", "\\") else default
 
 
 def doclist_context(rows, path: str, *, fixed: dict | None = None) -> dict:
@@ -84,13 +86,36 @@ def register_home_routes(app: Flask) -> None:
 
     @app.get("/search")
     def search():
+        import getpass
+
+        from .recent import remember_quietly
+
         q = (request.args.get("q") or "").strip()
         needle = q.lower()
         found = [c for c in list_clients(settings().tra_home)
                  if needle and (needle in (c.name or "").lower() or c.code.lower().startswith(needle))]
+        if len({c.code for c in found}) == 1:
+            remember_quietly(settings().tra_home, getpass.getuser(), found[0].code, settings().client_code_pattern)
         rows = all_documents(settings().tra_home) if q else []
         return render_template("search.html", nav="", q=q, found_clients=found, total=len(rows),
                                **doclist_context(rows, "/search"))
+
+    @app.get("/search/open/<code>")
+    def search_open(code: str):
+        """A client opened from the search results: remember them in Recent searches, then open them."""
+        import getpass
+
+        from .recent import latest_year, remember_quietly
+
+        try:
+            validate_client_code(code, settings().client_code_pattern)
+        except ValueError:
+            abort(404)
+        year = latest_year(settings().tra_home, code)
+        if year is None:
+            abort(404)
+        remember_quietly(settings().tra_home, getpass.getuser(), code, settings().client_code_pattern)
+        return redirect(f"/c/{code}/{year}/files")
 
     @app.get("/help")
     def help_page():

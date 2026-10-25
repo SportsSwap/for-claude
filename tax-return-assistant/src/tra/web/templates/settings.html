@@ -8,7 +8,8 @@
     <div>
       <div class="title-row"><h2 id="ai-title">AI reader</h2><span class="badge approval">Needs privacy officer approval</span>
         <span class="badge"><span class="dot {{ 'ok' if app_settings.ai_reader else 'off' }}"></span>{{ 'On' if app_settings.ai_reader else 'Off' }}</span></div>
-      <p class="muted">Reads documents the built-in reader can't, using only the blanked-out text, which is sent to Anthropic's Claude service. Its figures arrive unconfirmed for you to check, and the workpaper flags them (R6). Scans still need entering by hand.</p>
+      <p class="muted">Reads documents the built-in reader can't, using only the blanked-out text, which is sent to Anthropic's Claude service. Its figures arrive unconfirmed for you to check, and the workpaper flags them (R6). {{ 'Scanned pages are also sent as pictures (below).' if app_settings.page_images_in_use else 'Scans still need entering by hand.' }}</p>
+      <p class="small">Model: <strong>{{ ai_model }}</strong></p>
       {% if app_settings.ai_reader %}<p class="small">Approved by {{ app_settings.approved_by }} on {{ app_settings.approved_on }}.{% if not key_set %} <span class="high">ANTHROPIC_API_KEY isn't set for this Windows account, so it won't run yet.</span>{% endif %}</p>{% endif %}
     </div>
   </div>
@@ -17,6 +18,33 @@
     <form method="post" action="/settings/ai-reader"><input type="hidden" name="action" value="off"><button class="btn-ghost" type="submit">Switch off</button></form>
     {% else %}
     <form class="cols" method="post" action="/settings/ai-reader">
+      <input type="hidden" name="action" value="on">
+      <label class="field col-side"><span>Approved by (privacy officer)</span><input type="text" name="approved_by" maxlength="80"></label>
+      <label class="field col-narrow"><span>Approved on</span><input type="date" name="approved_on"></label>
+      <div class="actions"><button class="btn-ghost" type="submit">Switch on</button></div>
+    </form>
+    {% endif %}
+  </div>
+</section>
+
+<section class="card" aria-labelledby="images-title">
+  <div class="setting">
+    <div>
+      <div class="title-row"><h2 id="images-title">Send page images for scans</h2><span class="badge approval">Needs privacy officer approval</span>
+        <span class="badge" id="images-badge"><span class="dot {{ 'ok' if app_settings.page_images_in_use else 'off' }}"></span>{{ 'On' if app_settings.page_images_in_use else 'Off' }}</span></div>
+      <p class="high">Pages with no usable text (scans) are sent to Anthropic as pictures. Numbers in a picture can't be blanked out first, so TFNs, account numbers and names on those pages go to Anthropic too. Needs the privacy officer's approval.</p>
+      <p class="muted small">Only for PDFs the AI reader is asked to read, at most 20 pages (20 MB of pictures) each; pages past that are listed for entering by hand. The audit log records which pages were sent. The pictures are never saved.</p>
+      <p class="muted small">Switching the AI reader off switches this off too; it then needs approving again.</p>
+      {% if app_settings.ai_page_images %}<p class="small">Approved by {{ app_settings.images_approved_by }} on {{ app_settings.images_approved_on }}.</p>{% endif %}
+    </div>
+  </div>
+  <div class="setting">
+    {% if app_settings.ai_page_images %}
+    <form method="post" action="/settings/ai-page-images"><input type="hidden" name="action" value="off"><button class="btn-ghost" type="submit">Switch off</button></form>
+    {% elif not app_settings.ai_reader %}
+    <p class="muted small">Switch the AI reader on first.</p>
+    {% else %}
+    <form class="cols" method="post" action="/settings/ai-page-images">
       <input type="hidden" name="action" value="on">
       <label class="field col-side"><span>Approved by (privacy officer)</span><input type="text" name="approved_by" maxlength="80"></label>
       <label class="field col-narrow"><span>Approved on</span><input type="date" name="approved_on"></label>
@@ -37,6 +65,10 @@
   <div class="setting"><div><strong>Xero</strong><span class="muted small">For sole trader clients. Connect with <span class="mono">.\tra xero connect</span>.</span></div>
     <span class="badge"><span class="dot {{ 'ok' if xero_ready else 'off' }}"></span>{{ 'Set up' if xero_ready else 'Not set up' }}</span></div>
   <div class="setting"><div><strong>Address</strong><span class="muted small">Only this laptop can open Sawnx. Close its black window to stop it.</span></div><span class="mono">127.0.0.1:{{ port }}</span></div>
+</section>
+<section class="card" aria-labelledby="layouts-title">
+  <div class="card-head"><h2 id="layouts-title">Layouts</h2><span class="muted small">Documents Sawnx reads with its own rules, and what's waiting to be taught</span></div>
+  <div class="setting"><div><strong>Learned layouts and documents not read yet</strong><span class="muted small">Teach Sawnx new layouts in a Claude chat, so fewer documents need the AI.</span></div><a class="btn-ghost" href="/layouts">Open Layouts</a></div>
 </section>
 <section id="rules" class="card" aria-labelledby="rules-title">
   <div class="card-head"><h2 id="rules-title">Filing rules</h2><span class="muted small">Change In Tray suggestions only; you still confirm every filing</span></div>

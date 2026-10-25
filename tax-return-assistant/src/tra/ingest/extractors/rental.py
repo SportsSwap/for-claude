@@ -35,4 +35,6 @@ class RentalExtractor:
             if m and amount(m.group("amt")) != 0:
                 key = "rent.interest" if "interest" in m.group("desc").lower() else "rent.other"
                 result.figures.append(figure(key, m.group("desc"), amount(m.group("amt")), doc_id, page, when))
+        if result.parse_status != "parsed":
+            result.doubts.append("Didn't find the total rent received.")
         return result

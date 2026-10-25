@@ -16,7 +16,6 @@ from pathlib import Path
 from .filing.index import DocumentIndex
 from .models import Document
 from .privacy.audit import AuditLog
-from .privacy.guard import check_text
 
 CABINETS = ("Tax return", "Permanent", "Correspondence")
 CODES = {"Permanent": "PERM", "Correspondence": "CORR"}
@@ -61,12 +60,10 @@ class CabinetSpace:
 
 
 def cabinet_filed_name(space: CabinetSpace, doc_type: str, when: date, suffix: str, existing: set[str]) -> str:
-    stem = f"{space.client_code}_{space.code}_{doc_type}_{when.isoformat()}"
-    name, n = f"{stem}{suffix.lower()}", 2
-    while name in existing:
-        name, n = f"{stem}_{n:02d}{suffix.lower()}", n + 1
-    check_text(name, "filename")
-    return name
+    """The same readable names as the tax return ("SMIT01 2026-10-25 Information request.docx")."""
+    from .filing.naming import filed_name
+
+    return filed_name(space.client_code, None, doc_type, when, suffix, existing)
 
 
 def store_in_cabinet(space: CabinetSpace, source: Path, folder: str, audit: AuditLog,

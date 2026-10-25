@@ -58,7 +58,7 @@
           <tr class="{{ 'sel' if request.args.get('view') == r.doc_id and hide_client }}">
             <td class="tick"><input type="checkbox" name="key" value="{{ r.key }}" aria-label="Tick {{ r.filed_name }}"></td>
             <td class="tick"><button class="star {{ 'on' if r.starred }}" type="submit" form="star-{{ loop.index }}" aria-label="{{ 'Unstar' if r.starred else 'Star' }} {{ r.filed_name }}" aria-pressed="{{ 'true' if r.starred else 'false' }}">{{ '★' if r.starred else '☆' }}</button></td>
-            <td class="namecell"><span class="fileicon ext-{{ r.ext }}" aria-hidden="true">{{ r.ext|upper }}</span><a href="{{ r.link }}">{{ r.filed_name }}</a>
+            <td class="namecell"><span class="fileicon ext-{{ r.ext }}" aria-hidden="true">{{ r.ext|upper }}</span><a href="{{ r.link }}">{{ r.filed_name }}</a>{% if r.to_check %} <span class="tocheck" title="Things to check in this document">{{ r.to_check }} to check</span>{% endif %}
               {% if r.description %}<div class="small">{{ r.description }}</div>{% endif %}</td>
             {% if not hide_client %}<td><a href="{{ r.client_link }}">{{ r.client }}</a></td><td class="{{ 'mono' if r.income_year }}">{{ 'FY' ~ r.income_year if r.income_year else r.cabinet }}</td>{% endif %}
             <td>{{ r.folder }}</td>
