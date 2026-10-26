@@ -25,7 +25,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from ..checks import label_name
 from ..dates import days_in_fy, fy_bounds, fy_label
-from ..labels import LabelDef
+from ..labels import LabelDef, return_key
 from ..models import ClientState, Document, Figure, ReviewNote
 from ..privacy.guard import FileLockedError, check_workbook
 from ..return_.cgt import discount_eligible
@@ -239,11 +239,23 @@ def _write_rows(ws: Worksheet, figures: list[Figure], docs: dict[str, Document],
     return row
 
 
-def _figure_groups(figures: list[Figure]) -> list[tuple[str, list[Figure], str]]:
-    """ATO pre-fill first, then the client's own documents, as the firm's workpapers show them."""
-    groups = [("ATO pre-fill", [f for f in figures if f.notes == "prefill"], "Subtotal – ATO pre-fill"),
-              ("Client documents and adjustments", [f for f in figures if f.notes != "prefill"],
-               "Subtotal – client documents")]
+SUNDRY_HEADING = "Sundry rental expenses"
+
+
+def _figure_groups(figures: list[Figure], d: LabelDef, labels: dict[str, LabelDef]) -> list[tuple[str, list[Figure], str]]:
+    """ATO pre-fill first, then the client's own documents, as the firm's workpapers show them. A label with a
+    breakdown (Item 21 U's rental categories) shows each category with its own subtotal instead, in schedule
+    order, with whatever is left on the label itself as sundry last."""
+    prefill = [f for f in figures if f.notes == "prefill"]
+    own = [f for f in figures if f.notes != "prefill"]
+    groups = [("ATO pre-fill", prefill, "Subtotal – ATO pre-fill")]
+    if any(f.label_key != d.key for f in own):
+        for key in [k for k in labels if labels[k].part_of == d.key] + [d.key]:
+            items = [f for f in own if f.label_key == key]
+            heading = SUNDRY_HEADING if key == d.key else labels[key].description
+            groups.append((heading, items, f"Subtotal – {heading}"))
+    else:
+        groups.append(("Client documents and adjustments", own, "Subtotal – client documents"))
     return [g for g in groups if g[1]]
 
 
@@ -251,14 +263,14 @@ RENTAL_DEDUCTION_KEYS = ("rent.interest", "rent.capital_works", "rent.other")
 
 
 def _item_section(ws: Worksheet, row: int, d: LabelDef, figures: list[Figure], docs: dict[str, Document],
-                  transfers: list) -> tuple[int, str]:
+                  transfers: list, labels: dict[str, LabelDef]) -> tuple[int, str]:
     """One return label: a section bar, its figures (pre-fill and client documents), the total and the
     'Transferred to' link. Labels are never added together. Returns the next free row and the total cell."""
     ws.cell(row=row, column=2, value=f"{_item_ref(d)}  {d.description}")
     L.style_section(ws, row, FIRST_COL, LAST_COL)
     _write_header(ws, row + 1)
     row += 2
-    groups = _figure_groups(figures)
+    groups = _figure_groups(figures, d, labels)
     subtotals, start = [], row
     for heading, items, subtotal_label in groups:
         L.style_subheading(ws.cell(row=row, column=4, value=heading))
@@ -290,9 +302,11 @@ def _item_tab(ws: Worksheet, tab: str, figures: list[Figure], ctx: WorkpaperCont
     _purpose(ws, PURPOSE.get(tab, "record the amounts for this part of the return"), ITEM_NOTE)
     row = BODY_ROW
     totals: dict[str, str] = {}
-    for key in [k for k in ctx.labels if any(f.label_key == k for f in figures)]:
-        row, totals[key] = _item_section(ws, row, ctx.labels[key], [f for f in figures if f.label_key == key],
-                                         docs, transfers)
+    # One section per return label; a rental category's figures sit in Item 21 U's section.
+    of = {f.figure_id: return_key(ctx.labels, f.label_key) for f in figures}
+    for key in [k for k in ctx.labels if any(of[f.figure_id] == k for f in figures)]:
+        row, totals[key] = _item_section(ws, row, ctx.labels[key], [f for f in figures if of[f.figure_id] == key],
+                                         docs, transfers, ctx.labels)
         wp.total_cells.append(f"{_q(tab)}!{totals[key]}")
     if "rent.gross" in totals or any(k in totals for k in RENTAL_DEDUCTION_KEYS):
         less = "".join(f"-{totals[k]}" for k in RENTAL_DEDUCTION_KEYS if k in totals)
@@ -870,7 +884,7 @@ def build_workpaper(path: Path, ctx: WorkpaperContext) -> WorkpaperMap:
         else:
             _item_tab(tab_sheets[tab], tab, figures, ctx, docs, wp, transfers)
         for f in figures:
-            tab_of[f.label_key] = tab
+            tab_of[return_key(ctx.labels, f.label_key)] = tab  # a rental category's tab is Item 21 U's
     summary_refs, landing = _summary(summary, ctx, tab_of, cgt_refs, wp)
     for cell, key in transfers:  # "Transferred to: Item 10 L" lands on that line of the Summary
         if key in landing:

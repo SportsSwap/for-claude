@@ -20,7 +20,7 @@ from .checks.prior_year import load_prior_year
 from .dates import fy_bounds
 from .docx_writer import write_docx
 from .figures import read_cgt, read_figures
-from .labels import load_labels
+from .labels import load_labels, return_key
 from .models import Document
 from .paths import CONFIG_DIR
 from .privacy.audit import AuditLog
@@ -73,12 +73,13 @@ def _last_year(ws: Workspace) -> tuple[dict[str, list[str]], list[str]]:
     from .web.client_names import load_names
 
     last = ws.for_year(ws.income_year - 1)
-    figures, _errors = read_figures(last.figures_csv, load_labels()) if last.figures_csv.exists() else ([], [])
+    labels = load_labels()
+    figures, _errors = read_figures(last.figures_csv, labels) if last.figures_csv.exists() else ([], [])
     client = load_names(ws.tra_home).get(ws.client_code)
     keys: dict[str, list[str]] = {}
     for f in figures:
         if f.confirmed and f.amount:
-            names = keys.setdefault(f.label_key, [])
+            names = keys.setdefault(return_key(labels, f.label_key), [])  # gardening asks for the rental papers
             who = payer(f.description)
             if who and "redacted" not in who.lower() and not _is_the_client(who, client) and who not in names:
                 names.append(who)

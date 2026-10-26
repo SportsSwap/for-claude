@@ -1,0 +1,29 @@
+# Words that sort an expense line on a property manager's statement (or another rental document) into a
+# category of the ATO's rental property schedule (config/labels.yaml, part of Item 21 U).
+# A line whose words point to exactly one category goes there; no match, or more than one, stays under
+# Sundry rental expenses (rent.other) for a person to sort. Matching ignores case and a trailing "s", and a
+# longer phrase beats a shorter one inside it ("garden maintenance" is gardening, not repairs).
+# These are only used on rental documents, so short words like "insurance" are safe here. Add words freely.
+# Interest and capital works are return labels of their own (Item 21 Q and F), not part of U.
+
+rent.interest: [interest, loan interest, mortgage interest]
+rent.capital_works: [capital works, building depreciation, division 43, div 43]
+
+rent.advertising: [advertising, advertisement, advertise, listing fee, marketing]
+rent.body_corporate: [body corporate, strata, strata levy, owners corporation, sinking fund, admin fund]
+rent.borrowing: [borrowing expense, loan establishment, establishment fee, mortgage registration,
+                 lenders mortgage insurance, loan application fee]
+rent.cleaning: [cleaning, cleaner, carpet clean]
+rent.council_rates: [council rate, council, shire rate, municipal rate]
+rent.capital_allowances: [depreciation, capital allowance, decline in value, plant and equipment]
+rent.gardening: [gardening, gardener, garden, garden maintenance, lawn, lawn mowing, mowing, landscaping]
+rent.insurance: [insurance, landlord insurance, building insurance, landlord protection]
+rent.land_tax: [land tax]
+rent.legal: [legal, legal fee, solicitor, lawyer, tribunal]
+rent.pest_control: [pest control, pest, termite, fumigation]
+rent.agent_fees: [management fee, agent fee, agent commission, commission, letting fee, leasing fee,
+                  property management, re letting fee, reletting fee, letting]
+rent.repairs: [repair, maintenance, plumber, plumbing, electrician, electrical, handyman]
+rent.stationery: [stationery, postage, telephone, phone]
+rent.travel: [travel, mileage, kilometre]
+rent.water: [water, water rate, water charge, water usage, sewerage]

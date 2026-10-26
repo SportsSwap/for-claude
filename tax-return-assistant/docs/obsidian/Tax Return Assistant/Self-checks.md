@@ -27,6 +27,9 @@ Back to [[Tax Return Assistant]]. These run on every return and appear on the Re
 | S12 | Things the tool doesn't prepare: family thresholds, non-residents, managed funds, business P8 detail, net investment losses |
 | S13 | Equipment over $300 claimed outright (it's depreciating, s40-80) |
 | S14 | Residency assumed |
+| S15 | Travel for a residential rental property (s26-31: not deductible from 1 July 2017 for most owners) |
+| S16 | Rental borrowing expenses over $100: spread over 5 years (s25-25) |
+| S17 | Rental depreciation on second-hand assets in a residential property (s40-27) |
 | Y1–Y2 | Over 20% (and $100) movement from last year; items that disappeared |
 | I1–I7 | From ingest: manual entry needed, no document date, FYI down, duplicate file, unmapped Xero section, an area it doesn't handle (ESS, foreign income, trusts…), hospital cover days read from the health statement |
 

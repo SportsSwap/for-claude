@@ -7,6 +7,7 @@ import openpyxl
 import pytest
 from wpctx import demo_context
 
+from tra.labels import load_labels, return_key
 from tra.privacy.guard import FileLockedError, SensitiveDataBlocked
 from tra.workpaper.build import build_workpaper
 
@@ -81,6 +82,7 @@ def test_transferred_to_links_land_on_the_summary_row(built):
             sheet, cell = link.hyperlink.location.rsplit("!", 1)
             assert sheet == f"'{SUMMARY}'"
             section_key = next(ws.cell(row=x, column=KEY).value for x in range(r, 0, -1) if ws.cell(row=x, column=KEY).value)
+            section_key = return_key(load_labels(), section_key)  # the last row may be a rental category of 21 U
             assert summary.cell(row=int(re.sub(r"\D", "", cell)), column=S_KEY).value == section_key, (tab, r)
             assert link.value  # 'Item 10 L', or 'PHI' for private health
 

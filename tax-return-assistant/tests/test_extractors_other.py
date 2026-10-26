@@ -20,11 +20,12 @@ def _extract(doc_type, path, doc_id="D001"):
 def test_rental(demo):
     result = _extract("RENTSTMT", demo.paths["rental"])
     gross = [f for f in result.figures if f.label_key == "rent.gross"]
-    other = [f for f in result.figures if f.label_key == "rent.other"]
+    other = [f for f in result.figures if f.label_key != "rent.gross"]  # all part of Item 21 U, by category
     assert [f.amount for f in gross] == [Decimal("26000.00")]
-    assert len(other) == 4
     assert sum(f.amount for f in other) == Decimal("5340.00")
-    assert {f.description for f in other} >= {"Management fees", "Council rates"}
+    assert {(f.description, f.label_key) for f in other} == {
+        ("Management fees", "rent.agent_fees"), ("Repairs - leaking tap", "rent.repairs"),
+        ("Council rates", "rent.council_rates"), ("Water rates", "rent.water")}
     assert result.parse_status == "parsed"
     assert result.doc_date == date(2026, 6, 30)
 

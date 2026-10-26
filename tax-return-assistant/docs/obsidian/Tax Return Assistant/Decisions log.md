@@ -120,5 +120,6 @@ Claude's calls along the way (worth knowing):
 - **File names:** readable, still led by the client code: `TEST01 2026-03-31 Receipt - SAMPLE SHOP.pdf`. New imports and documents read again; older ones keep their names.
 - **Scans with a text layer (26 Oct 2026):** a page that is one big picture is a scan even when the scanner typed text over it, so with page images on its picture goes to the AI reader as well as the blanked text. Covered by the page-images approval (it is a scanned page).
 - **"Matches the document's text" (26 Oct 2026):** an AI figure is ticked when its amount is also printed in the document's text. It speeds up checking; it never confirms a figure.
+- **Rental categories (26 Oct 2026):** Item 21 U is broken down like the ATO's rental property schedule. Each category is "part of" 21 U, so the return, both tax calculations and B01 Summary are unchanged; only the M25 tab, the Figures tab and the readers see the categories. Travel, borrowing and depreciation are flagged with citations, never decided.
 
 Related: [[How it works]], [[Privacy rules]]

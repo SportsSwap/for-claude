@@ -25,6 +25,13 @@ class LabelDef:
     tab: str
     order: int
     computed: bool = False
+    part_of: str | None = None  # a breakdown of another label (a rental expense category of Item 21 U)
+
+
+def return_key(labels: dict[str, LabelDef], key: str) -> str:
+    """The return label a figure counts towards: its own, or the one it is part of."""
+    d = labels.get(key)
+    return d.part_of if d is not None and d.part_of else key
 
 
 def load_labels(path: Path | None = None) -> dict[str, LabelDef]:
@@ -39,9 +46,17 @@ def _load_labels(path: str, _mtime: int) -> dict[str, LabelDef]:
     defs = [
         LabelDef(key=key, item=str(spec["item"]), label=str(spec.get("label", "")),
                  letter_verified=bool(spec.get("letter_verified", False)), description=spec["description"],
-                 role=spec["role"], tab=spec["tab"], order=int(spec["order"]), computed=bool(spec.get("computed", False)))
+                 role=spec["role"], tab=spec["tab"], order=int(spec["order"]), computed=bool(spec.get("computed", False)),
+                 part_of=spec.get("part_of"))
         for key, spec in raw.items()
     ]
+    by_key = {d.key: d for d in defs}
+    for d in defs:
+        parent = by_key.get(d.part_of) if d.part_of else None
+        if d.part_of and (parent is None or parent.part_of or (parent.item, parent.label, parent.role, parent.tab)
+                          != (d.item, d.label, d.role, d.tab)):
+            raise ValueError(f"labels.yaml: {d.key} is part_of {d.part_of!r}, which must be a label of its own with "
+                             "the same item, letter, role and tab.")
     return {d.key: d for d in sorted(defs, key=lambda d: d.order)}
 
 

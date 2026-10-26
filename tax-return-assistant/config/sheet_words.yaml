@@ -26,5 +26,14 @@ ded.d15: [income protection]
 
 rent.gross: [rent received, rental income, gross rent]
 rent.interest: [loan interest, mortgage interest]
-rent.other: [council rate, water rate, strata, body corporate, land tax, property management, letting fee,
-             landlord insurance, repair]
+# Rental expense categories (part of Item 21 U; config/rental_words.yaml has the fuller list used on rental
+# documents). Only words that can't mean anything else in a client's own list are here.
+rent.council_rates: [council rate]
+rent.water: [water rate]
+rent.body_corporate: [strata, body corporate]
+rent.land_tax: [land tax]
+rent.agent_fees: [property management, letting fee]
+rent.insurance: [landlord insurance]
+rent.repairs: [repair]
+rent.gardening: [lawn mowing, gardening]
+rent.pest_control: [pest control]

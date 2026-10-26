@@ -69,7 +69,8 @@ def test_ingest_demo_documents(run, home, tmp_path):
     result = run("ingest", "SMIT01", *map(str, demo.paths.values()))
     assert result.exit_code == 0, result.output
     assert len(_index_rows(home)) == 8
-    labels = {r["label_key"] for r in _figure_rows(home)}
+    from tra.labels import load_labels, return_key
+    labels = {return_key(load_labels(), r["label_key"]) for r in _figure_rows(home)}  # rental categories are 21 U
     assert set(demo.expected) <= labels
     assert "redacted: TFN×1" in result.output
     audit = (home / "audit").glob("*.jsonl")

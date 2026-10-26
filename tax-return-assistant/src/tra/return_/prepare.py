@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from decimal import Decimal
 
-from ..labels import LabelDef
+from ..labels import LabelDef, return_key
 from ..money import ZERO
 from .cgt import CgtSummary, compute_cgt
 
@@ -36,8 +36,9 @@ def build_draft(client_code: str, income_year: int, figures, cgt_events, labels:
     for f in figures:
         if not f.confirmed or f.label_key not in labels:
             continue
-        totals[f.label_key] = totals.get(f.label_key, ZERO) + f.amount
-        ids.setdefault(f.label_key, []).append(f.figure_id)
+        key = return_key(labels, f.label_key)  # a rental category counts towards Item 21 U
+        totals[key] = totals.get(key, ZERO) + f.amount
+        ids.setdefault(key, []).append(f.figure_id)
     draft = DraftReturn(client_code, income_year)
     for key in labels:  # ATO order
         if key in totals:

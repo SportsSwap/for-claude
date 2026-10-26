@@ -4,7 +4,25 @@ from __future__ import annotations
 
 import re
 
+from functools import lru_cache
+
+from ...paths import CONFIG_DIR
 from .base import AMOUNT, ExtractResult, amount, doc_date, figure, lines, require_redacted
+from .words import load_sheet_words, match_labels
+
+SUNDRY = "rent.other"  # Item 21 U itself: an expense no category fits, or one that fits more than one
+
+
+@lru_cache(maxsize=1)
+def _rental_words() -> dict[str, tuple[str, ...]]:
+    return load_sheet_words(CONFIG_DIR / "rental_words.yaml")
+
+
+def rental_category(description: str) -> str:
+    """The rental schedule category (or Item 21 Q / F) an expense line's words point to, else sundry."""
+    keys = match_labels(description, _rental_words())
+    return keys[0] if len(keys) == 1 else SUNDRY
+
 
 _GROSS = re.compile(rf"^Total rent received\s+({AMOUNT})$", re.I)
 _LINE = re.compile(rf"^(?P<desc>[A-Za-z].*?)\s+(?P<amt>{AMOUNT})$")
@@ -33,7 +51,7 @@ class RentalExtractor:
                 continue
             m = _LINE.match(line)
             if m and amount(m.group("amt")) != 0:
-                key = "rent.interest" if "interest" in m.group("desc").lower() else "rent.other"
+                key = rental_category(m.group("desc"))
                 result.figures.append(figure(key, m.group("desc"), amount(m.group("amt")), doc_id, page, when))
         if result.parse_status != "parsed":
             result.doubts.append("Didn't find the total rent received.")

@@ -8,6 +8,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 from ..dates import days_in_fy
+from ..labels import return_key
 from ..models import ReviewNote
 from ..money import ZERO, format_dollars
 from ..return_.cgt import anniversary, discount_eligible
@@ -22,6 +23,7 @@ EXPECTED_SOURCES = [
     ("salary or wages", ("income.salary",), {"INCSTMT", "PREFILL"}),
 ]
 NEAR_ANNIVERSARY_DAYS = 30
+BORROWING_LIMIT = Decimal("100")  # s25-25(6): $100 or less is deducted in the year it's incurred
 
 
 def _matches(text: str, keywords) -> str | None:
@@ -103,12 +105,35 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
                                "which is not deductible unless it is a uniform, protective or occupation-specific.",
                                f.amount, label_key="ded.d3", citation="tr97_12", figures=[f]))
 
-    # S7 rental repair that may be capital
-    for f in _confirmed(ctx, "rent.other"):
+    # S7 rental repair that may be capital (any Item 21 U expense: repairs, gardening, sundry...)
+    item_21u = [k for k in ctx.labels if return_key(ctx.labels, k) == "rent.other"]
+    for f in _confirmed(ctx, *item_21u):
         if _matches(f.description, cfg["capital_keywords"]):
             notes.append(_note("Medium", "S7", f"{f.figure_id} '{f.description}' may be a capital improvement or "
                                "depreciating asset rather than a repair. Confirm before claiming outright.", f.amount,
-                               label_key="rent.other", citation="tr97_23", figures=[f]))
+                               label_key=f.label_key, citation="tr97_23", figures=[f]))
+
+    # S15 travel for a residential rental property
+    for f in _confirmed(ctx, "rent.travel"):
+        notes.append(_note("Medium", "S15", f"{f.figure_id} '{f.description}': travel for a residential rental "
+                           "property generally isn't deductible from 1 July 2017, unless the owner carries on a "
+                           "rental property business or is an excluded entity. Confirm before claiming.", f.amount,
+                           label_key="rent.travel", citation="itaa97_s26_31", figures=[f]))
+
+    # S16 borrowing expenses over $100 are spread over 5 years (or the loan term)
+    for f in _confirmed(ctx, "rent.borrowing"):
+        if f.amount > BORROWING_LIMIT:
+            notes.append(_note("Medium", "S16", f"{f.figure_id} '{f.description}' ({format_dollars(f.amount)}): "
+                               "borrowing expenses over $100 are deducted over 5 years, or the loan term if shorter. "
+                               "Check only this year's share is claimed.", f.amount, label_key="rent.borrowing",
+                               citation="itaa97_s25_25", figures=[f]))
+
+    # S17 depreciation of second-hand assets in a residential rental property
+    for f in _confirmed(ctx, "rent.capital_allowances"):
+        notes.append(_note("Medium", "S17", f"{f.figure_id} '{f.description}': decline in value of second-hand "
+                           "assets in a residential rental property (bought from 7:30 pm, 9 May 2017) generally isn't "
+                           "deductible. Check the depreciation schedule only claims eligible assets.", f.amount,
+                           label_key="rent.capital_allowances", citation="itaa97_s40_27", figures=[f]))
 
     # S8 CGT events
     for e in ctx.cgt_events:

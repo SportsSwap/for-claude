@@ -80,6 +80,12 @@ Back to [[Tax Return Assistant]]
 - Page images are only sent when Sawnx's own readers found no figures, so a scanned page inside a document that's partly readable isn't sent.
 - Idea: let me pick the AI model in Settings (Sonnet 5.5 reads tables better than Haiku 5.5, still cheaply).
 
+## Rental expense categories (26 Oct 2026)
+- Rental expenses used to all land in "Other rental deductions" (21 U). Now each goes to its ATO rental schedule category: advertising, body corporate, borrowing, cleaning, council rates, capital allowances, gardening and lawn mowing, insurance, land tax, legal, pest control, property agent fees, repairs and maintenance, stationery and phone, travel, water. Anything that doesn't fit (or fits two) stays as **Sundry**. The M25 tab shows each with a subtotal; the return still has one 21 U line.
+- The words for each category are in `config/rental_words.yaml`: add words there when a statement's line goes to Sundry but shouldn't. I can change a figure's category on the Figures tab (the label list).
+- New review notes: S15 rental travel, S16 borrowing expenses over $100, S17 depreciation on second-hand assets.
+- Figures read before 26 Oct stay under Sundry until the document is read again or I change the label.
+
 ## From my tax agent's invoice (26 Oct 2026)
 - The rules and the AI both read nothing, with no warning. Why: the PDF is a **scan with a typed-over text layer** (the scanner's OCR). The text looked ordinary enough ("A0ourt Due 495.00") that Sawnx didn't count it as garbled, so no picture was sent; Haiku got only the messy text and said "nothing here", and an empty answer left no note.
 - **Fixed:** a page that is one big picture (80% of the page or more) now counts as a scan, so with page images on its picture is sent too. When the AI finds nothing, Things to check now says so. The built-in receipt reader also reads "Amount due", "Total (incl. GST)", "Invoice total" and "Total amount" lines (a nil "Amount due 0.00" is skipped).

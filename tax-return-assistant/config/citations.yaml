@@ -4,6 +4,7 @@
 # Unverified citations appear in the workpaper as "(citation to be confirmed by reviewer)".
 itaa97_s8_1:      {ref: "ITAA 1997 s8-1", description: "General deductions", verified: false}
 itaa97_s25_5:     {ref: "ITAA 1997 s25-5", description: "Tax-related expenses (cost of managing tax affairs)", verified: false}
+itaa97_s25_25:    {ref: "ITAA 1997 s25-25", description: "Borrowing expenses: spread over 5 years (or the loan term) when over $100", verified: false}
 itaa97_s26_31:    {ref: "ITAA 1997 s26-31", description: "Travel related to residential rental property not deductible", verified: false}
 itaa97_s28_25:    {ref: "ITAA 1997 s28-25", description: "Cents per kilometre method, 5,000 business km limit", verified: false}
 itaa97_s40_27:    {ref: "ITAA 1997 s40-27", description: "Second-hand depreciating assets in residential premises", verified: false}
