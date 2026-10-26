@@ -14,6 +14,7 @@ from ...dates import DATE_PATTERN, find_doc_date, parse_date
 # "Total", "Amount paid", and an invoice's "Amount due", "Total (incl. GST)", "Invoice total", "Total amount".
 _TOTAL = re.compile(rf"^(?:Total(?:\s+amount|\s+\(?inc(?:l|luding)?\.?\s+GST\)?)?|Amount\s+(?:paid|due)|Invoice\s+total)"
                     rf"\s*:?\s+({AMOUNT})(?:\s+AUD)?$", re.I)
+NO_TOTAL = "Didn't find a total."  # dropped once the AI reader finds an amount: then there was a total
 _DATE = rf"\bDate\s*:?\s*({DATE_PATTERN})"
 # An item line ends in a price with cents (so "ABN 51 824 753 556" is not an item).
 _ITEM = re.compile(r"^(?P<desc>[A-Za-z].*?)\s+\$?\d[\d,]*\.\d{2}$")
@@ -35,7 +36,7 @@ class ReceiptExtractor:
         is_receipt = any(word in rt.text.lower() for word in ("tax invoice", "receipt"))
         if not total:
             if is_receipt:  # an unrecognised document isn't expected to have a total
-                result.doubts.append("Didn't find a total.")
+                result.doubts.append(NO_TOTAL)
             return result
         item = next((m.group("desc") for _, line in lines(rt)
                      if (m := _ITEM.match(line)) and not _NOT_ITEM.match(line)), "")

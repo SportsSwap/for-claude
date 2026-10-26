@@ -20,7 +20,7 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact â†
 ## Working on it
 ```
 python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest          # 902 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
+.venv/bin/python -m pytest          # 916 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
 .venv/bin/python -m pyflakes src tests
 ```
 - On Windows the paths are `.venv\Scripts\...`. pyflakes isn't in the `dev` extras; `pip install pyflakes` into the venv.

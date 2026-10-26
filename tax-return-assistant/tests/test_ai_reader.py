@@ -13,7 +13,8 @@ from tra.checks.reconcile import check_reconcile
 from tra.demo import _write_pdf
 from tra.filing.local_store import LocalStore
 from tra.ingest.classify import classify, load_doc_types
-from tra.ingest.extractors.ai_reader import DEFAULT_MODEL, AiReader, AiReaderUnavailable, ai_reader_from_settings
+from tra.ingest.extractors.ai_reader import (DEFAULT_MODEL, TEXT_MATCH, AiReader, AiReaderUnavailable,
+                                            ai_reader_from_settings)
 from tra.ingest.pipeline import ingest_file, read_document
 from tra.ingest.readers import LoadedDocument, load
 from tra.reading_notes import load_reading_notes
@@ -135,6 +136,34 @@ def test_an_empty_answer_says_the_ai_found_nothing():
                              "item. Check the document and enter any figures by hand."]
 
 
+def _read_one(text_lines, amount):
+    fee = _answer({"label_key": "ded.d10", "description": "SAMPLE ADVISERS fee", "amount": amount, "page": 1})
+    [figure] = AiReader(FakeClient(fee)).extract(redact_pages(text_lines), "D001").figures
+    return figure
+
+
+@pytest.mark.parametrize("lines, amount", [
+    (["SAMPLE ADVISERS", "5ubtotal 450.00", "A0ourt Due 495.00"], "495.00"),  # the scanner's text, slips and all
+    (["Total $1,204.50"], "1204.50"),
+    (["Total 1204.50"], "$1,204.50"),
+    (["Fee $500"], "500"),
+    (["Fee 500.00"], "500"),
+    (["Refund (45.00)"], "45.00"),
+])
+def test_an_ai_amount_printed_in_the_text_is_marked(lines, amount):
+    assert _read_one(lines, amount).notes == TEXT_MATCH
+
+
+@pytest.mark.parametrize("lines, amount", [
+    (["SAMPLE ADVISERS", "A0ourt Due 495.00"], "435.00"),  # read differently from the picture: look closely
+    (["SAMPLE ADVISERS", "Postcode 2000"], "2000"),         # a bare number isn't an amount
+    (["A0ourt Due 4g5.0O"], "495.00"),                      # garbled in the text: only the picture shows it
+    ([""], "495.00"),                                       # no text at all (a scan)
+])
+def test_an_ai_amount_not_in_the_text_is_not_marked(lines, amount):
+    assert _read_one(lines, amount).notes == ""
+
+
 def test_r6_raised_for_ai_figures():
     f = fig("F1", "income.interest", 100)
     f.method = "ai"
@@ -213,6 +242,26 @@ def test_an_email_keeps_its_type():
     client = FakeClient(_typed_answer("RENTSTMT"))
     doc_type, _result, _layout = read_document(loaded, load_doc_types(), "D001", ai_reader=AiReader(client))
     assert client.calls and doc_type == "EMAIL"
+
+
+def _invoice(rows):
+    return LoadedDocument(redacted=redact_pages(["SAMPLE ADVISERS PTY LTD", "Tax invoice", *rows]), sha256="0" * 64,
+                          page_count=1, image_only_pages=(), suffix=".pdf")
+
+
+def test_no_total_note_goes_once_the_ai_reads_the_total():
+    fee = _answer({"label_key": "ded.d10", "description": "SAMPLE ADVISERS tax return fee", "amount": "495.00",
+                   "page": 1})
+    _type, result, _layout = read_document(_invoice(["A0ourt Due 495.00"]), load_doc_types(), "D001",
+                                           ai_reader=AiReader(FakeClient(fee)))
+    assert [f.amount for f in result.figures] == [Decimal("495.00")]
+    assert "Didn't find a total." not in result.doubts
+
+
+def test_no_total_note_stays_when_the_ai_finds_nothing_either():
+    _type, result, _layout = read_document(_invoice(["A0ourt Due 495.00"]), load_doc_types(), "D001",
+                                           ai_reader=AiReader(FakeClient(_answer())))
+    assert "Didn't find a total." in result.doubts
 
 
 def test_settings_show_the_model_and_find_a_saved_key(tmp_path, monkeypatch):

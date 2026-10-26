@@ -13,7 +13,7 @@ from flask import Flask, abort, current_app, flash, redirect, render_template, r
 
 from ..ingest.classify import load_doc_types
 from ..filing.fyi_store import make_store
-from ..ingest.extractors.ai_reader import AiReaderUnavailable, ai_reader_from_settings
+from ..ingest.extractors.ai_reader import TEXT_MATCH, AiReaderUnavailable, ai_reader_from_settings
 from ..privacy.guard import FileLockedError, SensitiveDataBlocked
 from ..checks import load_citations
 from ..review_store import load_review, mark_reviewed, note_key, save_response
@@ -277,7 +277,7 @@ def register_client_routes(app: Flask) -> None:
         return render_template("client_figures.html", **client_context(ws, "figures"), rows=rows, problem=problem,
                                selected=selected, source=source, labels=label_choices(), docs=docs,
                                doc_types=doc_types, checks=to_check_by_figure(ws) if not problem else {},
-                               by_document=by_document)
+                               by_document=by_document, text_match=TEXT_MATCH)
 
     @app.post("/c/<code>/<int:fy>/doc/<doc_id>/confirm-all")
     def doc_confirm_all(code: str, fy: int, doc_id: str):

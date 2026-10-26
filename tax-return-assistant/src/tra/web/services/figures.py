@@ -7,6 +7,7 @@ from typing import NamedTuple
 from ...checks import label_name
 from ...figures import append_figures, read_figures, write_figures
 from ...filing.index import DocumentIndex
+from ...ingest.extractors.ai_reader import TEXT_MATCH
 from ...labels import figure_allowed, load_labels
 from ...models import Figure
 from ...money import parse_amount
@@ -56,6 +57,8 @@ def set_figure(ws: Workspace, figure_id: str, *, confirmed: bool | None = None, 
         fig.label_key, changed = _label(label_key), changed + ["label_key"]
     if amount is not None and _amount(amount) != fig.amount:
         fig.amount, changed = _amount(amount), changed + ["amount"]
+        if fig.notes == TEXT_MATCH:
+            fig.notes = ""  # the new amount isn't the one found in the document's text
     if confirmed is not None and confirmed != fig.confirmed:
         fig.confirmed, changed = confirmed, changed + ["confirmed"]
     if substantiated is not None and substantiated != fig.substantiated:

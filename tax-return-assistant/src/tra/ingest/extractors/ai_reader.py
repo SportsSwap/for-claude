@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import base64
 import json
+import re
 from collections.abc import Mapping
 from decimal import Decimal
 from pathlib import Path
@@ -37,6 +38,11 @@ MODEL_NAMES = {"claude-haiku-5-5": "Claude Haiku 5.5", "claude-opus-5-5": "Claud
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 FALLBACK_MODELS = frozenset({"claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-1"})  # "fallbacks" accepted
 MAX_FIGURES = 60
+# A figure's note when its amount is also printed in the document's own text: two separate readings agree (the
+# scanner's or PDF's text, and the AI reading the text or the picture). A figure without it needs a closer look.
+TEXT_MATCH = "matches the document's text"
+# Money in the text: with a $, thousands commas or cents (a bare 2000 could be a postcode or a year).
+_MONEY = re.compile(r"(?<![\w.,])(?:\$\s?\d[\d,]*(?:\.\d{2})?|\d{1,3}(?:,\d{3})+(?:\.\d{2})?|\d+\.\d{2})(?![\w,]|\.?\d)")
 NOTHING_FOUND = ("The AI reader read this document but found no amounts it could match to a return item. Check the "
                  "document and enter any figures by hand.")
 
@@ -89,6 +95,17 @@ def figures_from_items(items: list, keys: list[str], doc_id: str, page_count: in
         figures.append(Figure(figure_id="", label_key=key, description=f"{reader}: {description}", amount=amount,
                               date=None, doc_id=doc_id, page=page, method="ai", confirmed=False, substantiated=None))
     return figures, problems
+
+
+def printed_amounts(text: str) -> set[Decimal]:
+    """Every amount of money written in the text, without its sign (a refund in brackets is still 45.00)."""
+    found = set()
+    for m in _MONEY.finditer(text):
+        try:
+            found.add(abs(parse_amount(m.group(0).replace(" ", ""))))
+        except ValueError:
+            continue
+    return found
 
 
 def _blanked(description: str) -> str:
@@ -207,6 +224,10 @@ class AiReader:
         if isinstance(doc_type, str) and doc_type in self.type_choices:
             result.facts["ai_doc_type"] = doc_type
         figures, problems = figures_from_items(items or [], self.keys, doc_id, len(rt.pages), "AI")
+        printed = printed_amounts(rt.text)
+        for f in figures:
+            if abs(f.amount) in printed:
+                f.notes = TEXT_MATCH
         result.figures.extend(figures)
         if items is None or problems:
             result.notes.append(_note("Medium", "A3", "The AI reader couldn't give a usable answer for some or all "

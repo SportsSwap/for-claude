@@ -83,6 +83,9 @@ Back to [[Tax Return Assistant]]
 ## From my tax agent's invoice (26 Oct 2026)
 - The rules and the AI both read nothing, with no warning. Why: the PDF is a **scan with a typed-over text layer** (the scanner's OCR). The text looked ordinary enough ("A0ourt Due 495.00") that Sawnx didn't count it as garbled, so no picture was sent; Haiku got only the messy text and said "nothing here", and an empty answer left no note.
 - **Fixed:** a page that is one big picture (80% of the page or more) now counts as a scan, so with page images on its picture is sent too. When the AI finds nothing, Things to check now says so. The built-in receipt reader also reads "Amount due", "Total (incl. GST)", "Invoice total" and "Total amount" lines (a nil "Amount due 0.00" is skipped).
+- After that the AI read it right ($495.00 at D10), but Things to check still said "Didn't find a total." (the rules' note). **Fixed:** that note goes once the AI finds an amount. Other "Didn't find the ..." notes stay, because they name one amount the AI may have missed too. Figures still need confirming: a person checks every amount before it goes in a return.
+- **New: the "matches" tick.** When the AI reads an amount, Sawnx looks for the same amount written as money ($, cents or commas) in the document's own text. Found: the Figures tab shows "✓ Same amount in the document's own text" (and the workpaper notes say so), so confirming is a glance. Not found: "look at this one closely". My $495.00 invoice figure has the tick. It still needs confirming.
+- Known gap: changing an amount in Excel (figures.csv) doesn't remove the tick; the Figures tab does.
 - **Read again** uses the free rules only, never the AI: to retry a document with the AI, delete it and import it again.
 
 ## From teaching layouts (25 Oct 2026)

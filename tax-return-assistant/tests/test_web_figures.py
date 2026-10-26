@@ -84,6 +84,33 @@ def test_prefill_row_shows_warning(tmp_path, monkeypatch):
     assert "Leave unconfirmed if another document supports this" in page
 
 
+def _ai_figures(ws):
+    """The first two figures as if the AI reader read them: the first found in the document's text, the second not."""
+    from tra.ingest.extractors.ai_reader import TEXT_MATCH
+    figures = figure_rows(ws)
+    for f, notes in zip(figures, (TEXT_MATCH, "")):
+        f.method, f.notes = "ai", notes
+    write_figures(ws.figures_csv, figures)
+    return figures
+
+
+def test_ai_figures_show_whether_the_text_agrees(tmp_path, monkeypatch):
+    client, ws, _audit = _setup(tmp_path, monkeypatch)
+    _ai_figures(ws)
+    page = client.get("/c/TEST01/2026/figures").get_data(as_text=True).replace("&#39;", "'")
+    assert page.count("Same amount in the document's own text") == 1
+    assert page.count("Not found in the document's own text") == 1
+
+
+def test_changing_the_amount_clears_the_match(tmp_path, monkeypatch):
+    _client, ws, audit = _setup(tmp_path, monkeypatch)
+    first = _ai_figures(ws)[0]
+    set_figure(ws, first.figure_id, confirmed=True, audit=audit)
+    assert figure_rows(ws)[0].notes != ""  # confirming keeps it
+    set_figure(ws, first.figure_id, amount=str(first.amount + 1), audit=audit)
+    assert figure_rows(ws)[0].notes == ""  # the new amount wasn't the one found in the text
+
+
 def test_excel_lock_message(tmp_path, monkeypatch):
     client, ws, _audit = _setup(tmp_path, monkeypatch)
     before = ws.figures_csv.read_bytes()

@@ -29,6 +29,7 @@ from .classify import DocType, classify
 from .emails import EMAIL_TYPES, EmailLibraryMissing, read_email
 from .extractors import ExtractResult, get_extractor
 from .extractors.ai_reader import NOT_AI_TYPES
+from .extractors.receipt import NO_TOTAL
 from .layouts import load_layouts, match_layout, read_with_layout
 from .page_images import MAX_PAGE_IMAGES, pages_wanted, render_pages, scanned_pages
 from .readers import SUPPORTED, UnsupportedFile, load
@@ -277,7 +278,10 @@ def read_document(loaded, doc_types: dict[str, DocType], doc_id: str, override_t
         read = (ai_reader.extract(loaded.redacted, doc_id, images, on_send=on_images_sent) if images
                 else ai_reader.extract(loaded.redacted, doc_id))
         result.figures, result.parse_status, result.notes = read.figures, read.parse_status, result.notes + read.notes
-        result.doubts = list(result.doubts) + list(read.doubts)
+        # A receipt's "no total" is settled once the AI finds an amount; other "Didn't find the ..." notes name one
+        # amount the AI may have missed too, so they stay.
+        kept = [d for d in result.doubts if not (read.figures and d == NO_TOTAL)]
+        result.doubts = kept + list(read.doubts)
         if read.facts.get("ai_picture_pages"):
             result.facts["ai_picture_pages"] = read.facts["ai_picture_pages"]
         ai_type = read.facts.get("ai_doc_type")
