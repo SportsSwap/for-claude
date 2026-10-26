@@ -40,6 +40,7 @@ from .services.figures import (FiguresFileProblem, add_figure, confirm_document_
 from .services.imports import RETURN_TYPES, import_file, store_upload_in_cabinet
 from .services.activity import activity
 from .services.prepare import COMPONENTS, load_summary, run_prepare, workpapers
+from .services.rental import has_rental
 from .status import job_status
 
 INLINE_TYPES = {"application/pdf", "image/png", "image/jpeg"}
@@ -48,7 +49,7 @@ INLINE_TYPES = {"application/pdf", "image/png", "image/jpeg"}
 def client_context(ws: Workspace, tab: str) -> dict:
     name = load_names(ws.tra_home).get(ws.client_code)
     return {"client": {"code": ws.client_code, "name": name, "fy": ws.income_year, "status": job_status(ws),
-                       "tab": tab}, "nav": "clients"}
+                       "tab": tab, "rental": tab == "rental" or has_rental(ws)}, "nav": "clients"}
 
 
 def base_url(ws: Workspace) -> str:

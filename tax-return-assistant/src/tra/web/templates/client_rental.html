@@ -1,0 +1,111 @@
+{% extends "client_base.html" %}
+{% block tab %}
+{% set base = '/c/' ~ client.code ~ '/' ~ client.fy %}
+{% if problem %}<div class="flash error" role="alert">{{ problem }}</div>{% else %}
+<p class="muted small">Each property's share, private use and ticks drive Item 21 on the return and the property's
+  tab in the workpaper (M25 Rental &lt;name&gt;). Use a short name such as the suburb; owners' names aren't kept.
+  {% if unconfirmed %}The amounts below include {{ unconfirmed }} figure{{ '' if unconfirmed == 1 else 's' }} not
+  confirmed yet: only confirmed figures go in the return.{% endif %}</p>
+
+{% for r in results %}
+{% set p = r.prop %}
+<section class="card pad stack" aria-labelledby="prop-{{ p.id }}">
+  <div class="title-row">
+    <h2 id="prop-{{ p.id }}">{{ p.name }}</h2>
+    {% if p.share_source == 'person' %}<span class="badge">Set by you</span>
+    {% elif p.share_source == 'suggested' %}<span class="badge tocheck-line">Suggested {{ "{:f}".format(p.share.normalize()) }}% from {{ p.share_doc }}: check it and Save</span>
+    {% else %}<span class="badge tocheck-line">Assumed 100%: set the share and Save</span>{% endif %}
+  </div>
+  <form class="stack" method="post" action="{{ base }}/rental/{{ p.id }}">
+    <div class="actions">
+      <label class="field"><span>Short name</span><input type="text" name="name" maxlength="18" value="{{ p.name }}" required></label>
+      <label class="field col-narrow"><span>This client's share (%)</span><input class="mono num-input" type="text" name="share" inputmode="decimal" value="{{ "{:f}".format(p.share.normalize()) }}" required></label>
+      <label class="field col-narrow"><span>Private use (%)</span><input class="mono num-input" type="text" name="private_use" inputmode="decimal" value="{{ "{:f}".format(p.private_use.normalize()) }}"></label>
+      <label class="field col-narrow"><span>Weeks rented</span><input class="mono num-input" type="text" name="weeks_rented" inputmode="numeric" value="{{ p.weeks_rented }}"></label>
+      <label class="field col-narrow"><span>Weeks available</span><input class="mono num-input" type="text" name="weeks_available" inputmode="numeric" value="{{ p.weeks_available }}"></label>
+      <label class="field col-narrow"><span>First earned rent</span><input type="text" name="first_income" maxlength="20" value="{{ p.first_income }}" placeholder="dd/mm/yyyy"></label>
+    </div>
+    <div class="tblwrap">
+      <table class="figs">
+        <thead><tr><th></th><th>Row</th><th>Apportion?</th><th class="num">Agent Summary</th><th class="num">Owners' Contribution</th><th class="num">This taxpayer only</th><th class="num">Client's share</th></tr></thead>
+        <tbody>
+        {% for row in r.rows %}
+          <tr>
+            <td class="mono">{{ row.row.letter }}</td>
+            <td>{% if row.row.kind == 'total' %}<strong>{{ row.row.heading }}</strong>{% else %}{{ row.row.heading }}{% endif %}</td>
+            <td>{% if row.row.kind == 'expense' %}<input type="checkbox" name="apportion" value="{{ row.row.key }}" aria-label="Apportion {{ row.row.heading }}" {{ 'checked' if p.apportioned(row.row.key) }}>{% endif %}</td>
+            <td class="num mono">{{ row.agent|money if row.agent else '-' }}</td>
+            <td class="num mono">{{ row.owners|money if row.owners else '-' }}</td>
+            <td class="num mono">{{ row.taxpayer|money if row.taxpayer else '-' }}</td>
+            <td class="num mono">{{ row.share|money if row.share else '-' }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">Item 21 for this property: P {{ r.return_labels['rent.gross']|money }} · Q {{ r.return_labels['rent.interest']|money }} · F {{ r.return_labels['rent.capital_works']|money }} · U {{ r.return_labels['rent.other']|money }}.
+      Ticked rows are reduced by the private use percentage.</p>
+    <div class="actions"><button class="btn" type="submit">Save {{ p.name }}</button></div>
+  </form>
+  {% if setup.properties|length > 1 %}
+  <form method="post" action="{{ base }}/rental/{{ p.id }}/remove">
+    <button class="btn-ghost btn-danger" type="submit">Remove {{ p.name }}</button>
+  </form>
+  {% endif %}
+</section>
+{% endfor %}
+
+<section class="card pad stack" aria-labelledby="add-prop">
+  <h2 id="add-prop">Another rental property?</h2>
+  <form class="actions" method="post" action="{{ base }}/rental/add">
+    <label class="field"><span>Short name</span><input type="text" name="name" maxlength="18" placeholder="e.g. Example Rd"></label>
+    <button class="btn-ghost" type="submit">Add property</button>
+  </form>
+</section>
+
+{% if setup.properties|length > 1 and documents %}
+<section class="card pad stack" aria-labelledby="docs-title">
+  <h2 id="docs-title">Which property is each document?</h2>
+  <form class="stack" method="post" action="{{ base }}/rental/documents">
+    {% for d in documents %}
+    <label class="field"><span>{{ d.doc_id }} · {{ d.name }}</span>
+      <select name="doc-{{ d.doc_id }}">
+        {% if not d.property %}<option value="" selected>Not picked yet (counted under {{ setup.properties[0].name }})</option>{% endif %}
+        {% for p in setup.properties %}<option value="{{ p.id }}" {{ 'selected' if d.property == p.id }}>{{ p.name }}</option>{% endfor %}
+      </select></label>
+    {% endfor %}
+    <div class="actions"><button class="btn-ghost" type="submit">Save properties</button></div>
+  </form>
+</section>
+{% endif %}
+
+{% if figures %}
+<section class="card pad stack" aria-labelledby="cols-title">
+  <h2 id="cols-title">Who paid each expense?</h2>
+  <p class="muted small">The agent's statement goes to Agent Summary and other papers to Owners' Contribution; both are
+    shared by the ownership share. Pick "This taxpayer only" for something only this client paid.</p>
+  <form class="stack" method="post" action="{{ base }}/rental/columns">
+    <div class="tblwrap">
+      <table class="figs">
+        <thead><tr><th>ID</th><th>Description</th><th class="num">Amount</th><th>Source</th><th>Column</th></tr></thead>
+        <tbody>
+        {% for item in figures %}
+          <tr>
+            <td class="mono">{{ item.f.figure_id }}</td>
+            <td class="wrap">{{ item.f.description }}{% if not item.f.confirmed %} <span class="muted small">(not confirmed)</span>{% endif %}</td>
+            <td class="num mono">{{ item.f.amount|money }}</td>
+            <td class="mono">{{ item.f.doc_id or '' }}</td>
+            <td><select name="col-{{ item.f.figure_id }}" aria-label="Column for {{ item.f.figure_id }}">
+              {% for key, name in column_names.items() %}<option value="{{ key }}" {{ 'selected' if item.column == key }}>{{ name }}</option>{% endfor %}
+            </select></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="actions"><button class="btn-ghost" type="submit">Save columns</button></div>
+  </form>
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

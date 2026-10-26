@@ -80,6 +80,15 @@ Back to [[Tax Return Assistant]]
 - Page images are only sent when Sawnx's own readers found no figures, so a scanned page inside a document that's partly readable isn't sent.
 - Idea: let me pick the AI model in Settings (Sonnet 5.5 reads tables better than Haiku 5.5, still cheaply).
 
+## Rental properties (26 Oct 2026)
+- I showed Claude the firm's rental sheet (an M25 Rental tab for one property). Now: a **Rental** tab in Sawnx per client year (share %, private use, weeks, Apportion? ticks; more than one property; which property each document is; who paid each expense) and **one workpaper tab per property** in the firm's layout, rows A to X.
+- **The return now uses the client's share.** Before this it claimed 100% of a jointly owned property.
+- The share is read from a document when it says so ("Ownership share 50%"), by the rules or the AI, as a suggestion; Save on the Rental page to confirm it. Review note S18 until then.
+- Why the rental sheet was missing from my test workpaper: none of its 11 rental figures were confirmed. Only confirmed figures go into the workpaper.
+- **Independent review (26 Oct 2026):** the money matched (Python and the Excel formulas agree at 100%, 50% and 33.33% with private use). Fixed 9 things: an apostrophe in a property name (O'Brien St) broke the Summary's formulas; two names differing only in capitals read the wrong tab (now refused); "NaN" or a blank share (a blank saved 0%) are refused; a damaged rental.json now gives a plain message instead of crashing Prepare, the Rental page or an import; with two properties a document's share is never put on the wrong property, and a second, different suggestion only adds a note; text starting with "=" stays text in the workpaper (and the guard now checks it); Save columns only keeps real changes.
+- Still to check on a laptop with Excel or LibreOffice: rounding at exactly half a cent with an odd share (Excel works in floating point).
+- Not yet: acquisition and disposal details, the daily apportionment helper, prior-period amounts per row, reading weeks rented from documents.
+
 ## Rental expense categories (26 Oct 2026)
 - Rental expenses used to all land in "Other rental deductions" (21 U). Now each goes to its ATO rental schedule category: advertising, body corporate, borrowing, cleaning, council rates, capital allowances, gardening and lawn mowing, insurance, land tax, legal, pest control, property agent fees, repairs and maintenance, stationery and phone, travel, water. Anything that doesn't fit (or fits two) stays as **Sundry**. The M25 tab shows each with a subtotal; the return still has one 21 U line.
 - The words for each category are in `config/rental_words.yaml`: add words there when a statement's line goes to Sundry but shouldn't. I can change a figure's category on the Figures tab (the label list).

@@ -19,11 +19,13 @@ from ..figures import append_figures, append_prefill
 from ..filing.index import DocumentIndex
 from ..filing.naming import filed_name
 from ..filing.store import DocumentStore, FilingRequest
+from ..labels import load_labels
 from ..models import Document, ReviewNote
 from ..notes_store import append_notes
 from ..privacy.audit import AuditLog
 from ..privacy.redact import RedactionError
 from ..reading_notes import load_reading_notes, save_reading_notes
+from ..rental import is_rental, suggest_share
 from ..workspace import Workspace
 from .classify import DocType, classify
 from .emails import EMAIL_TYPES, EmailLibraryMissing, read_email
@@ -284,6 +286,8 @@ def read_document(loaded, doc_types: dict[str, DocType], doc_id: str, override_t
         result.doubts = kept + list(read.doubts)
         if read.facts.get("ai_picture_pages"):
             result.facts["ai_picture_pages"] = read.facts["ai_picture_pages"]
+        if read.facts.get("ownership_share") is not None:
+            result.facts.setdefault("ownership_share", read.facts["ownership_share"])
         ai_type = read.facts.get("ai_doc_type")
         if (ai_type in doc_types and ai_type not in NOT_AI_TYPES and ai_type != doc_type and not override_type
                 and layout is None and doc_type not in _AI_KEEPS_TYPE):
@@ -336,7 +340,10 @@ def ingest_file(path: Path, ws: Workspace, store: DocumentStore, doc_types: dict
 
     # Figures first, the index row last: if any step fails, everything is rolled back and
     # the file is not marked as ingested, so running the command again does the whole job.
-    with restore_on_error(ws.figures_csv, ws.prefill_json, ws.reading_notes_json):
+    with restore_on_error(ws.figures_csv, ws.prefill_json, ws.reading_notes_json, ws.rental_json):
+        share = result.facts.get("ownership_share")  # a suggestion for the Rental page, never over a person's
+        if share is not None and (doc_type == "RENTSTMT" or any(is_rental(f, load_labels()) for f in result.figures)):
+            result.doubts = list(result.doubts) + [suggest_share(ws, doc_id, share, audit)]
         added = append_figures(ws.figures_csv, result.figures) if result.figures else []
         if result.prefill:
             append_prefill(ws.prefill_json, result.prefill)

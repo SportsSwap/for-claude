@@ -53,7 +53,9 @@ Give each figure the label key from the list that it belongs to, a short descrip
 (payer or issuer and what the amount is), and the page it is on. If nothing in the text matches a label, return
 an empty list. Never copy account numbers, BSBs, TFNs, card or licence numbers into a description.
 Also give doc_type: the code from the list of document types that describes the whole document (for example, a
-property manager's statement is RENTSTMT). Use OTHER if none fits.{pictures}
+property manager's statement is RENTSTMT). Use OTHER if none fits.
+If the document shows the client's ownership share of a rental property (for example 50% when it is owned with a
+spouse), give it as ownership_percent, a number from 0 to 100; otherwise null. Never give owners' names.{pictures}
 
 Label keys:
 {labels}
@@ -152,9 +154,11 @@ class AiReader:
                 "properties": {"label_key": {"type": "string", "enum": self.keys},
                                "description": {"type": "string"}, "amount": {"type": "string"},
                                "page": {"type": "integer"}}}
-        return {"type": "object", "additionalProperties": False, "required": ["doc_type", "figures"],
+        return {"type": "object", "additionalProperties": False,
+                "required": ["doc_type", "figures", "ownership_percent"],
                 "properties": {"doc_type": {"type": "string", "enum": list(self.type_choices)},
-                               "figures": {"type": "array", "items": item}}}
+                               "figures": {"type": "array", "items": item},
+                               "ownership_percent": {"anyOf": [{"type": "number"}, {"type": "null"}]}}}
 
     def _ask(self, rt: RedactedText, images) -> str | None:
         text = "\n\n".join(f"--- Page {i} ---\n{page}" for i, page in enumerate(rt.pages, start=1))
@@ -223,6 +227,11 @@ class AiReader:
         doc_type = answer.get("doc_type") if isinstance(answer, dict) else None
         if isinstance(doc_type, str) and doc_type in self.type_choices:
             result.facts["ai_doc_type"] = doc_type
+        share = answer.get("ownership_percent") if isinstance(answer, dict) else None
+        if isinstance(share, (int, float)) and not isinstance(share, bool) and 0 < share <= 100:
+            share = Decimal(str(share)).quantize(Decimal("0.01")).normalize()  # 50, 33.33: never 1E-7
+            if share > 0:
+                result.facts["ownership_share"] = Decimal(f"{share:f}")  # a suggestion for the Rental page
         figures, problems = figures_from_items(items or [], self.keys, doc_id, len(rt.pages), "AI")
         printed = printed_amounts(rt.text)
         for f in figures:

@@ -121,5 +121,6 @@ Claude's calls along the way (worth knowing):
 - **Scans with a text layer (26 Oct 2026):** a page that is one big picture is a scan even when the scanner typed text over it, so with page images on its picture goes to the AI reader as well as the blanked text. Covered by the page-images approval (it is a scanned page).
 - **"Matches the document's text" (26 Oct 2026):** an AI figure is ticked when its amount is also printed in the document's text. It speeds up checking; it never confirms a figure.
 - **Rental categories (26 Oct 2026):** Item 21 U is broken down like the ATO's rental property schedule. Each category is "part of" 21 U, so the return, both tax calculations and B01 Summary are unchanged; only the M25 tab, the Figures tab and the readers see the categories. Travel, borrowing and depreciation are flagged with citations, never decided.
+- **Rental properties (26 Oct 2026):** share, private use and the weeks live on a Rental page (readers only suggest the share); columns by document (agent's statement = Agent Summary, other papers = Owners' Contribution), changeable; one tab per property; private use apportioned on ticked rows. The workpaper shows a short property name and percentages, never owners' names or the address. Design: docs/specs/2026-10-26-rental-properties-design.md.
 
 Related: [[How it works]], [[Privacy rules]]

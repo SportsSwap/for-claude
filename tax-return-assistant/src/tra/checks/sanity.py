@@ -11,6 +11,7 @@ from ..dates import days_in_fy
 from ..labels import return_key
 from ..models import ReviewNote
 from ..money import ZERO, format_dollars
+from ..rental import compute, default_setup, is_rental
 from ..return_.cgt import anniversary, discount_eligible
 from .context import CheckContext
 
@@ -35,6 +36,10 @@ def _matches(text: str, keywords) -> str | None:
 
 def _confirmed(ctx: CheckContext, *keys: str):
     return [f for f in ctx.figures if f.confirmed and f.label_key in keys]
+
+
+def _percent(value: Decimal) -> str:
+    return f"{value.normalize():f}%"
 
 
 def _note(risk, check_id, message, impact=None, *, audience="reviewer", action="confirm", label_key=None,
@@ -127,6 +132,23 @@ def check_sanity(ctx: CheckContext) -> list[ReviewNote]:
                                "borrowing expenses over $100 are deducted over 5 years, or the loan term if shorter. "
                                "Check only this year's share is claimed.", f.amount, label_key="rent.borrowing",
                                citation="itaa97_s25_25", figures=[f]))
+
+    # S18 the rental share assumed or only suggested; a rental document with no property
+    rental_figures = [f for f in ctx.figures if f.confirmed and is_rental(f, ctx.labels)]
+    if rental_figures:
+        setup = ctx.rental or default_setup()
+        for p in setup.properties:
+            if p.share_source == "person":
+                continue
+            how = (f"was read as {_percent(p.share)} from {p.share_doc}" if p.share_source == "suggested"
+                   else f"is assumed to be {_percent(p.share)} (no one has set it)")
+            notes.append(_note("Medium", "S18", f"{p.name}: the client's ownership share {how}. Check the title or "
+                               "the agent's statement and confirm it on the Rental page.", label_key="rent.gross"))
+        for result in compute(rental_figures, setup, ctx.labels):
+            for doc_id in result.unassigned_docs:
+                notes.append(_note("Medium", "S18", f"{doc_id} isn't assigned to a property, so it's counted under "
+                                   f"{result.prop.name}. Pick its property on the Rental page.",
+                                   label_key="rent.gross", docs=[doc_id]))
 
     # S17 depreciation of second-hand assets in a residential rental property
     for f in _confirmed(ctx, "rent.capital_allowances"):

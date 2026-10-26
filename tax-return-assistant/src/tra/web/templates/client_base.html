@@ -26,6 +26,7 @@
 <nav class="tabs" aria-label="Client sections">
   <a href="{{ base }}/files" class="{{ 'on' if client.tab == 'files' }}" {{ 'aria-current=page' if client.tab == 'files' }}>Files</a>
   <a href="{{ base }}/figures" class="{{ 'on' if client.tab == 'figures' }}" {{ 'aria-current=page' if client.tab == 'figures' }}>Figures</a>
+  {% if client.rental %}<a href="{{ base }}/rental" class="{{ 'on' if client.tab == 'rental' }}" {{ 'aria-current=page' if client.tab == 'rental' }}>Rental</a>{% endif %}
   <a href="{{ base }}/prepare" class="{{ 'on' if client.tab == 'prepare' }}" {{ 'aria-current=page' if client.tab == 'prepare' }}>Prepare</a>
   <a href="{{ base }}/review" class="{{ 'on' if client.tab == 'review' }}" {{ 'aria-current=page' if client.tab == 'review' }}>Review notes</a>
   <a href="{{ base }}/notes" class="{{ 'on' if client.tab == 'notes' }}" {{ 'aria-current=page' if client.tab == 'notes' }}>Notes</a>

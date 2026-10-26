@@ -3,10 +3,8 @@ tax calculations only ever see the one label, while the M25 tab shows the breakd
 
 from decimal import Decimal
 
-import openpyxl
 import pytest
 from checkctx import fig, ids, make_ctx
-from wpctx import demo_context
 
 from tra.checks.sanity import check_sanity
 from tra.ingest.extractors import get_extractor
@@ -16,7 +14,6 @@ from tra.models import Figure
 from tra.privacy.redact import redact_pages
 from tra.return_.prepare import build_draft
 from tra.web.services.figures import label_choices
-from tra.workpaper.build import build_workpaper
 
 CATEGORIES = ["rent.advertising", "rent.body_corporate", "rent.borrowing", "rent.cleaning", "rent.council_rates",
               "rent.capital_allowances", "rent.gardening", "rent.insurance", "rent.land_tax", "rent.legal",
@@ -60,7 +57,7 @@ def test_labels_file_rejects_a_bad_part_of(tmp_path):
 
 def test_categories_can_be_chosen_on_the_figures_tab_and_by_the_ai():
     names = dict(label_choices())
-    assert names["rent.gardening"] == "Item 21 U Gardening and lawn mowing"
+    assert names["rent.gardening"] == "Item 21 U Gardening/lawnmowing"
     assert set(CATEGORIES) <= set(AiReader(object()).keys)
 
 
@@ -98,26 +95,6 @@ def test_statement_lines_go_to_their_category(line, key):
 def test_a_line_that_fits_two_categories_goes_to_sundry():
     [_gross, expense] = _rental("Cleaning and pest control 330.00").figures
     assert expense.label_key == "rent.other"
-
-
-# --- the M25 tab ----------------------------------------------------------------------------------------------
-
-def test_the_rental_tab_shows_each_category_with_a_subtotal(tmp_path):
-    ctx = demo_context(tmp_path)
-    path = tmp_path / "wp.xlsx"
-    build_workpaper(path, ctx)
-    ws = openpyxl.load_workbook(path)["M25 Rental Property"]
-    texts = [ws.cell(row=r, column=4).value for r in range(1, ws.max_row + 1)]
-    for heading in ("Property agent fees and commission", "Repairs and maintenance", "Council rates",
-                    "Water charges"):
-        assert heading in texts and f"Subtotal – {heading}" in texts
-    assert "Total Other rental deductions (Item 21 U)" in texts
-    total_row = texts.index("Total Other rental deductions (Item 21 U)") + 1
-    formula = ws.cell(row=total_row, column=9).value
-    assert formula.startswith("=") and formula.count("+") == 3  # the four subtotals, never a SUM across them
-    transfers = [ws.cell(row=r, column=9).value for r in range(1, ws.max_row + 1)
-                 if ws.cell(row=r, column=8).value == "Transferred to:"]
-    assert transfers == ["Item 21 P", "Item 21 U"]  # gross rent and U: never one per category
 
 
 # --- review notes ---------------------------------------------------------------------------------------------

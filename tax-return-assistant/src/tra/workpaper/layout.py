@@ -206,6 +206,7 @@ def flag_nonzero(ws: Worksheet, cell_range: str) -> None:
 ITEM_WIDTHS = {"A": 2, "B": 9, "C": 11, "D": 44, "E": 38, "F": 6, "G": 9, "H": 14, "I": 16, "J": 4, "K": 34}
 # Summary: A margin, B item, C code, D item, E go to, F amount, G tax credits, H pre-fill, I difference,
 # J prior year, K movement, L review notes, M key (hidden).
+RENTAL_WIDTHS = {"A": 2, "B": 52, "C": 11, "D": 15, "E": 15, "F": 15, "G": 13, "H": 16, "I": 14, "J": 30, "K": 22}
 SUMMARY_WIDTHS = {"A": 2, "B": 10, "C": 6, "D": 52, "E": 8, "F": 16, "G": 15, "H": 15, "I": 13, "J": 15,
                   "K": 11, "L": 22, "M": 4}
 TAXCALC_WIDTHS = {"A": 44, "B": 18, "C": 18, "D": 13, "E": 70}

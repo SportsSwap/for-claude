@@ -7,6 +7,7 @@ from decimal import Decimal
 
 from ..labels import LabelDef
 from ..models import ClientState, Document, Figure, PrefillLine
+from ..rental import RentalSetup
 from ..return_.prepare import DraftReturn
 from ..taxcalc.rates import Rates
 from ..taxcalc.result import TaxResult
@@ -27,3 +28,4 @@ class CheckContext:
     cfg: dict = field(default_factory=dict)
     citations: dict = field(default_factory=dict)
     cgt_events: list = field(default_factory=list)
+    rental: RentalSetup | None = None  # rental.json; None = one property, owned outright (S18 says so)

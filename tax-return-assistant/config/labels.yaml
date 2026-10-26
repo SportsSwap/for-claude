@@ -38,29 +38,30 @@ cgt.prior_losses:         {item: "18", label: "", description: "Net capital loss
 cgt.total_gains:          {item: "18", label: "H", description: "Total current year capital gains", role: info, tab: "M03 Capital Gains", order: 318, computed: true}
 cgt.net_gain:             {item: "18", label: "A", description: "Net capital gain", role: income, tab: "M03 Capital Gains", order: 319, computed: true}
 rent.gross:               {item: "21", label: "P", description: "Gross rent", role: rental_income, tab: "M25 Rental Property", order: 321}
-rent.interest:            {item: "21", label: "Q", description: "Rental interest deductions", role: rental_deduction, tab: "M25 Rental Property", order: 322}
-rent.capital_works:       {item: "21", label: "F", description: "Capital works deductions", role: rental_deduction, tab: "M25 Rental Property", order: 323}
-rent.other:               {item: "21", label: "U", description: "Other rental deductions", role: rental_deduction, tab: "M25 Rental Property", order: 324}
-# Item 21 U broken down as the ATO's rental property schedule (and Xero Tax) lists it. Each is part_of rent.other:
+rent.other_income:        {item: "21", label: "P", description: "Other rental income", role: rental_income, tab: "M25 Rental Property", order: 322, part_of: rent.gross}
+rent.interest:            {item: "21", label: "Q", description: "Rental interest deductions", role: rental_deduction, tab: "M25 Rental Property", order: 323}
+rent.capital_works:       {item: "21", label: "F", description: "Capital works deductions", role: rental_deduction, tab: "M25 Rental Property", order: 324}
+rent.other:               {item: "21", label: "U", description: "Other rental deductions", role: rental_deduction, tab: "M25 Rental Property", order: 325}
+# Item 21 U broken down as the firm's rental sheet (and the ATO's rental schedule) lists it. Each is part_of rent.other:
 # the return and both tax calculations only see 21 U; the M25 tab shows each with a subtotal. A figure left on
 # rent.other itself is "Sundry rental expenses". Interest (Q) and capital works (F) are labels of their own.
-rent.advertising:         {item: "21", label: "U", description: "Advertising for tenants", role: rental_deduction, tab: "M25 Rental Property", order: 325, part_of: rent.other}
-rent.body_corporate:      {item: "21", label: "U", description: "Body corporate fees and charges", role: rental_deduction, tab: "M25 Rental Property", order: 326, part_of: rent.other}
-rent.borrowing:           {item: "21", label: "U", description: "Borrowing expenses", role: rental_deduction, tab: "M25 Rental Property", order: 327, part_of: rent.other}
-rent.cleaning:            {item: "21", label: "U", description: "Cleaning", role: rental_deduction, tab: "M25 Rental Property", order: 328, part_of: rent.other}
-rent.council_rates:       {item: "21", label: "U", description: "Council rates", role: rental_deduction, tab: "M25 Rental Property", order: 329, part_of: rent.other}
-rent.capital_allowances:  {item: "21", label: "U", description: "Capital allowances (depreciation on plant)", role: rental_deduction, tab: "M25 Rental Property", order: 330, part_of: rent.other}
-rent.gardening:           {item: "21", label: "U", description: "Gardening and lawn mowing", role: rental_deduction, tab: "M25 Rental Property", order: 331, part_of: rent.other}
-rent.insurance:           {item: "21", label: "U", description: "Insurance", role: rental_deduction, tab: "M25 Rental Property", order: 332, part_of: rent.other}
-rent.land_tax:            {item: "21", label: "U", description: "Land tax", role: rental_deduction, tab: "M25 Rental Property", order: 333, part_of: rent.other}
-rent.legal:               {item: "21", label: "U", description: "Legal fees", role: rental_deduction, tab: "M25 Rental Property", order: 334, part_of: rent.other}
-rent.pest_control:        {item: "21", label: "U", description: "Pest control", role: rental_deduction, tab: "M25 Rental Property", order: 335, part_of: rent.other}
-rent.agent_fees:          {item: "21", label: "U", description: "Property agent fees and commission", role: rental_deduction, tab: "M25 Rental Property", order: 336, part_of: rent.other}
-rent.repairs:             {item: "21", label: "U", description: "Repairs and maintenance", role: rental_deduction, tab: "M25 Rental Property", order: 337, part_of: rent.other}
-rent.stationery:          {item: "21", label: "U", description: "Stationery, telephone and postage", role: rental_deduction, tab: "M25 Rental Property", order: 338, part_of: rent.other}
-rent.travel:              {item: "21", label: "U", description: "Travel expenses", role: rental_deduction, tab: "M25 Rental Property", order: 339, part_of: rent.other}
-rent.water:               {item: "21", label: "U", description: "Water charges", role: rental_deduction, tab: "M25 Rental Property", order: 340, part_of: rent.other}
-income.other:             {item: "24", label: "", description: "Other income", role: income, tab: "24 Other Income", order: 341}
+rent.advertising:         {item: "21", label: "U", description: "Advertising", role: rental_deduction, tab: "M25 Rental Property", order: 326, part_of: rent.other}
+rent.body_corporate:      {item: "21", label: "U", description: "Body corporate", role: rental_deduction, tab: "M25 Rental Property", order: 327, part_of: rent.other}
+rent.borrowing:           {item: "21", label: "U", description: "Borrowing expenses", role: rental_deduction, tab: "M25 Rental Property", order: 328, part_of: rent.other}
+rent.cleaning:            {item: "21", label: "U", description: "Cleaning", role: rental_deduction, tab: "M25 Rental Property", order: 329, part_of: rent.other}
+rent.council_rates:       {item: "21", label: "U", description: "Council rates", role: rental_deduction, tab: "M25 Rental Property", order: 330, part_of: rent.other}
+rent.capital_allowances:  {item: "21", label: "U", description: "Deductions for decline in value", role: rental_deduction, tab: "M25 Rental Property", order: 331, part_of: rent.other}
+rent.gardening:           {item: "21", label: "U", description: "Gardening/lawnmowing", role: rental_deduction, tab: "M25 Rental Property", order: 332, part_of: rent.other}
+rent.insurance:           {item: "21", label: "U", description: "Insurance", role: rental_deduction, tab: "M25 Rental Property", order: 333, part_of: rent.other}
+rent.land_tax:            {item: "21", label: "U", description: "Land tax", role: rental_deduction, tab: "M25 Rental Property", order: 334, part_of: rent.other}
+rent.legal:               {item: "21", label: "U", description: "Legal expenses", role: rental_deduction, tab: "M25 Rental Property", order: 335, part_of: rent.other}
+rent.pest_control:        {item: "21", label: "U", description: "Pest control", role: rental_deduction, tab: "M25 Rental Property", order: 336, part_of: rent.other}
+rent.agent_fees:          {item: "21", label: "U", description: "Agent fees", role: rental_deduction, tab: "M25 Rental Property", order: 337, part_of: rent.other}
+rent.repairs:             {item: "21", label: "U", description: "Repairs and maintenance", role: rental_deduction, tab: "M25 Rental Property", order: 338, part_of: rent.other}
+rent.stationery:          {item: "21", label: "U", description: "Office supplies", role: rental_deduction, tab: "M25 Rental Property", order: 339, part_of: rent.other}
+rent.travel:              {item: "21", label: "U", description: "Travel expenses", role: rental_deduction, tab: "M25 Rental Property", order: 340, part_of: rent.other}
+rent.water:               {item: "21", label: "U", description: "Water charges", role: rental_deduction, tab: "M25 Rental Property", order: 341, part_of: rent.other}
+income.other:             {item: "24", label: "", description: "Other income", role: income, tab: "24 Other Income", order: 342}
 phi.premiums_p1:          {item: "PHI", label: "", description: "Premiums eligible for rebate 1 Jul–31 Mar", role: phi, tab: "PHI Private Health", order: 601}
 phi.rebate_p1:            {item: "PHI", label: "", description: "Government rebate received 1 Jul–31 Mar", role: phi, tab: "PHI Private Health", order: 602}
 phi.premiums_p2:          {item: "PHI", label: "", description: "Premiums eligible for rebate 1 Apr–30 Jun", role: phi, tab: "PHI Private Health", order: 603}

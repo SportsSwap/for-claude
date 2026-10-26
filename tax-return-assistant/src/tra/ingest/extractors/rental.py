@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-
+from decimal import Decimal
 from functools import lru_cache
 
 from ...paths import CONFIG_DIR
@@ -24,6 +24,19 @@ def rental_category(description: str) -> str:
     return keys[0] if len(keys) == 1 else SUNDRY
 
 
+# "Ownership share 50%", "Owner's share: 50 %", "Your share 33.33%": a suggestion for the Rental page.
+_SHARE = re.compile(r"\b(?:ownership\s+share|owner'?s?\s+share|your\s+share|ownership)\b\s*:?\s*"
+                    r"(\d{1,3}(?:\.\d{1,2})?)\s?%", re.I)
+
+
+def ownership_share(rt) -> Decimal | None:
+    for _page, line in lines(rt):
+        m = _SHARE.search(line)
+        if m and Decimal(0) < Decimal(m.group(1)) <= Decimal(100):
+            return Decimal(m.group(1))
+    return None
+
+
 _GROSS = re.compile(rf"^Total rent received\s+({AMOUNT})$", re.I)
 _LINE = re.compile(rf"^(?P<desc>[A-Za-z].*?)\s+(?P<amt>{AMOUNT})$")
 _STOP = re.compile(r"^(?:Total expenses|Net to owner|Net)\b", re.I)
@@ -36,6 +49,9 @@ class RentalExtractor:
         rt = require_redacted(rt)
         when = doc_date(rt)
         result = ExtractResult(doc_date=when)
+        share = ownership_share(rt)
+        if share is not None:
+            result.facts["ownership_share"] = share
         in_expenses = False
         for page, line in lines(rt):
             m = _GROSS.match(line)

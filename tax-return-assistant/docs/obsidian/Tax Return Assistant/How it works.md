@@ -39,7 +39,7 @@ Documents it can't read (scans, password-protected files, unknown layouts) are s
 |---|---|
 | Cover | DRAFT – NOT FOR LODGMENT, estimated result, partner / manager / reviewer / preparer, sign-off boxes |
 | B01 Summary | The hub, like the firm's: tax summary box, then each return item with a **Go to** link, amount, tax credits, pre-fill, difference, prior year, movement % |
-| Item tabs (only the ones needed) | Named like the firm's: 01 Salaries and Wages, 10 Interest Received, D05 Other Work Deductions, M25 Rental Property, PHI Private Health… Same header on each; ATO pre-fill and client documents shown separately; each figure links to its document and page; **Transferred to: Item 10 L** links back to the Summary line |
+| Item tabs (only the ones needed) | Named like the firm's: 01 Salaries and Wages, 10 Interest Received, D05 Other Work Deductions, M25 Rental <property> (one per property, in the firm's rental layout), PHI Private Health… Same header on each; ATO pre-fill and client documents shown separately; each figure links to its document and page; **Transferred to: Item 10 L** links back to the Summary line |
 | M03 Capital Gains | CGT events and the net capital gain working (when there are any) |
 | Tax Calc | Taxable income through to refund or payable, all live Excel formulas, with the second calculation beside it |
 | Rates | That year's rates, copied in |

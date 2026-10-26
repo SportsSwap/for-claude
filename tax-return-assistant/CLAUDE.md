@@ -7,7 +7,7 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact â†
 
 **Sawnx** (`src/tra/web/`, `tra web`, `Sawnx.cmd`) is the same tool as a local website: Flask on 127.0.0.1 only, a per-start session key, no CDN or external fonts. Routes are thin; behaviour is in `web/services/`, which call the existing code. The AI reader (`ingest/extractors/ai_reader.py`, Claude Haiku 5.5) takes `RedactedText`, plus page images of scanned pages only when Settings' separate "Send page images" switch is on (its own privacy officer approval; pictures can't be blanked; never saved) and its tests use a stand-in client. **The privacy officer approved the AI reader for real clients (25 Oct 2026, as told by the owner)**: it's switched on in Sawnx Settings with the approver's name and date, and needs the firm's `ANTHROPIC_API_KEY` saved for the Windows account (the owner types it; never ask for it or put it in a chat or file). **Claude reading in chat is still made-up clients only:** when the owner asks you to read a client's documents, or to teach layouts, run `.\tra ai-text CODE` (blanked text of the documents the readers couldn't read), read it, and add figures with `.\tra ai-add CODE DOC_ID '<json>'` (unconfirmed, method ai) only for made-up clients or the owner's own papers with their OK. Never open the original files.
 
-- Design: `docs/specs/2026-10-14-tax-return-assistant-design.md` (binding), `docs/specs/2026-10-18-sawnx-design.md` and `docs/specs/2026-10-25-sawnx-six-additions-design.md` (emails, client spreadsheets, Things to check, progress bar, recent searches, info request).
+- Design: `docs/specs/2026-10-14-tax-return-assistant-design.md` (binding), `docs/specs/2026-10-26-rental-properties-design.md` (rental share, private use, the firm's rental tab), `docs/specs/2026-10-18-sawnx-design.md` and `docs/specs/2026-10-25-sawnx-six-additions-design.md` (emails, client spreadsheets, Things to check, progress bar, recent searches, info request).
 - Plans: `docs/plans/2026-10-14-tax-return-assistant.md`, `docs/plans/2026-10-18-sawnx.md`, `docs/plans/2026-10-25-sawnx-six-additions.md`.
 - User guide: `README.md`.
 
@@ -20,7 +20,7 @@ A local Python CLI (`tra`) that prepares **draft** individual returns: redact â†
 ## Working on it
 ```
 python -m venv .venv && .venv/bin/pip install -e ".[dev]"
-.venv/bin/python -m pytest          # 945 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
+.venv/bin/python -m pytest          # 1030 tests; LibreOffice recalc tests run if soffice exists; 4 run only on Windows
 .venv/bin/python -m pyflakes src tests
 ```
 - On Windows the paths are `.venv\Scripts\...`. pyflakes isn't in the `dev` extras; `pip install pyflakes` into the venv.

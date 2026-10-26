@@ -13,6 +13,7 @@ results sit beside the formulas as a check. Layout and styling come from layout.
 from __future__ import annotations
 
 import os
+import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
@@ -25,7 +26,8 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from ..checks import label_name
 from ..dates import days_in_fy, fy_bounds, fy_label
-from ..labels import LabelDef, return_key
+from ..labels import LabelDef
+from ..rental import TAB as RENTAL_TAB, RentalSetup, column_of, compute, default_setup, is_rental
 from ..models import ClientState, Document, Figure, ReviewNote
 from ..privacy.guard import FileLockedError, check_workbook
 from ..return_.cgt import discount_eligible
@@ -110,6 +112,7 @@ class WorkpaperContext:
     responses: dict = field(default_factory=dict)  # note_key -> the preparer's response (review.json)
     doc_summaries: dict = field(default_factory=dict)  # doc_id -> automatic summary (doc_summary.py)
     doc_descriptions: dict = field(default_factory=dict)  # doc_id -> the preparer's description
+    rental: RentalSetup | None = None  # rental.json: each property's share and private use
 
 
 @dataclass
@@ -120,7 +123,15 @@ class WorkpaperMap:
 
 
 def _q(sheet: str) -> str:
-    return f"'{sheet}'"
+    """A tab name quoted for a formula; an apostrophe inside it is doubled (O'Brien St -> 'O''Brien St')."""
+    return "'" + sheet.replace("'", "''") + "'"
+
+
+def _text(cell, value) -> None:
+    """Typed or read-in text (a property name, a description) that starts like a formula stays text."""
+    cell.value = value
+    if isinstance(value, str) and value[:1] in ("=", "+", "-", "@"):
+        cell.data_type = "s"
 
 
 def _link(location: str) -> str:
@@ -218,7 +229,7 @@ def _write_rows(ws: Worksheet, figures: list[Figure], docs: dict[str, Document],
         ws.cell(row=row, column=2, value=f.figure_id)
         if f.date:
             ws.cell(row=row, column=3, value=f.date).number_format = L.DATE
-        ws.cell(row=row, column=4, value=f.description)
+        _text(ws.cell(row=row, column=4), f.description)
         doc = docs.get(f.doc_id or "")
         source = ws.cell(row=row, column=5)
         if doc:
@@ -239,38 +250,23 @@ def _write_rows(ws: Worksheet, figures: list[Figure], docs: dict[str, Document],
     return row
 
 
-SUNDRY_HEADING = "Sundry rental expenses"
-
-
-def _figure_groups(figures: list[Figure], d: LabelDef, labels: dict[str, LabelDef]) -> list[tuple[str, list[Figure], str]]:
-    """ATO pre-fill first, then the client's own documents, as the firm's workpapers show them. A label with a
-    breakdown (Item 21 U's rental categories) shows each category with its own subtotal instead, in schedule
-    order, with whatever is left on the label itself as sundry last."""
-    prefill = [f for f in figures if f.notes == "prefill"]
-    own = [f for f in figures if f.notes != "prefill"]
-    groups = [("ATO pre-fill", prefill, "Subtotal – ATO pre-fill")]
-    if any(f.label_key != d.key for f in own):
-        for key in [k for k in labels if labels[k].part_of == d.key] + [d.key]:
-            items = [f for f in own if f.label_key == key]
-            heading = SUNDRY_HEADING if key == d.key else labels[key].description
-            groups.append((heading, items, f"Subtotal – {heading}"))
-    else:
-        groups.append(("Client documents and adjustments", own, "Subtotal – client documents"))
+def _figure_groups(figures: list[Figure]) -> list[tuple[str, list[Figure], str]]:
+    """ATO pre-fill first, then the client's own documents, as the firm's workpapers show them."""
+    groups = [("ATO pre-fill", [f for f in figures if f.notes == "prefill"], "Subtotal – ATO pre-fill"),
+              ("Client documents and adjustments", [f for f in figures if f.notes != "prefill"],
+               "Subtotal – client documents")]
     return [g for g in groups if g[1]]
 
 
-RENTAL_DEDUCTION_KEYS = ("rent.interest", "rent.capital_works", "rent.other")
-
-
 def _item_section(ws: Worksheet, row: int, d: LabelDef, figures: list[Figure], docs: dict[str, Document],
-                  transfers: list, labels: dict[str, LabelDef]) -> tuple[int, str]:
+                  transfers: list) -> tuple[int, str]:
     """One return label: a section bar, its figures (pre-fill and client documents), the total and the
     'Transferred to' link. Labels are never added together. Returns the next free row and the total cell."""
     ws.cell(row=row, column=2, value=f"{_item_ref(d)}  {d.description}")
     L.style_section(ws, row, FIRST_COL, LAST_COL)
     _write_header(ws, row + 1)
     row += 2
-    groups = _figure_groups(figures, d, labels)
+    groups = _figure_groups(figures)
     subtotals, start = [], row
     for heading, items, subtotal_label in groups:
         L.style_subheading(ws.cell(row=row, column=4, value=heading))
@@ -301,22 +297,219 @@ def _item_tab(ws: Worksheet, tab: str, figures: list[Figure], ctx: WorkpaperCont
     _sheet_header(ws, tab.split(" ", 1)[1], tab, ctx, right=("H", "I", "K"), back="K2")
     _purpose(ws, PURPOSE.get(tab, "record the amounts for this part of the return"), ITEM_NOTE)
     row = BODY_ROW
-    totals: dict[str, str] = {}
-    # One section per return label; a rental category's figures sit in Item 21 U's section.
-    of = {f.figure_id: return_key(ctx.labels, f.label_key) for f in figures}
-    for key in [k for k in ctx.labels if any(of[f.figure_id] == k for f in figures)]:
-        row, totals[key] = _item_section(ws, row, ctx.labels[key], [f for f in figures if of[f.figure_id] == key],
-                                         docs, transfers, ctx.labels)
-        wp.total_cells.append(f"{_q(tab)}!{totals[key]}")
-    if "rent.gross" in totals or any(k in totals for k in RENTAL_DEDUCTION_KEYS):
-        less = "".join(f"-{totals[k]}" for k in RENTAL_DEDUCTION_KEYS if k in totals)
-        ws.cell(row=row, column=4, value="Net rent")
-        L.style_label(ws.cell(row=row, column=4))
-        L.style_total(ws.cell(row=row, column=9, value=f"={totals.get('rent.gross', '0')}{less}"))
-        wp.total_cells.append(f"{_q(tab)}!{AMOUNT}{row}")
+    for key in [k for k in ctx.labels if any(f.label_key == k for f in figures)]:
+        row, total = _item_section(ws, row, ctx.labels[key], [f for f in figures if f.label_key == key], docs,
+                                   transfers)
+        wp.total_cells.append(f"{_q(tab)}!{total}")
     ws.column_dimensions[KEY].hidden = True
     L.set_widths(ws, L.ITEM_WIDTHS)
     L.setup_print(ws)
+
+
+# --- rental tabs (the firm's "M25 Rental <property>") ------------------------------------------------------------
+
+RENTAL_HEADERS = ["Detail", "Apportion?", "Agent Summary", "Owners' Contribution", "This Taxpayer's Contribution Only",
+                  None, "Taxpayer's Share", "Prior Period", "Sources", "key"]
+R_DETAIL, R_TICK, R_AGENT, R_OWNERS, R_TAXPAYER, R_LETTER, R_SHARE, R_PRIOR, R_SOURCES, R_KEY = range(2, 12)
+R_LAST = R_KEY
+TICK = "✓"
+RENTAL_PURPOSE = ("record this property's rental income and expenses and the client's share of them. Blue cells "
+                  "are typed in: change the share, private use or a tick and the share column follows")
+RENTAL_NOTE = (f"i  Tick {TICK} in Apportion? to reduce an expense by the private use percentage. Amounts are the "
+               "whole property's (Agent Summary and Owners' Contribution) or this taxpayer's alone.")
+RENTAL_LABELS = [("rent.gross", "Gross rent (Item 21 P)", "C"), ("rent.interest", "Rental interest deductions (Item 21 Q)", "L"),
+                 ("rent.capital_works", "Capital works deductions (Item 21 F)", "R"),
+                 ("rent.other", "Other rental deductions (Item 21 U)", None)]
+_BAD_TAB = re.compile(r"[\[\]:*?/\\]+")
+
+
+def rental_tab_name(name: str, taken: set[str]) -> str:
+    """'M25 Rental Sample St': Excel's banned characters dropped, at most 31 characters, never a duplicate."""
+    clean = " ".join(_BAD_TAB.sub(" ", name).split()).strip("'").strip() or "Property"  # no leading/trailing '
+    tab = f"M25 Rental {clean}"[:31].rstrip(" '")
+    used = {t.lower() for t in taken}  # Excel's tab names ignore capitals
+    n = 2
+    while tab.lower() in used:
+        suffix = f" {n}"
+        tab = f"M25 Rental {clean}"[:31 - len(suffix)].rstrip(" '") + suffix
+        n += 1
+    return tab
+
+
+def _sources_cell(cell, figures, docs: dict[str, Document]) -> None:
+    refs = list(dict.fromkeys(f"{f.doc_id} p{f.page}" if f.page else f.doc_id for f in figures if f.doc_id))
+    if not refs:
+        return
+    cell.value = ", ".join(refs)
+    first = docs.get(figures[0].doc_id or "")
+    if first:
+        cell.hyperlink = _link(first.filed_location)
+        L.style_link(cell)
+
+
+def _amount_cells(ws: Worksheet, row: int, figures, columns: dict[str, str]) -> None:
+    """Agent, owners and taxpayer-only amounts: a number, or a sum of each figure so every one is still visible."""
+    for col, name in ((R_AGENT, "agent"), (R_OWNERS, "owners"), (R_TAXPAYER, "taxpayer")):
+        amounts = [f.amount for f in figures if columns[f.figure_id] == name]
+        if not amounts:
+            continue
+        value = amounts[0] if len(amounts) == 1 else "=" + "+".join(str(a) for a in amounts)
+        L.style_input(ws.cell(row=row, column=col, value=value))
+
+
+def _share_formula(row: int, share: str, private: str) -> str:
+    """The same sum as rental.share_of: ROUND(((agent + owners) x share + taxpayer only) x private use factor, 2)."""
+    d, e, f, c = (f"{L.letter(col)}{row}" for col in (R_AGENT, R_OWNERS, R_TAXPAYER, R_TICK))
+    return f'=ROUND((({d}+{e})*{share}+{f})*IF({c}="{TICK}",1-{private},1),2)'
+
+
+def _rental_row(ws: Worksheet, row: int, text: str, *, letter: str | None = None, key: str | None = None,
+                ticked: bool = False, bold: bool = False) -> None:
+    cell = ws.cell(row=row, column=R_DETAIL)
+    _text(cell, text)
+    if bold:
+        L.style_label(cell)
+    if ticked:
+        ws.cell(row=row, column=R_TICK, value=TICK)
+    if letter:
+        L.style_label(ws.cell(row=row, column=R_LETTER, value=letter))
+    if key:
+        ws.cell(row=row, column=R_KEY, value=key)
+    L.style_input(ws.cell(row=row, column=R_PRIOR))
+    L.rule_rows(ws, row, row, R_DETAIL, R_SOURCES)
+
+
+def _rental_tab(ws: Worksheet, tab: str, result, ctx: WorkpaperContext, columns: dict[str, str],
+                docs: dict[str, Document], wp: WorkpaperMap, transfers: list) -> dict[str, str]:
+    """One property in the firm's layout. Returns where its Item 21 P, Q, F and U amounts are."""
+    prop = result.prop
+    _sheet_header(ws, f"Rental {prop.name}", tab, ctx, right=("H", "I", "K"), back="K2")
+    _purpose(ws, RENTAL_PURPOSE, "Confirmed figures only. Each row lists its source documents and pages; the "
+                                 "first is linked.")
+    row = BODY_ROW
+    share_col = L.letter(R_SHARE)
+
+    def section(title: str) -> None:
+        nonlocal row
+        ws.cell(row=row, column=R_DETAIL, value=title)
+        L.style_section(ws, row, R_DETAIL, R_SOURCES)
+        row += 1
+
+    def detail(text: str, value, fmt: str = L.NUMBER) -> str:
+        nonlocal row
+        ws.cell(row=row, column=R_DETAIL, value=text)
+        cell = ws.cell(row=row, column=R_SHARE)
+        _text(cell, value)
+        L.style_input(cell, fmt)
+        L.rule_rows(ws, row, row, R_DETAIL, R_SHARE)
+        row += 1
+        return f"${share_col}${row - 1}"
+
+    section("Property Details")
+    detail("Name of property", prop.name, "@")
+    detail("Date property first earned rental income", prop.first_income or None, "@")
+    detail("No. of weeks rented this year", prop.weeks_rented, L.WHOLE)
+    detail("No. of weeks the property was available for rent this year", prop.weeks_available, L.WHOLE)
+    private = detail("Private use percentage", float(prop.private_use / 100), L.PERCENT)
+    row += 1
+    section("Ownership")
+    share = detail("This taxpayer's share", float(prop.share / 100), L.PERCENT)
+    ws.cell(row=row, column=R_DETAIL, value="Other owners' share")
+    L.style_formula(ws.cell(row=row, column=R_SHARE, value=f"=1-{share.replace('$', '')}"), L.PERCENT)
+    L.rule_rows(ws, row, row, R_DETAIL, R_SHARE)
+    row += 2
+    section("Income / Expenses")
+    ws.cell(row=row, column=R_DETAIL, value=RENTAL_NOTE)
+    L.style_purpose(ws.cell(row=row, column=R_DETAIL))
+    row += 1
+    for col, header in enumerate(RENTAL_HEADERS, start=R_DETAIL):
+        ws.cell(row=row, column=col, value=header)
+    L.style_header_row(ws, row, len(RENTAL_HEADERS), first=R_DETAIL)
+    row += 1
+
+    cells: dict[str, int] = {}  # letter -> the row of its Taxpayer's Share
+    expense_rows: list[int] = []
+    for r in result.rows:
+        spec = r.row
+        if spec.kind == "total":
+            continue
+        ticked = prop.apportioned(spec.key)
+        if spec.letter == "D":
+            L.style_subheading(ws.cell(row=row, column=R_DETAIL, value="Less: Expenses"))
+            row += 1
+        if spec.itemised:
+            _rental_row(ws, row, spec.heading, key=spec.key, ticked=ticked, bold=True)
+            first = row + 1
+            row += 1
+            for line in r.lines:
+                f = line.figure
+                _rental_row(ws, row, f.description, key=f.label_key, ticked=ticked)
+                _amount_cells(ws, row, [f], columns)
+                L.style_formula(ws.cell(row=row, column=R_SHARE, value=_share_formula(row, share, private)))
+                _sources_cell(ws.cell(row=row, column=R_SOURCES), [f], docs)
+                row += 1
+            _rental_row(ws, row, f"Total {spec.heading.lower()}", letter=spec.letter)
+            for col in (R_AGENT, R_OWNERS, R_TAXPAYER, R_SHARE):
+                c = L.letter(col)
+                value = f"=SUM({c}{first}:{c}{row - 1})" if row > first else 0
+                L.style_subtotal(ws.cell(row=row, column=col, value=value))
+        else:
+            _rental_row(ws, row, spec.heading, letter=spec.letter, key=spec.key, ticked=ticked)
+            _amount_cells(ws, row, r.figures, columns)
+            L.style_formula(ws.cell(row=row, column=R_SHARE, value=_share_formula(row, share, private)))
+            if r.figures:
+                _sources_cell(ws.cell(row=row, column=R_SOURCES), r.figures, docs)
+        cells[spec.letter] = row
+        if spec.kind == "expense":
+            expense_rows.append(row)
+        row += 1
+        if spec.letter == "B":  # C Total Income straight after the income rows
+            _rental_row(ws, row, "Total Income", letter="C", bold=True)
+            for col in (R_AGENT, R_OWNERS, R_TAXPAYER, R_SHARE):
+                c = L.letter(col)
+                L.style_subtotal(ws.cell(row=row, column=col, value=f"={c}{cells['A']}+{c}{cells['B']}"))
+            cells["C"] = row
+            row += 2
+
+    row += 1
+    _rental_row(ws, row, "Total Expenses", letter="W", bold=True)
+    for col in (R_AGENT, R_OWNERS, R_TAXPAYER, R_SHARE):
+        c = L.letter(col)
+        L.style_total(ws.cell(row=row, column=col, value="=" + "+".join(f"{c}{x}" for x in expense_rows)))
+    cells["W"] = row
+    row += 1
+    _rental_row(ws, row, "Net Income / (Loss)", letter="X", bold=True)
+    for col in (R_AGENT, R_OWNERS, R_TAXPAYER, R_SHARE):
+        c = L.letter(col)
+        L.style_total(ws.cell(row=row, column=col, value=f"={c}{cells['C']}-{c}{cells['W']}"))
+    cells["X"] = row
+    wp.total_cells.append(f"{_q(tab)}!{share_col}{row}")
+    row += 2
+
+    section("Return labels")
+    refs: dict[str, str] = {}
+    for key, text, letter in RENTAL_LABELS:
+        if key not in ctx.draft.lines:
+            continue
+        ws.cell(row=row, column=R_DETAIL, value=text)
+        L.style_label(ws.cell(row=row, column=R_DETAIL))
+        s = f"{share_col}{{}}"
+        formula = (f"={s.format(cells[letter])}" if letter else
+                   f"={s.format(cells['W'])}-{s.format(cells['L'])}-{s.format(cells['R'])}")
+        L.style_total(ws.cell(row=row, column=R_SHARE, value=formula))
+        ws.cell(row=row, column=R_KEY, value=key)
+        refs[key] = f"{_q(tab)}!{share_col}{row}"
+        wp.total_cells.append(refs[key])
+        ws.cell(row=row + 1, column=R_LETTER, value="Transferred to:")
+        L.style_label(ws.cell(row=row + 1, column=R_LETTER))
+        link = ws.cell(row=row + 1, column=R_SHARE, value=_item_ref(ctx.labels[key]))
+        L.style_link_box(link)
+        transfers.append((link, key))
+        row += 3
+    ws.column_dimensions[L.letter(R_KEY)].hidden = True
+    L.set_widths(ws, L.RENTAL_WIDTHS)
+    L.setup_print(ws)
+    return refs
 
 
 def _cgt_tab(ws: Worksheet, figures: list[Figure], ctx: WorkpaperContext, docs: dict[str, Document],
@@ -420,7 +613,7 @@ def _taxcalc_ref(name: str) -> str:
 
 
 def _summary(ws: Worksheet, ctx: WorkpaperContext, tab_of: dict[str, str], cgt_refs: dict[str, str],
-             wp: WorkpaperMap) -> tuple[dict[str, str], dict[str, str]]:
+             wp: WorkpaperMap, rental_refs: dict[str, list[str]] | None = None) -> tuple[dict[str, str], dict[str, str]]:
     """Returns where each label's amount is (for the tax calculation) and where to land a 'Transferred to' link."""
     _sheet_header(ws, "Summary", SUMMARY_TAB, ctx, right=("I", "J", "L"), back=None)
     _purpose(ws, "summarise the amounts for the income tax return. Totals come from the supporting "
@@ -470,6 +663,8 @@ def _summary(ws: Worksheet, ctx: WorkpaperContext, tab_of: dict[str, str], cgt_r
             amount = ws.cell(row=row, column=col)
             if key in cgt_refs:
                 amount.value = f"={cgt_refs[key]}"
+            elif key in (rental_refs or {}):  # Item 21: each property tab's share
+                amount.value = "=" + "+".join(rental_refs[key])
             elif key in tab_of:
                 t = _q(tab_of[key])
                 amount.value = f'=SUMIFS({t}!${AMOUNT}:${AMOUNT},{t}!${KEY}:${KEY},"{key}")'
@@ -858,6 +1053,14 @@ def build_workpaper(path: Path, ctx: WorkpaperContext) -> WorkpaperMap:
     by_tab: dict[str, list[Figure]] = defaultdict(list)
     for f in ctx.figures:
         by_tab[ctx.labels[f.label_key].tab].append(f)
+    setup = ctx.rental or default_setup()
+    doc_types = {d.doc_id: d.doc_type for d in ctx.documents}
+    rental_figures = [f for f in ctx.figures if is_rental(f, ctx.labels)]
+    rental_results = compute(rental_figures, setup, ctx.labels, doc_types) if rental_figures else []
+    columns = {f.figure_id: column_of(f, setup, doc_types) for f in rental_figures}
+    rental_tabs: list[str] = []
+    for result in rental_results:
+        rental_tabs.append(rental_tab_name(result.prop.name, set(rental_tabs)))
     tab_order = sorted(by_tab, key=lambda t: min(ctx.labels[f.label_key].order for f in by_tab[t]))
     has_cgt = bool(by_tab.get(CGT_TAB)) or any(e.confirmed for e in ctx.cgt_events)
     if has_cgt and CGT_TAB not in tab_order:
@@ -868,7 +1071,10 @@ def build_workpaper(path: Path, ctx: WorkpaperContext) -> WorkpaperMap:
     cover = wb.active
     cover.title = "Cover"
     summary = wb.create_sheet(SUMMARY_TAB)
-    tab_sheets = {tab: wb.create_sheet(tab) for tab in tab_order}
+    tab_sheets = {}
+    for tab in tab_order:
+        for name in (rental_tabs if tab == RENTAL_TAB else [tab]):  # the firm's "M25 Rental <property>" tabs
+            tab_sheets[name] = wb.create_sheet(name)
     tax_calc = wb.create_sheet(TAXCALC_TAB)
     rates = wb.create_sheet("Rates")
     sources = wb.create_sheet("Sources")
@@ -877,15 +1083,22 @@ def build_workpaper(path: Path, ctx: WorkpaperContext) -> WorkpaperMap:
     cgt_refs: dict[str, str] = {}
     tab_of: dict[str, str] = {}
     transfers: list = []
+    rental_refs: dict[str, list[str]] = defaultdict(list)
     for tab in tab_order:
         figures = by_tab.get(tab, [])
+        if tab == RENTAL_TAB:
+            for name, result in zip(rental_tabs, rental_results):
+                for key, ref in _rental_tab(tab_sheets[name], name, result, ctx, columns, docs, wp, transfers).items():
+                    rental_refs[key].append(ref)
+                    tab_of.setdefault(key, name)
+            continue
         if tab == CGT_TAB:
             cgt_refs = _cgt_tab(tab_sheets[tab], figures, ctx, docs, wp, transfers)
         else:
             _item_tab(tab_sheets[tab], tab, figures, ctx, docs, wp, transfers)
         for f in figures:
-            tab_of[return_key(ctx.labels, f.label_key)] = tab  # a rental category's tab is Item 21 U's
-    summary_refs, landing = _summary(summary, ctx, tab_of, cgt_refs, wp)
+            tab_of[f.label_key] = tab
+    summary_refs, landing = _summary(summary, ctx, tab_of, cgt_refs, wp, rental_refs)
     for cell, key in transfers:  # "Transferred to: Item 10 L" lands on that line of the Summary
         if key in landing:
             _jump(cell, SUMMARY_TAB, landing[key])

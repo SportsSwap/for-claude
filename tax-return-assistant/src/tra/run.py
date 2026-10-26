@@ -25,6 +25,7 @@ from .doc_summary import summaries
 from .review_store import responses_by_key
 from .privacy.audit import AuditLog
 from .privacy.guard import atomic_write_text, check_value
+from .rental import RentalFileProblem, load_rental
 from .return_.prepare import build_draft
 from .taxcalc.calc_a import calculate_a
 from .taxcalc.calc_b import calculate_b
@@ -71,12 +72,18 @@ def prepare_client(ws: Workspace, audit: AuditLog, prepared_by: str) -> PrepareR
     documents = DocumentIndex(ws.index_csv).load()
     prefill = read_prefill(ws.prefill_json)
     prior = load_prior_year(ws)
-    draft = build_draft(ws.client_code, ws.income_year, figures, events, labels, resident=state.resident)
+    try:
+        rental = load_rental(ws) if ws.rental_json.exists() else None  # None: one property, owned outright (S18)
+    except RentalFileProblem as exc:
+        raise PrepareError(str(exc)) from None
+    draft = build_draft(ws.client_code, ws.income_year, figures, events, labels, resident=state.resident,
+                        rental=rental)
     calc_a = calculate_a(draft, state, rates)
     calc_b = calculate_b(draft, state, rates, labels)
     ctx = CheckContext(draft=draft, rates=rates, state=state, calc_a=calc_a, calc_b=calc_b, labels=labels,
                        figures=figures, documents=documents, prefill=prefill, prior_year=prior,
-                       cfg=load_checks_cfg(), citations=load_citations(), cgt_events=events)
+                       cfg=load_checks_cfg(), citations=load_citations(), cgt_events=events,
+                       rental=rental)
     notes = rank_notes(run_all_checks(ctx) + read_notes(ws.ingest_notes_json))
 
     prefill_totals: dict[str, Decimal] = {}
@@ -89,7 +96,7 @@ def prepare_client(ws: Workspace, audit: AuditLog, prepared_by: str) -> PrepareR
         notes=notes, prefill=prefill_totals, prior_year=prior, labels=labels, prepared_by=prepared_by,
         tool_version=__version__, cgt_events=events, citations=ctx.citations,
         responses=responses_by_key(ws), doc_summaries=summaries(ws),
-        doc_descriptions={k: v.get("text", "") for k, v in load_doc_notes(ws).items()}))
+        doc_descriptions={k: v.get("text", "") for k, v in load_doc_notes(ws).items()}, rental=rental))
 
     last_return = {key: str(line.amount) for key, line in draft.lines.items()}
     check_value(last_return, "last_return.json")

@@ -19,7 +19,7 @@ from tra.workpaper.build import WorkpaperContext
 from tra.workspace import Workspace
 
 
-def demo_context(tmp_path, ids=None, state=None, mutate=None, cgt_rows=()):
+def demo_context(tmp_path, ids=None, state=None, mutate=None, cgt_rows=(), rental=None):
     home = tmp_path / "home"
     home.mkdir(exist_ok=True)
     ws = Workspace(home, "DEMO01", 2026)
@@ -45,13 +45,13 @@ def demo_context(tmp_path, ids=None, state=None, mutate=None, cgt_rows=()):
     events, errors = read_cgt(ws.cgt_csv)
     assert errors == []
     rates = load_rates(2026)
-    draft = build_draft("DEMO01", 2026, figures, events, labels)
+    draft = build_draft("DEMO01", 2026, figures, events, labels, rental=rental)
     a, b = calculate_a(draft, state, rates), calculate_b(draft, state, rates, labels)
     docs = DocumentIndex(ws.index_csv).load()
     prefill_lines = read_prefill(ws.prefill_json)
     ctx = CheckContext(draft=draft, rates=rates, state=state, calc_a=a, calc_b=b, labels=labels, figures=figures,
                        documents=docs, prefill=prefill_lines, prior_year={}, cfg=load_checks_cfg(),
-                       citations=load_citations(), cgt_events=events)
+                       citations=load_citations(), cgt_events=events, rental=rental)
     notes = run_all_checks(ctx)
     prefill = {}
     for line in prefill_lines:
@@ -59,4 +59,4 @@ def demo_context(tmp_path, ids=None, state=None, mutate=None, cgt_rows=()):
     return WorkpaperContext(client_code="DEMO01", income_year=2026, state=state, documents=docs,
                             figures=[f for f in figures if f.confirmed], draft=draft, rates=rates, calc_a=a, calc_b=b,
                             notes=notes, prefill=prefill, prior_year={}, labels=labels, prepared_by="tester",
-                            tool_version="0.1.0", cgt_events=events, citations=load_citations())
+                            tool_version="0.1.0", cgt_events=events, citations=load_citations(), rental=rental)

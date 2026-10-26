@@ -60,6 +60,10 @@ class Workspace:
         return self.work_dir / "reading_notes.json"
 
     @property
+    def rental_json(self) -> Path:
+        return self.work_dir / "rental.json"
+
+    @property
     def state_json(self) -> Path:
         return self.work_dir / "state.json"
 

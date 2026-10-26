@@ -12,7 +12,9 @@ from tra.privacy.guard import FileLockedError, SensitiveDataBlocked
 from tra.workpaper.build import build_workpaper
 
 SUMMARY = "B01 Summary"
-ITEM_TABS = ("01 Salaries and Wages", "10 Interest Received", "11 Dividends Received", "M25 Rental Property",
+# The rental tab has the firm's own layout (tests/test_workpaper_rental.py), one per property.
+RENTAL_TAB = "M25 Rental Property 1"
+ITEM_TABS = ("01 Salaries and Wages", "10 Interest Received", "11 Dividends Received",
              "D05 Other Work Deductions", "PHI Private Health")
 # Item tab columns (the firm's layout starts in column B): B ref, E source, F page, I amount, J key (hidden).
 REF, SOURCE, PAGE, DETAIL, AMOUNT, KEY = 2, 5, 6, 4, 9, 10
@@ -35,7 +37,7 @@ def _summary_rows(ws):
 def test_tabs_present(built):
     path, _, _ = built
     names = openpyxl.load_workbook(path).sheetnames
-    for tab in ("Cover", SUMMARY, *ITEM_TABS, "Tax Calc", "Rates", "Sources", "Review Notes"):
+    for tab in ("Cover", SUMMARY, *ITEM_TABS, RENTAL_TAB, "Tax Calc", "Rates", "Sources", "Review Notes"):
         assert tab in names
     assert names[:2] == ["Cover", SUMMARY]
     assert names[-4:] == ["Tax Calc", "Rates", "Sources", "Review Notes"]
@@ -99,7 +101,8 @@ def test_summary_is_the_hub(built):
     for key, r in rows.items():
         go = ws.cell(row=r, column=GO)
         if key in with_figures:
-            assert go.hyperlink.location == f"'{wb[ctx.labels[key].tab].title}'!A1", key
+            tab = RENTAL_TAB if ctx.labels[key].tab == "M25 Rental Property" else ctx.labels[key].tab
+            assert go.hyperlink.location == f"'{wb[tab].title}'!A1", key
     withheld = rows["income.salary_tax_withheld"]
     assert ws.cell(row=withheld, column=S_AMOUNT).value is None
     assert ws.cell(row=withheld, column=S_CREDITS).value.startswith("=SUMIFS(")
@@ -113,7 +116,8 @@ def test_summary_is_the_hub(built):
 def test_every_figure_row_has_source(built):
     path, _, ctx = built
     wb = openpyxl.load_workbook(path)
-    ids = {f.figure_id for f in ctx.figures}
+    rental = {f.figure_id for f in ctx.figures if ctx.labels[f.label_key].tab == "M25 Rental Property"}
+    ids = {f.figure_id for f in ctx.figures} - rental
     rows = 0
     for tab in ITEM_TABS:
         ws = wb[tab]
@@ -123,7 +127,11 @@ def test_every_figure_row_has_source(built):
                 assert ws.cell(row=r, column=SOURCE).value, (tab, r)
                 assert ws.cell(row=r, column=PAGE).value, (tab, r)
                 assert ws.cell(row=r, column=SOURCE).hyperlink is not None
-    assert rows == len(ctx.figures)
+    assert rows == len(ids)
+    sources = " ".join(str(c.value) for row in wb[RENTAL_TAB].iter_rows() for c in row if c.column == 10 and c.value)
+    for f in ctx.figures:
+        if f.figure_id in rental:
+            assert f.doc_id in sources, f.figure_id  # each rental row lists its documents
 
 
 def test_prefill_figures_have_their_own_section(tmp_path):
@@ -280,9 +288,9 @@ def test_no_total_mixes_different_labels(built):
 
 def test_rental_tab_shows_net_rent(built):
     path, _, _ = built
-    ws = openpyxl.load_workbook(path)["M25 Rental Property"]
-    labels = [ws.cell(row=r, column=DETAIL).value for r in range(1, ws.max_row + 1)]
-    assert "Net rent" in labels
+    ws = openpyxl.load_workbook(path)[RENTAL_TAB]
+    labels = [ws.cell(row=r, column=2).value for r in range(1, ws.max_row + 1)]
+    assert "Net Income / (Loss)" in labels
 
 
 def test_combined_tabs_keep_separate_totals(tmp_path):

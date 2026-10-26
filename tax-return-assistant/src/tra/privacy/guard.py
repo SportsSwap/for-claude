@@ -89,7 +89,7 @@ def check_workbook(wb: openpyxl.Workbook, location: str) -> None:
         for row in ws.iter_rows():
             for cell in row:
                 value = cell.value
-                if isinstance(value, str) and value.startswith("="):
+                if cell.data_type == "f":  # a formula; text that only starts with "=" is still checked
                     continue
                 _check_scalar(value, f"{ws.title}!{cell.coordinate}")
 

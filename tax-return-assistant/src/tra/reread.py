@@ -28,6 +28,7 @@ from .money import format_dollars
 from .privacy.audit import AuditLog
 from .privacy.guard import FileLockedError, atomic_write_text, check_value
 from .reading_notes import load_reading_notes, save_reading_notes
+from .rental import is_rental, suggest_share
 
 # How the readers (and the learned layouts' required fields) begin a doubt about an amount they expected but didn't
 # find. A document with one is waiting for a layout. Keep the readers' wording and this in step. ("Looks misread"
@@ -105,7 +106,10 @@ def reread_document(ws, doc_id: str, audit: AuditLog) -> RereadResult:
     is_email = loaded.suffix in EMAIL_TYPES or doc.doc_type == "EMAIL"
     carried = [d for d in entry.get("doubts", []) if d.startswith(EMAIL_DOUBTS)] if is_email else []
     doubts = carried + [d for d in result.doubts if d not in carried] + differ
-    with restore_on_error(ws.figures_csv, ws.reading_notes_json, ws.index_csv, ws.ingest_notes_json):
+    with restore_on_error(ws.figures_csv, ws.reading_notes_json, ws.index_csv, ws.ingest_notes_json, ws.rental_json):
+        share = result.facts.get("ownership_share")  # as on import: a suggestion, never over a person's share
+        if share is not None and (doc_type == "RENTSTMT" or any(is_rental(f, labels) for f in result.figures)):
+            doubts.append(suggest_share(ws, doc_id, share, audit))
         write_figures(ws.figures_csv, kept)
         added = append_figures(ws.figures_csv, new) if new else []
         save_reading_notes(ws, doc_id, doubts, entry.get("from_email"), layout=layout)
