@@ -11,7 +11,7 @@ from webctx import make_client, new_client
 from tra.filing.local_store import LocalStore
 from tra.ingest.classify import load_doc_types
 from tra.ingest.extractors.ai_reader import AiReader, ai_reader_from_settings
-from tra.ingest.page_images import MAX_PAGE_IMAGES, looks_garbled, pages_to_send, render_pages
+from tra.ingest.page_images import MAX_PAGE_IMAGES, looks_garbled, pages_to_send, render_pages, scanned_pages
 from tra.ingest.pipeline import ingest_file
 from tra.privacy.audit import AuditLog
 from tra.privacy.redact import redact_pages
@@ -115,6 +115,49 @@ def test_a_garbled_page_is_sent(tmp_path, monkeypatch, make_pdf):
     _ingest(settings, ws, make_pdf("ocr.pdf", [TEXT, [SOUP]]), reader)
     [call] = client.calls
     assert [label for label, _ in _images(call)] == ["--- Page 2 (picture; not blanked) ---"]
+
+
+def _scan_with_text_layer(path, lines):
+    """A page that is one picture filling the page, with a scanner's typed-over text layer on top (OCR)."""
+    from PIL import Image
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas
+    c = canvas.Canvas(str(path), pagesize=A4)
+    c.drawImage(ImageReader(Image.new("L", (300, 420), 230)), 0, 0, *A4)
+    y = 800
+    for line in lines:
+        c.drawString(50, y, line)
+        y -= 16
+    c.showPage()
+    c.save()
+    return path
+
+
+# Ordinary-looking words with the scanner's slips in them: not garbled enough to count as soup.
+OCR_INVOICE = ["SAMPLE ADVISERS PTY LTD", "Tax invoice", "Professional services for preparing the tax return",
+               "5ubtotal 450.00", "Total GsT 10% 45.00", "A0ourt Due 495.00"]
+
+
+def test_a_page_that_is_one_big_picture_is_a_scan(tmp_path, make_pdf):
+    path = _scan_with_text_layer(tmp_path / "ocr.pdf", OCR_INVOICE)
+    assert not looks_garbled("\n".join(OCR_INVOICE))
+    assert scanned_pages(path) == [1]
+    assert scanned_pages(make_pdf("typed.pdf", [TEXT, None])) == []  # a small drawing isn't a scan
+
+
+def test_a_scan_with_a_text_layer_is_sent_as_a_picture(tmp_path, monkeypatch):
+    settings, ws, reader, client = _setup(tmp_path, monkeypatch, images=True)
+    _ingest(settings, ws, _scan_with_text_layer(tmp_path / "ocr.pdf", OCR_INVOICE), reader)
+    [call] = client.calls
+    assert [label for label, _ in _images(call)] == ["--- Page 1 (picture; not blanked) ---"]
+
+
+def test_a_scan_with_a_text_layer_sends_no_picture_while_images_are_off(tmp_path, monkeypatch):
+    settings, ws, reader, client = _setup(tmp_path, monkeypatch, images=False)
+    _ingest(settings, ws, _scan_with_text_layer(tmp_path / "ocr.pdf", OCR_INVOICE), reader)
+    [call] = client.calls
+    assert _images(call) == []
 
 
 def test_no_more_than_twenty_pictures(tmp_path, monkeypatch, make_pdf):

@@ -118,5 +118,6 @@ Claude's calls along the way (worth knowing):
 - **My samples (25 Oct 2026):** real papers, used with my OK to learn the layouts only (files and tests hold invented details), then deleted. 3 of 7 now read without AI: ATO income statement, Bupa health statement, NSW school receipts. The tax agent's invoice, the super statement and the two property manager bundles are scans too garbled for rules: they need OCR or the AI.
 - **A misread amount is never used:** the Bupa scan showed "$24s" for $245; Sawnx flags it instead of taking $24.
 - **File names:** readable, still led by the client code: `TEST01 2026-03-31 Receipt - SAMPLE SHOP.pdf`. New imports and documents read again; older ones keep their names.
+- **Scans with a text layer (26 Oct 2026):** a page that is one big picture is a scan even when the scanner typed text over it, so with page images on its picture goes to the AI reader as well as the blanked text. Covered by the page-images approval (it is a scanned page).
 
 Related: [[How it works]], [[Privacy rules]]

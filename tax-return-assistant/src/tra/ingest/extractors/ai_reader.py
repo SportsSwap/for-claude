@@ -37,6 +37,8 @@ MODEL_NAMES = {"claude-haiku-5-5": "Claude Haiku 5.5", "claude-opus-5-5": "Claud
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
 FALLBACK_MODELS = frozenset({"claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-1"})  # "fallbacks" accepted
 MAX_FIGURES = 60
+NOTHING_FOUND = ("The AI reader read this document but found no amounts it could match to a return item. Check the "
+                 "document and enter any figures by hand.")
 
 SYSTEM = """You read Australian tax source documents for a tax agent's draft workpaper.
 Identifiers in the text have already been replaced with markers such as [TFN REDACTED].
@@ -209,6 +211,8 @@ class AiReader:
         if items is None or problems:
             result.notes.append(_note("Medium", "A3", "The AI reader couldn't give a usable answer for some or all "
                                       "of this document. Enter anything missing by hand.", doc_id))
+        elif not items:  # said plainly, so the document doesn't look as if the AI was never asked
+            result.doubts.append(NOTHING_FOUND)
         result.parse_status = "partial" if result.figures else "manual_needed"
         return result
 

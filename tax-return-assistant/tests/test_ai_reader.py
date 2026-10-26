@@ -126,6 +126,15 @@ def test_refusal_adds_nothing():
     assert result.figures == [] and [n.check_id for n in result.notes] == ["A3"]
 
 
+def test_an_empty_answer_says_the_ai_found_nothing():
+    # Without this the document just sat at "manual entry needed", as if the AI reader had never been asked.
+    rt = redact_pages(["SAMPLE ADVISERS Tax invoice", "A0ourt Due 495.00"])
+    result = AiReader(FakeClient(_answer())).extract(rt, "D001")
+    assert result.figures == [] and result.notes == [] and result.parse_status == "manual_needed"
+    assert result.doubts == ["The AI reader read this document but found no amounts it could match to a return "
+                             "item. Check the document and enter any figures by hand."]
+
+
 def test_r6_raised_for_ai_figures():
     f = fig("F1", "income.interest", 100)
     f.method = "ai"

@@ -70,6 +70,23 @@ def test_receipt_without_date_not_substantiated(demo):
     assert fig.date is None
 
 
+@pytest.mark.parametrize("line", ["Amount due $495.00", "Amount Due 495.00 AUD", "Total (incl. GST) 495.00",
+                                  "Total inc GST: $495.00", "Invoice total 495.00", "Total amount 495.00"])
+def test_receipt_reads_an_invoices_total(line):
+    from tra.privacy.redact import redact_pages
+    rt = redact_pages(["SAMPLE ADVISERS PTY LTD", "Tax invoice", "Date: 31/03/2026", "Subtotal 450.00",
+                       "Total GST 10% 45.00", line])
+    [fig] = get_extractor("RECEIPT").extract(rt, "D001").figures
+    assert fig.amount == Decimal("495.00") and fig.label_key == "ded.d5"
+
+
+def test_receipt_skips_a_nil_amount_due_for_the_total():
+    from tra.privacy.redact import redact_pages
+    rt = redact_pages(["SAMPLE ADVISERS PTY LTD", "Tax invoice", "Amount due 0.00", "Total 495.00"])
+    [fig] = get_extractor("RECEIPT").extract(rt, "D001").figures
+    assert fig.amount == Decimal("495.00")
+
+
 def test_xero_pl_csv(tmp_path):
     csv = tmp_path / "pl.csv"
     csv.write_text(

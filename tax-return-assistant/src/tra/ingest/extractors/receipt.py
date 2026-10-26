@@ -11,7 +11,9 @@ import re
 from .base import AMOUNT, ExtractResult, amount, figure, first_line, lines, require_redacted, search
 from ...dates import DATE_PATTERN, find_doc_date, parse_date
 
-_TOTAL = rf"^(?:Total|Amount paid)\s+({AMOUNT})$"
+# "Total", "Amount paid", and an invoice's "Amount due", "Total (incl. GST)", "Invoice total", "Total amount".
+_TOTAL = re.compile(rf"^(?:Total(?:\s+amount|\s+\(?inc(?:l|luding)?\.?\s+GST\)?)?|Amount\s+(?:paid|due)|Invoice\s+total)"
+                    rf"\s*:?\s+({AMOUNT})(?:\s+AUD)?$", re.I)
 _DATE = rf"\bDate\s*:?\s*({DATE_PATTERN})"
 # An item line ends in a price with cents (so "ABN 51 824 753 556" is not an item).
 _ITEM = re.compile(r"^(?P<desc>[A-Za-z].*?)\s+\$?\d[\d,]*\.\d{2}$")
@@ -27,7 +29,9 @@ class ReceiptExtractor:
         when = parse_date(date_hit[1].group(1)) if date_hit else find_doc_date(rt.text)
         supplier = first_line(rt)
         result = ExtractResult(doc_date=when)
-        total = search(rt, _TOTAL)
+        # The first total that isn't nil: a paid invoice can say "Amount due 0.00" above its total.
+        total = next(((page, m) for page, line in lines(rt)
+                      if (m := _TOTAL.search(line)) and amount(m.group(1)) != 0), None)
         is_receipt = any(word in rt.text.lower() for word in ("tax invoice", "receipt"))
         if not total:
             if is_receipt:  # an unrecognised document isn't expected to have a total

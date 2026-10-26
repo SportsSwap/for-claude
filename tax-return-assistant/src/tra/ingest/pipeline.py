@@ -30,7 +30,7 @@ from .emails import EMAIL_TYPES, EmailLibraryMissing, read_email
 from .extractors import ExtractResult, get_extractor
 from .extractors.ai_reader import NOT_AI_TYPES
 from .layouts import load_layouts, match_layout, read_with_layout
-from .page_images import MAX_PAGE_IMAGES, pages_wanted, render_pages
+from .page_images import MAX_PAGE_IMAGES, pages_wanted, render_pages, scanned_pages
 from .readers import SUPPORTED, UnsupportedFile, load
 
 # Areas the tool does not prepare. A mention in any document raises a High note (feeds spec check S12).
@@ -233,7 +233,11 @@ def _page_images(loaded, ai_reader, source: Path | None) -> tuple[list[tuple[int
     pages that wanted one but won't get one (past MAX_PAGE_IMAGES or the size budget, or a page that won't draw)."""
     if not getattr(ai_reader, "page_images", False) or loaded.suffix != ".pdf" or source is None:
         return [], []
-    wanted = pages_wanted(loaded.redacted.pages, loaded.image_only_pages)
+    try:
+        scanned = scanned_pages(source)
+    except Exception:  # a PDF pdfplumber can't look inside: only empty and garbled pages are pictured
+        scanned = []
+    wanted = pages_wanted(loaded.redacted.pages, loaded.image_only_pages, scanned)
     try:
         images = render_pages(source, wanted[:MAX_PAGE_IMAGES]) if wanted else []
     except Exception:  # a page pdfium can't draw (RuntimeError) never stops the import: the text is still read

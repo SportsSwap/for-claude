@@ -18,6 +18,7 @@ RESOLUTION = 110  # dots per inch: an A4 page is about 910 x 1290 pixels, enough
 MAX_IMAGE_BYTES = 20 * 1024 * 1024  # all of a document's pictures together, base64-encoded as they are sent
 MAX_EDGE = 2000  # pixels on a picture's long side: a bigger page (a plan, an A3 sheet) is drawn smaller
 JPEG_QUALITY = 70  # greyscale JPEG: printed amounts stay sharp at a fraction of a PNG's size
+SCAN_COVER = 0.8  # a picture covering this much of a page makes it a scan (a logo or a signature is far smaller)
 
 # A token is "ordinary" once the punctuation around it is stripped if it is a word (letters in any language, with
 # an apostrophe or hyphen inside: tenant's, year-end, José, Müller), an amount or number ($1,234.56, -50.00, 5%,
@@ -51,9 +52,23 @@ def looks_garbled(text: str) -> bool:
     return bool(marks) and sum(marks) * 2 < len(marks)
 
 
-def pages_wanted(loaded_text_pages, image_only_pages) -> list[int]:
-    """Page numbers (from 1) with no text or garbled text, in page order: every page a picture would help."""
-    scans = set(image_only_pages)
+def scanned_pages(pdf_path: Path) -> list[int]:
+    """Pages (from 1) that are one picture covering most of the page: a scan, even when the scanner typed a text
+    layer over it (OCR). That text can look ordinary yet be full of slips ("A0ourt Due"), so the picture is sent too."""
+    with pdfplumber.open(pdf_path) as pdf:
+        return [n for n, page in enumerate(pdf.pages, start=1)
+                if any(_cover(image, page) >= SCAN_COVER for image in page.images)]
+
+
+def _cover(image, page) -> float:
+    area = float(page.width) * float(page.height)
+    return float(image["x1"] - image["x0"]) * float(image["bottom"] - image["top"]) / area if area else 0.0
+
+
+def pages_wanted(loaded_text_pages, image_only_pages, scanned=()) -> list[int]:
+    """Page numbers (from 1) with no text, garbled text or a scan behind the text, in page order: every page a
+    picture would help."""
+    scans = set(image_only_pages) | set(scanned)
     return [n for n, text in enumerate(loaded_text_pages, start=1)
             if n in scans or not text.strip() or looks_garbled(text)]
 

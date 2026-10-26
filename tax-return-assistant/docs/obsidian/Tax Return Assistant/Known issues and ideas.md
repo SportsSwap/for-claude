@@ -80,6 +80,11 @@ Back to [[Tax Return Assistant]]
 - Page images are only sent when Sawnx's own readers found no figures, so a scanned page inside a document that's partly readable isn't sent.
 - Idea: let me pick the AI model in Settings (Sonnet 5.5 reads tables better than Haiku 5.5, still cheaply).
 
+## From my tax agent's invoice (26 Oct 2026)
+- The rules and the AI both read nothing, with no warning. Why: the PDF is a **scan with a typed-over text layer** (the scanner's OCR). The text looked ordinary enough ("A0ourt Due 495.00") that Sawnx didn't count it as garbled, so no picture was sent; Haiku got only the messy text and said "nothing here", and an empty answer left no note.
+- **Fixed:** a page that is one big picture (80% of the page or more) now counts as a scan, so with page images on its picture is sent too. When the AI finds nothing, Things to check now says so. The built-in receipt reader also reads "Amount due", "Total (incl. GST)", "Invoice total" and "Total amount" lines (a nil "Amount due 0.00" is skipped).
+- **Read again** uses the free rules only, never the AI: to retry a document with the AI, delete it and import it again.
+
 ## From teaching layouts (25 Oct 2026)
 - Scans with garbled text (my tax agent's invoice, AustralianSuper statement, property manager bundles) can't be taught: they need OCR or the AI.
 - A layout doesn't fix a document's date when the scan garbles it (my income statement and Bupa samples got the import date).
