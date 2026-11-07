@@ -94,14 +94,17 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         start: str | None = None, end: str | None = None,
         daily: dict[str, pd.DataFrame] | None = None,
         lower: dict[str, dict[str, pd.DataFrame]] | None = None, interval: str = "1d",
-        market: pd.DataFrame | None = None) -> Result:
+        market: pd.DataFrame | None = None,
+        higher: dict[str, dict[str, pd.DataFrame]] | None = None) -> Result:
     """lower: {ticker: {"15m": bars, ...}} for the lower-timeframe check (data.load_lower).
-    market: daily bars of the index used by the short market filter (QQQ)."""
+    market: daily bars of the index used by the short market filter (QQQ).
+    higher: {ticker: {"4h": bars, "1d": bars}} for the higher-timeframe check (data.load_higher)."""
     rows: dict[str, dict] = {}
     for t, df in prices.items():
         if not len(df):
             continue
-        d = add_signals(df, s, (daily or {}).get(t), (lower or {}).get(t), interval, market)
+        d = add_signals(df, s, (daily or {}).get(t), (lower or {}).get(t), interval, market,
+                        (higher or {}).get(t))
         d["prev_atr"] = d["atr"].shift(1)
         rows[t] = d.to_dict("index")
 

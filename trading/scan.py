@@ -67,6 +67,8 @@ def main():
     elif s.confirm_min:
         raise SystemExit("--mtf needs an intraday --interval and can't be used with --no-mtf.")
 
+    higher = data.load_higher(args.tickers, start, args.interval, s.higher_tfs, daily,
+                              refresh=not args.offline, offline=args.offline)
     market = None
     if s.sides in ("short", "both") and s.short_market_filter:
         market = data.load([s.short_market_filter], start, "1d", refresh=not args.offline,
@@ -74,7 +76,8 @@ def main():
 
     signals, shorts, watch, watch_short = [], [], [], []
     for t, df in prices.items():
-        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None, lower.get(t), args.interval, market)
+        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None, lower.get(t), args.interval, market,
+                        higher.get(t))
         last = d.iloc[-1]
         vs_ma = (last["Close"] / last["trend_ma"] - 1) * 100 if "trend_ma" in d and pd.notna(last["trend_ma"]) else None
         vs_ma = round(vs_ma, 1) if vs_ma is not None else None

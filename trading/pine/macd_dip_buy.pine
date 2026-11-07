@@ -4,6 +4,8 @@
 // and by default only while the market (QQQ) is below its own 200-day EMA.
 // Exit: hold until the setup flips. A long sells when the MACD crosses DOWN while ABOVE zero (the
 // short setup); a short covers when it crosses UP while BELOW zero. No fixed target, no time limit.
+// Only the best trades: waits 2 bars after the cross for confirmation, and the 4h and daily MACDs
+// must point the same way.
 // Optional buffer: the cross must happen at least N ATRs away from zero (off by default).
 // Lower timeframes: counts how many of 15m/30m/45m agree with each trade and can require it.
 // Pair it with macd_panel.pine to see the MACD with the buffer lines drawn on it.
@@ -42,6 +44,14 @@ useMarket = input.bool(true, "Only short when the market is below its 200-day EM
 marketSym = input.symbol("NASDAQ:QQQ", "Market index", group = grpS)
 shortRiskMult = input.float(1.0, "Short size (x normal risk)", minval = 0.1, maxval = 1, step = 0.25, group = grpS)
 shortStopMult = input.float(0.0, "Short stop N x ATR (0 = same as longs)", minval = 0, step = 0.5, group = grpS)
+
+grpQ = "Only the best trades"
+confirmBars = input.int(2, "Wait N bars after the cross (0 = enter on the cross)", minval = 0, maxval = 10, group = grpQ,
+     tooltip = "After the cross, the MACD must stay on the right side of its signal line and the histogram must grow on each of these bars. Crosses that fizzle are skipped.")
+reqHigher = input.bool(true, "Higher timeframes must agree", group = grpQ,
+     tooltip = "At entry, the MACD on these timeframes (last finished bar) must be above its signal line for a buy, below for a short. Only timeframes longer than the chart count.")
+htfA = input.timeframe("240", "Higher timeframe 1", group = grpQ)
+htfB = input.timeframe("D", "Higher timeframe 2", group = grpQ)
 
 grpL = "Lower timeframes"
 confirmMin = input.int(0, "How many must agree (0 = just show the count)", minval = 0, maxval = 3, group = grpL,
@@ -104,6 +114,26 @@ lowerTf(simple string tf) =>
                     break
     d
 
+// Higher timeframes: +1 MACD above its signal line, -1 below, on the last FINISHED higher bar.
+higherDir() =>
+    [m, s, h] = ta.macd(close, fastLen, slowLen, sigLen)
+    m > s ? 1 : m < s ? -1 : 0
+
+higherTf(simple string tf) =>
+    int d = na
+    if timeframe.in_seconds(tf) > timeframe.in_seconds()
+        d := request.security(syminfo.tickerid, tf, higherDir()[1], lookahead = barmerge.lookahead_on)
+    d
+
+isHigher(simple string tf) => timeframe.in_seconds(tf) > timeframe.in_seconds() ? 1 : 0
+hA = higherTf(htfA)
+hB = higherTf(htfB)
+higherCount = isHigher(htfA) + isHigher(htfB)
+higherUp = (hA == 1 ? 1 : 0) + (hB == 1 ? 1 : 0)
+higherDown = (hA == -1 ? 1 : 0) + (hB == -1 ? 1 : 0)
+higherOkLong = not reqHigher or higherUp >= higherCount
+higherOkShort = not reqHigher or higherDown >= higherCount
+
 isLower(simple string tf) => timeframe.in_seconds(tf) < timeframe.in_seconds() ? 1 : 0
 dA = lowerTf(tfA)
 dB = lowerTf(tfB)
@@ -116,23 +146,33 @@ needed = math.min(confirmMin, lowerCount)
 // ---------- Entry rules ----------
 depthOkLong = minDepthAtr <= 0 ? macdLine < 0 : macdLine < -minDepthAtr * atrVal
 depthOkShort = minDepthAtr <= 0 ? macdLine > 0 : macdLine > minDepthAtr * atrVal
-trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or depthOkLong) : zeroUp
+crossNow = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or depthOkLong) : zeroUp
+// Wait confirmBars bars: MACD still above its signal line and the histogram growing on each.
+// (ta.* calls sit on their own lines so they run on every bar.)
+heldUp = macdLine > signalLine and hist > hist[1] ? 1 : 0
+barsSinceUp = ta.barssince(crossNow)
+heldUpSum = math.sum(heldUp, math.max(confirmBars, 1))
+trigger = confirmBars == 0 ? crossNow : barsSinceUp == confirmBars and heldUpSum == confirmBars
 trendOk = emaSide == "Off" ? true : emaSide == "Below" ? close < trendEma : close > trendEma
 runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
 warm = bar_index > 2 * slowLen
 allowLong = direction != "Short only"
 allowShort = direction != "Long only"
-buySignal = allowLong and trigger and trendOk and runOk and upCount >= needed and warm and time >= startDate
+buySignal = allowLong and trigger and higherOkLong and trendOk and runOk and upCount >= needed and warm and time >= startDate
 
 // Short: the same rule upside down.
-triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
+crossNowS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
+heldDown = macdLine < signalLine and hist < hist[1] ? 1 : 0
+barsSinceDown = ta.barssince(crossNowS)
+heldDownSum = math.sum(heldDown, math.max(confirmBars, 1))
+triggerS = confirmBars == 0 ? crossNowS : barsSinceDown == confirmBars and heldDownSum == confirmBars
 mirrorSide = emaSide == "Below" ? "Above" : emaSide == "Above" ? "Below" : "Off"
 sSide = shortSide == "Mirror of longs" ? mirrorSide : shortSide == "Above their 200 EMA" ? "Above" :
      shortSide == "Below their 200 EMA" ? "Below" : "Off"
 trendOkS = sSide == "Off" ? true : sSide == "Above" ? close > trendEma : close < trendEma
 marketOk = not useMarket or marketDown
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
-shortSignal = allowShort and triggerS and trendOkS and runOkS and marketOk and downCount >= needed and warm and time >= startDate
+shortSignal = allowShort and triggerS and higherOkShort and trendOkS and runOkS and marketOk and downCount >= needed and warm and time >= startDate
 
 // Crosses the buffer threw away (everything else passed), so you can see what it removed.
 inTest = warm and time >= startDate and entryMode == "Signal-line cross" and needBelowZero and minDepthAtr > 0
@@ -224,11 +264,13 @@ plotshape(skippedLong, "Skipped buy: too close to zero", style = shape.xcross, l
 plotshape(skippedShort, "Skipped short: too close to zero", style = shape.xcross, location = location.abovebar, color = color.gray, size = size.tiny)
 
 // Lower-timeframe agreement right now, top right of the chart.
-var table info = table.new(position.top_right, 2, 3, bgcolor = color.new(color.black, 30))
+var table info = table.new(position.top_right, 2, 4, bgcolor = color.new(color.black, 30))
 if barstate.islast
     table.cell(info, 0, 0, "Lower TFs up", text_color = color.white)
     table.cell(info, 1, 0, str.tostring(upCount) + "/" + str.tostring(lowerCount), text_color = upCount >= 2 ? color.lime : color.white)
     table.cell(info, 0, 1, "Lower TFs down", text_color = color.white)
     table.cell(info, 1, 1, str.tostring(downCount) + "/" + str.tostring(lowerCount), text_color = downCount >= 2 ? color.fuchsia : color.white)
+    table.cell(info, 0, 3, "Higher TFs up / down", text_color = color.white)
+    table.cell(info, 1, 3, str.tostring(higherUp) + "/" + str.tostring(higherCount) + "  " + str.tostring(higherDown) + "/" + str.tostring(higherCount), text_color = color.white)
     table.cell(info, 0, 2, "Shorts allowed", text_color = color.white)
     table.cell(info, 1, 2, not allowShort ? "off" : marketOk ? "yes" : "no: market up", text_color = marketOk ? color.fuchsia : color.gray)

@@ -36,6 +36,8 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 |---|---|---|
 | Chart | 2h bars (1h, 4h and daily also supported) | `--interval` |
 | Entry | MACD line crosses above its signal line **while under zero**, and price is **below the 200 EMA** | `config.py` → `Strategy` |
+| Confirmation | **Don't enter on the cross.** Wait 2 bars: the MACD must stay above its signal line and the histogram must grow on both. Crosses that fizzle straight away are skipped | `confirm_bars` |
+| Higher timeframes | **The 4h and daily MACDs must agree**: above their signal lines for a buy, below for a short (last finished bar). Only timeframes longer than the chart count | `higher_tfs`, `require_higher` |
 | Buffer | Off: any cross under zero counts. Can require the cross to be N × ATR(14) below zero | `min_macd_depth_atr`, `--buffer` |
 | Lower timeframes | Counts how many of **15m / 30m / 45m** agree (their MACD above its signal line and histogram rising). Shown on every trade; doesn't block trades unless you ask | `confirm_min`, `--mtf` |
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe (what a "200" EMA on a 2h chart shows, about 50 trading days) is tested as a variant | `trend_ma_source` |
@@ -101,6 +103,9 @@ short, so treat the backtest as a test of the signal, not of those instruments.
 | Variant | What it tests |
 |---|---|
 | Dip buy, below 200-day EMA | The default above: hold until the sell setup |
+| Enter on the cross (no 2-bar wait) | Is waiting for confirmation worth it? |
+| No higher-timeframe check | Does making the 4h and daily agree help? |
+| Neither filter (as before) | Both filters off: more trades, lower quality? |
 | Old exits: 2R target, any MACD cross back, 15 days | The earlier, quicker exits, to see how much letting winners run changes |
 | Sell setup exit + 3 ATR trailing stop | The default, plus a stop that follows price up (gives back less, but can exit earlier) |
 | 3 ATR trailing stop only | No MACD exit at all: ride until a 3 ATR pullback from the best close |
@@ -126,7 +131,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "53 passed"
+python -m pytest -q tests        # should print "58 passed"
 ```
 
 ## Run the backtest
@@ -226,6 +231,15 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Classic 12/26/9 | Slow length: **26**; untick "must happen under zero"; Price must be: **Above** |
 | Long only | Entry → Trades to take: **Long only** |
 | Short only | Entry → Trades to take: **Short only** |
+
+**Your MACD panel must be 12/144/9 to match the strategy.** TradingView's built-in MACD defaults to
+12/26/9, a much faster indicator whose crosses the strategy never sees. Open the MACD indicator's
+settings and set Slow length to 144.
+
+**Fewer, better trades:** by default the strategy waits 2 bars after a cross (both must confirm) and
+needs the 4h and daily MACDs to point the same way. The box at the top right shows "Higher TFs up /
+down" right now. To compare, set **Only the best trades → Wait N bars** to 0, or untick **Higher
+timeframes must agree**.
 
 Short signals show as pink triangles above the bar; buy signals as teal triangles below. The red line
 is the stop while a trade is open. With the buffer on, grey crosses mark signals it skipped.

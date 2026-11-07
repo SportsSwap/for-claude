@@ -39,7 +39,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d", market=None: df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d", market=None, higher=None: df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -213,7 +213,7 @@ def test_200_day_ema_on_intraday_bars_uses_yesterdays_value():
 def test_zero_line_cross_and_price_not_run_filter():
     close = np.r_[np.linspace(300, 200, 300), np.linspace(200, 260, 150)]
     df = ohlc(close, pd.bdate_range("2022-01-03", periods=len(close)))
-    zero = replace(DEFAULT_STRATEGY, entry="zero_cross", require_below_zero=False, trend_ma=None)
+    zero = replace(DEFAULT_STRATEGY, entry="zero_cross", require_below_zero=False, trend_ma=None, confirm_bars=0)
     d = add_signals(df, zero)
     hits = d[d.entry_signal]
     assert len(hits) == 1
@@ -608,3 +608,70 @@ def test_short_stop_can_differ_from_long_stop(fake_signals):
     df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, FLAT], signal_days=[0])
     t = backtest.run({"X": df}, replace(SHORT, short_stop_atr_mult=4.0), NO_BORROW).trades.iloc[0]
     assert t.stop == 105                                      # 101 + 4 x ATR(1), not the 2 ATR long stop
+
+
+
+# --- Only the best trades: wait for confirmation, higher timeframes must agree ---
+
+def dip_and_bounce():
+    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 230, 25)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    return ohlc(close, idx)
+
+
+def test_entry_waits_for_confirmation_bars():
+    df = dip_and_bounce()
+    now = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=0), daily=df)
+    wait = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=2), daily=df)
+    i_now = now.index.get_loc(now[now.entry_signal].index[0])
+    i_wait = wait.index.get_loc(wait[wait.entry_signal].index[0])
+    assert i_wait == i_now + 2
+    # Both bars after the cross: MACD still above its signal line and the histogram growing.
+    for j in (i_now + 1, i_now + 2):
+        assert wait.macd.iloc[j] > wait.macd_signal.iloc[j] and wait.macd_hist.iloc[j] > wait.macd_hist.iloc[j - 1]
+
+
+def test_cross_that_fizzles_is_skipped():
+    from strategy import confirmed_after
+    idx = pd.bdate_range("2024-01-01", periods=6)
+    df = pd.DataFrame({"macd": [-5, -4, -3.5, -3.6, -3, -2], "macd_signal": [-4, -4.1, -3.8, -3.5, -3.4, -3.3]}, index=idx)
+    df["macd_hist"] = df.macd - df.macd_signal
+    trigger = pd.Series([False, True, False, False, False, False], index=idx)   # cross up on day 1
+    # Day 3 the MACD drops back under its signal line: no entry.
+    assert not confirmed_after(trigger, df, 2, 1).any()
+    assert confirmed_after(trigger, df, 1, 1).tolist() == [False, False, True, False, False, False]
+
+
+def test_higher_timeframes_must_agree():
+    from strategy import higher_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    days = pd.bdate_range("2024-01-01", periods=40)
+    up_daily = ohlc(np.linspace(100, 200, 40) ** 1.5, days)            # daily MACD above signal
+    dn_daily = ohlc(300 - np.arange(40) ** 2 / 8, days)                # accelerating fall
+    chart = session_bars(days[-1], 120, [1.0, 2, 3, 4])                # 2h bars on the last day
+    up = higher_tf_agreement(chart, "2h", {"1d": up_daily}, s)
+    dn = higher_tf_agreement(chart, "2h", {"1d": dn_daily}, s)
+    assert (up.htf_max == 2).all() and (up.htf_up == 1).all() and (dn.htf_down == 1).all()
+
+
+def test_higher_timeframe_uses_only_finished_bars():
+    from strategy import higher_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    days = pd.bdate_range("2024-01-01", periods=40)
+    close = np.linspace(100, 200, 40) ** 1.5
+    close[-1] = 1.0                                                    # today's daily bar crashes
+    daily = ohlc(close, days)
+    chart = session_bars(days[-1], 120, [1.0, 2, 3, 4])
+    out = higher_tf_agreement(chart, "2h", {"1d": daily}, s)
+    # Today's daily bar isn't finished during today's 2h bars, so yesterday's (rising) one is used.
+    assert (out.htf_up == 1).all()
+
+
+def test_missing_higher_data_blocks_entries_on_intraday_charts():
+    days = pd.bdate_range("2023-01-02", periods=200)
+    times = [d + pd.Timedelta(hours=h, minutes=30) for d in days for h in (9, 11, 13, 15)]
+    close = np.r_[np.linspace(300, 300, 400), np.linspace(300, 200, 300), np.linspace(200, 260, 100)]
+    df = ohlc(close, pd.DatetimeIndex(times))
+    s = replace(DEFAULT_STRATEGY, trend_ma=None, sides="long")
+    assert add_signals(df, replace(s, require_higher=False), interval="2h").entry_signal.any()
+    assert not add_signals(df, s, interval="2h").entry_signal.any()

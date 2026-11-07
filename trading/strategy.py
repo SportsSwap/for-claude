@@ -60,13 +60,55 @@ def market_downtrend(market: pd.DataFrame, s: Strategy, index: pd.DatetimeIndex)
                      index=index)
 
 
+def higher_tf_agreement(chart: pd.DataFrame, interval: str, higher: dict[str, pd.DataFrame],
+                        s: Strategy) -> pd.DataFrame:
+    """For each chart bar, count the higher timeframes whose MACD is above (up) or below (down)
+    its signal line, using the last higher bar that had FINISHED before this chart bar started
+    (the same bar TradingView gives with [1] and lookahead on). htf_max: how many could agree."""
+    usable = [tf for tf in s.higher_tfs if bar_minutes(tf) > bar_minutes(interval)]
+    out = pd.DataFrame({"htf_up": 0, "htf_down": 0, "htf_max": len(usable)}, index=chart.index)
+    left = pd.DataFrame({"t": chart.index.to_numpy(), "i": range(len(chart))}).sort_values("t")
+    for tf in usable:
+        bars = higher.get(tf)
+        if bars is None or bars.empty:
+            continue
+        m = macd(bars["Close"], s.macd_fast, s.macd_slow, s.macd_signal)
+        ready = (pd.Series(range(len(bars))) >= 2 * s.macd_slow).to_numpy()
+        lo = pd.DataFrame({"t": bar_ends(bars.index, tf),
+                           "up": pd.Series((m["macd"] > m["macd_signal"]).to_numpy(), dtype=float).where(ready).to_numpy(),
+                           "down": pd.Series((m["macd"] < m["macd_signal"]).to_numpy(), dtype=float).where(ready).to_numpy()}
+                          ).sort_values("t")
+        hit = pd.merge_asof(left, lo, on="t", direction="backward",
+                            tolerance=pd.Timedelta(days=6)).sort_values("i")
+        out["htf_up"] += (hit["up"] == 1).to_numpy().astype(int)
+        out["htf_down"] += (hit["down"] == 1).to_numpy().astype(int)
+    return out
+
+
+def confirmed_after(trigger: pd.Series, df: pd.DataFrame, n: int, side: int) -> pd.Series:
+    """Fire n bars after the trigger, only if on each of those n bars the MACD stayed on the
+    right side of its signal line and the histogram grew (shrank, for shorts)."""
+    if n <= 0:
+        return trigger
+    if side > 0:
+        held = (df["macd"] > df["macd_signal"]) & (df["macd_hist"] > df["macd_hist"].shift(1))
+    else:
+        held = (df["macd"] < df["macd_signal"]) & (df["macd_hist"] < df["macd_hist"].shift(1))
+    out = trigger.shift(n, fill_value=False).astype(bool)
+    for j in range(n):
+        out &= held.shift(j, fill_value=False).astype(bool)
+    return out
+
+
 def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = None,
                 lower: dict[str, pd.DataFrame] | None = None, interval: str = "1d",
-                market: pd.DataFrame | None = None) -> pd.DataFrame:
+                market: pd.DataFrame | None = None,
+                higher: dict[str, pd.DataFrame] | None = None) -> pd.DataFrame:
     """prices: bars of the chart timeframe. daily: daily bars of the same stock, needed
     for a 200-day average on an intraday chart. Without it the average is taken over bars.
     lower: {"15m": bars, ...} for the lower-timeframe check; interval: the chart's bar size.
-    market: daily bars of the index in s.short_market_filter (QQQ) for the short market filter."""
+    market: daily bars of the index in s.short_market_filter (QQQ) for the short market filter.
+    higher: {"4h": bars, "1d": bars} for the higher-timeframe check."""
     df = prices.copy()
     df = df.join(macd(df["Close"], s.macd_fast, s.macd_slow, s.macd_signal))
     df["atr"] = atr(df, s.atr_period)
@@ -75,6 +117,7 @@ def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = 
     df["depth_atr"] = df["macd"] / df["atr"]
     if lower:
         df = df.join(lower_tf_agreement(df, interval, lower, s))
+    df = df.join(higher_tf_agreement(df, interval, higher or {}, s))
 
     above = df["macd"] > df["macd_signal"]
     was_above = above.shift(1, fill_value=False)
@@ -124,6 +167,9 @@ def _long_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
         entry = df["zero_cross_up"].copy()
     else:
         raise ValueError(f"unknown entry type {s.entry!r}")
+    entry = confirmed_after(entry, df, s.confirm_bars, 1)
+    if s.require_higher:
+        entry &= df["htf_up"] >= df["htf_max"]
     if s.trend_ma:
         entry &= df["Close"] < df["trend_ma"] if s.trend_side == "below" else df["Close"] > df["trend_ma"]
     if s.max_run_atr is not None:
@@ -154,6 +200,9 @@ def _short_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
         entry = df["zero_cross_down"].copy()
     else:
         raise ValueError(f"unknown entry type {s.entry!r}")
+    entry = confirmed_after(entry, df, s.confirm_bars, -1)
+    if s.require_higher:
+        entry &= df["htf_down"] >= df["htf_max"]
     side = s.short_trend_side or ("above" if s.trend_side == "below" else "below")
     if s.trend_ma and side == "above":
         entry &= df["Close"] > df["trend_ma"]

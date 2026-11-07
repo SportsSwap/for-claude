@@ -64,6 +64,17 @@ class Strategy:
     # any cross under zero counts.
     min_macd_depth_atr: float = 0.0
 
+    # Confirmation: don't enter on the cross itself. Wait this many bars; the MACD must stay on the
+    # right side of its signal line AND the histogram must grow on every one of them. Crosses that
+    # fizzle straight away (chop) are skipped. 0 = enter on the cross.
+    confirm_bars: int = 2
+
+    # Higher timeframes must agree: at entry, the MACD (same 12/144/9) on each of these timeframes
+    # must be above its signal line for a long (below for a short), using the last FINISHED bar
+    # of that timeframe. Only timeframes longer than the chart count (on a 4h chart only 1d).
+    higher_tfs: tuple[str, ...] = ("4h", "1d")
+    require_higher: bool = True
+
     # Lower-timeframe check. A lower timeframe "agrees" with a buy when its own MACD
     # (same 12/144/9 settings) is above its signal line AND its histogram rose on its last
     # closed bar (mirror for shorts). Only timeframes shorter than the chart's count.
@@ -146,6 +157,9 @@ _D = DEFAULT_STRATEGY
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
 VARIANTS = [
     _D,
+    replace(_D, name="Enter on the cross (no 2-bar wait)", confirm_bars=0),
+    replace(_D, name="No higher-timeframe check", require_higher=False),
+    replace(_D, name="Neither filter (as before)", confirm_bars=0, require_higher=False),
     replace(_D, name="Old exits: 2R target, any MACD cross back, 15 days", target_r=2.0,
             macd_exit="any", max_hold_days=15),
     replace(_D, name="Sell setup exit + 3 ATR trailing stop", trail_atr_mult=3.0),

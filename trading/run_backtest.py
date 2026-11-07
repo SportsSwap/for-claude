@@ -63,6 +63,8 @@ def main():
     prices = data.load(args.tickers, daily_start, args.interval, args.refresh, args.offline) if intraday else daily
     bench = data.load(BENCHMARKS, daily_start, "1d", args.refresh, args.offline)
     market = bench.get("QQQ")
+    higher = data.load_higher(args.tickers, daily_start, args.interval, DEFAULT_STRATEGY.higher_tfs,
+                              daily, args.refresh, args.offline)
     if market is None:
         print("Warning: no QQQ prices, so the short market filter blocks every short.")
     if not prices:
@@ -106,7 +108,7 @@ def main():
     rows, first_day = [], None
     for s in strategies:
         res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None, lower, args.interval,
-                           market)
+                           market, higher)
         st = backtest.stats(res)
         rows.append(st)
         if not res.equity.empty:

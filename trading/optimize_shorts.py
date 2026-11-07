@@ -62,6 +62,8 @@ def main():
     daily = data.load(tickers, daily_start, "1d", args.refresh, args.offline)
     prices = data.load(tickers, daily_start, args.interval, args.refresh, args.offline) if intraday else daily
     market = data.load(["QQQ"], daily_start, "1d", args.refresh, args.offline).get("QQQ")
+    higher = data.load_higher(tickers, daily_start, args.interval, DEFAULT_STRATEGY.higher_tfs, daily,
+                              args.refresh, args.offline)
     if not prices or market is None:
         raise SystemExit("Need stock prices and QQQ. Check your internet connection or the cache folder.")
 
@@ -73,7 +75,7 @@ def main():
 
     def run(s, a, b):
         res = backtest.run(prices, s, DEFAULT_RISK, str(a.date()), str(b.date()),
-                           daily if intraday else None, None, args.interval, market)
+                           daily if intraday else None, None, args.interval, market, higher)
         return res
 
     rows = []

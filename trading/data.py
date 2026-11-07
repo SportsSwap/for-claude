@@ -117,6 +117,19 @@ def load(tickers: list[str], start: str = "2015-01-01", interval: str = "1d",
     return out
 
 
+def load_higher(tickers: list[str], start: str, interval: str, tfs: tuple[str, ...],
+                daily: dict[str, pd.DataFrame] | None = None, refresh: bool = False, offline: bool = False,
+                cache_dir: Path | None = None) -> dict[str, dict[str, pd.DataFrame]]:
+    """Bars of the timeframes in tfs that are longer than the chart's, as {ticker: {"4h": bars, ...}}.
+    Pass the daily bars you already loaded to avoid loading them twice."""
+    frames = {}
+    for tf in tfs:
+        if bar_minutes(tf) <= bar_minutes(interval):
+            continue
+        frames[tf] = daily if tf == "1d" and daily is not None else load(tickers, start, tf, refresh, offline, cache_dir)
+    return {t: {tf: by_t[t] for tf, by_t in frames.items() if t in by_t} for t in tickers}
+
+
 def load_lower(tickers: list[str], start: str, refresh: bool = False, offline: bool = False,
                cache_dir: Path | None = None) -> dict[str, dict[str, pd.DataFrame]]:
     """15m, 30m and 45m bars for the lower-timeframe check, as {ticker: {"15m": bars, ...}}.
