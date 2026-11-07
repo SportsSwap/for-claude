@@ -67,9 +67,14 @@ def main():
     elif s.confirm_min:
         raise SystemExit("--mtf needs an intraday --interval and can't be used with --no-mtf.")
 
+    market = None
+    if s.sides in ("short", "both") and s.short_market_filter:
+        market = data.load([s.short_market_filter], start, "1d", refresh=not args.offline,
+                           offline=args.offline).get(s.short_market_filter)
+
     signals, shorts, watch, watch_short = [], [], [], []
     for t, df in prices.items():
-        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None, lower.get(t), args.interval)
+        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None, lower.get(t), args.interval, market)
         last = d.iloc[-1]
         vs_ma = (last["Close"] / last["trend_ma"] - 1) * 100 if "trend_ma" in d and pd.notna(last["trend_ma"]) else None
         vs_ma = round(vs_ma, 1) if vs_ma is not None else None
@@ -77,7 +82,8 @@ def main():
             if not last[flag]:
                 continue
             entry = last["Close"]
-            stop = entry - side * s.stop_atr_mult * last["atr"]
+            mult = s.short_stop_atr_mult if side < 0 and s.short_stop_atr_mult else s.stop_atr_mult
+            stop = entry - side * mult * last["atr"]
             shares = position_size(args.equity, args.equity, entry, stop, r)
             out.append({
                 "ticker": t,
@@ -131,6 +137,14 @@ def main():
         else:
             print("\nNo buy signals.")
     if s.sides in ("short", "both"):
+        if s.short_market_filter:
+            if market is None:
+                print(f"\nNo {s.short_market_filter} prices: the market filter blocks all shorts.")
+            else:
+                ma = market["Close"].ewm(span=s.short_market_ma, adjust=False).mean()
+                state = "BELOW" if market["Close"].iloc[-1] < ma.iloc[-1] else "ABOVE"
+                print(f"\nMarket filter: {s.short_market_filter} is {state} its {s.short_market_ma}-day EMA"
+                      + (" -> shorts allowed." if state == "BELOW" else " -> no shorts until it drops below."))
         if shorts:
             print("\nSHORT SIGNALS (sell short at the next bar's open; the stop is ABOVE the entry):")
             print(pd.DataFrame(shorts).to_string(index=False))

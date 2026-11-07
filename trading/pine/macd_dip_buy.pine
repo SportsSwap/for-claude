@@ -1,6 +1,7 @@
 //@version=6
 // MACD 12/144/9 dip buy with a 200 EMA filter, plus an optional mirror-image short:
-// MACD crosses DOWN through its signal line while ABOVE zero, with price ABOVE the 200-day EMA.
+// MACD crosses DOWN through its signal line while ABOVE zero, with price ABOVE the 200-day EMA,
+// and by default only while the market (QQQ) is below its own 200-day EMA.
 // Exit: hold until the setup flips. A long sells when the MACD crosses DOWN while ABOVE zero (the
 // short setup); a short covers when it crosses UP while BELOW zero. No fixed target, no time limit.
 // Optional buffer: the cross must happen at least N ATRs away from zero (off by default).
@@ -33,6 +34,15 @@ emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
 emaSide = input.string("Below", "Price must be (longs; shorts use the opposite)", options = ["Below", "Above", "Off"], group = grpT)
 
+grpS = "Shorts"
+shortSide = input.string("Mirror of longs", "Short stocks that are", group = grpS,
+     options = ["Mirror of longs", "Above their 200 EMA", "Below their 200 EMA", "Either side"],
+     tooltip = "Mirror of longs: above the 200 EMA when longs need below (stretched up). Below: stocks already in a downtrend, shorting with the trend.")
+useMarket = input.bool(true, "Only short when the market is below its 200-day EMA", group = grpS)
+marketSym = input.symbol("NASDAQ:QQQ", "Market index", group = grpS)
+shortRiskMult = input.float(1.0, "Short size (x normal risk)", minval = 0.1, maxval = 1, step = 0.25, group = grpS)
+shortStopMult = input.float(0.0, "Short stop N x ATR (0 = same as longs)", minval = 0, step = 0.5, group = grpS)
+
 grpL = "Lower timeframes"
 confirmMin = input.int(0, "How many must agree (0 = just show the count)", minval = 0, maxval = 3, group = grpL,
      tooltip = "A lower timeframe agrees with a buy when its MACD is above its signal line and its histogram rose on its last closed bar (mirror for shorts). Only timeframes shorter than the chart count.")
@@ -63,6 +73,8 @@ chartEma = ta.ema(close, emaLen)
 // Yesterday's daily 200 EMA: the value you could actually see before today's open (no repainting).
 dailyEma = request.security(syminfo.tickerid, "D", ta.ema(close, emaLen)[1], lookahead = barmerge.lookahead_on)
 trendEma = emaSource == "Daily" ? dailyEma : chartEma
+// Market filter: was the index below its 200-day EMA at yesterday's close? (known before today's open)
+marketDown = request.security(marketSym, "D", close[1] < ta.ema(close, 200)[1], lookahead = barmerge.lookahead_on)
 
 crossUp = ta.crossover(macdLine, signalLine)
 crossDown = ta.crossunder(macdLine, signalLine)
@@ -114,9 +126,13 @@ buySignal = allowLong and trigger and trendOk and runOk and upCount >= needed an
 
 // Short: the same rule upside down.
 triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
-trendOkS = emaSide == "Off" ? true : emaSide == "Below" ? close > trendEma : close < trendEma
+mirrorSide = emaSide == "Below" ? "Above" : emaSide == "Above" ? "Below" : "Off"
+sSide = shortSide == "Mirror of longs" ? mirrorSide : shortSide == "Above their 200 EMA" ? "Above" :
+     shortSide == "Below their 200 EMA" ? "Below" : "Off"
+trendOkS = sSide == "Off" ? true : sSide == "Above" ? close > trendEma : close < trendEma
+marketOk = not useMarket or marketDown
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
-shortSignal = allowShort and triggerS and trendOkS and runOkS and downCount >= needed and warm and time >= startDate
+shortSignal = allowShort and triggerS and trendOkS and runOkS and marketOk and downCount >= needed and warm and time >= startDate
 
 // Crosses the buffer threw away (everything else passed), so you can see what it removed.
 inTest = warm and time >= startDate and entryMode == "Signal-line cross" and needBelowZero and minDepthAtr > 0
@@ -132,6 +148,10 @@ stopDist = stopMult * atrVal
 qtyRisk = strategy.equity * riskPct / 100 / stopDist
 qtyCap = strategy.equity * maxPosPct / 100 / close
 qty = math.floor(math.min(qtyRisk, qtyCap) * 10000) / 10000
+// Shorts can use their own stop distance and a smaller size.
+stopDistS = (shortStopMult > 0 ? shortStopMult : stopMult) * atrVal
+qtyRiskS = strategy.equity * riskPct * shortRiskMult / 100 / stopDistS
+qtyS = math.floor(math.min(qtyRiskS, qtyCap) * 10000) / 10000
 
 var float tradeStopDist = na
 pos = strategy.position_size
@@ -155,18 +175,17 @@ shortExit = pos >= 0 ? "" : crossUp and exitMode == SELL_SETUP and macdLine < 0 
 // ---------- Entries ----------
 // A new trade needs no open position, or the open one exits on this bar: the sell setup that ends
 // a long is also a short signal, so the long flips straight into a short (one order does both).
-canEnter = not killed and qty > 0
-goLong = buySignal and canEnter and (pos == 0 or shortExit != "")
-goShort = not goLong and shortSignal and canEnter and (pos == 0 or longExit != "")
+goLong = buySignal and not killed and qty > 0 and (pos == 0 or shortExit != "")
+goShort = not goLong and shortSignal and not killed and qtyS > 0 and (pos == 0 or longExit != "")
 if goLong
     tradeStopDist := stopDist
     strategy.entry("Long", strategy.long, qty = qty, comment = "Long " + str.tostring(upCount) + "/" + str.tostring(lowerCount))
     strategy.exit("Exit Long", "Long", loss = stopDist / syminfo.mintick, profit = targetR > 0 ? stopDist / syminfo.mintick * targetR : na)
     alert("MACD buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 if goShort
-    tradeStopDist := stopDist
-    strategy.entry("Short", strategy.short, qty = qty, comment = "Short " + str.tostring(downCount) + "/" + str.tostring(lowerCount))
-    strategy.exit("Exit Short", "Short", loss = stopDist / syminfo.mintick, profit = targetR > 0 ? stopDist / syminfo.mintick * targetR : na)
+    tradeStopDist := stopDistS
+    strategy.entry("Short", strategy.short, qty = qtyS, comment = "Short " + str.tostring(downCount) + "/" + str.tostring(lowerCount))
+    strategy.exit("Exit Short", "Short", loss = stopDistS / syminfo.mintick, profit = targetR > 0 ? stopDistS / syminfo.mintick * targetR : na)
     alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 if longExit != "" and not goShort
     strategy.close("Long", comment = longExit)
@@ -205,9 +224,11 @@ plotshape(skippedLong, "Skipped buy: too close to zero", style = shape.xcross, l
 plotshape(skippedShort, "Skipped short: too close to zero", style = shape.xcross, location = location.abovebar, color = color.gray, size = size.tiny)
 
 // Lower-timeframe agreement right now, top right of the chart.
-var table info = table.new(position.top_right, 2, 2, bgcolor = color.new(color.black, 30))
+var table info = table.new(position.top_right, 2, 3, bgcolor = color.new(color.black, 30))
 if barstate.islast
     table.cell(info, 0, 0, "Lower TFs up", text_color = color.white)
     table.cell(info, 1, 0, str.tostring(upCount) + "/" + str.tostring(lowerCount), text_color = upCount >= 2 ? color.lime : color.white)
     table.cell(info, 0, 1, "Lower TFs down", text_color = color.white)
     table.cell(info, 1, 1, str.tostring(downCount) + "/" + str.tostring(lowerCount), text_color = downCount >= 2 ? color.fuchsia : color.white)
+    table.cell(info, 0, 2, "Shorts allowed", text_color = color.white)
+    table.cell(info, 1, 2, not allowShort ? "off" : marketOk ? "yes" : "no: market up", text_color = marketOk ? color.fuchsia : color.gray)

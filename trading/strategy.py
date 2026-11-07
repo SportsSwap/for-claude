@@ -50,11 +50,23 @@ def lower_tf_agreement(chart: pd.DataFrame, interval: str, lower: dict[str, pd.D
     return out
 
 
+def market_downtrend(market: pd.DataFrame, s: Strategy, index: pd.DatetimeIndex) -> pd.Series:
+    """True on bars where the market index closed below its N-day EMA YESTERDAY (known before
+    today's open). Bars with no market data count as False: no shorts when we can't check."""
+    ma = ema(market["Close"], s.short_market_ma)
+    down = (market["Close"] < ma).shift(1)
+    down.iloc[:s.short_market_ma] = False
+    return pd.Series(down.reindex(index.normalize(), method="ffill").fillna(False).astype(bool).to_numpy(),
+                     index=index)
+
+
 def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = None,
-                lower: dict[str, pd.DataFrame] | None = None, interval: str = "1d") -> pd.DataFrame:
+                lower: dict[str, pd.DataFrame] | None = None, interval: str = "1d",
+                market: pd.DataFrame | None = None) -> pd.DataFrame:
     """prices: bars of the chart timeframe. daily: daily bars of the same stock, needed
     for a 200-day average on an intraday chart. Without it the average is taken over bars.
-    lower: {"15m": bars, ...} for the lower-timeframe check; interval: the chart's bar size."""
+    lower: {"15m": bars, ...} for the lower-timeframe check; interval: the chart's bar size.
+    market: daily bars of the index in s.short_market_filter (QQQ) for the short market filter."""
     df = prices.copy()
     df = df.join(macd(df["Close"], s.macd_fast, s.macd_slow, s.macd_signal))
     df["atr"] = atr(df, s.atr_period)
@@ -95,7 +107,11 @@ def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = 
 
     no = pd.Series(False, index=df.index)
     df["entry_signal"] = finish(_long_entry(df, s)) if s.sides in ("long", "both") else no
-    df["short_signal"] = finish(_short_entry(df, s)) if s.sides in ("short", "both") else no
+    short = _short_entry(df, s) if s.sides in ("short", "both") else no
+    if s.short_market_filter:
+        df["market_down"] = market_downtrend(market, s, df.index) if market is not None else False
+        short = short & df["market_down"]
+    df["short_signal"] = finish(short)
     return df
 
 
@@ -138,8 +154,11 @@ def _short_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
         entry = df["zero_cross_down"].copy()
     else:
         raise ValueError(f"unknown entry type {s.entry!r}")
-    if s.trend_ma:
-        entry &= df["Close"] > df["trend_ma"] if s.trend_side == "below" else df["Close"] < df["trend_ma"]
+    side = s.short_trend_side or ("above" if s.trend_side == "below" else "below")
+    if s.trend_ma and side == "above":
+        entry &= df["Close"] > df["trend_ma"]
+    elif s.trend_ma and side == "below":
+        entry &= df["Close"] < df["trend_ma"]
     if s.max_run_atr is not None:
         entry &= df["run_atr_down"] <= s.max_run_atr
     return entry & _confirmed(df, s, "mtf_down")

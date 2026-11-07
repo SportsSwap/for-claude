@@ -20,7 +20,7 @@ from strategy import add_signals  # noqa: E402
 NO_COSTS = replace(DEFAULT_RISK, slippage_pct=0.0, commission_min=0.0, commission_per_share=0.0)
 # Mechanics tests use simple fixed exits: 2-ATR stop, 2R target, nothing else.
 S = replace(DEFAULT_STRATEGY, macd_exit="off", max_hold_days=None, stop_atr_mult=2.0, target_r=2.0,
-            trail_atr_mult=None)
+            trail_atr_mult=None, short_market_filter=None)
 CLASSIC = replace(DEFAULT_STRATEGY, macd_slow=26, require_below_zero=False, trend_ma=None)
 
 
@@ -39,7 +39,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d": df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d", market=None: df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -284,7 +284,7 @@ def test_short_signal_is_the_mirror_of_the_dip_buy():
     assert not add_signals(df, SHORT, daily=high_daily).short_signal.any()
     # Long-only mode never shorts; the default (both sides) does.
     assert not add_signals(df, replace(DEFAULT_STRATEGY, sides="long"), daily=df).short_signal.any()
-    assert add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
+    assert add_signals(df, replace(DEFAULT_STRATEGY, short_market_filter=None), daily=df).short_signal.any()
 
 
 def test_short_entry_stop_above_and_stop_hit(fake_signals):
@@ -555,3 +555,56 @@ def test_sell_setup_flips_long_into_short(fake_signals):
 
 def test_default_takes_both_sides():
     assert DEFAULT_STRATEGY.sides == "both"
+
+
+
+# --- Fixing shorts: market filter, which stocks to short, smaller size ---
+
+def rollover():
+    close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    return ohlc(close, idx)
+
+
+def test_market_filter_blocks_shorts_in_a_bull_market():
+    df = rollover()
+    on = replace(SHORT, short_market_filter="QQQ")
+    bull = ohlc(np.linspace(100, 300, len(df)), df.index)              # QQQ rising: above its EMA
+    bear = ohlc(np.linspace(300, 100, len(df)), df.index)              # QQQ falling: below its EMA
+    assert not add_signals(df, on, daily=df, market=bull).short_signal.any()
+    assert add_signals(df, on, daily=df, market=bear).short_signal.any()
+    assert not add_signals(df, on, daily=df).short_signal.any()        # no market data: no shorts
+    # Longs are never affected by the market filter.
+    assert add_signals(df, on, daily=df, market=bull).entry_signal.sum() == \
+        add_signals(df, replace(on, short_market_filter=None), daily=df).entry_signal.sum()
+
+
+def test_market_filter_uses_yesterdays_close():
+    from strategy import market_downtrend
+    s = replace(DEFAULT_STRATEGY, short_market_ma=3)
+    idx = pd.bdate_range("2024-01-01", periods=8)
+    qqq = ohlc([10, 10, 10, 10, 10, 1, 1, 1], idx)                     # drops below its EMA on day 5
+    down = market_downtrend(qqq, s, idx)
+    assert not down.iloc[5] and down.iloc[6]                           # known only the next day
+
+
+def test_short_trend_side_options():
+    df = rollover()
+    base = add_signals(df, replace(SHORT, short_trend_side="off"), daily=df)
+    assert base.short_signal.any()
+    low_daily = ohlc(np.full(len(df), 1000.0), df.index)               # stock far below its "EMA"
+    assert not add_signals(df, replace(SHORT, short_trend_side="above"), daily=low_daily).short_signal.any()
+    assert add_signals(df, replace(SHORT, short_trend_side="below"), daily=low_daily).short_signal.any()
+
+
+def test_short_risk_mult_halves_short_size(fake_signals):
+    df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, (100, 111.5, 100, 111)], signal_days=[0], atr=5.0)
+    full = backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0]
+    half = backtest.run({"X": df}, replace(SHORT, short_risk_mult=0.5), NO_BORROW).trades.iloc[0]
+    assert half.pnl == pytest.approx(full.pnl / 2, abs=0.01)
+
+
+def test_short_stop_can_differ_from_long_stop(fake_signals):
+    df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, FLAT], signal_days=[0])
+    t = backtest.run({"X": df}, replace(SHORT, short_stop_atr_mult=4.0), NO_BORROW).trades.iloc[0]
+    assert t.stop == 105                                      # 101 + 4 x ATR(1), not the 2 ATR long stop

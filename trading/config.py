@@ -80,6 +80,20 @@ class Strategy:
     trend_side: str = "below"           # longs: price must be "below" or "above" the average
                                         # (shorts use the opposite side)
 
+    # Shorts.
+    # Which side of its own 200-day EMA a stock must be on to be shorted:
+    #   None = mirror of the long rule ("above" when longs need "below"): short stocks stretched up
+    #   "below" = short stocks already in a downtrend (with the trend); "off" = no EMA rule for shorts
+    short_trend_side: str | None = None
+    # Market filter: only short while this index is BELOW its N-day EMA (yesterday's values), i.e.
+    # the whole market is in a downtrend. Shorting in a bull market is what loses. None = off.
+    short_market_filter: str | None = "QQQ"
+    short_market_ma: int = 200
+    # Risk on shorts as a fraction of the normal risk per trade (0.5 = half size).
+    short_risk_mult: float = 1.0
+    # Stop distance for shorts in ATRs; None = same as longs (stop_atr_mult).
+    short_stop_atr_mult: float | None = None
+
     # "Price hasn't moved yet": skip the trade if price is already more than N ATRs
     # above its lowest low of the last run_lookback bars. None turns it off.
     max_run_atr: float | None = None

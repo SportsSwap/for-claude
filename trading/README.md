@@ -55,12 +55,28 @@ The short is the dip buy turned upside down, for stocks that have run too far up
 | Rule | Short |
 |---|---|
 | Entry | MACD line crosses **below** its signal line **while above zero**, and price is **above the 200-day EMA** |
+| Market filter | **Only while QQQ is below its own 200-day EMA** (yesterday's close). Shorting in a bull market is what loses money, so in an uptrending market there are no shorts at all |
 | Fill | Sell short at the open of the next bar |
 | Stop | Entry **+** 3 × ATR(14), above the entry |
 | Exit | **Hold until the buy setup:** the MACD crosses back above its signal line **while below zero** → buy to cover at the next bar's open |
 | Target / time limit | None, same as longs |
 | Size and limits | Same as longs: 2% risk, ~34% cap, and longs and shorts share the 3 position slots |
 | Extra cost | Stock-loan fee of 0.5% a year on the position's value (`short_borrow_pct_per_year`) |
+
+Short settings in `config.py` (and under **Shorts** in TradingView):
+
+| Setting | Options |
+|---|---|
+| `short_market_filter` | `"QQQ"` (default) or `None` to short in any market |
+| `short_trend_side` | mirror of longs (default: stock above its 200 EMA), `"below"` (short stocks already in a downtrend), `"off"` |
+| `short_stop_atr_mult` | a different stop for shorts, e.g. 2 or 4 ATR (default: same as longs) |
+| `short_risk_mult` | 0.5 = shorts risk half as much as longs |
+
+**Do shorts help? Run `python optimize_shorts.py`** (add `--interval 2h` or `--group ai` as usual). It
+tries every combination of the market filter, which stocks to short and the short stop, on the first
+70% of history, then shows how each did on the last 30% it never saw. A setting is only worth keeping if
+it makes money in both halves on 20+ trades; if none does, it tells you to trade long only. It ends by
+comparing long only vs long + short for the whole strategy.
 
 If more signals fire than there are free slots, longs with the highest
 20-bar momentum and shorts with the lowest win. In the backtest a short sets aside cash equal to its
@@ -110,7 +126,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "48 passed"
+python -m pytest -q tests        # should print "53 passed"
 ```
 
 ## Run the backtest

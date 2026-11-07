@@ -62,6 +62,9 @@ def main():
     daily = data.load(args.tickers, daily_start, "1d", args.refresh, args.offline)
     prices = data.load(args.tickers, daily_start, args.interval, args.refresh, args.offline) if intraday else daily
     bench = data.load(BENCHMARKS, daily_start, "1d", args.refresh, args.offline)
+    market = bench.get("QQQ")
+    if market is None:
+        print("Warning: no QQQ prices, so the short market filter blocks every short.")
     if not prices:
         raise SystemExit("No price data loaded. Check your internet connection or the cache folder.")
     if args.mtf is not None and not intraday:
@@ -102,7 +105,8 @@ def main():
 
     rows, first_day = [], None
     for s in strategies:
-        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None, lower, args.interval)
+        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None, lower, args.interval,
+                           market)
         st = backtest.stats(res)
         rows.append(st)
         if not res.equity.empty:

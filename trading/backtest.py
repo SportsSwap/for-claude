@@ -17,7 +17,7 @@ cash equal to its value (no leverage), so it is sized and limited exactly like a
 a stock-loan fee for the days it is open.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 import math
 
 import pandas as pd
@@ -93,13 +93,15 @@ def position_size(equity: float, cash: float, entry: float, stop: float, r: Risk
 def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         start: str | None = None, end: str | None = None,
         daily: dict[str, pd.DataFrame] | None = None,
-        lower: dict[str, dict[str, pd.DataFrame]] | None = None, interval: str = "1d") -> Result:
-    """lower: {ticker: {"15m": bars, ...}} for the lower-timeframe check (data.load_lower)."""
+        lower: dict[str, dict[str, pd.DataFrame]] | None = None, interval: str = "1d",
+        market: pd.DataFrame | None = None) -> Result:
+    """lower: {ticker: {"15m": bars, ...}} for the lower-timeframe check (data.load_lower).
+    market: daily bars of the index used by the short market filter (QQQ)."""
     rows: dict[str, dict] = {}
     for t, df in prices.items():
         if not len(df):
             continue
-        d = add_signals(df, s, (daily or {}).get(t), (lower or {}).get(t), interval)
+        d = add_signals(df, s, (daily or {}).get(t), (lower or {}).get(t), interval, market)
         d["prev_atr"] = d["atr"].shift(1)
         rows[t] = d.to_dict("index")
 
@@ -173,8 +175,10 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             if bar is None or t in positions or pd.isna(bar["prev_atr"]):
                 continue
             entry = bar["Open"] * (1 + side * r.slippage_pct)   # buy higher, short lower
-            stop = entry - side * s.stop_atr_mult * bar["prev_atr"]
-            shares = position_size(equity, cash, entry, stop, r)
+            mult = s.short_stop_atr_mult if side < 0 and s.short_stop_atr_mult else s.stop_atr_mult
+            stop = entry - side * mult * bar["prev_atr"]
+            risk = r if side > 0 else replace(r, risk_per_trade=r.risk_per_trade * s.short_risk_mult)
+            shares = position_size(equity, cash, entry, stop, risk)
             if shares <= 0 or stop <= 0:
                 skipped += 1
                 continue
