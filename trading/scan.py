@@ -6,6 +6,7 @@ your chosen risk percent of the account.
 
     python scan.py                          # default strategy on 2h bars
     python scan.py --interval 4h --equity 1150
+    python scan.py --no-markers             # skip the 30m/45m/1h marker check
     python scan.py --variant 3              # use VARIANTS[3] from config.py instead
     python scan.py --group ai               # just the AI list
     python scan.py --sides both             # also look for shorts: MACD cross down above zero,
@@ -37,6 +38,7 @@ def main():
     ap.add_argument("--variant", type=int, default=None, help="index into config.VARIANTS")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
                     help="which signals to look for (default: what the strategy sets, long)")
+    ap.add_argument("--no-markers", action="store_true", help="skip the 30m/45m/1h marker check")
     ap.add_argument("--offline", action="store_true")
     args = ap.parse_args()
     args.tickers = args.tickers or GROUPS[args.group]
@@ -47,12 +49,17 @@ def main():
     r = replace(DEFAULT_RISK, starting_capital=args.equity, risk_per_trade=args.risk_pct / 100)
     start = (pd.Timestamp.today() - pd.DateOffset(years=2)).strftime("%Y-%m-%d")
     daily = data.load(args.tickers, start, "1d", refresh=not args.offline, offline=args.offline)
-    prices = daily if args.interval == "1d" else data.load(
-        args.tickers, start, args.interval, refresh=not args.offline, offline=args.offline)
+    prices = data.load(args.tickers, start, args.interval, refresh=not args.offline, offline=args.offline)
+    markers = None
+    if not args.no_markers:
+        markers = data.load_markers(args.tickers, start, s.marker_tfs, refresh=not args.offline,
+                                    offline=args.offline)
 
     signals, shorts, watch, watch_short = [], [], [], []
     for t, df in prices.items():
-        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None)
+        d = add_signals(df, s, daily.get(t), (markers or {}).get(t, {}) if markers is not None else None,
+                        args.interval)
+        mk = lambda col: f"{int(last[col])}/{int(last['mk_n'])}" if "mk_n" in d else "-"
         last = d.iloc[-1]
         vs_ma = (last["Close"] / last["trend_ma"] - 1) * 100 if "trend_ma" in d and pd.notna(last["trend_ma"]) else None
         vs_ma = round(vs_ma, 1) if vs_ma is not None else None
@@ -72,10 +79,11 @@ def main():
                 "value": round(shares * entry, 2),
                 "risk_$": round(shares * abs(entry - stop), 2),
                 "vs_200ma_%": vs_ma,
+                "markers": mk("mk_up" if side > 0 else "mk_down"),
             })
         hist = d["macd_hist"].iloc[-3:]
         row = {"ticker": t, "close": round(last["Close"], 2), "macd": round(last["macd"], 2),
-               "macd_hist": round(hist.iloc[-1], 2), "vs_200ma_%": vs_ma}
+               "macd_hist": round(hist.iloc[-1], 2), "vs_200ma_%": vs_ma, "markers_up": mk("mk_up")}
         # Getting close to a buy: MACD under zero, histogram negative but rising for 3 bars.
         if s.sides in ("long", "both") and last["macd"] < 0 and hist.iloc[-1] < 0 and hist.is_monotonic_increasing:
             watch.append(row)

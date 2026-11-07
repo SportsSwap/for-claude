@@ -34,7 +34,8 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 
 | Rule | Default | Where to change it |
 |---|---|---|
-| Chart | 2h bars (1h, 4h and daily also supported) | `--interval` |
+| Chart | **2h or 4h only** | `--interval` |
+| Markers | At the signal, the 12/144/9 MACD on **30m, 45m and 1h** must point the same way: blue above orange for a buy, below for a short (last finished bar of each). A marker with no data is skipped; at least one must have data | `marker_tfs`, `require_markers`, `--no-markers` |
 | Entry | MACD line crosses above its signal line **while under zero**, and price is **above the 200-day EMA** | `config.py` → `Strategy` |
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe (what a "200" EMA on a 2h chart shows, about 50 trading days) is tested as a variant | `trend_ma_source` |
 | Fill | Open of the next bar (no peeking at the future) | `backtest.py` |
@@ -107,7 +108,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "30 passed"
+python -m pytest -q tests        # should print "35 passed"
 ```
 
 ## Run the backtest
@@ -115,8 +116,7 @@ python -m pytest -q tests        # should print "30 passed"
 ```bash
 python run_backtest.py --compare                         # all variants, 2h bars
 python run_backtest.py --compare --interval 4h           # 4h bars
-python run_backtest.py --compare --interval 1h
-python run_backtest.py --compare --interval 1d --start 2018-01-01   # daily bars, includes the 2022 crash
+python run_backtest.py --no-markers                      # without the 30m/45m/1h marker check
 python run_backtest.py --compare --risk-pct 3            # same again at 3% risk per trade
 python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a few stocks, with detail
 python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
@@ -126,9 +126,14 @@ python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
 
 Prices come from Yahoo Finance (free, cached in `data/`; add `--refresh` to re-download). **Yahoo only
 has about two years of hourly data**, which has been mostly a bull market, so dip-buying will look
-better than it would in a year like 2022. Run the daily version too: it goes back to 2018 and
-includes the 2022 drawdown. Interactive Brokers' API has longer intraday history, which we can wire in later.
-TradingView's 45-minute chart can't be backtested here: Yahoo keeps under 30-minute bars for only 60 days.
+better than it would in a year like 2022. Interactive Brokers' API has longer intraday history, which
+we can wire in later.
+
+**Markers and history:** Yahoo keeps 30m bars (and the 15m bars the 45m ones are built from) for only
+60 days, but 1h bars for two years. So in the Python backtest, older trades are checked against the 1h
+marker only and the last 60 days against all three. Each run saves the 30m/15m bars, so the history
+grows if you run the scanner regularly. The detailed output shows results split by how many markers
+agreed. Expect the markers to agree on most signals: the 30m/45m/1h MACDs turn before the 2h/4h one.
 
 ### How to read the results
 
@@ -159,7 +164,8 @@ would have in real time (survivorship bias). Treat any backtest return as an upp
 `pine/macd_dip_buy.pine` is the same strategy as a TradingView strategy script, so you can run it in
 TradingView's Strategy Tester on TradingView's own data and see every trade on your chart.
 
-1. Open a chart (for example NVDA or SNDK) and set the timeframe to 2h (or 1h, 4h, 45m).
+1. Open a chart (for example NVDA or SNDK) and set the timeframe to **2h or 4h**. On any other timeframe
+   the script takes no trades and the box at the top right says so.
 2. Open the **Pine Editor** at the bottom of the screen, delete what's there, paste in the whole file, and click **Add to chart**.
 3. Open the **Strategy Tester** tab at the bottom. **Overview** shows the equity curve, **List of trades** shows each trade.
 4. Click the gear on the strategy to change settings. To test each variant:
@@ -177,6 +183,10 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Classic 12/26/9 | Slow length: **26**; untick "must happen under zero" |
 | Short only | Entry → Trades to take: **Short only** |
 | Long + short | Entry → Trades to take: **Long and short** |
+
+Each trade is labelled with how many markers agreed, like "Long 3/3". The box at the top right shows
+the markers right now. To test without them, untick **Markers → 30m / 45m / 1h markers must agree**.
+How far back 30m/45m data reaches depends on your TradingView plan; a marker with no data is skipped.
 
 Short signals show as pink triangles above the bar; buy signals as teal triangles below. The
 **orange line is the 200-day EMA** the strategy uses. A "200 EMA" indicator added to an intraday chart

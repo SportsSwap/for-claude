@@ -1,5 +1,7 @@
 //@version=6
-// MACD 12/144/9 with a 200-day EMA filter (the orange line on the chart).
+// MACD 12/144/9 with a 200-day EMA filter (the orange line on the chart). Use it on a 2h or 4h
+// chart only (other timeframes take no trades). The 30m, 45m and 1h MACDs are markers: each one
+// with data must agree at the signal (blue above orange for a buy, below for a short).
 // Buy: MACD crosses UP through its signal line while UNDER zero, and price is ABOVE the 200-day EMA.
 // Optional short (off by default, Entry -> Trades to take): MACD crosses DOWN through its signal
 // line while ABOVE zero, and price is BELOW the 200-day EMA.
@@ -27,6 +29,13 @@ grpT = "200 EMA filter"
 emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
 emaSide = input.string("Above", "Price must be (longs; shorts use the opposite)", options = ["Below", "Above", "Off"], group = grpT)
+
+grpK = "Markers"
+reqMarkers = input.bool(true, "30m / 45m / 1h markers must agree", group = grpK,
+     tooltip = "At the signal, the 12/144/9 MACD on each marker timeframe (last finished bar) must be above its signal line for a buy, below for a short. A marker with no data is skipped.")
+mkA = input.timeframe("30", "Marker 1", group = grpK)
+mkB = input.timeframe("45", "Marker 2", group = grpK)
+mkC = input.timeframe("60", "Marker 3", group = grpK)
 
 grpX = "Exits"
 atrLen = input.int(14, "ATR length", minval = 1, group = grpX)
@@ -56,6 +65,38 @@ zeroDown = ta.crossunder(macdLine, 0)
 runAtr = (close - ta.lowest(low, runLookback)) / atrVal
 runAtrDown = (ta.highest(high, runLookback) - close) / atrVal
 
+// ---------- Markers (30m / 45m / 1h) ----------
+// +1 = MACD above its signal line, -1 = below, on the last marker bar that had CLOSED when this
+// chart bar closed. A 45m bar can straddle the end of a 2h bar (11:00-11:45 vs 9:30-11:30); that
+// one is skipped so the backtest can't peek ahead.
+markerDir() =>
+    [m, s, h] = ta.macd(close, fastLen, slowLen, sigLen)
+    m > s ? 1 : m < s ? -1 : 0
+
+markerTf(simple string tf) =>
+    int d = na
+    if timeframe.in_seconds(tf) < timeframe.in_seconds()
+        [dirs, ends] = request.security_lower_tf(syminfo.tickerid, tf, [markerDir(), time_close])
+        int n = array.size(dirs)
+        if n > 0
+            for i = n - 1 to 0
+                if array.get(ends, i) <= time_close
+                    d := array.get(dirs, i)
+                    break
+    d
+
+mA = markerTf(mkA)
+mB = markerTf(mkB)
+mC = markerTf(mkC)
+mkN = (na(mA) ? 0 : 1) + (na(mB) ? 0 : 1) + (na(mC) ? 0 : 1)
+mkUp = (mA == 1 ? 1 : 0) + (mB == 1 ? 1 : 0) + (mC == 1 ? 1 : 0)
+mkDown = (mA == -1 ? 1 : 0) + (mB == -1 ? 1 : 0) + (mC == -1 ? 1 : 0)
+markersOkLong = not reqMarkers or (mkN >= 1 and mkUp == mkN)
+markersOkShort = not reqMarkers or (mkN >= 1 and mkDown == mkN)
+
+// Trade only on 2h and 4h charts.
+tfOk = timeframe.in_seconds() == 7200 or timeframe.in_seconds() == 14400
+
 // ---------- Entry rules ----------
 trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or macdLine < 0) : zeroUp
 trendOk = emaSide == "Off" ? true : emaSide == "Below" ? close < trendEma : close > trendEma
@@ -63,13 +104,13 @@ runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
 warm = bar_index > 2 * slowLen
 allowLong = direction != "Short only"
 allowShort = direction != "Long only"
-buySignal = allowLong and trigger and trendOk and runOk and warm and time >= startDate
+buySignal = allowLong and trigger and trendOk and runOk and markersOkLong and tfOk and warm and time >= startDate
 
 // Short: the same rule upside down.
 triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or macdLine > 0) : zeroDown
 trendOkS = emaSide == "Off" ? true : emaSide == "Below" ? close > trendEma : close < trendEma
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
-shortSignal = allowShort and triggerS and trendOkS and runOkS and warm and time >= startDate
+shortSignal = allowShort and triggerS and trendOkS and runOkS and markersOkShort and tfOk and warm and time >= startDate
 
 var bool killed = false
 if not killed and strategy.equity <= strategy.initial_capital * killPct / 100
@@ -85,11 +126,11 @@ var float tradeStopDist = na
 flat = strategy.position_size == 0
 if buySignal and flat and not killed and qty > 0
     tradeStopDist := stopDist
-    strategy.entry("Long", strategy.long, qty = qty)
+    strategy.entry("Long", strategy.long, qty = qty, comment = "Long " + str.tostring(mkUp) + "/" + str.tostring(mkN))
     alert("MACD buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 else if shortSignal and flat and not killed and qty > 0
     tradeStopDist := stopDist
-    strategy.entry("Short", strategy.short, qty = qty)
+    strategy.entry("Short", strategy.short, qty = qty, comment = "Short " + str.tostring(mkDown) + "/" + str.tostring(mkN))
     alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 
 // Stop and target are measured from the actual fill price (next bar's open).
@@ -131,3 +172,11 @@ plot(inTrade ? strategy.position_avg_price - side * tradeStopDist : na, "Stop", 
 plot(inTrade and targetR > 0 ? strategy.position_avg_price + side * tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
 plotshape(buySignal and not killed, "Buy signal", style = shape.triangleup, location = location.belowbar, color = color.teal, size = size.small)
 plotshape(shortSignal and not killed, "Short signal", style = shape.triangledown, location = location.abovebar, color = color.fuchsia, size = size.small)
+
+// Markers right now, and a warning on the wrong timeframe.
+var table info = table.new(position.top_right, 2, 2, bgcolor = color.new(color.black, 30))
+if barstate.islast
+    table.cell(info, 0, 0, "Markers up (30m/45m/1h)", text_color = color.white)
+    table.cell(info, 1, 0, str.tostring(mkUp) + "/" + str.tostring(mkN), text_color = mkN > 0 and mkUp == mkN ? color.lime : color.white)
+    table.cell(info, 0, 1, "Chart", text_color = color.white)
+    table.cell(info, 1, 1, tfOk ? "OK" : "Use 2h or 4h: no trades", text_color = tfOk ? color.lime : color.red)

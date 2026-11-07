@@ -37,7 +37,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None: df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, markers=None, interval="2h": df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -360,3 +360,58 @@ def test_default_has_no_profit_target(fake_signals):
     assert DEFAULT_STRATEGY.target_r is None
     assert backtest.run({"X": df}, s, NO_COSTS).trades.iloc[0].exit_reason == "end of test"
     assert backtest.run({"X": df}, replace(s, target_r=2.0), NO_COSTS).trades.iloc[0].exit_reason == "target"
+
+
+# --- Trade on 2h/4h, with 30m / 45m / 1h MACDs as markers that must agree ---
+
+def session_bars(day, minutes, closes):
+    start = pd.Timestamp(day) + pd.Timedelta(hours=9, minutes=30)
+    idx = pd.DatetimeIndex([start + pd.Timedelta(minutes=minutes * i) for i in range(len(closes))])
+    return ohlc(closes, idx)
+
+
+FAST = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+
+
+def test_resample_45m_from_15m():
+    from data import resample_session
+    m15 = session_bars("2024-03-05", 15, np.arange(26, dtype=float))   # 9:30 .. 15:45
+    m45 = resample_session(m15, 3)
+    assert [t.strftime("%H:%M") for t in m45.index][:4] == ["09:30", "10:15", "11:00", "11:45"]
+    assert m45.index[-1].strftime("%H:%M") == "15:30"
+
+
+def test_markers_use_only_finished_bars():
+    from strategy import marker_agreement
+    days = pd.bdate_range("2024-03-01", periods=3)
+    m45 = pd.concat([session_bars(d, 45, (np.arange(9, dtype=float) + 9 * k) ** 3 / 10 + 100)
+                     for k, d in enumerate(days)])                    # accelerating rise
+    m45.loc[days[-1] + pd.Timedelta(hours=11), ["Open", "High", "Low", "Close"]] = [0.0, 1.0, -1.0, 0.0]
+    chart = session_bars(days[-1], 120, [100.0, 100, 100, 100])
+    out = marker_agreement(chart, "2h", {"45m": m45}, FAST)
+    # The 9:30-11:30 2h bar uses the 10:15 45m bar (rising), not the 11:00-11:45 crash bar.
+    assert out.loc[chart.index[0], "mk_up"] == 1 and out.loc[chart.index[0], "mk_n"] == 1
+
+
+def test_markers_missing_data_is_skipped_not_counted():
+    from strategy import marker_agreement
+    m1h = session_bars("2024-03-01", 60, np.arange(7, dtype=float))
+    chart = session_bars("2024-03-08", 120, [1.0, 2, 3, 4])            # a week later, no marker data
+    out = marker_agreement(chart, "2h", {"1h": m1h}, FAST)
+    assert (out.mk_n == 0).all()
+
+
+def test_buy_needs_every_marker_with_data_to_agree():
+    idx = pd.bdate_range("2024-01-01", periods=3)
+    df = pd.DataFrame({"mk_up": [3, 2, 1], "mk_down": [0, 1, 0], "mk_n": [3, 3, 1]}, index=idx)
+    from strategy import _markers_agree
+    assert _markers_agree(df, DEFAULT_STRATEGY, "mk_up").tolist() == [True, False, True]
+    none = df.assign(mk_up=0, mk_n=0)
+    assert not _markers_agree(none, DEFAULT_STRATEGY, "mk_up").any()   # no marker data at all: no trade
+    assert _markers_agree(none, replace(DEFAULT_STRATEGY, require_markers=False), "mk_up").all()
+
+
+def test_only_2h_and_4h_charts():
+    from config import INTERVALS
+    assert INTERVALS == ["2h", "4h"]
+    assert DEFAULT_STRATEGY.marker_tfs == ("30m", "45m", "1h")

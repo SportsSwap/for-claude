@@ -33,6 +33,7 @@ class Position:
     target: float | None
     entry_cost: float
     side: int = 1                       # +1 long, -1 short
+    markers: str | None = None          # markers that agreed at the signal, e.g. "3/3"
     days_held: int = 1                  # trading sessions, counting the entry session
     last_day: object = None
     exit_next_open: str | None = None
@@ -85,12 +86,15 @@ def position_size(equity: float, cash: float, entry: float, stop: float, r: Risk
 
 def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         start: str | None = None, end: str | None = None,
-        daily: dict[str, pd.DataFrame] | None = None) -> Result:
+        daily: dict[str, pd.DataFrame] | None = None,
+        markers: dict[str, dict[str, pd.DataFrame]] | None = None, interval: str = "2h") -> Result:
+    """markers: {ticker: {"30m": bars, "45m": bars, "1h": bars}} (data.load_markers)."""
     rows: dict[str, dict] = {}
     for t, df in prices.items():
         if not len(df):
             continue
-        d = add_signals(df, s, (daily or {}).get(t))
+        mk = (markers or {}).get(t, {}) if markers is not None else None
+        d = add_signals(df, s, (daily or {}).get(t), mk, interval)
         d["prev_atr"] = d["atr"].shift(1)
         rows[t] = d.to_dict("index")
 
@@ -100,7 +104,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
 
     cash = r.starting_capital
     positions: dict[str, Position] = {}
-    pending_entries: list[tuple[str, int]] = []
+    pending_entries: list[tuple[str, int, dict]] = []
     trades: list[dict] = []
     equity_curve: dict[pd.Timestamp, float] = {}
     last_close: dict[str, float] = {}
@@ -131,6 +135,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             "target": round(p.target, 4) if p.target else None,
             "days_held": p.days_held,
             "exit_reason": reason,
+            "markers": p.markers,
             "pnl": round(pnl, 2),
             "r_multiple": round(pnl / risk_dollars, 2) if risk_dollars > 0 else 0.0,
         })
@@ -156,7 +161,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 close_position(p, ts, bar["Open"], "target (gap)")
 
         # 3. Entries at the open, sized off the previous bar's equity.
-        for t, side in pending_entries:
+        for t, side, sig in pending_entries:
             bar = bars.get(t)
             if bar is None or t in positions or pd.isna(bar["prev_atr"]):
                 continue
@@ -169,7 +174,10 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             cost = shares * entry + commission(shares, entry, r)
             cash -= cost
             target = entry + s.target_r * (entry - stop) if s.target_r else None
-            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, last_day=day)
+            mk = None
+            if pd.notna(sig.get("mk_n", float("nan"))):
+                mk = f"{int(sig['mk_up' if side > 0 else 'mk_down'])}/{int(sig['mk_n'])}"
+            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, mk, last_day=day)
         pending_entries = []
 
         # 4. Stops and targets during the bar.
@@ -210,12 +218,12 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 continue
             score = bar[s.rank_by] if pd.notna(bar[s.rank_by]) else None
             if bar["entry_signal"]:
-                candidates.append((t, 1, score if score is not None else -1e9))
+                candidates.append((t, 1, score if score is not None else -1e9, bar))
             elif bar.get("short_signal", False):
-                candidates.append((t, -1, -score if score is not None else -1e9))
+                candidates.append((t, -1, -score if score is not None else -1e9, bar))
         candidates.sort(key=lambda c: -c[2])
         open_slots = r.max_positions - sum(1 for p in positions.values() if not p.exit_next_open)
-        pending_entries = [(t, side) for t, side, _ in candidates[:max(open_slots, 0)]]
+        pending_entries = [(t, side, bar) for t, side, _, bar in candidates[:max(open_slots, 0)]]
         skipped += max(len(candidates) - len(pending_entries), 0)
 
     # Close anything still open at the last available price.

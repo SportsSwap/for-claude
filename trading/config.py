@@ -34,7 +34,8 @@ GROUPS = {
 
 BENCHMARKS = ["QQQ", "SMH"]
 
-INTERVALS = ["1d", "1h", "2h", "4h"]
+# Trade only on 2h and 4h charts. The 30m, 45m and 1h MACDs are used as markers (see Strategy).
+INTERVALS = ["2h", "4h"]
 
 
 @dataclass(frozen=True)
@@ -59,6 +60,13 @@ class Strategy:
     entry: str = "signal_cross"
     require_below_zero: bool = True     # signal_cross only: the cross must happen under zero
                                         # (above zero for shorts)
+
+    # Markers: at the signal, the MACD (same 12/144/9) on each of these shorter timeframes must
+    # point the same way: above its signal line for a buy, below for a short. Only finished
+    # marker bars are used. A marker with no data on that bar is skipped (Yahoo keeps 30m/45m
+    # for 60 days, 1h for 2 years); at least one marker must have data.
+    marker_tfs: tuple[str, ...] = ("30m", "45m", "1h")
+    require_markers: bool = True
 
     # Moving-average filter: the 200 EMA.
     trend_ma: int | None = 200          # None turns it off

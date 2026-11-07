@@ -2,7 +2,10 @@
 
     python run_backtest.py --compare                  # every variant, 2h bars, last ~2 years
     python run_backtest.py --interval 4h              # 4-hour bars instead
-    python run_backtest.py --interval 1d --start 2018-01-01 --compare   # daily bars, longer history
+    python run_backtest.py --no-markers               # without the 30m/45m/1h marker check
+
+Trades only on 2h and 4h bars. The 30m, 45m and 1h MACDs are markers that must agree at the
+signal. Yahoo keeps 30m/45m for 60 days only, so before that just the 1h marker is checked.
     python run_backtest.py --tickers NVDA AMD SNDK    # just these stocks
     python run_backtest.py --group ai                 # just the AI list (see config.GROUPS)
     python run_backtest.py --risk-pct 3               # risk 3% of the account per trade
@@ -31,7 +34,7 @@ def main():
                     help="which stock list to use (default: all)")
     ap.add_argument("--interval", default="2h", choices=INTERVALS, help="bar size (default 2h)")
     ap.add_argument("--start", default=None,
-                    help="first day of the test (default: 2018-01-01 for 1d, all ~2 years for intraday)")
+                    help="first day of the test (default: all ~2 years Yahoo keeps for hourly bars)")
     ap.add_argument("--end", default=None)
     ap.add_argument("--capital", type=float, default=DEFAULT_RISK.starting_capital)
     ap.add_argument("--risk-pct", type=float, default=DEFAULT_RISK.risk_per_trade * 100,
@@ -40,20 +43,25 @@ def main():
                     help="largest single position as a percent of the account (default 34)")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
                     help="long, short or both (default: long). Ignored with --compare, whose variants set it")
+    ap.add_argument("--no-markers", action="store_true", help="skip the 30m/45m/1h marker check")
     ap.add_argument("--compare", action="store_true", help="run every variant in config.VARIANTS")
     ap.add_argument("--refresh", action="store_true", help="re-download prices instead of using the cache")
     ap.add_argument("--offline", action="store_true", help="use cached CSVs only")
     args = ap.parse_args()
     args.tickers = args.tickers or GROUPS[args.group]
 
-    intraday = args.interval != "1d"
-    start = args.start or (None if intraday else "2018-01-01")
+    start = args.start
     # Daily history reaches well back so the 200-day average is ready on day one.
     daily_start = (pd.Timestamp(start or pd.Timestamp.today()) - pd.DateOffset(years=3)).strftime("%Y-%m-%d")
 
     print(f"Loading {args.interval} prices for {len(args.tickers)} tickers...")
     daily = data.load(args.tickers, daily_start, "1d", args.refresh, args.offline)
-    prices = data.load(args.tickers, daily_start, args.interval, args.refresh, args.offline) if intraday else daily
+    prices = data.load(args.tickers, daily_start, args.interval, args.refresh, args.offline)
+    markers = None
+    if not args.no_markers:
+        print("Loading the 30m / 45m / 1h marker bars...")
+        markers = data.load_markers(args.tickers, daily_start, DEFAULT_STRATEGY.marker_tfs,
+                                    args.refresh, args.offline)
     bench = data.load(BENCHMARKS, daily_start, "1d", args.refresh, args.offline)
     if not prices:
         raise SystemExit("No price data loaded. Check your internet connection or the cache folder.")
@@ -73,7 +81,7 @@ def main():
 
     rows, first_day = [], None
     for s in strategies:
-        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None)
+        res = backtest.run(prices, s, risk, start, args.end, daily, markers, args.interval)
         st = backtest.stats(res)
         rows.append(st)
         if not res.equity.empty:
@@ -120,6 +128,12 @@ def print_detail(st: dict, res: backtest.Result):
             win_rate=("pnl", lambda x: round((x > 0).mean() * 100))).sort_values("pnl")
         print("\n  P&L by ticker (worst to best):")
         print("  " + by_ticker.to_string().replace("\n", "\n  "))
+        if res.trades.markers.notna().any():
+            by_mk = res.trades.groupby("markers").agg(
+                trades=("pnl", "size"), pnl=("pnl", "sum"),
+                win_rate=("pnl", lambda x: round((x > 0).mean() * 100))).round(2)
+            print("\n  By markers agreeing (30m/45m/1h with data at the signal):")
+            print("  " + by_mk.to_string().replace("\n", "\n  "))
         print("\n  Exit reasons:")
         print("  " + res.trades.exit_reason.value_counts().to_string().replace("\n", "\n  "))
 
