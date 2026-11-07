@@ -36,13 +36,13 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 |---|---|---|
 | Chart | 2h bars (1h, 4h and daily also supported) | `--interval` |
 | Entry | MACD line crosses above its signal line **while under zero**, and price is **below the 200 EMA** | `config.py` → `Strategy` |
-| Buffer | The cross only counts if the MACD is at least **0.5 × ATR(14) below zero**. Crosses hugging the zero line are mostly chop | `min_macd_depth_atr`, `--buffer` |
+| Buffer | Off: any cross under zero counts. Can require the cross to be N × ATR(14) below zero | `min_macd_depth_atr`, `--buffer` |
 | Lower timeframes | Counts how many of **15m / 30m / 45m** agree (their MACD above its signal line and histogram rising). Shown on every trade; doesn't block trades unless you ask | `confirm_min`, `--mtf` |
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe (what a "200" EMA on a 2h chart shows, about 50 trading days) is tested as a variant | `trend_ma_source` |
 | Fill | Open of the next bar (no peeking at the future) | `backtest.py` |
-| Stop | Entry − 3 × ATR(14) of the chart timeframe | `stop_atr_mult` |
-| Target | 2 × the risk (2R) | `target_r` |
-| Other exits | MACD crosses back below its signal line → sell at the next bar's open; 15-trading-day time stop | `exit_on_macd_cross_down`, `max_hold_days` |
+| Stop | Entry − 3 × ATR(14) of the chart timeframe. Stays put unless the optional trailing stop is on | `stop_atr_mult`, `trail_atr_mult` |
+| Exit | **Hold until the sell setup:** the MACD crosses back below its signal line **while above zero** → sell at the next bar's open. A cross back while still under zero (a wobble on the way up) doesn't exit | `macd_exit` |
+| Target / time limit | None: winners run until the sell setup or the stop | `target_r`, `max_hold_days` |
 | Size | Lose 2% of the account if the stop hits; no position above ~34% of the account; fractional shares | `--risk-pct`, `--max-position-pct` |
 | Limits | Max 3 positions; no new trades once the account hits $800 | `max_positions`, `kill_switch_pct` |
 | Costs | IBKR Pro fixed commissions + 0.05% slippage per fill | `Risk` |
@@ -57,8 +57,8 @@ The short is the dip buy turned upside down, for stocks that have run too far up
 | Entry | MACD line crosses **below** its signal line **while above zero**, and price is **above the 200-day EMA** |
 | Fill | Sell short at the open of the next bar |
 | Stop | Entry **+** 3 × ATR(14), above the entry |
-| Target | 2R **below** the entry |
-| Other exits | MACD crosses back **above** its signal line → buy to cover at the next bar's open; 15-trading-day time stop |
+| Exit | **Hold until the buy setup:** the MACD crosses back above its signal line **while below zero** → buy to cover at the next bar's open |
+| Target / time limit | None, same as longs |
 | Size and limits | Same as longs: 2% risk, ~34% cap, and longs and shorts share the 3 position slots |
 | Extra cost | Stock-loan fee of 0.5% a year on the position's value (`short_borrow_pct_per_year`) |
 
@@ -84,9 +84,10 @@ short, so treat the backtest as a test of the signal, not of those instruments.
 
 | Variant | What it tests |
 |---|---|
-| Dip buy, below 200-day EMA | The default above (0.5 ATR buffer) |
-| Dip buy, no buffer | Any cross under zero, however close: what you had before |
-| Dip buy, 1 ATR buffer | A deeper buffer |
+| Dip buy, below 200-day EMA | The default above: hold until the sell setup |
+| Old exits: 2R target, any MACD cross back, 15 days | The earlier, quicker exits, to see how much letting winners run changes |
+| Sell setup exit + 3 ATR trailing stop | The default, plus a stop that follows price up (gives back less, but can exit earlier) |
+| 3 ATR trailing stop only | No MACD exit at all: ride until a 3 ATR pullback from the best close |
 | Dip buy, below 200-bar EMA | Same, using the 200 EMA of the chart timeframe instead of the daily |
 | Dip buy, no 200 EMA rule | Whether the 200 EMA filter helps at all |
 | Zero-line cross, price not run | MACD crosses above zero while price is still within 3 ATR of its 20-bar low ("MACD turned, price hasn't moved yet") |
@@ -109,7 +110,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "41 passed"
+python -m pytest -q tests        # should print "46 passed"
 ```
 
 ## Run the backtest
@@ -124,18 +125,17 @@ python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a
 python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
 python run_backtest.py --compare --group ai              # every variant on the AI list only
 python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
-python run_backtest.py --buffer 0                        # default strategy without the buffer
+python run_backtest.py --buffer 0.5                      # only crosses at least 0.5 ATR under zero
 python run_backtest.py --mtf 0                           # record the 15m/30m/45m count on each trade
 python run_backtest.py --mtf 2                           # only trades where 2 of 3 lower timeframes agree
 ```
 
 ### The buffer and the lower-timeframe check
 
-**Buffer.** The MACD is measured in ATRs (ATR(14) of the chart timeframe), so one number works for a
-$100 stock and a $900 stock, and on 1h, 2h and 4h charts. At 0.5, a buy only counts if the blue MACD
-line is at least half an ATR below zero when it crosses up (mirror for shorts). 0.5 is a starting
-guess, not a tuned value. `--compare` runs it next to "no buffer" and "1 ATR". Keep it only if both
-0.5 and 1.0 beat no buffer, on 2h **and** on daily bars from 2018. If only one value wins, that's luck.
+**Buffer (off by default).** The MACD is measured in ATRs (ATR(14) of the chart timeframe), so one
+number works for a $100 stock and a $900 stock, and on 1h, 2h and 4h charts. At 0.5, a buy only counts
+if the blue MACD line is at least half an ATR below zero when it crosses up (mirror for shorts). Try it
+with `--buffer 0.5`; the detailed output also splits results by how far from zero each cross was.
 
 **Lower timeframes.** A lower timeframe "agrees" with a buy when its own MACD (same 12/144/9) is above
 its signal line and its histogram rose on its last closed bar. Only lower-timeframe bars that had
@@ -162,7 +162,8 @@ TradingView's 45-minute chart can't be backtested here: Yahoo keeps under 30-min
 
 - **total_return_pct / cagr_pct**: what $1,000 became, as a total and per year.
 - **max_drawdown_pct**: the worst drop from a high. This is the pain you would have sat through.
-- **win_rate_pct**: share of trades that made money. Below 50% is normal at a 2R target.
+- **win_rate_pct**: share of trades that made money. Holding for the sell setup means fewer, bigger
+  winners, so a win rate well below 50% is normal. Look at avg_r and profit_factor instead.
 - **avg_r**: average result per trade, in units of what was risked. Anything above 0 means the strategy has an edge.
 - **profit_factor**: dollars won ÷ dollars lost. Above 1.3 is decent; below 1.1 is close to noise.
 - **longest_losing_streak**: how many losses in a row you need to be able to stomach.
@@ -189,17 +190,18 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 
 1. Open a chart (for example NVDA or SNDK) and set the timeframe to 2h (or 1h, 4h, 45m).
 2. Open the **Pine Editor** at the bottom of the screen, delete what's there, paste in the whole file, and click **Add to chart**.
-   Optional: open a new Pine Editor tab, paste `pine/macd_panel.pine`, and add it too. It's the MACD
-   panel with the buffer drawn as dotted lines: green dots are crosses deep enough to count, grey dots
-   are crosses the buffer skips.
+   Optional, only if you turn the buffer on: `pine/macd_panel.pine` is the MACD panel with the buffer
+   drawn as dotted lines (set its buffer to the same number).
 3. Open the **Strategy Tester** tab at the bottom. **Overview** shows the equity curve, **List of trades** shows each trade.
 4. Click the gear on the strategy to change settings. To test each variant:
 
 | Variant | Settings to change from the default |
 |---|---|
 | Dip buy, below 200-day EMA | Default, nothing to change |
-| Dip buy, no buffer | Entry → Buffer: **0** |
-| Dip buy, 1 ATR buffer | Entry → Buffer: **1** |
+| Old exits: 2R target, any MACD cross back, 15 days | Exits → MACD exit: **Any cross back**; Target in R: **2**; Time stop: **15** |
+| Sell setup exit + 3 ATR trailing stop | Exits → Trailing stop: **3** |
+| 3 ATR trailing stop only | Exits → MACD exit: **Off**; Trailing stop: **3** |
+| With a buffer | Entry → Buffer: **0.5** (or 1) |
 | Dip buy, below 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
 | Dip buy, no 200 EMA rule | 200 EMA filter → Price must be: **Off** |
 | Zero-line cross, price not run | Entry trigger: **Zero-line cross**; Skip if price ran more than: **3**; Price must be: **Off** |
@@ -209,8 +211,8 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Short only | Entry → Trades to take: **Short only** |
 | Long + short | Entry → Trades to take: **Long and short** |
 
-Short signals show as pink triangles above the bar; buy signals as teal triangles below. Grey
-crosses are signals the buffer skipped because the MACD was too close to zero.
+Short signals show as pink triangles above the bar; buy signals as teal triangles below. The red line
+is the stop while a trade is open. With the buffer on, grey crosses mark signals it skipped.
 
 **Lower timeframes:** each trade is labelled with how many of 15m/30m/45m agreed, like "Long 2/3",
 and the box at the top right shows the count right now. To make it a rule, set **Lower timeframes →

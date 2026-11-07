@@ -84,12 +84,12 @@ def main():
                 "close": round(entry, 2),
                 "stop": round(stop, 2),
                 "stop_%": round((stop / entry - 1) * 100, 1),
-                "target": round(entry + s.target_r * (entry - stop), 2) if s.target_r else None,
                 "shares": shares,
                 "value": round(shares * entry, 2),
                 "risk_$": round(shares * abs(entry - stop), 2),
                 "vs_200ma_%": vs_ma,
                 "depth_atr": round(last["depth_atr"], 2),
+                **({"target": round(entry + s.target_r * (entry - stop), 2)} if s.target_r else {}),
                 "lower_tfs_agree": f"{int(last['mtf_up' if side > 0 else 'mtf_down'])}/{int(last['mtf_max'])}"
                                    if "mtf_max" in d else "-",
             })
@@ -111,7 +111,17 @@ def main():
     print(f"\n{s.name}")
     print(f"MACD {s.macd_fast}/{s.macd_slow}/{s.macd_signal} on {args.interval} bars | last bar {as_of} "
           f"| account ${args.equity:,.0f}, risk {args.risk_pct:g}%")
-    print(f"Buffer: cross at least {s.min_macd_depth_atr:g} ATR past zero | lower timeframes: "
+    exits = [f"stop {s.stop_atr_mult:g} ATR",
+             {"above_zero": "sell when the MACD crosses down ABOVE zero (cover shorts when it crosses up below zero)",
+              "any": "sell on any MACD cross back", "off": "no MACD exit"}[s.macd_exit]]
+    if s.trail_atr_mult:
+        exits.append(f"trailing stop {s.trail_atr_mult:g} ATR behind the best close")
+    exits.append(f"target {s.target_r:g}R" if s.target_r else "no fixed target")
+    if s.max_hold_days:
+        exits.append(f"{s.max_hold_days}-day time stop")
+    print("Exits: " + ", ".join(exits))
+    print(f"Buffer: {f'cross at least {s.min_macd_depth_atr:g} ATR past zero' if s.min_macd_depth_atr else 'off'}"
+          " | lower timeframes: "
           + (f"need {s.confirm_min} of {'/'.join(s.confirm_tfs)} to agree" if s.confirm_min
              else "shown, not filtered"))
     if s.sides in ("long", "both"):
@@ -122,7 +132,7 @@ def main():
             print("\nNo buy signals.")
     if s.sides in ("short", "both"):
         if shorts:
-            print("\nSHORT SIGNALS (sell short at the next bar's open; stop is ABOVE, target BELOW):")
+            print("\nSHORT SIGNALS (sell short at the next bar's open; the stop is ABOVE the entry):")
             print(pd.DataFrame(shorts).to_string(index=False))
         else:
             print("\nNo short signals.")

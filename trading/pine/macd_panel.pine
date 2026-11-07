@@ -11,7 +11,7 @@ fastLen = input.int(12, "Fast length", minval = 1)
 slowLen = input.int(144, "Slow length", minval = 1)
 sigLen = input.int(9, "Signal smoothing", minval = 1)
 atrLen = input.int(14, "ATR length", minval = 1)
-minDepthAtr = input.float(0.5, "Buffer: N x ATR from zero", minval = 0, step = 0.25)
+minDepthAtr = input.float(0.0, "Buffer: N x ATR from zero (0 = off)", minval = 0, step = 0.25)
 
 [macdLine, signalLine, hist] = ta.macd(close, fastLen, slowLen, sigLen)
 band = minDepthAtr * ta.atr(atrLen)

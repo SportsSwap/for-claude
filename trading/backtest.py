@@ -8,6 +8,9 @@ Order of events on each bar:
      If both are touched in the same bar, the stop is assumed to have hit first.
   5. Close: equity is marked to market and the next bar's exits and entries are chosen.
 
+Trailing stop: at each close the stop is raised to N x ATR below the highest close since entry
+(never lowered) and used from the next bar. R multiples are measured against the FIRST stop.
+
 Shorts mirror longs: the stop sits above the entry and the target below, a gap UP through the
 stop fills at the open, and the trade covers when the MACD crosses back up. A short sets aside
 cash equal to its value (no leverage), so it is sized and limited exactly like a long, and pays
@@ -33,6 +36,8 @@ class Position:
     target: float | None
     entry_cost: float
     side: int = 1                       # +1 long, -1 short
+    first_stop: float = 0.0             # the stop at entry; R is measured against this
+    best_close: float = 0.0             # highest close since entry (lowest for shorts)
     depth_atr: float | None = None      # MACD in ATRs from zero at the signal bar
     mtf: str | None = None              # lower timeframes that agreed, e.g. "2/3"
     days_held: int = 1                  # trading sessions, counting the entry session
@@ -122,7 +127,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         proceeds = p.value(price) - fee
         cash += proceeds
         pnl = proceeds - p.entry_cost
-        risk_dollars = p.shares * abs(p.entry_price - p.stop)
+        risk_dollars = p.shares * abs(p.entry_price - p.first_stop)
         trades.append({
             "ticker": p.ticker,
             "side": "long" if p.side > 0 else "short",
@@ -131,7 +136,8 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             "exit_date": fmt_time(ts),
             "exit_price": round(price, 4),
             "shares": p.shares,
-            "stop": round(p.stop, 4),
+            "stop": round(p.first_stop, 4),
+            "exit_stop": round(p.stop, 4),
             "target": round(p.target, 4) if p.target else None,
             "days_held": p.days_held,
             "exit_reason": reason,
@@ -157,7 +163,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             if p.exit_next_open:
                 close_position(p, ts, bar["Open"], p.exit_next_open)
             elif p.hits_stop(bar["Open"]):
-                close_position(p, ts, bar["Open"], "stop (gap)")
+                close_position(p, ts, bar["Open"], "stop (gap)" if p.stop == p.first_stop else "trailing stop (gap)")
             elif p.hits_target(bar["Open"]):
                 close_position(p, ts, bar["Open"], "target (gap)")
 
@@ -180,7 +186,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 agreed = sig["mtf_up"] if side > 0 else sig["mtf_down"]
                 mtf = f"{int(agreed)}/{int(sig['mtf_max'])}"
             depth = sig.get("depth_atr")
-            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side,
+            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, stop, entry,
                                     depth if depth is not None and pd.notna(depth) else None, mtf,
                                     last_day=day)
         pending_entries = []
@@ -192,7 +198,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 continue
             worst, best = (bar["Low"], bar["High"]) if p.side > 0 else (bar["High"], bar["Low"])
             if p.hits_stop(worst):
-                close_position(p, ts, p.stop, "stop")
+                close_position(p, ts, p.stop, "stop" if p.stop == p.first_stop else "trailing stop")
             elif p.hits_target(best):
                 close_position(p, ts, p.target, "target")
 
@@ -206,8 +212,18 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
-            if s.exit_on_macd_cross_down and (bar["cross_down"] if p.side > 0 else bar["cross_up"]):
-                p.exit_next_open = "MACD cross down" if p.side > 0 else "MACD cross up"
+            if s.trail_atr_mult and pd.notna(bar["atr"]):
+                if p.side > 0:
+                    p.best_close = max(p.best_close, bar["Close"])
+                    p.stop = max(p.stop, p.best_close - s.trail_atr_mult * bar["atr"])
+                else:
+                    p.best_close = min(p.best_close, bar["Close"])
+                    p.stop = min(p.stop, p.best_close + s.trail_atr_mult * bar["atr"])
+            crossed_back = bar["cross_down"] if p.side > 0 else bar["cross_up"]
+            beyond_zero = bar.get("macd", 0) * p.side > 0       # above zero for longs, below for shorts
+            if crossed_back and (s.macd_exit == "any" or (s.macd_exit == "above_zero" and beyond_zero)):
+                p.exit_next_open = (("MACD sell setup" if beyond_zero else "MACD cross down") if p.side > 0
+                                    else ("MACD buy setup" if beyond_zero else "MACD cross up"))
             elif s.max_hold_days and p.days_held >= s.max_hold_days:
                 p.exit_next_open = "time stop"
 

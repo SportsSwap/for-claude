@@ -18,7 +18,9 @@ from data import resample_session  # noqa: E402
 from strategy import add_signals  # noqa: E402
 
 NO_COSTS = replace(DEFAULT_RISK, slippage_pct=0.0, commission_min=0.0, commission_per_share=0.0)
-S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0)
+# Mechanics tests use simple fixed exits: 2-ATR stop, 2R target, nothing else.
+S = replace(DEFAULT_STRATEGY, macd_exit="off", max_hold_days=None, stop_atr_mult=2.0, target_r=2.0,
+            trail_atr_mult=None)
 CLASSIC = replace(DEFAULT_STRATEGY, macd_slow=26, require_below_zero=False, trend_ma=None)
 
 
@@ -109,7 +111,7 @@ def test_gap_below_stop_fills_at_open(fake_signals):
 
 def test_macd_cross_down_exits_next_open(fake_signals):
     df = bars([FLAT, FLAT, FLAT, (100.7, 101, 100, 100.5)], signal_days=[0], cross_down_days=[2])
-    t = backtest.run({"X": df}, replace(S, exit_on_macd_cross_down=True), NO_COSTS).trades.iloc[0]
+    t = backtest.run({"X": df}, replace(S, macd_exit="any"), NO_COSTS).trades.iloc[0]
     assert t.exit_reason == "MACD cross down" and str(t.exit_date) == "2024-01-04" and t.exit_price == 100.7
 
 
@@ -314,7 +316,7 @@ def test_short_gap_up_through_stop_fills_at_open(fake_signals):
 
 def test_short_covers_on_macd_cross_up(fake_signals):
     df = short_bars([FLAT, FLAT, FLAT, (99.3, 100, 99, 99.5)], signal_days=[0], cross_up_days=[2])
-    t = backtest.run({"X": df}, replace(SHORT, exit_on_macd_cross_down=True), NO_BORROW).trades.iloc[0]
+    t = backtest.run({"X": df}, replace(SHORT, macd_exit="any"), NO_BORROW).trades.iloc[0]
     assert t.exit_reason == "MACD cross up" and str(t.exit_date) == "2024-01-04" and t.exit_price == 99.3
 
 
@@ -492,3 +494,47 @@ def test_failed_download_falls_back_to_cache(tmp_path, monkeypatch):
     monkeypatch.setattr(data, "_download", boom)
     out = data.load(["X"], "2000-01-01", "15m", refresh=True, cache_dir=tmp_path)
     assert len(out["X"]) == 26
+
+
+# --- Letting winners run: sell-setup exit and trailing stop ---
+
+def test_long_exits_only_on_cross_down_above_zero(fake_signals):
+    df = bars([FLAT] * 6, signal_days=[0], cross_down_days=[1, 3])
+    df["macd"] = [-5, -2, 1, 2, 1, 1]          # day 1: cross under zero (ignored); day 3: above zero
+    df["cross_up"] = False
+    t = backtest.run({"X": df}, replace(S, macd_exit="above_zero", target_r=None), NO_COSTS).trades.iloc[0]
+    assert t.exit_reason == "MACD sell setup" and str(t.exit_date) == "2024-01-05"
+    # The old rule leaves at the first cross back, under zero.
+    t_any = backtest.run({"X": df}, replace(S, macd_exit="any", target_r=None), NO_COSTS).trades.iloc[0]
+    assert t_any.exit_reason == "MACD cross down" and str(t_any.exit_date) == "2024-01-03"
+
+
+def test_short_covers_only_on_cross_up_below_zero(fake_signals):
+    df = short_bars([FLAT] * 6, signal_days=[0], cross_up_days=[1, 3])
+    df["macd"], df["cross_down"] = [5, 2, -1, -2, -1, -1], False
+    t = backtest.run({"X": df}, replace(SHORT, macd_exit="above_zero", target_r=None), NO_BORROW).trades.iloc[0]
+    assert t.exit_reason == "MACD buy setup" and str(t.exit_date) == "2024-01-05"
+
+
+def test_default_has_no_target_and_no_time_stop():
+    assert DEFAULT_STRATEGY.target_r is None and DEFAULT_STRATEGY.max_hold_days is None
+    assert DEFAULT_STRATEGY.macd_exit == "above_zero" and DEFAULT_STRATEGY.min_macd_depth_atr == 0
+
+
+def test_trailing_stop_follows_best_close_and_never_loosens(fake_signals):
+    rows = [FLAT, FLAT, (104, 106, 103.5, 106), (106, 110.5, 105.5, 110), (110, 110.5, 107, 108),
+            (108, 108.5, 107.4, 107.5)]
+    df = bars(rows, signal_days=[0])
+    t = backtest.run({"X": df}, replace(S, target_r=None, trail_atr_mult=3.0), NO_COSTS).trades.iloc[0]
+    # Entry 100, first stop 98 (2 ATR). Best close 110 -> trail 107. Day 4 close 108 keeps it at 107.
+    assert t.stop == 98 and t.exit_stop == 107
+    assert t.exit_reason == "trailing stop" and t.exit_price == 107
+    assert t.r_multiple == pytest.approx(3.5)                  # (107-100) / (100-98)
+
+
+def test_short_trailing_stop_mirrors(fake_signals):
+    rows = [FLAT, FLAT, (96, 96.5, 94, 94), (94, 94.5, 90, 90), (90, 93.5, 89.5, 93)]
+    df = short_bars(rows, signal_days=[0])
+    t = backtest.run({"X": df}, replace(SHORT, target_r=None, trail_atr_mult=3.0), NO_BORROW).trades.iloc[0]
+    assert t.stop == 102 and t.exit_stop == 93 and t.exit_reason == "trailing stop"
+    assert t.r_multiple == pytest.approx(3.5)

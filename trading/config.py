@@ -59,10 +59,9 @@ class Strategy:
     require_below_zero: bool = True     # signal_cross only: the cross must happen under zero
                                         # (above zero for shorts)
     # Buffer: with require_below_zero, the cross only counts if the MACD is at least this many
-    # ATRs (ATR(14) of the chart timeframe) below zero (above zero for shorts). Crosses that
-    # happen just under the zero line are mostly chop. 0 turns it off. 0.5 is a starting guess,
-    # not a tuned value: compare it with the "no buffer" and "1 ATR buffer" variants.
-    min_macd_depth_atr: float = 0.5
+    # ATRs (ATR(14) of the chart timeframe) below zero (above zero for shorts). 0 = off (default):
+    # any cross under zero counts.
+    min_macd_depth_atr: float = 0.0
 
     # Lower-timeframe check. A lower timeframe "agrees" with a buy when its own MACD
     # (same 12/144/9 settings) is above its signal line AND its histogram rose on its last
@@ -85,12 +84,20 @@ class Strategy:
     max_run_atr: float | None = None
     run_lookback: int = 20
 
-    # Exits.
+    # Exits. Built to let winners run: hold until the setup turns into its opposite.
     atr_period: int = 14
     stop_atr_mult: float = 3.0          # stop = entry -/+ 3 x ATR of the chart timeframe
-    target_r: float | None = 2.0        # take profit at 2x the risk; None = no target
-    exit_on_macd_cross_down: bool = True  # longs sell on a cross down; shorts cover on a cross up
-    max_hold_days: int | None = 15      # time stop in trading days; None = no limit
+    # When the MACD crossing back through its signal line ends the trade:
+    #   "above_zero": longs sell only when the MACD crosses DOWN while ABOVE zero, the sell setup
+    #                 (shorts cover when it crosses UP while BELOW zero). Wobbles under zero don't exit.
+    #   "any":        any cross back exits (the old, quicker exit)
+    #   "off":        never; only stops, target and time stop
+    macd_exit: str = "above_zero"
+    # Optional trailing stop: N x ATR behind the best close since entry; only ever tightens.
+    # None = off (the stop stays where it started).
+    trail_atr_mult: float | None = None
+    target_r: float | None = None       # take profit at N x the risk; None = no target, let it run
+    max_hold_days: int | None = None    # time stop in trading days; None = no limit
 
     # Ranking when more signals fire than there are free slots: higher wins for longs,
     # lower wins for shorts.
@@ -124,8 +131,10 @@ _D = DEFAULT_STRATEGY
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
 VARIANTS = [
     _D,
-    replace(_D, name="Dip buy, no buffer (any cross under zero)", min_macd_depth_atr=0.0),
-    replace(_D, name="Dip buy, 1 ATR buffer", min_macd_depth_atr=1.0),
+    replace(_D, name="Old exits: 2R target, any MACD cross back, 15 days", target_r=2.0,
+            macd_exit="any", max_hold_days=15),
+    replace(_D, name="Sell setup exit + 3 ATR trailing stop", trail_atr_mult=3.0),
+    replace(_D, name="3 ATR trailing stop only", macd_exit="off", trail_atr_mult=3.0),
     replace(_D, name="Dip buy, below 200-bar EMA (as on your chart)", trend_ma_source="bars"),
     replace(_D, name="Dip buy, no 200 EMA rule", trend_ma=None),
     replace(_D, name="Zero-line cross, price not run (<3 ATR)", entry="zero_cross",
