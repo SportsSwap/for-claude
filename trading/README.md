@@ -27,6 +27,39 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 | Size | Lose 2% of the account if the stop hits; no position above ~34% of the account; fractional shares | `--risk-pct`, `--max-position-pct` |
 | Limits | Max 3 positions; no new trades once the account hits $800 | `max_positions`, `kill_switch_pct` |
 | Costs | IBKR Pro fixed commissions + 0.05% slippage per fill | `Risk` |
+| Shorts | Off by default. Turn on with `--sides short` or `--sides both` (see below) | `sides` |
+
+### Shorts (optional)
+
+The short is the dip buy turned upside down, for stocks that have run too far up:
+
+| Rule | Short |
+|---|---|
+| Entry | MACD line crosses **below** its signal line **while above zero**, and price is **above the 200-day EMA** |
+| Fill | Sell short at the open of the next bar |
+| Stop | Entry **+** 3 × ATR(14), above the entry |
+| Target | 2R **below** the entry |
+| Other exits | MACD crosses back **above** its signal line → buy to cover at the next bar's open; 15-trading-day time stop |
+| Size and limits | Same as longs: 2% risk, ~34% cap, and longs and shorts share the 3 position slots |
+| Extra cost | Stock-loan fee of 0.5% a year on the position's value (`short_borrow_pct_per_year`) |
+
+With `--sides both`, if more signals fire than there are free slots, longs with the highest
+20-bar momentum and shorts with the lowest win. In the backtest a short sets aside cash equal to its
+value, so there is no leverage and a short is sized exactly like a long.
+
+**Before you short with real money, read this.** At Interactive Brokers:
+
+- Shorting needs a **margin account**, and IBKR margin accounts need at least **$2,000**. A $1,000
+  cash account can't short stocks.
+- **Fractional shares can't be shorted.** You'd need whole shares, which for a $900 stock means
+  one share is most of the account.
+- A short's loss has no ceiling. A gap up through the stop (on earnings, for example) can cost far
+  more than 2%. The backtest fills those gaps at the open, but it can't predict a buyout announcement.
+
+Ways to take the same bearish view in a small cash account: buy a **put option** (options approval
+needed; the most you can lose is what you paid), or buy an **inverse ETF** (SQQQ for the Nasdaq,
+SOXS for semiconductors, or single-stock ones like NVDS). Neither behaves exactly like the backtested
+short, so treat the backtest as a test of the signal, not of those instruments.
 
 `--compare` runs these side by side:
 
@@ -39,6 +72,8 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 | Zero-line cross, any | Same without the "price hasn't moved" check |
 | Trend: MACD cross, above 200-day EMA | The opposite idea: only buy stocks already in an uptrend |
 | Classic 12/26/9, above 200-day EMA | The textbook MACD for comparison |
+| Short only: MACD cross down above zero, above 200-day EMA | The short rule on its own |
+| Long + short: dip buy and its mirror | The default plus shorts, sharing the 3 slots |
 
 The backtester is deliberately pessimistic in two places. If a stop and a target are both touched in
 the same bar, it assumes the stop hit first. If a stock gaps through the stop, it fills at the
@@ -53,7 +88,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "21 passed"
+python -m pytest -q tests        # should print "29 passed"
 ```
 
 ## Run the backtest
@@ -65,6 +100,8 @@ python run_backtest.py --compare --interval 1h
 python run_backtest.py --compare --interval 1d --start 2018-01-01   # daily bars, includes the 2022 crash
 python run_backtest.py --compare --risk-pct 3            # same again at 3% risk per trade
 python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a few stocks, with detail
+python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
+python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
 ```
 
 Prices come from Yahoo Finance (free, cached in `data/`; add `--refresh` to re-download). **Yahoo only
@@ -82,12 +119,17 @@ TradingView's 45-minute chart can't be backtested here: Yahoo keeps under 30-min
 - **profit_factor**: dollars won ÷ dollars lost. Above 1.3 is decent; below 1.1 is close to noise.
 - **longest_losing_streak**: how many losses in a row you need to be able to stomach.
 - **kill_switch_hit**: when the account would have dropped to $800, if it did.
+- **long_pnl / short_pnl**: dollars made by each side, when shorts are on. If the shorts lose money
+  while the longs make it, leave shorts off.
 
 **The bar to clear:** beat buy-and-hold QQQ, or come close with a much smaller drawdown. If no
 variant manages that, trading it is extra work for less money.
 
 **Watch for overfitting.** If you tweak settings until the backtest looks great, you've fitted the
 past, not found an edge. Change one thing at a time, for a reason.
+
+**Shorts and the last two years:** this has mostly been a bull market for these stocks, so shorts
+will probably look worse here than in a year like 2022. Run the daily test from 2018 before deciding.
 
 **Known limit:** the stock list contains today's winners, so past results look better than they
 would have in real time (survivorship bias). Treat any backtest return as an upper bound.
@@ -111,6 +153,10 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Zero-line cross, any | Entry trigger: **Zero-line cross**; Price must be: **Off** |
 | Trend: MACD cross above 200-day EMA | Untick "must happen under zero"; Price must be: **Above** |
 | Classic 12/26/9 | Slow length: **26**; untick "must happen under zero"; Price must be: **Above** |
+| Short only | Entry → Trades to take: **Short only** |
+| Long + short | Entry → Trades to take: **Long and short** |
+
+Short signals show as pink triangles above the bar; buy signals as teal triangles below.
 
 For each stock and variant, note **Net profit**, **Max drawdown**, **Total closed trades**, **Percent
 profitable** and **Profit factor**, or just screenshot the Overview and Performance Summary.
@@ -125,6 +171,8 @@ Differences from the Python backtester:
   the bar's shape. Python always assumes the stop hit first.
 - **History** depends on your TradingView plan. Intraday charts load a limited number of bars, so a
   2h test may only reach back a year or two.
+- **Long and short on one chart:** the script holds one trade at a time, so it won't open a short
+  while a long is still open (the Python backtester behaves the same per stock).
 - The script also fires an **alert** on each buy signal. Create an alert on the strategy to get pinged,
   and later the agent can receive these by webhook.
 
@@ -133,11 +181,13 @@ Differences from the Python backtester:
 ```bash
 python scan.py --equity 1000                 # 2h bars, default strategy, your current account value
 python scan.py --interval 4h --variant 3     # 4h bars, zero-line-cross variant
+python scan.py --sides both                  # buy signals and short signals
 ```
 
 For each buy signal it prints a stop, a target and a share count, sized so that hitting the stop
 costs your risk percent of the account. It also prints a watchlist of stocks with the MACD under zero and
-curling up toward a cross. Run it after a bar closes: during market hours the newest bar is still
+curling up toward a cross. With `--sides short` or `both` it also lists short signals (stop above,
+target below) and a short watchlist: MACD above zero and rolling over. Run it after a bar closes: during market hours the newest bar is still
 forming and its signal can disappear by the close. The MACD and EMA match TradingView's formulas, so
 you can check any signal on your chart.
 

@@ -7,6 +7,11 @@ Order of events on each bar:
   4. During the bar: stops and targets are checked against the bar's low and high.
      If both are touched in the same bar, the stop is assumed to have hit first.
   5. Close: equity is marked to market and the next bar's exits and entries are chosen.
+
+Shorts mirror longs: the stop sits above the entry and the target below, a gap UP through the
+stop fills at the open, and the trade covers when the MACD crosses back up. A short sets aside
+cash equal to its value (no leverage), so it is sized and limited exactly like a long, and pays
+a stock-loan fee for the days it is open.
 """
 
 from dataclasses import dataclass, field
@@ -27,9 +32,21 @@ class Position:
     stop: float
     target: float | None
     entry_cost: float
+    side: int = 1                       # +1 long, -1 short
     days_held: int = 1                  # trading sessions, counting the entry session
     last_day: object = None
     exit_next_open: str | None = None
+
+
+    def value(self, price: float) -> float:
+        """What the position is worth at this price. A short's cash collateral grows as the price falls."""
+        return self.shares * (self.entry_price + self.side * (price - self.entry_price))
+
+    def hits_stop(self, price: float) -> bool:
+        return price <= self.stop if self.side > 0 else price >= self.stop
+
+    def hits_target(self, price: float) -> bool:
+        return self.target is not None and (price >= self.target if self.side > 0 else price <= self.target)
 
 
 @dataclass
@@ -53,7 +70,8 @@ def commission(shares: float, price: float, r: Risk) -> float:
 
 
 def position_size(equity: float, cash: float, entry: float, stop: float, r: Risk) -> float:
-    risk_per_share = entry - stop
+    """Works for both sides: the stop is below a long's entry and above a short's."""
+    risk_per_share = abs(entry - stop)
     if risk_per_share <= 0:
         return 0.0
     by_risk = equity * r.risk_per_trade / risk_per_share
@@ -82,7 +100,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
 
     cash = r.starting_capital
     positions: dict[str, Position] = {}
-    pending_entries: list[str] = []
+    pending_entries: list[tuple[str, int]] = []
     trades: list[dict] = []
     equity_curve: dict[pd.Timestamp, float] = {}
     last_close: dict[str, float] = {}
@@ -92,13 +110,18 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
 
     def close_position(p: Position, ts, raw_price: float, reason: str):
         nonlocal cash
-        price = raw_price * (1 - r.slippage_pct)
+        price = raw_price * (1 - p.side * r.slippage_pct)    # sell lower, buy to cover higher
         fee = commission(p.shares, price, r)
-        cash += p.shares * price - fee
-        pnl = p.shares * price - fee - p.entry_cost
-        risk_dollars = p.shares * (p.entry_price - p.stop)
+        if p.side < 0:
+            days = max((ts - p.entry_time).days, 1)
+            fee += p.shares * p.entry_price * r.short_borrow_pct_per_year * days / 365
+        proceeds = p.value(price) - fee
+        cash += proceeds
+        pnl = proceeds - p.entry_cost
+        risk_dollars = p.shares * abs(p.entry_price - p.stop)
         trades.append({
             "ticker": p.ticker,
+            "side": "long" if p.side > 0 else "short",
             "entry_date": fmt_time(p.entry_time),
             "entry_price": round(p.entry_price, 4),
             "exit_date": fmt_time(ts),
@@ -127,18 +150,18 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 p.last_day = day
             if p.exit_next_open:
                 close_position(p, ts, bar["Open"], p.exit_next_open)
-            elif bar["Open"] <= p.stop:
+            elif p.hits_stop(bar["Open"]):
                 close_position(p, ts, bar["Open"], "stop (gap)")
-            elif p.target and bar["Open"] >= p.target:
+            elif p.hits_target(bar["Open"]):
                 close_position(p, ts, bar["Open"], "target (gap)")
 
         # 3. Entries at the open, sized off the previous bar's equity.
-        for t in pending_entries:
+        for t, side in pending_entries:
             bar = bars.get(t)
             if bar is None or t in positions or pd.isna(bar["prev_atr"]):
                 continue
-            entry = bar["Open"] * (1 + r.slippage_pct)
-            stop = entry - s.stop_atr_mult * bar["prev_atr"]
+            entry = bar["Open"] * (1 + side * r.slippage_pct)   # buy higher, short lower
+            stop = entry - side * s.stop_atr_mult * bar["prev_atr"]
             shares = position_size(equity, cash, entry, stop, r)
             if shares <= 0 or stop <= 0:
                 skipped += 1
@@ -146,7 +169,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             cost = shares * entry + commission(shares, entry, r)
             cash -= cost
             target = entry + s.target_r * (entry - stop) if s.target_r else None
-            positions[t] = Position(t, ts, entry, shares, stop, target, cost, last_day=day)
+            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, last_day=day)
         pending_entries = []
 
         # 4. Stops and targets during the bar.
@@ -154,23 +177,24 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
-            if bar["Low"] <= p.stop:
+            worst, best = (bar["Low"], bar["High"]) if p.side > 0 else (bar["High"], bar["Low"])
+            if p.hits_stop(worst):
                 close_position(p, ts, p.stop, "stop")
-            elif p.target and bar["High"] >= p.target:
+            elif p.hits_target(best):
                 close_position(p, ts, p.target, "target")
 
         # 5. Close: mark to market, then plan the next bar.
         for t, bar in bars.items():
             last_close[t] = bar["Close"]
-        equity = cash + sum(p.shares * last_close[p.ticker] for p in positions.values())
+        equity = cash + sum(p.value(last_close[p.ticker]) for p in positions.values())
         equity_curve[ts] = equity
 
         for p in positions.values():
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
-            if s.exit_on_macd_cross_down and bar["cross_down"]:
-                p.exit_next_open = "MACD cross down"
+            if s.exit_on_macd_cross_down and (bar["cross_down"] if p.side > 0 else bar["cross_up"]):
+                p.exit_next_open = "MACD cross down" if p.side > 0 else "MACD cross up"
             elif s.max_hold_days and p.days_held >= s.max_hold_days:
                 p.exit_next_open = "time stop"
 
@@ -179,11 +203,19 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         if kill_date is not None:
             continue
 
-        candidates = [(t, bar[s.rank_by]) for t, bar in bars.items()
-                      if bar["entry_signal"] and t not in positions]
-        candidates.sort(key=lambda c: -(c[1] if pd.notna(c[1]) else -1e9))
+        # Longs rank highest-first, shorts lowest-first (the weakest stock is the best short).
+        candidates = []
+        for t, bar in bars.items():
+            if t in positions:
+                continue
+            score = bar[s.rank_by] if pd.notna(bar[s.rank_by]) else None
+            if bar["entry_signal"]:
+                candidates.append((t, 1, score if score is not None else -1e9))
+            elif bar.get("short_signal", False):
+                candidates.append((t, -1, -score if score is not None else -1e9))
+        candidates.sort(key=lambda c: -c[2])
         open_slots = r.max_positions - sum(1 for p in positions.values() if not p.exit_next_open)
-        pending_entries = [t for t, _ in candidates[:max(open_slots, 0)]]
+        pending_entries = [(t, side) for t, side, _ in candidates[:max(open_slots, 0)]]
         skipped += max(len(candidates) - len(pending_entries), 0)
 
     # Close anything still open at the last available price.
@@ -230,6 +262,12 @@ def stats(res: Result) -> dict:
             "longest_losing_streak": longest,
             "avg_days_held": round(tr.days_held.mean(), 1),
         })
+        if "side" in tr and (tr.side == "short").any():
+            for side in ("long", "short"):
+                part = tr[tr.side == side]
+                out[f"{side}_trades"] = len(part)
+                out[f"{side}_pnl"] = round(part.pnl.sum(), 2)
+                out[f"{side}_win_rate_pct"] = round((part.pnl > 0).mean() * 100, 1) if len(part) else 0.0
     return out
 
 

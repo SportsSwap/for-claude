@@ -251,3 +251,94 @@ def test_higher_risk_pct_means_bigger_position(fake_signals):
     small = backtest.run({"X": df}, S, NO_COSTS).trades.iloc[0]
     big = backtest.run({"X": df}, S, replace(NO_COSTS, risk_per_trade=0.03)).trades.iloc[0]
     assert big.pnl == pytest.approx(1.5 * small.pnl, abs=0.02)
+
+
+# --- Shorts: MACD crosses down above zero while price is above the 200-day EMA ---
+
+SHORT = replace(S, sides="short")
+NO_BORROW = replace(NO_COSTS, short_borrow_pct_per_year=0.0)
+
+
+def short_bars(rows, signal_days=(), cross_up_days=(), atr=1.0, momentum=0.0):
+    df = bars(rows, atr=atr, momentum=momentum)
+    df["entry_signal"] = False
+    df["short_signal"] = [i in signal_days for i in range(len(rows))]
+    df["cross_up"] = [i in cross_up_days for i in range(len(rows))]
+    return df
+
+
+def test_short_signal_is_the_mirror_of_the_dip_buy():
+    # Rise then roll over: the MACD crosses down through its signal line while still above zero.
+    close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    df = ohlc(close, idx)
+    d = add_signals(df, SHORT, daily=df)
+    hits = d[d.short_signal]
+    assert len(hits) >= 1
+    assert (hits.macd > 0).all() and (hits.Close > hits.trend_ma).all()
+    assert not d.entry_signal.any()                         # shorts only: no longs
+    # Same roll-over but the stock is below its 200-day average: no short.
+    high_daily = ohlc(np.full(len(close), 1000.0), idx)
+    assert not add_signals(df, SHORT, daily=high_daily).short_signal.any()
+    # Default strategy stays long-only.
+    assert not add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
+
+
+def test_short_entry_stop_above_and_stop_hit(fake_signals):
+    df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, (100, 111.5, 100, 111)], signal_days=[0], atr=5.0)
+    t = backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0]
+    assert t.side == "short" and t.entry_price == 101 and str(t.entry_date) == "2024-01-02"
+    assert t.stop == 111 and t.target == 81                  # 101 + 2 x ATR(5); 2R below
+    assert t.exit_reason == "stop" and t.exit_price == 111
+    assert t.r_multiple == pytest.approx(-1.0)
+    assert t.pnl == pytest.approx(-20.0, abs=0.01)           # 2% of $1000, same as a long
+
+
+def test_short_target_hit_makes_money(fake_signals):
+    df = short_bars([FLAT, FLAT, (100, 100.5, 95.5, 96)], signal_days=[0])
+    t = backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0]
+    assert t.exit_reason == "target" and t.exit_price == 96 and t.r_multiple == pytest.approx(2.0)
+    assert t.pnl > 0
+
+
+def test_short_stop_assumed_first_when_both_touched(fake_signals):
+    df = short_bars([FLAT, FLAT, (100, 103, 95, 99)], signal_days=[0])
+    assert backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0].exit_reason == "stop"
+
+
+def test_short_gap_up_through_stop_fills_at_open(fake_signals):
+    df = short_bars([FLAT, FLAT, (105, 106, 104, 105)], signal_days=[0])
+    t = backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0]
+    assert t.exit_reason == "stop (gap)" and t.exit_price == 105 and t.r_multiple < -1
+
+
+def test_short_covers_on_macd_cross_up(fake_signals):
+    df = short_bars([FLAT, FLAT, FLAT, (99.3, 100, 99, 99.5)], signal_days=[0], cross_up_days=[2])
+    t = backtest.run({"X": df}, replace(SHORT, exit_on_macd_cross_down=True), NO_BORROW).trades.iloc[0]
+    assert t.exit_reason == "MACD cross up" and str(t.exit_date) == "2024-01-04" and t.exit_price == 99.3
+
+
+def test_short_costs_and_equity_reconcile(fake_signals):
+    df = short_bars([FLAT, FLAT, FLAT, (99, 99.5, 98.5, 99)], signal_days=[0])
+    free = backtest.run({"X": df}, SHORT, NO_BORROW)
+    paid = backtest.run({"X": df}, SHORT, DEFAULT_RISK)
+    t = paid.trades.iloc[0]
+    assert t.entry_price < 100                               # shorted below the open (slippage)
+    assert paid.trades.pnl.sum() < free.trades.pnl.sum()     # commissions + borrow fee
+    assert paid.equity.iloc[-1] == pytest.approx(1000 + paid.trades.pnl.sum(), abs=0.01)
+    # Mark-to-market while open: price fell from 100 to 99, so the short is up.
+    assert free.equity.iloc[2] == pytest.approx(1000, abs=0.01)
+    assert free.equity.iloc[3] > 1000
+
+
+def test_both_sides_share_the_position_limit(fake_signals):
+    # Longs rank by highest momentum, shorts by lowest, on one scale.
+    prices = {"L_strong": bars([FLAT] * 3, signal_days=[0], momentum=0.7),
+              "L_weak": bars([FLAT] * 3, signal_days=[0], momentum=0.1),
+              "S_weak": short_bars([FLAT] * 3, signal_days=[0], momentum=-0.65),
+              "S_mid": short_bars([FLAT] * 3, signal_days=[0], momentum=-0.6),
+              "S_strong": short_bars([FLAT] * 3, signal_days=[0], momentum=0.2)}
+    res = backtest.run(prices, replace(S, sides="both"), NO_COSTS)
+    assert sorted(res.trades.ticker) == ["L_strong", "S_mid", "S_weak"]
+    assert res.skipped_signals == 2
+    assert dict(zip(res.trades.ticker, res.trades.side)) == {"L_strong": "long", "S_mid": "short", "S_weak": "short"}

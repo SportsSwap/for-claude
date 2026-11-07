@@ -26,6 +26,12 @@ INTERVALS = ["1d", "1h", "2h", "4h"]
 class Strategy:
     name: str = "Dip buy: MACD cross under zero, below 200-day EMA"
 
+    # Which trades to take: "long", "short" or "both".
+    # A short is the long rule upside down: MACD crosses DOWN through its signal line while
+    # ABOVE zero, with price ABOVE the 200-day EMA. Stop above, target below, and it covers
+    # when the MACD crosses back up.
+    sides: str = "long"
+
     # MACD. 12/144/9: the slow line acts as the trend, so signals are fewer and cleaner.
     macd_fast: int = 12
     macd_slow: int = 144
@@ -36,12 +42,14 @@ class Strategy:
     #   "zero_cross":   MACD line crosses above zero (the midline)
     entry: str = "signal_cross"
     require_below_zero: bool = True     # signal_cross only: the cross must happen under zero
+                                        # (above zero for shorts)
 
     # Moving-average filter: the 200 EMA.
     trend_ma: int | None = 200          # None turns it off
     trend_ma_type: str = "ema"          # "ema" or "sma"
     trend_ma_source: str = "daily"      # "daily" = 200-day EMA; "bars" = 200 EMA of the chart timeframe
-    trend_side: str = "below"           # price must be "below" or "above" the average
+    trend_side: str = "below"           # longs: price must be "below" or "above" the average
+                                        # (shorts use the opposite side)
 
     # "Price hasn't moved yet": skip the trade if price is already more than N ATRs
     # above its lowest low of the last run_lookback bars. None turns it off.
@@ -50,12 +58,13 @@ class Strategy:
 
     # Exits.
     atr_period: int = 14
-    stop_atr_mult: float = 3.0          # stop = entry - 3 x ATR of the chart timeframe
+    stop_atr_mult: float = 3.0          # stop = entry -/+ 3 x ATR of the chart timeframe
     target_r: float | None = 2.0        # take profit at 2x the risk; None = no target
-    exit_on_macd_cross_down: bool = True
+    exit_on_macd_cross_down: bool = True  # longs sell on a cross down; shorts cover on a cross up
     max_hold_days: int | None = 15      # time stop in trading days; None = no limit
 
-    # Ranking when more signals fire than there are free slots: higher wins.
+    # Ranking when more signals fire than there are free slots: higher wins for longs,
+    # lower wins for shorts.
     rank_by: str = "momentum_20"
 
 
@@ -73,6 +82,9 @@ class Risk:
     commission_min: float = 1.0
     commission_max_pct: float = 0.01
     slippage_pct: float = 0.0005        # 0.05% worse than the quoted price on every fill
+    # Stock-loan fee on shorts, per year of the position's value. Mega caps are "easy to
+    # borrow" at IBKR, typically 0.25-0.5% a year.
+    short_borrow_pct_per_year: float = 0.005
 
 
 DEFAULT_STRATEGY = Strategy()
@@ -91,4 +103,6 @@ VARIANTS = [
     replace(_D, name="Trend: MACD cross, above 200-day EMA", require_below_zero=False, trend_side="above"),
     replace(_D, name="Classic 12/26/9, above 200-day EMA", macd_slow=26, require_below_zero=False,
             trend_side="above"),
+    replace(_D, name="Short only: MACD cross down above zero, above 200-day EMA", sides="short"),
+    replace(_D, name="Long + short: dip buy and its mirror", sides="both"),
 ]

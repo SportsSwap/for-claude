@@ -23,15 +23,7 @@ def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = 
     df["cross_up"] = above & ~was_above
     df["cross_down"] = ~above & was_above
     df["zero_cross_up"] = (df["macd"] > 0) & (df["macd"].shift(1) <= 0)
-
-    if s.entry == "signal_cross":
-        entry = df["cross_up"].copy()
-        if s.require_below_zero:
-            entry &= df["macd"] < 0
-    elif s.entry == "zero_cross":
-        entry = df["zero_cross_up"].copy()
-    else:
-        raise ValueError(f"unknown entry type {s.entry!r}")
+    df["zero_cross_down"] = (df["macd"] < 0) & (df["macd"].shift(1) >= 0)
 
     if s.trend_ma:
         average = ema if s.trend_ma_type == "ema" else sma
@@ -41,20 +33,55 @@ def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = 
             df["trend_ma"] = ma.reindex(df.index.normalize(), method="ffill").to_numpy()
         else:
             df["trend_ma"] = average(df["Close"], s.trend_ma)
-        if s.trend_side == "below":
-            entry &= df["Close"] < df["trend_ma"]
-        else:
-            entry &= df["Close"] > df["trend_ma"]
-
     if s.max_run_atr is not None:
-        run = (df["Close"] - df["Low"].rolling(s.run_lookback).min()) / df["atr"]
-        df["run_atr"] = run
-        entry &= run <= s.max_run_atr
+        df["run_atr"] = (df["Close"] - df["Low"].rolling(s.run_lookback).min()) / df["atr"]
+        df["run_atr_down"] = (df["High"].rolling(s.run_lookback).max() - df["Close"]) / df["atr"]
 
     # Skip the warm-up period while the slow EMA settles.
     warmup = max(2 * s.macd_slow, s.atr_period, s.run_lookback) + 1
     if s.trend_ma and s.trend_ma_source == "bars":
         warmup = max(warmup, s.trend_ma)
-    entry.iloc[:warmup] = False
-    df["entry_signal"] = entry.fillna(False).astype(bool)
+
+    def finish(sig: pd.Series) -> pd.Series:
+        sig = sig.copy()
+        sig.iloc[:warmup] = False
+        return sig.fillna(False).astype(bool)
+
+    no = pd.Series(False, index=df.index)
+    df["entry_signal"] = finish(_long_entry(df, s)) if s.sides in ("long", "both") else no
+    df["short_signal"] = finish(_short_entry(df, s)) if s.sides in ("short", "both") else no
     return df
+
+
+def _long_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
+    if s.entry == "signal_cross":
+        entry = df["cross_up"].copy()
+        if s.require_below_zero:
+            entry &= df["macd"] < 0
+    elif s.entry == "zero_cross":
+        entry = df["zero_cross_up"].copy()
+    else:
+        raise ValueError(f"unknown entry type {s.entry!r}")
+    if s.trend_ma:
+        entry &= df["Close"] < df["trend_ma"] if s.trend_side == "below" else df["Close"] > df["trend_ma"]
+    if s.max_run_atr is not None:
+        entry &= df["run_atr"] <= s.max_run_atr
+    return entry
+
+
+def _short_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
+    """The long rule turned upside down: MACD crosses DOWN through its signal line while
+    ABOVE zero, and (by default) price is ABOVE the 200-day EMA, i.e. stretched too far up."""
+    if s.entry == "signal_cross":
+        entry = df["cross_down"].copy()
+        if s.require_below_zero:
+            entry &= df["macd"] > 0
+    elif s.entry == "zero_cross":
+        entry = df["zero_cross_down"].copy()
+    else:
+        raise ValueError(f"unknown entry type {s.entry!r}")
+    if s.trend_ma:
+        entry &= df["Close"] > df["trend_ma"] if s.trend_side == "below" else df["Close"] < df["trend_ma"]
+    if s.max_run_atr is not None:
+        entry &= df["run_atr_down"] <= s.max_run_atr
+    return entry

@@ -1,5 +1,6 @@
 //@version=6
-// MACD 12/144/9 dip buy with a 200 EMA filter.
+// MACD 12/144/9 dip buy with a 200 EMA filter, plus an optional mirror-image short:
+// MACD crosses DOWN through its signal line while ABOVE zero, with price ABOVE the 200-day EMA.
 // Same rules as trading/config.py, so TradingView's Strategy Tester and the Python backtester
 // can be checked against each other. Every rule is an input: open Settings to test the variants.
 
@@ -14,21 +15,22 @@ slowLen = input.int(144, "Slow length", minval = 1, group = grpM)
 sigLen = input.int(9, "Signal smoothing", minval = 1, group = grpM)
 
 grpE = "Entry"
+direction = input.string("Long only", "Trades to take", options = ["Long only", "Short only", "Long and short"], group = grpE)
 entryMode = input.string("Signal-line cross", "Entry trigger", options = ["Signal-line cross", "Zero-line cross"], group = grpE)
-needBelowZero = input.bool(true, "Signal-line cross must happen under zero", group = grpE)
+needBelowZero = input.bool(true, "Signal-line cross must happen under zero (above zero for shorts)", group = grpE)
 maxRunAtr = input.float(0.0, "Skip if price already ran more than N ATR off its low (0 = off)", minval = 0, step = 0.5, group = grpE)
 runLookback = input.int(20, "Low lookback (bars)", minval = 2, group = grpE)
 
 grpT = "200 EMA filter"
 emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
-emaSide = input.string("Below", "Price must be", options = ["Below", "Above", "Off"], group = grpT)
+emaSide = input.string("Below", "Price must be (longs; shorts use the opposite)", options = ["Below", "Above", "Off"], group = grpT)
 
 grpX = "Exits"
 atrLen = input.int(14, "ATR length", minval = 1, group = grpX)
-stopMult = input.float(3.0, "Stop = entry - N x ATR", minval = 0.5, step = 0.5, group = grpX)
+stopMult = input.float(3.0, "Stop = N x ATR from entry", minval = 0.5, step = 0.5, group = grpX)
 targetR = input.float(2.0, "Target in R (0 = no target)", minval = 0, step = 0.5, group = grpX)
-exitOnCrossDown = input.bool(true, "Sell when MACD crosses back below signal", group = grpX)
+exitOnCrossDown = input.bool(true, "Exit when MACD crosses back (down for longs, up for shorts)", group = grpX)
 maxHoldDays = input.int(15, "Time stop in trading days (0 = off)", minval = 0, group = grpX)
 
 grpR = "Risk"
@@ -48,14 +50,24 @@ trendEma = emaSource == "Daily" ? dailyEma : chartEma
 crossUp = ta.crossover(macdLine, signalLine)
 crossDown = ta.crossunder(macdLine, signalLine)
 zeroUp = ta.crossover(macdLine, 0)
+zeroDown = ta.crossunder(macdLine, 0)
 runAtr = (close - ta.lowest(low, runLookback)) / atrVal
+runAtrDown = (ta.highest(high, runLookback) - close) / atrVal
 
 // ---------- Entry rules ----------
 trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or macdLine < 0) : zeroUp
 trendOk = emaSide == "Off" ? true : emaSide == "Below" ? close < trendEma : close > trendEma
 runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
 warm = bar_index > 2 * slowLen
-buySignal = trigger and trendOk and runOk and warm and time >= startDate
+allowLong = direction != "Short only"
+allowShort = direction != "Long only"
+buySignal = allowLong and trigger and trendOk and runOk and warm and time >= startDate
+
+// Short: the same rule upside down.
+triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or macdLine > 0) : zeroDown
+trendOkS = emaSide == "Off" ? true : emaSide == "Below" ? close > trendEma : close < trendEma
+runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
+shortSignal = allowShort and triggerS and trendOkS and runOkS and warm and time >= startDate
 
 var bool killed = false
 if not killed and strategy.equity <= strategy.initial_capital * killPct / 100
@@ -73,18 +85,24 @@ if buySignal and flat and not killed and qty > 0
     tradeStopDist := stopDist
     strategy.entry("Long", strategy.long, qty = qty)
     alert("MACD dip buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
+else if shortSignal and flat and not killed and qty > 0
+    tradeStopDist := stopDist
+    strategy.entry("Short", strategy.short, qty = qty)
+    alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 
 // Stop and target are measured from the actual fill price (next bar's open).
+// loss/profit are in ticks against the trade, so the same call works for both sides.
 if not na(tradeStopDist)
     lossTicks = tradeStopDist / syminfo.mintick
-    if targetR > 0
-        strategy.exit("Stop/Target", "Long", loss = lossTicks, profit = lossTicks * targetR)
-    else
-        strategy.exit("Stop", "Long", loss = lossTicks)
+    for entryId in array.from("Long", "Short")
+        if targetR > 0
+            strategy.exit("Stop/Target " + entryId, entryId, loss = lossTicks, profit = lossTicks * targetR)
+        else
+            strategy.exit("Stop " + entryId, entryId, loss = lossTicks)
 
 // ---------- Other exits (fill at the next bar's open) ----------
 var int daysHeld = 0
-if strategy.position_size > 0
+if strategy.position_size != 0
     if strategy.position_size[1] == 0
         daysHeld := 1
     else if timeframe.change("D")
@@ -97,10 +115,17 @@ if strategy.position_size > 0
         strategy.close("Long", comment = "MACD cross down")
     else if maxHoldDays > 0 and daysHeld >= maxHoldDays
         strategy.close("Long", comment = "Time stop")
+if strategy.position_size < 0
+    if exitOnCrossDown and crossUp
+        strategy.close("Short", comment = "MACD cross up")
+    else if maxHoldDays > 0 and daysHeld >= maxHoldDays
+        strategy.close("Short", comment = "Time stop")
 
 // ---------- Chart ----------
-inTrade = strategy.position_size > 0 and not na(tradeStopDist)
+side = math.sign(strategy.position_size)
+inTrade = side != 0 and not na(tradeStopDist)
 plot(emaSide == "Off" ? na : trendEma, "200 EMA filter", color = color.orange, linewidth = 2)
-plot(inTrade ? strategy.position_avg_price - tradeStopDist : na, "Stop", color = color.red, style = plot.style_linebr)
-plot(inTrade and targetR > 0 ? strategy.position_avg_price + tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
+plot(inTrade ? strategy.position_avg_price - side * tradeStopDist : na, "Stop", color = color.red, style = plot.style_linebr)
+plot(inTrade and targetR > 0 ? strategy.position_avg_price + side * tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
 plotshape(buySignal and not killed, "Buy signal", style = shape.triangleup, location = location.belowbar, color = color.teal, size = size.small)
+plotshape(shortSignal and not killed, "Short signal", style = shape.triangledown, location = location.abovebar, color = color.fuchsia, size = size.small)
