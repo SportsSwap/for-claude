@@ -1,84 +1,39 @@
 //@version=6
-// Two long-only MACD systems in one script. Pick one under "System"; to see both on one chart,
-// add the script twice and set one copy to Short-term.
-// Both only BUY while price is ABOVE the 200-day EMA, when the MACD crosses up under zero.
-//   Long-term (12/144/9): wait 2 bars, then up to 30 bars for the 4h + daily MACDs to agree.
-//                         Stop 3 ATR. Hold until the sell setup (MACD crosses down ABOVE zero).
-//                         Weeks to months.
-//   Short-term (12/26/9): wait 1 bar, then up to 10 bars for 4h + daily to agree. Stop 2 ATR.
-//                         Sell setup or 10 trading days. Days to ~2 weeks.
-// Shorts (parked, off by default) mirror it: only while price is BELOW the 200-day EMA, when the
-// MACD crosses down above zero.
-//   Custom: uses every setting below as you set it.
-// Same rules as trading/config.py (LONG_TERM, SHORT_TERM), so TradingView's Strategy Tester and
-// the Python backtester can be checked against each other.
-// Short selling is parked (Entry -> Trades to take); see README "Shorts (parked)".
+// MACD 12/144/9 with a 200-day EMA filter (the orange line on the chart).
+// Buy: MACD crosses UP through its signal line while UNDER zero, and price is ABOVE the 200-day EMA.
+// Optional short (off by default, Entry -> Trades to take): MACD crosses DOWN through its signal
+// line while ABOVE zero, and price is BELOW the 200-day EMA.
+// Same rules as trading/config.py, so TradingView's Strategy Tester and the Python backtester
+// can be checked against each other. Every rule is an input: open Settings to test the variants.
 
-strategy("MACD Long-term / Short-term", shorttitle = "MACD Systems", overlay = true,
+strategy("MACD 12/144/9 + 200 EMA", shorttitle = "MACD 200 EMA", overlay = true,
      initial_capital = 1000, currency = currency.USD, pyramiding = 0,
      commission_type = strategy.commission.cash_per_order, commission_value = 1.0, slippage = 2)
 
 // ---------- Inputs ----------
-SYS_LONG = "Long-term: 12/144/9"
-SYS_SHORT = "Short-term: 12/26/9"
-SYS_CUSTOM = "Custom: use the settings below"
-system = input.string(SYS_LONG, "System", options = [SYS_LONG, SYS_SHORT, SYS_CUSTOM],
-     tooltip = "Long-term and Short-term fix the MACD slow length, 200 EMA side, wait bars, stop and time limit to the system's rules. Custom uses your settings below.")
-
 grpM = "MACD"
 fastLen = input.int(12, "Fast length", minval = 1, group = grpM)
-slowLen = input.int(144, "Slow length (Custom only)", minval = 1, group = grpM)
+slowLen = input.int(144, "Slow length", minval = 1, group = grpM)
 sigLen = input.int(9, "Signal smoothing", minval = 1, group = grpM)
 
 grpE = "Entry"
-direction = input.string("Long only", "Trades to take (shorts parked)", options = ["Long only", "Short only", "Long and short"], group = grpE)
+direction = input.string("Long only", "Trades to take", options = ["Long only", "Short only", "Long and short"], group = grpE)
 entryMode = input.string("Signal-line cross", "Entry trigger", options = ["Signal-line cross", "Zero-line cross"], group = grpE)
 needBelowZero = input.bool(true, "Signal-line cross must happen under zero (above zero for shorts)", group = grpE)
-minDepthAtr = input.float(0.0, "Buffer: cross at least N x ATR past zero (0 = off)", minval = 0, step = 0.25, group = grpE,
-     tooltip = "0.5 means the MACD must be at least half an ATR below zero when it crosses up (above zero for shorts). 0 = any cross under zero counts.")
 maxRunAtr = input.float(0.0, "Skip if price already ran more than N ATR off its low (0 = off)", minval = 0, step = 0.5, group = grpE)
 runLookback = input.int(20, "Low lookback (bars)", minval = 2, group = grpE)
 
 grpT = "200 EMA filter"
 emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
-emaSide = input.string("Above", "Price must be (Custom only)", options = ["Below", "Above", "Off"], group = grpT)
-
-grpS = "Shorts"
-shortSide = input.string("Mirror of longs", "Short stocks that are", group = grpS,
-     options = ["Mirror of longs", "Above their 200 EMA", "Below their 200 EMA", "Either side"],
-     tooltip = "Mirror of longs: longs need ABOVE the 200 EMA, so shorts need BELOW it (shorting stocks already in a downtrend).")
-useMarket = input.bool(true, "Only short when the market is below its 200-day EMA", group = grpS)
-marketSym = input.symbol("NASDAQ:QQQ", "Market index", group = grpS)
-shortRiskMult = input.float(1.0, "Short size (x normal risk)", minval = 0.1, maxval = 1, step = 0.25, group = grpS)
-shortStopMult = input.float(0.0, "Short stop N x ATR (0 = same as longs)", minval = 0, step = 0.5, group = grpS)
-
-grpQ = "Only the best trades"
-confirmBars = input.int(2, "Wait N bars after the cross (Custom only)", minval = 0, maxval = 10, group = grpQ,
-     tooltip = "After the cross, the MACD must stay on the right side of its signal line and the histogram must grow on each of these bars. Crosses that fizzle are skipped.")
-alignWin = input.int(30, "Line-up window: bars to wait for everything to agree (Custom only)", minval = 0, group = grpQ,
-     tooltip = "After the wait, keep waiting up to this many bars for the higher timeframes and other filters to agree, as long as the MACD stays above its signal line. The trade fires on the first bar where everything lines up.")
-reqHigher = input.bool(true, "Higher timeframes must agree", group = grpQ,
-     tooltip = "At entry, the MACD on these timeframes (last finished bar) must be above its signal line for a buy, below for a short. Only timeframes longer than the chart count.")
-htfA = input.timeframe("240", "Higher timeframe 1", group = grpQ)
-htfB = input.timeframe("D", "Higher timeframe 2", group = grpQ)
-
-grpL = "Lower timeframes"
-confirmMin = input.int(0, "How many must agree (0 = just show the count)", minval = 0, maxval = 3, group = grpL,
-     tooltip = "A lower timeframe agrees with a buy when its MACD is above its signal line and its histogram rose on its last closed bar (mirror for shorts). Only timeframes shorter than the chart count.")
-tfA = input.timeframe("15", "Lower timeframe 1", group = grpL)
-tfB = input.timeframe("30", "Lower timeframe 2", group = grpL)
-tfC = input.timeframe("45", "Lower timeframe 3", group = grpL)
+emaSide = input.string("Above", "Price must be (longs; shorts use the opposite)", options = ["Below", "Above", "Off"], group = grpT)
 
 grpX = "Exits"
 atrLen = input.int(14, "ATR length", minval = 1, group = grpX)
-stopMult = input.float(3.0, "Stop = N x ATR from entry (Custom only)", minval = 0.5, step = 0.5, group = grpX)
-SELL_SETUP = "Sell setup: cross back beyond zero"
-exitMode = input.string(SELL_SETUP, "MACD exit", options = [SELL_SETUP, "Any cross back", "Off"], group = grpX,
-     tooltip = "Sell setup: a long sells only when the MACD crosses down while ABOVE zero (a short covers when it crosses up while BELOW zero). Any cross back: the old, quicker exit.")
-trailMult = input.float(0.0, "Trailing stop: N x ATR behind best close (0 = off)", minval = 0, step = 0.5, group = grpX)
-targetR = input.float(0.0, "Target in R (0 = no target)", minval = 0, step = 0.5, group = grpX)
-maxHoldDays = input.int(0, "Time stop in trading days, 0 = off (Custom only)", minval = 0, group = grpX)
+stopMult = input.float(3.0, "Stop = N x ATR from entry", minval = 0.5, step = 0.5, group = grpX)
+targetR = input.float(2.0, "Target in R (0 = no target)", minval = 0, step = 0.5, group = grpX)
+exitOnCrossDown = input.bool(true, "Exit when MACD crosses back (down for longs, up for shorts)", group = grpX)
+maxHoldDays = input.int(15, "Time stop in trading days (0 = off)", minval = 0, group = grpX)
 
 grpR = "Risk"
 riskPct = input.float(2.0, "Risk per trade (% of equity)", minval = 0.1, step = 0.5, group = grpR)
@@ -86,25 +41,13 @@ maxPosPct = input.float(34.0, "Max position (% of equity)", minval = 1, maxval =
 killPct = input.float(80.0, "No new trades once equity falls to (% of start)", minval = 0, maxval = 100, group = grpR)
 startDate = input.time(timestamp("2018-01-01"), "Test from", group = grpR)
 
-// ---------- System preset ----------
-isLongSys = system == SYS_LONG
-isShortSys = system == SYS_SHORT
-slowEff = isLongSys ? 144 : isShortSys ? 26 : slowLen
-emaSideEff = isLongSys ? "Above" : isShortSys ? "Above" : emaSide
-confirmEff = isLongSys ? 2 : isShortSys ? 1 : confirmBars
-stopMultEff = isLongSys ? 3.0 : isShortSys ? 2.0 : stopMult
-holdEff = isLongSys ? 0 : isShortSys ? 10 : maxHoldDays
-alignEff = isLongSys ? 30 : isShortSys ? 10 : alignWin
-
 // ---------- Indicators ----------
-[macdLine, signalLine, hist] = ta.macd(close, fastLen, slowEff, sigLen)
+[macdLine, signalLine, hist] = ta.macd(close, fastLen, slowLen, sigLen)
 atrVal = ta.atr(atrLen)
 chartEma = ta.ema(close, emaLen)
 // Yesterday's daily 200 EMA: the value you could actually see before today's open (no repainting).
 dailyEma = request.security(syminfo.tickerid, "D", ta.ema(close, emaLen)[1], lookahead = barmerge.lookahead_on)
 trendEma = emaSource == "Daily" ? dailyEma : chartEma
-// Market filter: was the index below its 200-day EMA at yesterday's close? (known before today's open)
-marketDown = request.security(marketSym, "D", close[1] < ta.ema(close, 200)[1], lookahead = barmerge.lookahead_on)
 
 crossUp = ta.crossover(macdLine, signalLine)
 crossDown = ta.crossunder(macdLine, signalLine)
@@ -113,210 +56,78 @@ zeroDown = ta.crossunder(macdLine, 0)
 runAtr = (close - ta.lowest(low, runLookback)) / atrVal
 runAtrDown = (ta.highest(high, runLookback) - close) / atrVal
 
-// ---------- Lower timeframes ----------
-// +1 = agrees with a buy, -1 = agrees with a short, 0 = neither.
-lowerDir() =>
-    [m, s, h] = ta.macd(close, fastLen, slowEff, sigLen)
-    m > s and h > h[1] ? 1 : m < s and h < h[1] ? -1 : 0
-
-// Direction of the last lower-timeframe bar that had CLOSED when this chart bar closed.
-// A 45m bar can straddle the end of a 2h bar (11:00-11:45 vs 9:30-11:30); that one is skipped,
-// otherwise the backtest would peek 15 minutes into the future.
-lowerTf(simple string tf) =>
-    int d = na
-    if timeframe.in_seconds(tf) < timeframe.in_seconds()
-        [dirs, ends] = request.security_lower_tf(syminfo.tickerid, tf, [lowerDir(), time_close])
-        int n = array.size(dirs)
-        if n > 0
-            for i = n - 1 to 0
-                if array.get(ends, i) <= time_close
-                    d := array.get(dirs, i)
-                    break
-    d
-
-// Higher timeframes: +1 MACD above its signal line, -1 below, on the last FINISHED higher bar.
-higherDir() =>
-    [m, s, h] = ta.macd(close, fastLen, slowEff, sigLen)
-    m > s ? 1 : m < s ? -1 : 0
-
-higherTf(simple string tf) =>
-    int d = na
-    if timeframe.in_seconds(tf) > timeframe.in_seconds()
-        d := request.security(syminfo.tickerid, tf, higherDir()[1], lookahead = barmerge.lookahead_on)
-    d
-
-isHigher(simple string tf) => timeframe.in_seconds(tf) > timeframe.in_seconds() ? 1 : 0
-hA = higherTf(htfA)
-hB = higherTf(htfB)
-higherCount = isHigher(htfA) + isHigher(htfB)
-higherUp = (hA == 1 ? 1 : 0) + (hB == 1 ? 1 : 0)
-higherDown = (hA == -1 ? 1 : 0) + (hB == -1 ? 1 : 0)
-higherOkLong = not reqHigher or higherUp >= higherCount
-higherOkShort = not reqHigher or higherDown >= higherCount
-
-isLower(simple string tf) => timeframe.in_seconds(tf) < timeframe.in_seconds() ? 1 : 0
-dA = lowerTf(tfA)
-dB = lowerTf(tfB)
-dC = lowerTf(tfC)
-lowerCount = isLower(tfA) + isLower(tfB) + isLower(tfC)
-upCount = (dA == 1 ? 1 : 0) + (dB == 1 ? 1 : 0) + (dC == 1 ? 1 : 0)
-downCount = (dA == -1 ? 1 : 0) + (dB == -1 ? 1 : 0) + (dC == -1 ? 1 : 0)
-needed = math.min(confirmMin, lowerCount)
-
 // ---------- Entry rules ----------
-depthOkLong = minDepthAtr <= 0 ? macdLine < 0 : macdLine < -minDepthAtr * atrVal
-depthOkShort = minDepthAtr <= 0 ? macdLine > 0 : macdLine > minDepthAtr * atrVal
-crossNow = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or depthOkLong) : zeroUp
-// After the cross: the MACD must stay above its signal line (above zero for zero-line entries) and
-// the histogram must grow for the first confirmEff bars. Then, for up to alignEff more bars, the
-// trade fires on the FIRST bar where everything else lines up (higher timeframes, 200 EMA, ...).
-// One entry per cross.
-var int sinceUp = na
-var bool okUp = false
-var bool firedUp = false
-rightUp = entryMode == "Signal-line cross" ? macdLine > signalLine : macdLine > 0
-growUp = hist > hist[1]
-if crossNow
-    sinceUp := 0
-    okUp := true
-    firedUp := false
-else if not na(sinceUp)
-    sinceUp += 1
-if not na(sinceUp) and (not rightUp or (sinceUp >= 1 and sinceUp <= confirmEff and not growUp))
-    okUp := false
-trigger = okUp and not firedUp and not na(sinceUp) and sinceUp >= confirmEff and sinceUp <= confirmEff + alignEff
-trendOk = emaSideEff == "Off" ? true : emaSideEff == "Below" ? close < trendEma : close > trendEma
+trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or macdLine < 0) : zeroUp
+trendOk = emaSide == "Off" ? true : emaSide == "Below" ? close < trendEma : close > trendEma
 runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
-warm = bar_index > 2 * slowEff
+warm = bar_index > 2 * slowLen
 allowLong = direction != "Short only"
 allowShort = direction != "Long only"
-buySignal = allowLong and trigger and higherOkLong and trendOk and runOk and upCount >= needed and warm and time >= startDate
-if buySignal
-    firedUp := true
+buySignal = allowLong and trigger and trendOk and runOk and warm and time >= startDate
 
 // Short: the same rule upside down.
-crossNowS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
-var int sinceDown = na
-var bool okDown = false
-var bool firedDown = false
-rightDown = entryMode == "Signal-line cross" ? macdLine < signalLine : macdLine < 0
-growDown = hist < hist[1]
-if crossNowS
-    sinceDown := 0
-    okDown := true
-    firedDown := false
-else if not na(sinceDown)
-    sinceDown += 1
-if not na(sinceDown) and (not rightDown or (sinceDown >= 1 and sinceDown <= confirmEff and not growDown))
-    okDown := false
-triggerS = okDown and not firedDown and not na(sinceDown) and sinceDown >= confirmEff and sinceDown <= confirmEff + alignEff
-mirrorSide = emaSideEff == "Below" ? "Above" : emaSideEff == "Above" ? "Below" : "Off"
-sSide = shortSide == "Mirror of longs" ? mirrorSide : shortSide == "Above their 200 EMA" ? "Above" :
-     shortSide == "Below their 200 EMA" ? "Below" : "Off"
-trendOkS = sSide == "Off" ? true : sSide == "Above" ? close > trendEma : close < trendEma
-marketOk = not useMarket or marketDown
+triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or macdLine > 0) : zeroDown
+trendOkS = emaSide == "Off" ? true : emaSide == "Below" ? close > trendEma : close < trendEma
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
-shortSignal = allowShort and triggerS and higherOkShort and trendOkS and runOkS and marketOk and downCount >= needed and warm and time >= startDate
-if shortSignal
-    firedDown := true
-
-// Crosses the buffer threw away (everything else passed), so you can see what it removed.
-inTest = warm and time >= startDate and entryMode == "Signal-line cross" and needBelowZero and minDepthAtr > 0
-skippedLong = inTest and allowLong and crossUp and macdLine < 0 and not depthOkLong and trendOk and runOk
-skippedShort = inTest and allowShort and crossDown and macdLine > 0 and not depthOkShort and trendOkS and runOkS
+shortSignal = allowShort and triggerS and trendOkS and runOkS and warm and time >= startDate
 
 var bool killed = false
 if not killed and strategy.equity <= strategy.initial_capital * killPct / 100
     killed := true
 
 // Size so that hitting the stop loses riskPct of equity, capped at maxPosPct of equity.
-stopDist = stopMultEff * atrVal
+stopDist = stopMult * atrVal
 qtyRisk = strategy.equity * riskPct / 100 / stopDist
 qtyCap = strategy.equity * maxPosPct / 100 / close
 qty = math.floor(math.min(qtyRisk, qtyCap) * 10000) / 10000
-// Shorts can use their own stop distance and a smaller size.
-stopDistS = (shortStopMult > 0 ? shortStopMult : stopMultEff) * atrVal
-qtyRiskS = strategy.equity * riskPct * shortRiskMult / 100 / stopDistS
-qtyS = math.floor(math.min(qtyRiskS, qtyCap) * 10000) / 10000
 
 var float tradeStopDist = na
-pos = strategy.position_size
+flat = strategy.position_size == 0
+if buySignal and flat and not killed and qty > 0
+    tradeStopDist := stopDist
+    strategy.entry("Long", strategy.long, qty = qty)
+    alert("MACD buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
+else if shortSignal and flat and not killed and qty > 0
+    tradeStopDist := stopDist
+    strategy.entry("Short", strategy.short, qty = qty)
+    alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 
-// ---------- MACD and time exits (fill at the next bar's open) ----------
+// Stop and target are measured from the actual fill price (next bar's open).
+// loss/profit are in ticks against the trade, so the same call works for both sides.
+if not na(tradeStopDist)
+    lossTicks = tradeStopDist / syminfo.mintick
+    for entryId in array.from("Long", "Short")
+        if targetR > 0
+            strategy.exit("Stop/Target " + entryId, entryId, loss = lossTicks, profit = lossTicks * targetR)
+        else
+            strategy.exit("Stop " + entryId, entryId, loss = lossTicks)
+
+// ---------- Other exits (fill at the next bar's open) ----------
 var int daysHeld = 0
-if pos != 0
-    if math.sign(nz(pos[1])) != math.sign(pos)
+if strategy.position_size != 0
+    if strategy.position_size[1] == 0
         daysHeld := 1
     else if timeframe.change("D")
         daysHeld += 1
 else
     daysHeld := 0
 
-timeUp = holdEff > 0 and daysHeld >= holdEff
-longExit = pos <= 0 ? "" : crossDown and exitMode == SELL_SETUP and macdLine > 0 ? "MACD sell setup" :
-     crossDown and exitMode == "Any cross back" ? "MACD cross down" : timeUp ? "Time stop" : ""
-shortExit = pos >= 0 ? "" : crossUp and exitMode == SELL_SETUP and macdLine < 0 ? "MACD buy setup" :
-     crossUp and exitMode == "Any cross back" ? "MACD cross up" : timeUp ? "Time stop" : ""
-
-// ---------- Entries ----------
-// A new trade needs no open position, or the open one exits on this bar: the sell setup that ends
-// a long is also a short signal, so the long flips straight into a short (one order does both).
-goLong = buySignal and not killed and qty > 0 and (pos == 0 or shortExit != "")
-goShort = not goLong and shortSignal and not killed and qtyS > 0 and (pos == 0 or longExit != "")
-if goLong
-    tradeStopDist := stopDist
-    strategy.entry("Long", strategy.long, qty = qty, comment = (isShortSys ? "ST " : isLongSys ? "LT " : "") + "Long " + str.tostring(upCount) + "/" + str.tostring(lowerCount))
-    strategy.exit("Exit Long", "Long", loss = stopDist / syminfo.mintick, profit = targetR > 0 ? stopDist / syminfo.mintick * targetR : na)
-    alert(system + " buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
-if goShort
-    tradeStopDist := stopDistS
-    strategy.entry("Short", strategy.short, qty = qtyS, comment = "Short " + str.tostring(downCount) + "/" + str.tostring(lowerCount))
-    strategy.exit("Exit Short", "Short", loss = stopDistS / syminfo.mintick, profit = targetR > 0 ? stopDistS / syminfo.mintick * targetR : na)
-    alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
-if longExit != "" and not goShort
-    strategy.close("Long", comment = longExit)
-if shortExit != "" and not goLong
-    strategy.close("Short", comment = shortExit)
-
-// Stop and target. On the signal bar the fill price isn't known yet, so the first stop is set in
-// ticks from the fill (above). From the fill bar on it becomes a price, which the optional
-// trailing stop can tighten (never loosen).
-var float stopPx = na
-var float bestPx = na
-pSide = math.sign(strategy.position_size)
-entryPx = strategy.position_avg_price
-if pSide != 0 and not na(tradeStopDist)
-    if math.sign(nz(strategy.position_size[1])) != pSide
-        stopPx := entryPx - pSide * tradeStopDist
-        bestPx := entryPx
-    bestPx := pSide > 0 ? math.max(bestPx, close) : math.min(bestPx, close)
-    if trailMult > 0
-        trailPx = bestPx - pSide * trailMult * atrVal
-        stopPx := pSide > 0 ? math.max(stopPx, trailPx) : math.min(stopPx, trailPx)
-    targetPx = targetR > 0 ? entryPx + pSide * tradeStopDist * targetR : na
-    exitId = pSide > 0 ? "Long" : "Short"
-    strategy.exit("Exit " + exitId, exitId, stop = stopPx, limit = targetPx)
-else if pSide == 0
-    stopPx := na
-    bestPx := na
+if strategy.position_size > 0
+    if exitOnCrossDown and crossDown
+        strategy.close("Long", comment = "MACD cross down")
+    else if maxHoldDays > 0 and daysHeld >= maxHoldDays
+        strategy.close("Long", comment = "Time stop")
+if strategy.position_size < 0
+    if exitOnCrossDown and crossUp
+        strategy.close("Short", comment = "MACD cross up")
+    else if maxHoldDays > 0 and daysHeld >= maxHoldDays
+        strategy.close("Short", comment = "Time stop")
 
 // ---------- Chart ----------
-plot(emaSideEff == "Off" ? na : trendEma, "200 EMA filter", color = color.orange, linewidth = 2)
-plot(pSide != 0 ? stopPx : na, "Stop", color = color.red, style = plot.style_linebr)
-plot(pSide != 0 and targetR > 0 ? entryPx + pSide * tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
+side = math.sign(strategy.position_size)
+inTrade = side != 0 and not na(tradeStopDist)
+plot(emaSide == "Off" ? na : trendEma, "200 EMA filter", color = color.orange, linewidth = 2)
+plot(inTrade ? strategy.position_avg_price - side * tradeStopDist : na, "Stop", color = color.red, style = plot.style_linebr)
+plot(inTrade and targetR > 0 ? strategy.position_avg_price + side * tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
 plotshape(buySignal and not killed, "Buy signal", style = shape.triangleup, location = location.belowbar, color = color.teal, size = size.small)
 plotshape(shortSignal and not killed, "Short signal", style = shape.triangledown, location = location.abovebar, color = color.fuchsia, size = size.small)
-plotshape(skippedLong, "Skipped buy: too close to zero", style = shape.xcross, location = location.belowbar, color = color.gray, size = size.tiny)
-plotshape(skippedShort, "Skipped short: too close to zero", style = shape.xcross, location = location.abovebar, color = color.gray, size = size.tiny)
-
-// Lower-timeframe agreement right now, top right of the chart.
-var table info = table.new(position.top_right, 2, 4, bgcolor = color.new(color.black, 30))
-if barstate.islast
-    table.cell(info, 0, 0, "Lower TFs up", text_color = color.white)
-    table.cell(info, 1, 0, str.tostring(upCount) + "/" + str.tostring(lowerCount), text_color = upCount >= 2 ? color.lime : color.white)
-    table.cell(info, 0, 1, "Lower TFs down", text_color = color.white)
-    table.cell(info, 1, 1, str.tostring(downCount) + "/" + str.tostring(lowerCount), text_color = downCount >= 2 ? color.fuchsia : color.white)
-    table.cell(info, 0, 3, "Higher TFs up / down", text_color = color.white)
-    table.cell(info, 1, 3, str.tostring(higherUp) + "/" + str.tostring(higherCount) + "  " + str.tostring(higherDown) + "/" + str.tostring(higherCount), text_color = color.white)
-    table.cell(info, 0, 2, "Shorts allowed", text_color = color.white)
-    table.cell(info, 1, 2, not allowShort ? "off" : marketOk ? "yes" : "no: market up", text_color = marketOk ? color.fuchsia : color.gray)

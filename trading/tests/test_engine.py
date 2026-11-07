@@ -18,9 +18,7 @@ from data import resample_session  # noqa: E402
 from strategy import add_signals  # noqa: E402
 
 NO_COSTS = replace(DEFAULT_RISK, slippage_pct=0.0, commission_min=0.0, commission_per_share=0.0)
-# Mechanics tests use simple fixed exits: 2-ATR stop, 2R target, nothing else.
-S = replace(DEFAULT_STRATEGY, macd_exit="off", max_hold_days=None, stop_atr_mult=2.0, target_r=2.0,
-            trail_atr_mult=None, short_market_filter=None)
+S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0)
 CLASSIC = replace(DEFAULT_STRATEGY, macd_slow=26, require_below_zero=False, trend_ma=None)
 
 
@@ -39,7 +37,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d", market=None, higher=None: df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None: df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -111,7 +109,7 @@ def test_gap_below_stop_fills_at_open(fake_signals):
 
 def test_macd_cross_down_exits_next_open(fake_signals):
     df = bars([FLAT, FLAT, FLAT, (100.7, 101, 100, 100.5)], signal_days=[0], cross_down_days=[2])
-    t = backtest.run({"X": df}, replace(S, macd_exit="any"), NO_COSTS).trades.iloc[0]
+    t = backtest.run({"X": df}, replace(S, exit_on_macd_cross_down=True), NO_COSTS).trades.iloc[0]
     assert t.exit_reason == "MACD cross down" and str(t.exit_date) == "2024-01-04" and t.exit_price == 100.7
 
 
@@ -222,7 +220,7 @@ def test_200_day_ema_on_intraday_bars_uses_yesterdays_value():
 def test_zero_line_cross_and_price_not_run_filter():
     close = np.r_[np.linspace(300, 200, 300), np.linspace(200, 260, 150)]
     df = ohlc(close, pd.bdate_range("2022-01-03", periods=len(close)))
-    zero = replace(DEFAULT_STRATEGY, entry="zero_cross", require_below_zero=False, trend_ma=None, confirm_bars=0)
+    zero = replace(DEFAULT_STRATEGY, entry="zero_cross", require_below_zero=False, trend_ma=None)
     d = add_signals(df, zero)
     hits = d[d.entry_signal]
     assert len(hits) == 1
@@ -291,10 +289,8 @@ def test_short_signal_is_the_mirror_of_the_buy():
     # Same roll-over but the stock is ABOVE its 200-day average: no short.
     assert not add_signals(df, SHORT, daily=low_ema(df)).short_signal.any()
     assert not add_signals(df, SHORT, daily=df).short_signal.any()                # rose above its own EMA
-    # The default is long only (shorts parked); "both" still shorts.
+    # Default strategy stays long-only.
     assert not add_signals(df, DEFAULT_STRATEGY, daily=high_ema(df)).short_signal.any()
-    assert add_signals(df, replace(DEFAULT_STRATEGY, sides="both", short_market_filter=None),
-                       daily=high_ema(df)).short_signal.any()
 
 
 def test_short_entry_stop_above_and_stop_hit(fake_signals):
@@ -327,7 +323,7 @@ def test_short_gap_up_through_stop_fills_at_open(fake_signals):
 
 def test_short_covers_on_macd_cross_up(fake_signals):
     df = short_bars([FLAT, FLAT, FLAT, (99.3, 100, 99, 99.5)], signal_days=[0], cross_up_days=[2])
-    t = backtest.run({"X": df}, replace(SHORT, macd_exit="any"), NO_BORROW).trades.iloc[0]
+    t = backtest.run({"X": df}, replace(SHORT, exit_on_macd_cross_down=True), NO_BORROW).trades.iloc[0]
     assert t.exit_reason == "MACD cross up" and str(t.exit_date) == "2024-01-04" and t.exit_price == 99.3
 
 
@@ -355,394 +351,3 @@ def test_both_sides_share_the_position_limit(fake_signals):
     assert sorted(res.trades.ticker) == ["L_strong", "S_mid", "S_weak"]
     assert res.skipped_signals == 2
     assert dict(zip(res.trades.ticker, res.trades.side)) == {"L_strong": "long", "S_mid": "short", "S_weak": "short"}
-
-
-# --- Buffer: the cross must happen far enough from zero ---
-
-def test_buffer_blocks_crosses_just_under_zero():
-    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
-    idx = pd.bdate_range("2022-01-03", periods=len(close))
-    df = ohlc(close, idx)
-    none = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=0.0), daily=low_ema(df))
-    hit = none[none.entry_signal]
-    assert len(hit) == 1
-    depth = abs(hit.depth_atr.iloc[0])
-    assert hit.depth_atr.iloc[0] == pytest.approx(hit.macd.iloc[0] / hit.atr.iloc[0])
-    # A buffer just under the cross depth keeps it; just over removes it.
-    keep = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 0.9), daily=low_ema(df))
-    drop = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 1.1), daily=low_ema(df))
-    assert keep.entry_signal.sum() == 1 and not drop.entry_signal.any()
-
-
-def test_buffer_mirrors_for_shorts():
-    close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
-    idx = pd.bdate_range("2022-01-03", periods=len(close))
-    df = ohlc(close, idx)
-    base = add_signals(df, replace(SHORT, min_macd_depth_atr=0.0), daily=high_ema(df))
-    depth = base[base.short_signal].depth_atr.iloc[0]
-    assert depth > 0
-    assert add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 0.9), daily=high_ema(df)).short_signal.any()
-    assert not add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 1.1), daily=high_ema(df)).short_signal.any()
-
-
-# --- Lower-timeframe agreement ---
-
-def session_bars(day, minutes, closes):
-    start = pd.Timestamp(day) + pd.Timedelta(hours=9, minutes=30)
-    idx = pd.DatetimeIndex([start + pd.Timedelta(minutes=minutes * i) for i in range(len(closes))])
-    return ohlc(closes, idx)
-
-
-def test_resample_45m_from_15m():
-    from data import resample_session
-    m15 = session_bars("2024-03-05", 15, np.arange(26, dtype=float))   # 9:30 .. 15:45
-    m45 = resample_session(m15, 3)
-    assert [t.strftime("%H:%M") for t in m45.index][:4] == ["09:30", "10:15", "11:00", "11:45"]
-    assert m45.index[-1].strftime("%H:%M") == "15:30"          # last bar: 15:30-16:00 only
-    assert m45.Close.iloc[0] == 2 and m45.Open.iloc[1] == 3
-
-
-def test_bar_ends_cut_at_close():
-    from data import bar_ends
-    two_h = session_bars("2024-03-05", 120, [1, 2, 3, 4])
-    ends = bar_ends(two_h.index, "2h")
-    assert [t.strftime("%H:%M") for t in ends] == ["11:30", "13:30", "15:30", "16:00"]
-
-
-def test_lower_tf_uses_only_bars_closed_by_the_chart_close():
-    from strategy import lower_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    # Lower bars rise steadily, then the 45m bar that STARTS at 11:00 (ends 11:45) crashes.
-    days = pd.bdate_range("2024-03-01", periods=3)
-    m45 = pd.concat([session_bars(d, 45, (np.arange(9, dtype=float) + 9 * k) ** 3 / 10 + 100)
-                     for k, d in enumerate(days)])                   # accelerating rise
-    last_day = days[-1] + pd.Timedelta(hours=11)
-    m45.loc[last_day, ["Open", "High", "Low", "Close"]] = [0.0, 1.0, -1.0, 0.0]
-    chart = session_bars(days[-1], 120, [100.0, 100, 100, 100])
-    out = lower_tf_agreement(chart, "2h", {"45m": m45}, s)
-    # The 9:30-11:30 2h bar must use the 10:15 45m bar (rising), not the 11:00 crash bar.
-    assert out.loc[chart.index[0], "mtf_up"] == 1 and out.loc[chart.index[0], "mtf_n"] == 1
-    # The 11:30-13:30 bar sees the crash's aftermath: no longer agreeing with a buy.
-    assert out.loc[chart.index[1], "mtf_up"] == 0
-    # 15m, 30m and 45m all sit under a 2h chart, even though only 45m data was given.
-    assert (out.mtf_max == 3).all() and (out.mtf_n == 1).all()
-
-
-def test_lower_tf_missing_data_does_not_reach_back_to_old_bars():
-    from strategy import lower_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    m15 = session_bars("2024-03-01", 15, np.arange(26, dtype=float))
-    chart = session_bars("2024-03-08", 120, [1.0, 2, 3, 4])            # a week later, no 15m data
-    out = lower_tf_agreement(chart, "2h", {"15m": m15}, s)
-    assert (out.mtf_n == 0).all() and (out.mtf_up == 0).all()
-
-
-def test_confirm_filter_counts_agreeing_timeframes():
-    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
-    idx = pd.bdate_range("2022-01-03", periods=len(close))
-    df = ohlc(close, idx)
-    base = add_signals(df, DEFAULT_STRATEGY, daily=low_ema(df))
-    assert base.entry_signal.sum() == 1
-    # Fake "lower timeframe" columns via a stand-in: confirm_min with no lower data -> no trades.
-    assert not add_signals(df, replace(DEFAULT_STRATEGY, confirm_min=1), daily=low_ema(df)).entry_signal.any()
-    from strategy import _confirmed
-    d = base.assign(mtf_up=[2] * len(df), mtf_down=0, mtf_n=3, mtf_max=3)
-    assert _confirmed(d, replace(DEFAULT_STRATEGY, confirm_min=2), "mtf_up").all()
-    assert not _confirmed(d, replace(DEFAULT_STRATEGY, confirm_min=3), "mtf_up").any()
-    # Only one lower timeframe under this chart: needing "2" means that one must agree.
-    d1 = base.assign(mtf_up=1, mtf_down=0, mtf_n=1, mtf_max=1)
-    assert _confirmed(d1, replace(DEFAULT_STRATEGY, confirm_min=2), "mtf_up").all()
-
-
-def test_trade_log_records_depth_and_agreement(fake_signals):
-    df = bars([FLAT, FLAT, (100, 104.5, 99.5, 104)], signal_days=[0])
-    df["depth_atr"], df["mtf_up"], df["mtf_down"], df["mtf_max"] = -1.25, 2, 0, 3
-    t = backtest.run({"X": df}, S, NO_COSTS).trades.iloc[0]
-    assert t.depth_atr == -1.25 and t.mtf_agree == "2/3"
-
-
-def test_lower_tf_warmup_is_unknown_not_disagree():
-    from strategy import lower_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    m15 = session_bars("2024-03-05", 15, np.arange(26, dtype=float) ** 2)   # only 26 bars
-    chart = session_bars("2024-03-05", 120, [1.0, 2, 3, 4])
-    out = lower_tf_agreement(chart, "2h", {"15m": m15}, s)
-    # First 2h bar ends 11:30: the 15m MACD has only 8 bars (< 10 warm-up) -> unknown.
-    assert out.mtf_n.iloc[0] == 0 and out.mtf_up.iloc[0] == 0
-    assert out.mtf_n.iloc[-1] == 1 and out.mtf_up.iloc[-1] == 1
-
-
-def test_daily_chart_never_uses_yesterdays_lower_bar():
-    from strategy import lower_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    m15 = session_bars("2024-03-04", 15, np.arange(26, dtype=float) ** 2)   # Monday only
-    daily = ohlc([1.0, 2.0], pd.DatetimeIndex(["2024-03-04", "2024-03-05"]))
-    out = lower_tf_agreement(daily, "1d", {"15m": m15}, s)
-    assert out.mtf_n.tolist() == [1, 0]                                   # Tuesday: no 15m data
-
-
-def test_load_lower_builds_45m_and_drops_unfinished_bars(tmp_path):
-    import data
-    day = pd.Timestamp.today().normalize()
-    future = day + pd.Timedelta(days=7)                                  # bars "not closed yet"
-    past = pd.bdate_range(end=day - pd.Timedelta(days=1), periods=2)
-    m15 = pd.concat([session_bars(d, 15, np.arange(26, dtype=float)) for d in list(past) + [future]])
-    m30 = pd.concat([session_bars(d, 30, np.arange(13, dtype=float)) for d in past])
-    m15.rename_axis("Date").to_csv(tmp_path / "X_15m.csv")
-    m30.rename_axis("Date").to_csv(tmp_path / "X_30m.csv")
-    out = data.load_lower(["X"], "2000-01-01", offline=True, cache_dir=tmp_path)["X"]
-    assert set(out) == {"15m", "30m", "45m"}
-    assert len(out["15m"]) == 52 and out["15m"].index.max() < future      # future day dropped
-    assert len(out["45m"]) == 18                                         # 9 x 45m bars per day
-
-
-def test_failed_download_falls_back_to_cache(tmp_path, monkeypatch):
-    import data
-    cached = session_bars("2024-03-05", 15, np.arange(26, dtype=float))
-    cached.rename_axis("Date").to_csv(tmp_path / "X_15m.csv")
-    def boom(*a, **k):
-        raise ConnectionError("offline")
-    monkeypatch.setattr(data, "_download", boom)
-    out = data.load(["X"], "2000-01-01", "15m", refresh=True, cache_dir=tmp_path)
-    assert len(out["X"]) == 26
-
-
-# --- Letting winners run: sell-setup exit and trailing stop ---
-
-def test_long_exits_only_on_cross_down_above_zero(fake_signals):
-    df = bars([FLAT] * 6, signal_days=[0], cross_down_days=[1, 3])
-    df["macd"] = [-5, -2, 1, 2, 1, 1]          # day 1: cross under zero (ignored); day 3: above zero
-    df["cross_up"] = False
-    t = backtest.run({"X": df}, replace(S, macd_exit="above_zero", target_r=None), NO_COSTS).trades.iloc[0]
-    assert t.exit_reason == "MACD sell setup" and str(t.exit_date) == "2024-01-05"
-    # The old rule leaves at the first cross back, under zero.
-    t_any = backtest.run({"X": df}, replace(S, macd_exit="any", target_r=None), NO_COSTS).trades.iloc[0]
-    assert t_any.exit_reason == "MACD cross down" and str(t_any.exit_date) == "2024-01-03"
-
-
-def test_short_covers_only_on_cross_up_below_zero(fake_signals):
-    df = short_bars([FLAT] * 6, signal_days=[0], cross_up_days=[1, 3])
-    df["macd"], df["cross_down"] = [5, 2, -1, -2, -1, -1], False
-    t = backtest.run({"X": df}, replace(SHORT, macd_exit="above_zero", target_r=None), NO_BORROW).trades.iloc[0]
-    assert t.exit_reason == "MACD buy setup" and str(t.exit_date) == "2024-01-05"
-
-
-def test_default_has_no_target_and_no_time_stop():
-    assert DEFAULT_STRATEGY.target_r is None and DEFAULT_STRATEGY.max_hold_days is None
-    assert DEFAULT_STRATEGY.macd_exit == "above_zero" and DEFAULT_STRATEGY.min_macd_depth_atr == 0
-
-
-def test_trailing_stop_follows_best_close_and_never_loosens(fake_signals):
-    rows = [FLAT, FLAT, (104, 106, 103.5, 106), (106, 110.5, 105.5, 110), (110, 110.5, 107, 108),
-            (108, 108.5, 107.4, 107.5)]
-    df = bars(rows, signal_days=[0])
-    t = backtest.run({"X": df}, replace(S, target_r=None, trail_atr_mult=3.0), NO_COSTS).trades.iloc[0]
-    # Entry 100, first stop 98 (2 ATR). Best close 110 -> trail 107. Day 4 close 108 keeps it at 107.
-    assert t.stop == 98 and t.exit_stop == 107
-    assert t.exit_reason == "trailing stop" and t.exit_price == 107
-    assert t.r_multiple == pytest.approx(3.5)                  # (107-100) / (100-98)
-
-
-def test_short_trailing_stop_mirrors(fake_signals):
-    rows = [FLAT, FLAT, (96, 96.5, 94, 94), (94, 94.5, 90, 90), (90, 93.5, 89.5, 93)]
-    df = short_bars(rows, signal_days=[0])
-    t = backtest.run({"X": df}, replace(SHORT, target_r=None, trail_atr_mult=3.0), NO_BORROW).trades.iloc[0]
-    assert t.stop == 102 and t.exit_stop == 93 and t.exit_reason == "trailing stop"
-    assert t.r_multiple == pytest.approx(3.5)
-
-
-def test_sell_setup_flips_long_into_short(fake_signals):
-    # Day 0: buy signal. Day 3: MACD crosses down above zero = long's exit AND a short signal.
-    df = bars([FLAT] * 7, signal_days=[0], cross_down_days=[3])
-    df["macd"], df["cross_up"] = 1.0, False
-    df["short_signal"] = [i == 3 for i in range(7)]
-    res = backtest.run({"X": df}, replace(S, sides="both", macd_exit="above_zero", target_r=None), NO_BORROW)
-    tr = res.trades
-    assert list(tr.side) == ["long", "short"]
-    assert tr.exit_date.iloc[0] == tr.entry_date.iloc[1] == "2024-01-05"
-    assert tr.exit_reason.iloc[0] == "MACD sell setup"
-
-
-def test_default_is_long_only():
-    assert DEFAULT_STRATEGY.sides == "long"
-
-
-
-# --- Fixing shorts: market filter, which stocks to short, smaller size ---
-
-def rollover():
-    close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
-    idx = pd.bdate_range("2022-01-03", periods=len(close))
-    return ohlc(close, idx)
-
-
-def test_market_filter_blocks_shorts_in_a_bull_market():
-    df = rollover()
-    on = replace(SHORT, short_market_filter="QQQ")
-    bull = ohlc(np.linspace(100, 300, len(df)), df.index)              # QQQ rising: above its EMA
-    bear = ohlc(np.linspace(300, 100, len(df)), df.index)              # QQQ falling: below its EMA
-    assert not add_signals(df, on, daily=high_ema(df), market=bull).short_signal.any()
-    assert add_signals(df, on, daily=high_ema(df), market=bear).short_signal.any()
-    assert not add_signals(df, on, daily=high_ema(df)).short_signal.any()        # no market data: no shorts
-    # Longs are never affected by the market filter.
-    assert add_signals(df, on, daily=high_ema(df), market=bull).entry_signal.sum() == \
-        add_signals(df, replace(on, short_market_filter=None), daily=high_ema(df)).entry_signal.sum()
-
-
-def test_market_filter_uses_yesterdays_close():
-    from strategy import market_downtrend
-    s = replace(DEFAULT_STRATEGY, short_market_ma=3)
-    idx = pd.bdate_range("2024-01-01", periods=8)
-    qqq = ohlc([10, 10, 10, 10, 10, 1, 1, 1], idx)                     # drops below its EMA on day 5
-    down = market_downtrend(qqq, s, idx)
-    assert not down.iloc[5] and down.iloc[6]                           # known only the next day
-
-
-def test_short_trend_side_options():
-    df = rollover()
-    base = add_signals(df, replace(SHORT, short_trend_side="off"), daily=high_ema(df))
-    assert base.short_signal.any()
-    low_daily = ohlc(np.full(len(df), 1000.0), df.index)               # stock far below its "EMA"
-    assert not add_signals(df, replace(SHORT, short_trend_side="above"), daily=low_daily).short_signal.any()
-    assert add_signals(df, replace(SHORT, short_trend_side="below"), daily=low_daily).short_signal.any()
-
-
-def test_short_risk_mult_halves_short_size(fake_signals):
-    df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, (100, 111.5, 100, 111)], signal_days=[0], atr=5.0)
-    full = backtest.run({"X": df}, SHORT, NO_BORROW).trades.iloc[0]
-    half = backtest.run({"X": df}, replace(SHORT, short_risk_mult=0.5), NO_BORROW).trades.iloc[0]
-    assert half.pnl == pytest.approx(full.pnl / 2, abs=0.01)
-
-
-def test_short_stop_can_differ_from_long_stop(fake_signals):
-    df = short_bars([FLAT, (101, 101.5, 100.5, 101), FLAT, FLAT], signal_days=[0])
-    t = backtest.run({"X": df}, replace(SHORT, short_stop_atr_mult=4.0), NO_BORROW).trades.iloc[0]
-    assert t.stop == 105                                      # 101 + 4 x ATR(1), not the 2 ATR long stop
-
-
-
-# --- Only the best trades: wait for confirmation, higher timeframes must agree ---
-
-def dip_and_bounce():
-    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 230, 25)]
-    idx = pd.bdate_range("2022-01-03", periods=len(close))
-    return ohlc(close, idx)
-
-
-def test_entry_waits_for_confirmation_bars():
-    df = dip_and_bounce()
-    now = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=0), daily=low_ema(df))
-    wait = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=2), daily=low_ema(df))
-    i_now = now.index.get_loc(now[now.entry_signal].index[0])
-    i_wait = wait.index.get_loc(wait[wait.entry_signal].index[0])
-    assert i_wait == i_now + 2
-    # Both bars after the cross: MACD still above its signal line and the histogram growing.
-    for j in (i_now + 1, i_now + 2):
-        assert wait.macd.iloc[j] > wait.macd_signal.iloc[j] and wait.macd_hist.iloc[j] > wait.macd_hist.iloc[j - 1]
-
-
-def test_cross_that_fizzles_is_skipped():
-    from strategy import confirmed_after
-    idx = pd.bdate_range("2024-01-01", periods=6)
-    df = pd.DataFrame({"macd": [-5, -4, -3.5, -3.6, -3, -2], "macd_signal": [-4, -4.1, -3.8, -3.5, -3.4, -3.3]}, index=idx)
-    df["macd_hist"] = df.macd - df.macd_signal
-    trigger = pd.Series([False, True, False, False, False, False], index=idx)   # cross up on day 1
-    # Day 3 the MACD drops back under its signal line: no entry.
-    assert not confirmed_after(trigger, df, 2, 1).any()
-    assert confirmed_after(trigger, df, 1, 1).tolist() == [False, False, True, False, False, False]
-
-
-def test_higher_timeframes_must_agree():
-    from strategy import higher_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    days = pd.bdate_range("2024-01-01", periods=40)
-    up_daily = ohlc(np.linspace(100, 200, 40) ** 1.5, days)            # daily MACD above signal
-    dn_daily = ohlc(300 - np.arange(40) ** 2 / 8, days)                # accelerating fall
-    chart = session_bars(days[-1], 120, [1.0, 2, 3, 4])                # 2h bars on the last day
-    up = higher_tf_agreement(chart, "2h", {"1d": up_daily}, s)
-    dn = higher_tf_agreement(chart, "2h", {"1d": dn_daily}, s)
-    assert (up.htf_max == 2).all() and (up.htf_up == 1).all() and (dn.htf_down == 1).all()
-
-
-def test_higher_timeframe_uses_only_finished_bars():
-    from strategy import higher_tf_agreement
-    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
-    days = pd.bdate_range("2024-01-01", periods=40)
-    close = np.linspace(100, 200, 40) ** 1.5
-    close[-1] = 1.0                                                    # today's daily bar crashes
-    daily = ohlc(close, days)
-    chart = session_bars(days[-1], 120, [1.0, 2, 3, 4])
-    out = higher_tf_agreement(chart, "2h", {"1d": daily}, s)
-    # Today's daily bar isn't finished during today's 2h bars, so yesterday's (rising) one is used.
-    assert (out.htf_up == 1).all()
-
-
-def test_missing_higher_data_blocks_entries_on_intraday_charts():
-    days = pd.bdate_range("2023-01-02", periods=200)
-    times = [d + pd.Timedelta(hours=h, minutes=30) for d in days for h in (9, 11, 13, 15)]
-    close = np.r_[np.linspace(300, 300, 400), np.linspace(300, 200, 300), np.linspace(200, 260, 100)]
-    df = ohlc(close, pd.DatetimeIndex(times))
-    s = replace(DEFAULT_STRATEGY, trend_ma=None, sides="long")
-    assert add_signals(df, replace(s, require_higher=False), interval="2h").entry_signal.any()
-    assert not add_signals(df, s, interval="2h").entry_signal.any()
-
-
-
-# --- Two long systems: long-term 12/144/9 and short-term 12/26/9 ---
-
-def test_two_systems_settings():
-    from config import LONG_TERM, SHORT_TERM
-    assert (LONG_TERM.macd_slow, LONG_TERM.max_hold_days) == (144, None)
-    assert (SHORT_TERM.macd_slow, SHORT_TERM.trend_side, SHORT_TERM.max_hold_days) == (26, "above", 10)
-    assert LONG_TERM.trend_side == "above"
-    assert SHORT_TERM.stop_atr_mult == 2.0 and SHORT_TERM.confirm_bars == 1
-    assert LONG_TERM.sides == SHORT_TERM.sides == "long"
-
-
-def test_combine_adds_two_half_accounts(fake_signals):
-    half = replace(NO_COSTS, starting_capital=500)
-    a = backtest.run({"X": bars([FLAT, FLAT, (100, 104.5, 99.5, 104)], signal_days=[0])}, S, half)
-    b = backtest.run({"Y": bars([FLAT, FLAT, FLAT, (100, 100, 97, 97)], signal_days=[0])},
-                     replace(S, name="Short-term: test"), half)
-    both = backtest.combine([a, b], "Both")
-    assert both.risk.starting_capital == 1000
-    assert both.equity.iloc[0] == pytest.approx(1000, abs=0.01)
-    assert both.equity.iloc[-1] == pytest.approx(1000 + a.trades.pnl.sum() + b.trades.pnl.sum(), abs=0.01)
-    assert sorted(both.trades.ticker) == ["X", "Y"] and "system" in both.trades
-
-
-# --- Line-up window: wait for the higher timeframes to come round after the cross ---
-
-def staged_frame(macd, signal):
-    idx = pd.bdate_range("2024-01-01", periods=len(macd))
-    df = pd.DataFrame({"macd": macd, "macd_signal": signal}, index=idx, dtype=float)
-    df["macd_hist"] = df.macd - df.macd_signal
-    return df
-
-
-def test_entry_fires_when_higher_timeframes_line_up_later():
-    from strategy import staged_entry
-    # Cross up on bar 1, histogram grows on bars 2-3, MACD stays above its signal line after that.
-    df = staged_frame([-5, -4, -3, -2, -1.5, -1.2, -1.0, -0.9], [-4.5, -4.2, -3.8, -3.2, -2.6, -2.1, -1.7, -1.4])
-    trigger = pd.Series([False, True] + [False] * 6, index=df.index)
-    higher_ok = pd.Series([False] * 5 + [True] * 3, index=df.index)          # 4h/daily agree from bar 5
-    s = replace(DEFAULT_STRATEGY, confirm_bars=2, align_window=10)
-    assert staged_entry(trigger, df, s, 1, higher_ok).tolist() == [False] * 5 + [True, False, False]
-    # With no line-up window the higher timeframes must already agree on bar 3: no trade.
-    assert not staged_entry(trigger, df, replace(s, align_window=0), 1, higher_ok).any()
-    # Window too short to reach bar 5: no trade.
-    assert not staged_entry(trigger, df, replace(s, align_window=1), 1, higher_ok).any()
-
-
-def test_line_up_cancelled_if_macd_crosses_back():
-    from strategy import staged_entry
-    df = staged_frame([-5, -4, -3, -2, -2.8, -1.2, -1.0], [-4.5, -4.2, -3.8, -3.2, -2.7, -2.1, -1.7])
-    trigger = pd.Series([False, True] + [False] * 5, index=df.index)
-    higher_ok = pd.Series([False] * 5 + [True] * 2, index=df.index)
-    # Bar 4: MACD dips back under its signal line, so the later line-up doesn't count.
-    assert not staged_entry(trigger, df, replace(DEFAULT_STRATEGY, confirm_bars=2, align_window=10), 1, higher_ok).any()
-
-
-def test_short_term_system_has_shorter_window():
-    from config import LONG_TERM, SHORT_TERM
-    assert LONG_TERM.align_window == 30 and SHORT_TERM.align_window == 10

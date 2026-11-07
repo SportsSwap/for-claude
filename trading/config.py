@@ -39,13 +39,13 @@ INTERVALS = ["1d", "1h", "2h", "4h"]
 
 @dataclass(frozen=True)
 class Strategy:
-    name: str = "Long-term: MACD 12/144/9 buy above 200-day EMA"
+    name: str = "Buy: MACD cross under zero, above 200-day EMA"
 
-    # Which trades to take: "long" (default), "short" or "both". Shorts are PARKED: the code works
-    # and is tested, but they lost money in the 2024-2026 bull market; see README "Shorts (parked)".
-    # A short is the long rule upside down: MACD crosses DOWN through its signal line while
-    # ABOVE zero, with price ABOVE the 200-day EMA. With "both", the sell setup that ends a long
-    # also opens a short on the same bar.
+    # Which trades to take: "long" (default), "short" or "both".
+    # Longs: MACD crosses UP through its signal line while UNDER zero, price ABOVE the 200-day EMA.
+    # Shorts are the long rule upside down: MACD crosses DOWN through its signal line while
+    # ABOVE zero, with price BELOW the 200-day EMA. Stop above, target below, and it covers
+    # when the MACD crosses back up.
     sides: str = "long"
 
     # MACD. 12/144/9: the slow line acts as the trend, so signals are fewer and cleaner.
@@ -59,35 +59,6 @@ class Strategy:
     entry: str = "signal_cross"
     require_below_zero: bool = True     # signal_cross only: the cross must happen under zero
                                         # (above zero for shorts)
-    # Buffer: with require_below_zero, the cross only counts if the MACD is at least this many
-    # ATRs (ATR(14) of the chart timeframe) below zero (above zero for shorts). 0 = off (default):
-    # any cross under zero counts.
-    min_macd_depth_atr: float = 0.0
-
-    # Confirmation: don't enter on the cross itself. Wait this many bars; the MACD must stay on the
-    # right side of its signal line AND the histogram must grow on every one of them. Crosses that
-    # fizzle straight away (chop) are skipped. 0 = enter on the cross.
-    confirm_bars: int = 2
-    # Line-up window: after the confirmation bars, keep waiting up to this many more bars for the
-    # higher timeframes (and the other filters) to agree, as long as the MACD stays above its
-    # signal line. The trade fires on the first bar where everything lines up. Higher timeframes
-    # turn later than the chart, so 0 (agree on the confirmation bar itself) almost never trades.
-    align_window: int = 30
-
-    # Higher timeframes must agree: at entry, the MACD (same 12/144/9) on each of these timeframes
-    # must be above its signal line for a long (below for a short), using the last FINISHED bar
-    # of that timeframe. Only timeframes longer than the chart count (on a 4h chart only 1d).
-    higher_tfs: tuple[str, ...] = ("4h", "1d")
-    require_higher: bool = True
-
-    # Lower-timeframe check. A lower timeframe "agrees" with a buy when its own MACD
-    # (same 12/144/9 settings) is above its signal line AND its histogram rose on its last
-    # closed bar (mirror for shorts). Only timeframes shorter than the chart's count.
-    # confirm_min = how many must agree to take the trade; 0 = don't filter, just record the
-    # count on each trade. Yahoo keeps only 60 days of 15m/30m bars, so this can't be
-    # backtested over long periods in Python.
-    confirm_tfs: tuple[str, ...] = ("15m", "30m", "45m")
-    confirm_min: int = 0
 
     # Moving-average filter: the 200 EMA.
     trend_ma: int | None = 200          # None turns it off
@@ -96,39 +67,17 @@ class Strategy:
     trend_side: str = "above"           # longs: price must be "above" (default) or "below" the average
                                         # (shorts use the opposite side)
 
-    # Shorts.
-    # Which side of its own 200-day EMA a stock must be on to be shorted:
-    #   None = mirror of the long rule ("above" when longs need "below"): short stocks stretched up
-    #   "below" = short stocks already in a downtrend (with the trend); "off" = no EMA rule for shorts
-    short_trend_side: str | None = None
-    # Market filter: only short while this index is BELOW its N-day EMA (yesterday's values), i.e.
-    # the whole market is in a downtrend. Shorting in a bull market is what loses. None = off.
-    short_market_filter: str | None = "QQQ"
-    short_market_ma: int = 200
-    # Risk on shorts as a fraction of the normal risk per trade (0.5 = half size).
-    short_risk_mult: float = 1.0
-    # Stop distance for shorts in ATRs; None = same as longs (stop_atr_mult).
-    short_stop_atr_mult: float | None = None
-
     # "Price hasn't moved yet": skip the trade if price is already more than N ATRs
     # above its lowest low of the last run_lookback bars. None turns it off.
     max_run_atr: float | None = None
     run_lookback: int = 20
 
-    # Exits. Built to let winners run: hold until the setup turns into its opposite.
+    # Exits.
     atr_period: int = 14
     stop_atr_mult: float = 3.0          # stop = entry -/+ 3 x ATR of the chart timeframe
-    # When the MACD crossing back through its signal line ends the trade:
-    #   "above_zero": longs sell only when the MACD crosses DOWN while ABOVE zero, the sell setup
-    #                 (shorts cover when it crosses UP while BELOW zero). Wobbles under zero don't exit.
-    #   "any":        any cross back exits (the old, quicker exit)
-    #   "off":        never; only stops, target and time stop
-    macd_exit: str = "above_zero"
-    # Optional trailing stop: N x ATR behind the best close since entry; only ever tightens.
-    # None = off (the stop stays where it started).
-    trail_atr_mult: float | None = None
-    target_r: float | None = None       # take profit at N x the risk; None = no target, let it run
-    max_hold_days: int | None = None    # time stop in trading days; None = no limit
+    target_r: float | None = 2.0        # take profit at 2x the risk; None = no target
+    exit_on_macd_cross_down: bool = True  # longs sell on a cross down; shorts cover on a cross up
+    max_hold_days: int | None = 15      # time stop in trading days; None = no limit
 
     # Ranking when more signals fire than there are free slots: higher wins for longs,
     # lower wins for shorts.
@@ -157,42 +106,19 @@ class Risk:
 DEFAULT_STRATEGY = Strategy()
 DEFAULT_RISK = Risk()
 
-# Two long systems that run side by side, each on its own share of the account.
-#   Both only buy while price is ABOVE the 200-day EMA, when the MACD crosses up under zero.
-#   Long-term: MACD 12/144/9, holds weeks to months.
-#   Short-term: MACD 12/26/9, holds days to about two weeks: quicker confirmation (1 bar),
-#   tighter stop (2 ATR), 10-day time limit.
-#   (Parked) shorts mirror this: only while price is BELOW the 200-day EMA, when the MACD
-#   crosses down above zero.
-LONG_TERM = DEFAULT_STRATEGY
-SHORT_TERM = replace(DEFAULT_STRATEGY, name="Short-term: MACD 12/26/9 buy above 200-day EMA",
-                     macd_slow=26, confirm_bars=1, align_window=10, stop_atr_mult=2.0,
-                     max_hold_days=10)
-SYSTEMS = {"long-term": LONG_TERM, "short-term": SHORT_TERM}
-SYSTEM_SPLIT = 0.5                      # share of the account for the long-term system; the rest is short-term
-
 _D = DEFAULT_STRATEGY
 
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
 VARIANTS = [
     _D,
-    replace(_D, name="Enter on the cross (no 2-bar wait)", confirm_bars=0),
-    replace(_D, name="No higher-timeframe check", require_higher=False),
-    replace(_D, name="Neither filter (as before)", confirm_bars=0, require_higher=False),
-    replace(_D, name="Old exits: 2R target, any MACD cross back, 15 days", target_r=2.0,
-            macd_exit="any", max_hold_days=15),
-    replace(_D, name="Sell setup exit + 3 ATR trailing stop", trail_atr_mult=3.0),
-    replace(_D, name="3 ATR trailing stop only", macd_exit="off", trail_atr_mult=3.0),
     replace(_D, name="Above 200-bar EMA (as on your chart)", trend_ma_source="bars"),
-    replace(_D, name="Below 200-day EMA (the old long-term rule)", trend_side="below"),
+    replace(_D, name="Below 200-day EMA (the old rule)", trend_side="below"),
     replace(_D, name="No 200 EMA rule", trend_ma=None),
     replace(_D, name="Zero-line cross, price not run (<3 ATR)", entry="zero_cross",
             require_below_zero=False, trend_ma=None, max_run_atr=3.0),
     replace(_D, name="Zero-line cross, any", entry="zero_cross", require_below_zero=False, trend_ma=None),
-    replace(_D, name="Trend: MACD cross, above 200-day EMA", require_below_zero=False, trend_side="above"),
-    replace(_D, name="Classic 12/26/9, above 200-day EMA", macd_slow=26, require_below_zero=False,
-            trend_side="above"),
-    # Parked short side, kept for reference.
-    replace(_D, name="(parked) Long + short", sides="both"),
-    replace(_D, name="(parked) Short only", sides="short"),
+    replace(_D, name="Any MACD cross (not just under zero), above 200-day EMA", require_below_zero=False),
+    replace(_D, name="Classic 12/26/9, above 200-day EMA", macd_slow=26, require_below_zero=False),
+    replace(_D, name="Short only: MACD cross down above zero, below 200-day EMA", sides="short"),
+    replace(_D, name="Long + short", sides="both"),
 ]

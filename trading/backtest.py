@@ -8,16 +8,13 @@ Order of events on each bar:
      If both are touched in the same bar, the stop is assumed to have hit first.
   5. Close: equity is marked to market and the next bar's exits and entries are chosen.
 
-Trailing stop: at each close the stop is raised to N x ATR below the highest close since entry
-(never lowered) and used from the next bar. R multiples are measured against the FIRST stop.
-
 Shorts mirror longs: the stop sits above the entry and the target below, a gap UP through the
 stop fills at the open, and the trade covers when the MACD crosses back up. A short sets aside
 cash equal to its value (no leverage), so it is sized and limited exactly like a long, and pays
 a stock-loan fee for the days it is open.
 """
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 import math
 
 import pandas as pd
@@ -36,10 +33,6 @@ class Position:
     target: float | None
     entry_cost: float
     side: int = 1                       # +1 long, -1 short
-    first_stop: float = 0.0             # the stop at entry; R is measured against this
-    best_close: float = 0.0             # highest close since entry (lowest for shorts)
-    depth_atr: float | None = None      # MACD in ATRs from zero at the signal bar
-    mtf: str | None = None              # lower timeframes that agreed, e.g. "2/3"
     days_held: int = 1                  # trading sessions, counting the entry session
     last_day: object = None
     exit_next_open: str | None = None
@@ -92,19 +85,12 @@ def position_size(equity: float, cash: float, entry: float, stop: float, r: Risk
 
 def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         start: str | None = None, end: str | None = None,
-        daily: dict[str, pd.DataFrame] | None = None,
-        lower: dict[str, dict[str, pd.DataFrame]] | None = None, interval: str = "1d",
-        market: pd.DataFrame | None = None,
-        higher: dict[str, dict[str, pd.DataFrame]] | None = None) -> Result:
-    """lower: {ticker: {"15m": bars, ...}} for the lower-timeframe check (data.load_lower).
-    market: daily bars of the index used by the short market filter (QQQ).
-    higher: {ticker: {"4h": bars, "1d": bars}} for the higher-timeframe check (data.load_higher)."""
+        daily: dict[str, pd.DataFrame] | None = None) -> Result:
     rows: dict[str, dict] = {}
     for t, df in prices.items():
         if not len(df):
             continue
-        d = add_signals(df, s, (daily or {}).get(t), (lower or {}).get(t), interval, market,
-                        (higher or {}).get(t))
+        d = add_signals(df, s, (daily or {}).get(t))
         d["prev_atr"] = d["atr"].shift(1)
         rows[t] = d.to_dict("index")
 
@@ -114,7 +100,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
 
     cash = r.starting_capital
     positions: dict[str, Position] = {}
-    pending_entries: list[tuple[str, int, dict]] = []
+    pending_entries: list[tuple[str, int]] = []
     trades: list[dict] = []
     equity_curve: dict[pd.Timestamp, float] = {}
     last_close: dict[str, float] = {}
@@ -132,7 +118,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         proceeds = p.value(price) - fee
         cash += proceeds
         pnl = proceeds - p.entry_cost
-        risk_dollars = p.shares * abs(p.entry_price - p.first_stop)
+        risk_dollars = p.shares * abs(p.entry_price - p.stop)
         trades.append({
             "ticker": p.ticker,
             "side": "long" if p.side > 0 else "short",
@@ -141,13 +127,10 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             "exit_date": fmt_time(ts),
             "exit_price": round(price, 4),
             "shares": p.shares,
-            "stop": round(p.first_stop, 4),
-            "exit_stop": round(p.stop, 4),
+            "stop": round(p.stop, 4),
             "target": round(p.target, 4) if p.target else None,
             "days_held": p.days_held,
             "exit_reason": reason,
-            "depth_atr": round(p.depth_atr, 2) if p.depth_atr is not None else None,
-            "mtf_agree": p.mtf,
             "pnl": round(pnl, 2),
             "r_multiple": round(pnl / risk_dollars, 2) if risk_dollars > 0 else 0.0,
         })
@@ -168,34 +151,25 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             if p.exit_next_open:
                 close_position(p, ts, bar["Open"], p.exit_next_open)
             elif p.hits_stop(bar["Open"]):
-                close_position(p, ts, bar["Open"], "stop (gap)" if p.stop == p.first_stop else "trailing stop (gap)")
+                close_position(p, ts, bar["Open"], "stop (gap)")
             elif p.hits_target(bar["Open"]):
                 close_position(p, ts, bar["Open"], "target (gap)")
 
         # 3. Entries at the open, sized off the previous bar's equity.
-        for t, side, sig in pending_entries:
+        for t, side in pending_entries:
             bar = bars.get(t)
             if bar is None or t in positions or pd.isna(bar["prev_atr"]):
                 continue
             entry = bar["Open"] * (1 + side * r.slippage_pct)   # buy higher, short lower
-            mult = s.short_stop_atr_mult if side < 0 and s.short_stop_atr_mult else s.stop_atr_mult
-            stop = entry - side * mult * bar["prev_atr"]
-            risk = r if side > 0 else replace(r, risk_per_trade=r.risk_per_trade * s.short_risk_mult)
-            shares = position_size(equity, cash, entry, stop, risk)
+            stop = entry - side * s.stop_atr_mult * bar["prev_atr"]
+            shares = position_size(equity, cash, entry, stop, r)
             if shares <= 0 or stop <= 0:
                 skipped += 1
                 continue
             cost = shares * entry + commission(shares, entry, r)
             cash -= cost
             target = entry + s.target_r * (entry - stop) if s.target_r else None
-            mtf = None
-            if pd.notna(sig.get("mtf_max", float("nan"))):
-                agreed = sig["mtf_up"] if side > 0 else sig["mtf_down"]
-                mtf = f"{int(agreed)}/{int(sig['mtf_max'])}"
-            depth = sig.get("depth_atr")
-            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, stop, entry,
-                                    depth if depth is not None and pd.notna(depth) else None, mtf,
-                                    last_day=day)
+            positions[t] = Position(t, ts, entry, shares, stop, target, cost, side, last_day=day)
         pending_entries = []
 
         # 4. Stops and targets during the bar.
@@ -205,7 +179,7 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                 continue
             worst, best = (bar["Low"], bar["High"]) if p.side > 0 else (bar["High"], bar["Low"])
             if p.hits_stop(worst):
-                close_position(p, ts, p.stop, "stop" if p.stop == p.first_stop else "trailing stop")
+                close_position(p, ts, p.stop, "stop")
             elif p.hits_target(best):
                 close_position(p, ts, p.target, "target")
 
@@ -219,18 +193,8 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
             bar = bars.get(p.ticker)
             if bar is None:
                 continue
-            if s.trail_atr_mult and pd.notna(bar["atr"]):
-                if p.side > 0:
-                    p.best_close = max(p.best_close, bar["Close"])
-                    p.stop = max(p.stop, p.best_close - s.trail_atr_mult * bar["atr"])
-                else:
-                    p.best_close = min(p.best_close, bar["Close"])
-                    p.stop = min(p.stop, p.best_close + s.trail_atr_mult * bar["atr"])
-            crossed_back = bar["cross_down"] if p.side > 0 else bar["cross_up"]
-            beyond_zero = bar.get("macd", 0) * p.side > 0       # above zero for longs, below for shorts
-            if crossed_back and (s.macd_exit == "any" or (s.macd_exit == "above_zero" and beyond_zero)):
-                p.exit_next_open = (("MACD sell setup" if beyond_zero else "MACD cross down") if p.side > 0
-                                    else ("MACD buy setup" if beyond_zero else "MACD cross up"))
+            if s.exit_on_macd_cross_down and (bar["cross_down"] if p.side > 0 else bar["cross_up"]):
+                p.exit_next_open = "MACD cross down" if p.side > 0 else "MACD cross up"
             elif s.max_hold_days and p.days_held >= s.max_hold_days:
                 p.exit_next_open = "time stop"
 
@@ -242,19 +206,16 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         # Longs rank highest-first, shorts lowest-first (the weakest stock is the best short).
         candidates = []
         for t, bar in bars.items():
-            held = positions.get(t)
-            # A stock already held is skipped, unless that trade exits at the next open: then a new
-            # signal can take its place (the sell setup that ends a long is also a short signal).
-            if held is not None and not held.exit_next_open:
+            if t in positions:
                 continue
             score = bar[s.rank_by] if pd.notna(bar[s.rank_by]) else None
             if bar["entry_signal"]:
-                candidates.append((t, 1, score if score is not None else -1e9, bar))
+                candidates.append((t, 1, score if score is not None else -1e9))
             elif bar.get("short_signal", False):
-                candidates.append((t, -1, -score if score is not None else -1e9, bar))
+                candidates.append((t, -1, -score if score is not None else -1e9))
         candidates.sort(key=lambda c: -c[2])
         open_slots = r.max_positions - sum(1 for p in positions.values() if not p.exit_next_open)
-        pending_entries = [(t, side, bar) for t, side, _, bar in candidates[:max(open_slots, 0)]]
+        pending_entries = [(t, side) for t, side, _ in candidates[:max(open_slots, 0)]]
         skipped += max(len(candidates) - len(pending_entries), 0)
 
     # Close anything still open at the last available price.
@@ -265,24 +226,6 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
 
     return Result(s, r, pd.DataFrame(trades), pd.Series(equity_curve, name="equity", dtype=float),
                   kill_date, skipped)
-
-
-def combine(results: list[Result], name: str) -> Result:
-    """Add up systems that each traded their own slice of the account into one account."""
-    curves = pd.concat([r.equity for r in results], axis=1).sort_index().ffill()
-    for col, r in zip(curves.columns, results):
-        curves[col] = curves[col].fillna(r.risk.starting_capital)
-    trades = [r.trades.assign(system=r.strategy.name.split(":")[0]) for r in results if len(r.trades)]
-    total = replace(results[0].risk, starting_capital=sum(r.risk.starting_capital for r in results))
-    equity = curves.sum(axis=1).rename("equity")
-    # Kill switch of the whole account (each system also has its own on its slice).
-    low = equity[equity <= total.starting_capital * total.kill_switch_pct]
-    return Result(replace(results[0].strategy, name=name), total,
-                  pd.concat(trades, ignore_index=True) if trades else pd.DataFrame(),
-                  equity, low.index[0] if len(low) else None,
-                  sum(r.skipped_signals for r in results),
-                  [f"{r.strategy.name}: kill switch {fmt_time(r.kill_switch_date)}"
-                   for r in results if r.kill_switch_date is not None])
 
 
 def stats(res: Result) -> dict:
