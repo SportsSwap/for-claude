@@ -1,4 +1,4 @@
-"""Find out whether shorts help, and which short rules (if any) make money.
+"""(Parked) Find out whether shorts help, and which short rules (if any) make money.
 
 Runs the SHORT side on its own with every combination of the short settings, on the first
 70% of the history (in-sample), then shows how each did on the last 30% it never saw
@@ -112,11 +112,11 @@ def main():
     # Does adding shorts improve the whole strategy?
     print("\nWHOLE STRATEGY, full period:")
     candidates = [("Long only", replace(DEFAULT_STRATEGY, sides="long")),
-                  ("Long + short, default short rules", DEFAULT_STRATEGY)]
+                  ("Long + short, default short rules", replace(DEFAULT_STRATEGY, sides="both"))]
     if best:
-        candidates.append(("Long + short, best short setting", replace(DEFAULT_STRATEGY, **best)))
+        candidates.append(("Long + short, best short setting", replace(DEFAULT_STRATEGY, sides="both", **best)))
         candidates.append(("Long + short, best, half-size shorts",
-                           replace(DEFAULT_STRATEGY, short_risk_mult=0.5, **best)))
+                           replace(DEFAULT_STRATEGY, sides="both", short_risk_mult=0.5, **best)))
     out = []
     for name, s in candidates:
         st = backtest.stats(run(s, first, last))

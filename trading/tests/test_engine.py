@@ -282,9 +282,9 @@ def test_short_signal_is_the_mirror_of_the_dip_buy():
     # Same roll-over but the stock is below its 200-day average: no short.
     high_daily = ohlc(np.full(len(close), 1000.0), idx)
     assert not add_signals(df, SHORT, daily=high_daily).short_signal.any()
-    # Long-only mode never shorts; the default (both sides) does.
-    assert not add_signals(df, replace(DEFAULT_STRATEGY, sides="long"), daily=df).short_signal.any()
-    assert add_signals(df, replace(DEFAULT_STRATEGY, short_market_filter=None), daily=df).short_signal.any()
+    # The default is long only (shorts parked); "both" still shorts.
+    assert not add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
+    assert add_signals(df, replace(DEFAULT_STRATEGY, sides="both", short_market_filter=None), daily=df).short_signal.any()
 
 
 def test_short_entry_stop_above_and_stop_hit(fake_signals):
@@ -553,8 +553,8 @@ def test_sell_setup_flips_long_into_short(fake_signals):
     assert tr.exit_reason.iloc[0] == "MACD sell setup"
 
 
-def test_default_takes_both_sides():
-    assert DEFAULT_STRATEGY.sides == "both"
+def test_default_is_long_only():
+    assert DEFAULT_STRATEGY.sides == "long"
 
 
 
@@ -675,3 +675,26 @@ def test_missing_higher_data_blocks_entries_on_intraday_charts():
     s = replace(DEFAULT_STRATEGY, trend_ma=None, sides="long")
     assert add_signals(df, replace(s, require_higher=False), interval="2h").entry_signal.any()
     assert not add_signals(df, s, interval="2h").entry_signal.any()
+
+
+
+# --- Two long systems: long-term 12/144/9 and short-term 12/26/9 ---
+
+def test_two_systems_settings():
+    from config import LONG_TERM, SHORT_TERM
+    assert (LONG_TERM.macd_slow, LONG_TERM.trend_side, LONG_TERM.max_hold_days) == (144, "below", None)
+    assert (SHORT_TERM.macd_slow, SHORT_TERM.trend_side, SHORT_TERM.max_hold_days) == (26, "above", 10)
+    assert SHORT_TERM.stop_atr_mult == 2.0 and SHORT_TERM.confirm_bars == 1
+    assert LONG_TERM.sides == SHORT_TERM.sides == "long"
+
+
+def test_combine_adds_two_half_accounts(fake_signals):
+    half = replace(NO_COSTS, starting_capital=500)
+    a = backtest.run({"X": bars([FLAT, FLAT, (100, 104.5, 99.5, 104)], signal_days=[0])}, S, half)
+    b = backtest.run({"Y": bars([FLAT, FLAT, FLAT, (100, 100, 97, 97)], signal_days=[0])},
+                     replace(S, name="Short-term: test"), half)
+    both = backtest.combine([a, b], "Both")
+    assert both.risk.starting_capital == 1000
+    assert both.equity.iloc[0] == pytest.approx(1000, abs=0.01)
+    assert both.equity.iloc[-1] == pytest.approx(1000 + a.trades.pnl.sum() + b.trades.pnl.sum(), abs=0.01)
+    assert sorted(both.trades.ticker) == ["X", "Y"] and "system" in both.trades

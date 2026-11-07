@@ -39,14 +39,14 @@ INTERVALS = ["1d", "1h", "2h", "4h"]
 
 @dataclass(frozen=True)
 class Strategy:
-    name: str = "Long + short: MACD cross beyond zero, against the 200-day EMA"
+    name: str = "Long-term: MACD 12/144/9 dip buy below 200-day EMA"
 
-    # Which trades to take: "long", "short" or "both" (default). With "both", the sell setup that
-    # ends a long also opens a short on the same bar, and the buy setup that ends a short opens a long.
+    # Which trades to take: "long" (default), "short" or "both". Shorts are PARKED: the code works
+    # and is tested, but they lost money in the 2024-2026 bull market; see README "Shorts (parked)".
     # A short is the long rule upside down: MACD crosses DOWN through its signal line while
-    # ABOVE zero, with price ABOVE the 200-day EMA. Stop above, target below, and it covers
-    # when the MACD crosses back up.
-    sides: str = "both"
+    # ABOVE zero, with price ABOVE the 200-day EMA. With "both", the sell setup that ends a long
+    # also opens a short on the same bar.
+    sides: str = "long"
 
     # MACD. 12/144/9: the slow line acts as the trend, so signals are fewer and cleaner.
     macd_fast: int = 12
@@ -152,6 +152,16 @@ class Risk:
 DEFAULT_STRATEGY = Strategy()
 DEFAULT_RISK = Risk()
 
+# Two long systems that run side by side, each on its own share of the account.
+#   Long-term: MACD 12/144/9, buys deep dips below the 200-day EMA, holds weeks to months.
+#   Short-term: MACD 12/26/9, buys pullbacks in stocks ABOVE their 200-day EMA, holds days to
+#   about two weeks: quicker confirmation (1 bar), tighter stop (2 ATR), 10-day time limit.
+LONG_TERM = DEFAULT_STRATEGY
+SHORT_TERM = replace(DEFAULT_STRATEGY, name="Short-term: MACD 12/26/9 pullback buy above 200-day EMA",
+                     macd_slow=26, trend_side="above", confirm_bars=1, stop_atr_mult=2.0, max_hold_days=10)
+SYSTEMS = {"long-term": LONG_TERM, "short-term": SHORT_TERM}
+SYSTEM_SPLIT = 0.5                      # share of the account for the long-term system; the rest is short-term
+
 _D = DEFAULT_STRATEGY
 
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
@@ -172,6 +182,7 @@ VARIANTS = [
     replace(_D, name="Trend: MACD cross, above 200-day EMA", require_below_zero=False, trend_side="above"),
     replace(_D, name="Classic 12/26/9, above 200-day EMA", macd_slow=26, require_below_zero=False,
             trend_side="above"),
-    replace(_D, name="Long only: dip buy below 200-day EMA", sides="long"),
-    replace(_D, name="Short only: MACD cross down above zero, above 200-day EMA", sides="short"),
+    # Parked short side, kept for reference.
+    replace(_D, name="(parked) Long + short", sides="both"),
+    replace(_D, name="(parked) Short only", sides="short"),
 ]

@@ -267,6 +267,24 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
                   kill_date, skipped)
 
 
+def combine(results: list[Result], name: str) -> Result:
+    """Add up systems that each traded their own slice of the account into one account."""
+    curves = pd.concat([r.equity for r in results], axis=1).sort_index().ffill()
+    for col, r in zip(curves.columns, results):
+        curves[col] = curves[col].fillna(r.risk.starting_capital)
+    trades = [r.trades.assign(system=r.strategy.name.split(":")[0]) for r in results if len(r.trades)]
+    total = replace(results[0].risk, starting_capital=sum(r.risk.starting_capital for r in results))
+    equity = curves.sum(axis=1).rename("equity")
+    # Kill switch of the whole account (each system also has its own on its slice).
+    low = equity[equity <= total.starting_capital * total.kill_switch_pct]
+    return Result(replace(results[0].strategy, name=name), total,
+                  pd.concat(trades, ignore_index=True) if trades else pd.DataFrame(),
+                  equity, low.index[0] if len(low) else None,
+                  sum(r.skipped_signals for r in results),
+                  [f"{r.strategy.name}: kill switch {fmt_time(r.kill_switch_date)}"
+                   for r in results if r.kill_switch_date is not None])
+
+
 def stats(res: Result) -> dict:
     eq, tr = res.equity, res.trades
     if eq.empty:

@@ -6,8 +6,9 @@
     python run_backtest.py --tickers NVDA AMD SNDK    # just these stocks
     python run_backtest.py --group ai                 # just the AI list (see config.GROUPS)
     python run_backtest.py --risk-pct 3               # risk 3% of the account per trade
-    python run_backtest.py --sides long               # longs only (default is long + short)
-    python run_backtest.py --sides short              # shorts only
+    python run_backtest.py --system long-term         # only the 12/144/9 long-term system
+    python run_backtest.py --system short-term        # only the 12/26/9 short-term system
+    python run_backtest.py --sides both               # (parked) add short selling back in
     python run_backtest.py --buffer 0                 # no buffer: take crosses right under zero
     python run_backtest.py --mtf 2                    # need 2 of 15m/30m/45m to agree (last ~60 days only)
 """
@@ -21,7 +22,8 @@ import pandas as pd
 
 import backtest
 import data
-from config import BENCHMARKS, DEFAULT_RISK, DEFAULT_STRATEGY, INTERVALS, GROUPS, VARIANTS
+from config import (BENCHMARKS, DEFAULT_RISK, DEFAULT_STRATEGY, GROUPS, INTERVALS, LONG_TERM, SHORT_TERM,
+                    SYSTEM_SPLIT, SYSTEMS, VARIANTS)
 
 RESULTS_DIR = Path(__file__).parent / "results"
 
@@ -40,8 +42,10 @@ def main():
                     help="percent of the account lost if a stop is hit (default 2)")
     ap.add_argument("--max-position-pct", type=float, default=DEFAULT_RISK.max_position_pct * 100,
                     help="largest single position as a percent of the account (default 34)")
+    ap.add_argument("--system", choices=["both", *SYSTEMS], default="both",
+                    help="both (default): long-term 12/144/9 and short-term 12/26/9 on half the account each")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
-                    help="long, short or both (default: both). Ignored with --compare, whose variants set it")
+                    help="(parked) long, short or both for short SELLING. Default: long only")
     ap.add_argument("--buffer", type=float, default=None,
                     help="MACD must be at least this many ATRs past zero at the cross (default 0.5; 0 = off)")
     ap.add_argument("--mtf", type=int, default=None, choices=[0, 1, 2, 3],
@@ -74,21 +78,24 @@ def main():
 
     risk = replace(DEFAULT_RISK, starting_capital=args.capital, risk_per_trade=args.risk_pct / 100,
                    max_position_pct=args.max_position_pct / 100)
+    # Each job: (strategy, share of the account, part of the combined two-system account?)
+    halves = [(LONG_TERM, SYSTEM_SPLIT, True), (SHORT_TERM, 1 - SYSTEM_SPLIT, True)]
     if args.compare:
-        strategies = VARIANTS
-    elif args.sides:
-        names = {"long": "Long only: dip buy below 200-day EMA",
-                 "short": "Short only: MACD cross down above zero, above 200-day EMA",
-                 "both": DEFAULT_STRATEGY.name}
-        strategies = [replace(DEFAULT_STRATEGY, sides=args.sides, name=names[args.sides])]
+        jobs = [(s, 1.0, False) for s in VARIANTS] + [(SHORT_TERM, 1.0, False)] + halves
+    elif args.system == "both":
+        jobs = halves
     else:
-        strategies = [DEFAULT_STRATEGY]
+        jobs = [(SYSTEMS[args.system], 1.0, False)]
+    if args.sides:
+        jobs = [(replace(s, sides=args.sides, name=f"{s.name} [sides: {args.sides}]"), w, c) for s, w, c in jobs]
+    strategies = [s for s, _, _ in jobs]
     if args.buffer is not None:
-        strategies = [replace(s, min_macd_depth_atr=args.buffer,
-                              name=f"{s.name} [buffer {args.buffer:g} ATR]") for s in strategies]
+        jobs = [(replace(s, min_macd_depth_atr=args.buffer, name=f"{s.name} [buffer {args.buffer:g} ATR]"), w, c)
+                for s, w, c in jobs]
     if args.mtf:
-        strategies = [replace(s, confirm_min=args.mtf,
-                              name=f"{s.name} [{args.mtf} lower TFs agree]") for s in strategies]
+        jobs = [(replace(s, confirm_min=args.mtf, name=f"{s.name} [{args.mtf} lower TFs agree]"), w, c)
+                for s, w, c in jobs]
+    strategies = [s for s, _, _ in jobs]
     lower = None
     if args.mtf is not None:
         lower = data.load_lower(args.tickers, daily_start, args.refresh, args.offline)
@@ -105,19 +112,32 @@ def main():
         print(f"Lower timeframes ready from {start}: the test is limited to that window.")
     RESULTS_DIR.mkdir(exist_ok=True)
 
-    rows, first_day = [], None
-    for s in strategies:
-        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None, lower, args.interval,
-                           market, higher)
+    rows, first_day, parts = [], None, []
+
+    def record(res: backtest.Result, show: bool, detail: bool):
+        nonlocal first_day
         st = backtest.stats(res)
-        rows.append(st)
+        if show:
+            rows.append(st)
         if not res.equity.empty:
             first_day = res.equity.index[0] if first_day is None else min(first_day, res.equity.index[0])
-        slug = re.sub(r"[^a-z0-9]+", "_", s.name.lower()).strip("_")
+        slug = re.sub(r"[^a-z0-9]+", "_", res.strategy.name.lower()).strip("_")
         res.trades.to_csv(RESULTS_DIR / f"trades_{args.interval}_{slug}.csv", index=False)
         res.equity.to_csv(RESULTS_DIR / f"equity_{args.interval}_{slug}.csv")
-        if not args.compare:
+        if detail:
             print_detail(st, res)
+
+    for s, share, combined in jobs:
+        sized = replace(risk, starting_capital=args.capital * share)
+        if share < 1:
+            s = replace(s, name=f"{s.name} (${sized.starting_capital:,.0f})")
+        res = backtest.run(prices, s, sized, start, args.end, daily if intraday else None, lower, args.interval,
+                           market, higher)
+        if combined:
+            parts.append(res)
+        record(res, show=not (args.compare and combined), detail=not args.compare)
+    if len(parts) == 2:
+        record(backtest.combine(parts, "BOTH SYSTEMS: long-term + short-term"), show=True, detail=not args.compare)
 
     for b, df in bench.items():
         bh = backtest.buy_and_hold(df, args.capital, first_day, args.end)
@@ -151,6 +171,9 @@ def print_detail(st: dict, res: backtest.Result):
             print("\n  Longs vs shorts:")
             print("  " + by_side.to_string().replace("\n", "\n  "))
         t = res.trades
+        if "system" in t:
+            print("\n  By system:")
+            print("  " + summarize(t.groupby("system")).to_string().replace("\n", "\n  "))
         if t.depth_atr.notna().any():
             depth = pd.cut(t.depth_atr.abs(), [0, 0.5, 1, 2, float("inf")],
                            labels=["<0.5 ATR", "0.5-1 ATR", "1-2 ATR", ">2 ATR"], include_lowest=True)
