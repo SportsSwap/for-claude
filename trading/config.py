@@ -39,13 +39,14 @@ INTERVALS = ["1d", "1h", "2h", "4h"]
 
 @dataclass(frozen=True)
 class Strategy:
-    name: str = "Dip buy: MACD cross under zero, below 200-day EMA"
+    name: str = "Long + short: MACD cross beyond zero, against the 200-day EMA"
 
-    # Which trades to take: "long", "short" or "both".
+    # Which trades to take: "long", "short" or "both" (default). With "both", the sell setup that
+    # ends a long also opens a short on the same bar, and the buy setup that ends a short opens a long.
     # A short is the long rule upside down: MACD crosses DOWN through its signal line while
     # ABOVE zero, with price ABOVE the 200-day EMA. Stop above, target below, and it covers
     # when the MACD crosses back up.
-    sides: str = "long"
+    sides: str = "both"
 
     # MACD. 12/144/9: the slow line acts as the trend, so signals are fewer and cleaner.
     macd_fast: int = 12
@@ -143,6 +144,6 @@ VARIANTS = [
     replace(_D, name="Trend: MACD cross, above 200-day EMA", require_below_zero=False, trend_side="above"),
     replace(_D, name="Classic 12/26/9, above 200-day EMA", macd_slow=26, require_below_zero=False,
             trend_side="above"),
+    replace(_D, name="Long only: dip buy below 200-day EMA", sides="long"),
     replace(_D, name="Short only: MACD cross down above zero, above 200-day EMA", sides="short"),
-    replace(_D, name="Long + short: dip buy and its mirror", sides="both"),
 ]

@@ -6,7 +6,7 @@
     python run_backtest.py --tickers NVDA AMD SNDK    # just these stocks
     python run_backtest.py --group ai                 # just the AI list (see config.GROUPS)
     python run_backtest.py --risk-pct 3               # risk 3% of the account per trade
-    python run_backtest.py --sides both               # take the short mirror trades as well
+    python run_backtest.py --sides long               # longs only (default is long + short)
     python run_backtest.py --sides short              # shorts only
     python run_backtest.py --buffer 0                 # no buffer: take crosses right under zero
     python run_backtest.py --mtf 2                    # need 2 of 15m/30m/45m to agree (last ~60 days only)
@@ -41,7 +41,7 @@ def main():
     ap.add_argument("--max-position-pct", type=float, default=DEFAULT_RISK.max_position_pct * 100,
                     help="largest single position as a percent of the account (default 34)")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
-                    help="long, short or both (default: long). Ignored with --compare, whose variants set it")
+                    help="long, short or both (default: both). Ignored with --compare, whose variants set it")
     ap.add_argument("--buffer", type=float, default=None,
                     help="MACD must be at least this many ATRs past zero at the cross (default 0.5; 0 = off)")
     ap.add_argument("--mtf", type=int, default=None, choices=[0, 1, 2, 3],
@@ -72,9 +72,9 @@ def main():
     if args.compare:
         strategies = VARIANTS
     elif args.sides:
-        names = {"long": DEFAULT_STRATEGY.name,
-                 "short": "Short: MACD cross down above zero, above 200-day EMA",
-                 "both": "Long + short: dip buy and its mirror"}
+        names = {"long": "Long only: dip buy below 200-day EMA",
+                 "short": "Short only: MACD cross down above zero, above 200-day EMA",
+                 "both": DEFAULT_STRATEGY.name}
         strategies = [replace(DEFAULT_STRATEGY, sides=args.sides, name=names[args.sides])]
     else:
         strategies = [DEFAULT_STRATEGY]

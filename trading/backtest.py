@@ -235,7 +235,10 @@ def run(prices: dict[str, pd.DataFrame], s: Strategy, r: Risk,
         # Longs rank highest-first, shorts lowest-first (the weakest stock is the best short).
         candidates = []
         for t, bar in bars.items():
-            if t in positions:
+            held = positions.get(t)
+            # A stock already held is skipped, unless that trade exits at the next open: then a new
+            # signal can take its place (the sell setup that ends a long is also a short signal).
+            if held is not None and not held.exit_next_open:
                 continue
             score = bar[s.rank_by] if pd.notna(bar[s.rank_by]) else None
             if bar["entry_signal"]:

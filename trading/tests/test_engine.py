@@ -282,8 +282,9 @@ def test_short_signal_is_the_mirror_of_the_dip_buy():
     # Same roll-over but the stock is below its 200-day average: no short.
     high_daily = ohlc(np.full(len(close), 1000.0), idx)
     assert not add_signals(df, SHORT, daily=high_daily).short_signal.any()
-    # Default strategy stays long-only.
-    assert not add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
+    # Long-only mode never shorts; the default (both sides) does.
+    assert not add_signals(df, replace(DEFAULT_STRATEGY, sides="long"), daily=df).short_signal.any()
+    assert add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
 
 
 def test_short_entry_stop_above_and_stop_hit(fake_signals):
@@ -538,3 +539,19 @@ def test_short_trailing_stop_mirrors(fake_signals):
     t = backtest.run({"X": df}, replace(SHORT, target_r=None, trail_atr_mult=3.0), NO_BORROW).trades.iloc[0]
     assert t.stop == 102 and t.exit_stop == 93 and t.exit_reason == "trailing stop"
     assert t.r_multiple == pytest.approx(3.5)
+
+
+def test_sell_setup_flips_long_into_short(fake_signals):
+    # Day 0: buy signal. Day 3: MACD crosses down above zero = long's exit AND a short signal.
+    df = bars([FLAT] * 7, signal_days=[0], cross_down_days=[3])
+    df["macd"], df["cross_up"] = 1.0, False
+    df["short_signal"] = [i == 3 for i in range(7)]
+    res = backtest.run({"X": df}, replace(S, sides="both", macd_exit="above_zero", target_r=None), NO_BORROW)
+    tr = res.trades
+    assert list(tr.side) == ["long", "short"]
+    assert tr.exit_date.iloc[0] == tr.entry_date.iloc[1] == "2024-01-05"
+    assert tr.exit_reason.iloc[0] == "MACD sell setup"
+
+
+def test_default_takes_both_sides():
+    assert DEFAULT_STRATEGY.sides == "both"

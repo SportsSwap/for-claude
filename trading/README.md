@@ -46,9 +46,9 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 | Size | Lose 2% of the account if the stop hits; no position above ~34% of the account; fractional shares | `--risk-pct`, `--max-position-pct` |
 | Limits | Max 3 positions; no new trades once the account hits $800 | `max_positions`, `kill_switch_pct` |
 | Costs | IBKR Pro fixed commissions + 0.05% slippage per fill | `Risk` |
-| Shorts | Off by default. Turn on with `--sides short` or `--sides both` (see below) | `sides` |
+| Shorts | **On by default.** The sell setup that ends a long also opens a short on the same bar, and the buy setup that ends a short opens a long. `--sides long` for longs only (see below) | `sides` |
 
-### Shorts (optional)
+### Shorts
 
 The short is the dip buy turned upside down, for stocks that have run too far up:
 
@@ -62,7 +62,7 @@ The short is the dip buy turned upside down, for stocks that have run too far up
 | Size and limits | Same as longs: 2% risk, ~34% cap, and longs and shorts share the 3 position slots |
 | Extra cost | Stock-loan fee of 0.5% a year on the position's value (`short_borrow_pct_per_year`) |
 
-With `--sides both`, if more signals fire than there are free slots, longs with the highest
+If more signals fire than there are free slots, longs with the highest
 20-bar momentum and shorts with the lowest win. In the backtest a short sets aside cash equal to its
 value, so there is no leverage and a short is sized exactly like a long.
 
@@ -94,8 +94,8 @@ short, so treat the backtest as a test of the signal, not of those instruments.
 | Zero-line cross, any | Same without the "price hasn't moved" check |
 | Trend: MACD cross, above 200-day EMA | The opposite idea: only buy stocks already in an uptrend |
 | Classic 12/26/9, above 200-day EMA | The textbook MACD for comparison |
+| Long only: dip buy below 200-day EMA | No shorts |
 | Short only: MACD cross down above zero, above 200-day EMA | The short rule on its own |
-| Long + short: dip buy and its mirror | The default plus shorts, sharing the 3 slots |
 
 The backtester is deliberately pessimistic in two places. If a stop and a target are both touched in
 the same bar, it assumes the stop hit first. If a stock gaps through the stop, it fills at the
@@ -110,7 +110,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "46 passed"
+python -m pytest -q tests        # should print "48 passed"
 ```
 
 ## Run the backtest
@@ -122,7 +122,7 @@ python run_backtest.py --compare --interval 1h
 python run_backtest.py --compare --interval 1d --start 2018-01-01   # daily bars, includes the 2022 crash
 python run_backtest.py --compare --risk-pct 3            # same again at 3% risk per trade
 python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a few stocks, with detail
-python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
+python run_backtest.py --sides long                      # longs only (default is long + short)
 python run_backtest.py --compare --group ai              # every variant on the AI list only
 python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
 python run_backtest.py --buffer 0.5                      # only crosses at least 0.5 ATR under zero
@@ -208,8 +208,8 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Zero-line cross, any | Entry trigger: **Zero-line cross**; Price must be: **Off** |
 | Trend: MACD cross above 200-day EMA | Untick "must happen under zero"; Price must be: **Above** |
 | Classic 12/26/9 | Slow length: **26**; untick "must happen under zero"; Price must be: **Above** |
+| Long only | Entry → Trades to take: **Long only** |
 | Short only | Entry → Trades to take: **Short only** |
-| Long + short | Entry → Trades to take: **Long and short** |
 
 Short signals show as pink triangles above the bar; buy signals as teal triangles below. The red line
 is the stop while a trade is open. With the buffer on, grey crosses mark signals it skipped.
@@ -242,14 +242,14 @@ Differences from the Python backtester:
 ```bash
 python scan.py --equity 1000                 # 2h bars, default strategy, your current account value
 python scan.py --interval 4h --variant 5     # 4h bars, zero-line-cross variant
-python scan.py --sides both                  # buy signals and short signals
+python scan.py --sides long                  # buy signals only (default shows buys and shorts)
 python scan.py --mtf 2                       # only signals where 2 of 15m/30m/45m agree
 python scan.py --group ai                    # AI list only
 ```
 
 For each buy signal it prints a stop, a target and a share count, sized so that hitting the stop
 costs your risk percent of the account. It also prints a watchlist of stocks with the MACD under zero and
-curling up toward a cross. With `--sides short` or `both` it also lists short signals (stop above,
+curling up toward a cross. It also lists short signals (stop above,
 target below) and a short watchlist: MACD above zero and rolling over. Each signal shows `depth_atr`
 (how far from zero the cross was) and `lower_tfs_agree` (how many of 15m/30m/45m agree right now).
 Add `--no-mtf` to skip downloading the lower timeframes. Run it after a bar closes: during market hours the newest bar is still

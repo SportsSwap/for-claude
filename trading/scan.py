@@ -38,7 +38,7 @@ def main():
     ap.add_argument("--risk-pct", type=float, default=DEFAULT_RISK.risk_per_trade * 100)
     ap.add_argument("--variant", type=int, default=None, help="index into config.VARIANTS")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
-                    help="which signals to look for (default: what the strategy sets, long)")
+                    help="which signals to look for (default: both)")
     ap.add_argument("--buffer", type=float, default=None,
                     help="MACD must be at least this many ATRs past zero at the cross (default 0.5; 0 = off)")
     ap.add_argument("--mtf", type=int, default=None, choices=[0, 1, 2, 3],
