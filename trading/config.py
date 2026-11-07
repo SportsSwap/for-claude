@@ -68,6 +68,11 @@ class Strategy:
     # right side of its signal line AND the histogram must grow on every one of them. Crosses that
     # fizzle straight away (chop) are skipped. 0 = enter on the cross.
     confirm_bars: int = 2
+    # Line-up window: after the confirmation bars, keep waiting up to this many more bars for the
+    # higher timeframes (and the other filters) to agree, as long as the MACD stays above its
+    # signal line. The trade fires on the first bar where everything lines up. Higher timeframes
+    # turn later than the chart, so 0 (agree on the confirmation bar itself) almost never trades.
+    align_window: int = 30
 
     # Higher timeframes must agree: at entry, the MACD (same 12/144/9) on each of these timeframes
     # must be above its signal line for a long (below for a short), using the last FINISHED bar
@@ -158,7 +163,8 @@ DEFAULT_RISK = Risk()
 #   about two weeks: quicker confirmation (1 bar), tighter stop (2 ATR), 10-day time limit.
 LONG_TERM = DEFAULT_STRATEGY
 SHORT_TERM = replace(DEFAULT_STRATEGY, name="Short-term: MACD 12/26/9 pullback buy above 200-day EMA",
-                     macd_slow=26, trend_side="above", confirm_bars=1, stop_atr_mult=2.0, max_hold_days=10)
+                     macd_slow=26, trend_side="above", confirm_bars=1, align_window=10, stop_atr_mult=2.0,
+                     max_hold_days=10)
 SYSTEMS = {"long-term": LONG_TERM, "short-term": SHORT_TERM}
 SYSTEM_SPLIT = 0.5                      # share of the account for the long-term system; the rest is short-term
 

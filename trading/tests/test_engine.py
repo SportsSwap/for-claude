@@ -698,3 +698,40 @@ def test_combine_adds_two_half_accounts(fake_signals):
     assert both.equity.iloc[0] == pytest.approx(1000, abs=0.01)
     assert both.equity.iloc[-1] == pytest.approx(1000 + a.trades.pnl.sum() + b.trades.pnl.sum(), abs=0.01)
     assert sorted(both.trades.ticker) == ["X", "Y"] and "system" in both.trades
+
+
+# --- Line-up window: wait for the higher timeframes to come round after the cross ---
+
+def staged_frame(macd, signal):
+    idx = pd.bdate_range("2024-01-01", periods=len(macd))
+    df = pd.DataFrame({"macd": macd, "macd_signal": signal}, index=idx, dtype=float)
+    df["macd_hist"] = df.macd - df.macd_signal
+    return df
+
+
+def test_entry_fires_when_higher_timeframes_line_up_later():
+    from strategy import staged_entry
+    # Cross up on bar 1, histogram grows on bars 2-3, MACD stays above its signal line after that.
+    df = staged_frame([-5, -4, -3, -2, -1.5, -1.2, -1.0, -0.9], [-4.5, -4.2, -3.8, -3.2, -2.6, -2.1, -1.7, -1.4])
+    trigger = pd.Series([False, True] + [False] * 6, index=df.index)
+    higher_ok = pd.Series([False] * 5 + [True] * 3, index=df.index)          # 4h/daily agree from bar 5
+    s = replace(DEFAULT_STRATEGY, confirm_bars=2, align_window=10)
+    assert staged_entry(trigger, df, s, 1, higher_ok).tolist() == [False] * 5 + [True, False, False]
+    # With no line-up window the higher timeframes must already agree on bar 3: no trade.
+    assert not staged_entry(trigger, df, replace(s, align_window=0), 1, higher_ok).any()
+    # Window too short to reach bar 5: no trade.
+    assert not staged_entry(trigger, df, replace(s, align_window=1), 1, higher_ok).any()
+
+
+def test_line_up_cancelled_if_macd_crosses_back():
+    from strategy import staged_entry
+    df = staged_frame([-5, -4, -3, -2, -2.8, -1.2, -1.0], [-4.5, -4.2, -3.8, -3.2, -2.7, -2.1, -1.7])
+    trigger = pd.Series([False, True] + [False] * 5, index=df.index)
+    higher_ok = pd.Series([False] * 5 + [True] * 2, index=df.index)
+    # Bar 4: MACD dips back under its signal line, so the later line-up doesn't count.
+    assert not staged_entry(trigger, df, replace(DEFAULT_STRATEGY, confirm_bars=2, align_window=10), 1, higher_ok).any()
+
+
+def test_short_term_system_has_shorter_window():
+    from config import LONG_TERM, SHORT_TERM
+    assert LONG_TERM.align_window == 30 and SHORT_TERM.align_window == 10

@@ -149,32 +149,53 @@ def add_signals(prices: pd.DataFrame, s: Strategy, daily: pd.DataFrame | None = 
         return sig.fillna(False).astype(bool)
 
     no = pd.Series(False, index=df.index)
-    df["entry_signal"] = finish(_long_entry(df, s)) if s.sides in ("long", "both") else no
-    short = _short_entry(df, s) if s.sides in ("short", "both") else no
     if s.short_market_filter:
         df["market_down"] = market_downtrend(market, s, df.index) if market is not None else False
-        short = short & df["market_down"]
-    df["short_signal"] = finish(short)
+    df["entry_signal"] = finish(_long_entry(df, s)) if s.sides in ("long", "both") else no
+    df["short_signal"] = finish(_short_entry(df, s)) if s.sides in ("short", "both") else no
     return df
+
+
+def staged_entry(trigger: pd.Series, df: pd.DataFrame, s: Strategy, side: int, filters: pd.Series) -> pd.Series:
+    """Turn a cross into an entry once everything lines up.
+
+    After the cross (bar 0) the MACD must stay on the right side of its signal line (of zero for
+    zero-line entries), and on bars 1..confirm_bars the histogram must grow. From bar confirm_bars
+    up to confirm_bars + align_window, the trade fires on the FIRST bar where all the other
+    filters (higher timeframes, 200 EMA, ...) agree. One entry per cross at most."""
+    n, window = s.confirm_bars, s.align_window
+    grp = trigger.astype(int).cumsum()
+    since = df.groupby(grp.to_numpy()).cumcount().where(grp > 0)
+    if s.entry == "zero_cross":
+        right_side = df["macd"] * side > 0
+    else:
+        right_side = (df["macd"] - df["macd_signal"]) * side > 0
+    growing = (df["macd_hist"] - df["macd_hist"].shift(1)) * side > 0
+    bad = ~right_side | ((since >= 1) & (since <= n) & ~growing)
+    broken = bad.astype(int).groupby(grp.to_numpy()).cummax().astype(bool)
+    eligible = (grp > 0) & ~broken & (since >= n) & (since <= n + window) & filters.fillna(False).astype(bool)
+    first = eligible & (eligible.astype(int).groupby(grp.to_numpy()).cumsum() == 1)
+    return first.fillna(False).astype(bool)
 
 
 def _long_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
     if s.entry == "signal_cross":
-        entry = df["cross_up"].copy()
+        cross = df["cross_up"].copy()
         if s.require_below_zero:
-            entry &= df["macd"] < -s.min_macd_depth_atr * df["atr"] if s.min_macd_depth_atr else df["macd"] < 0
+            cross &= df["macd"] < -s.min_macd_depth_atr * df["atr"] if s.min_macd_depth_atr else df["macd"] < 0
     elif s.entry == "zero_cross":
-        entry = df["zero_cross_up"].copy()
+        cross = df["zero_cross_up"].copy()
     else:
         raise ValueError(f"unknown entry type {s.entry!r}")
-    entry = confirmed_after(entry, df, s.confirm_bars, 1)
+    ok = pd.Series(True, index=df.index)
     if s.require_higher:
-        entry &= df["htf_up"] >= df["htf_max"]
+        ok &= df["htf_up"] >= df["htf_max"]
     if s.trend_ma:
-        entry &= df["Close"] < df["trend_ma"] if s.trend_side == "below" else df["Close"] > df["trend_ma"]
+        ok &= df["Close"] < df["trend_ma"] if s.trend_side == "below" else df["Close"] > df["trend_ma"]
     if s.max_run_atr is not None:
-        entry &= df["run_atr"] <= s.max_run_atr
-    return entry & _confirmed(df, s, "mtf_up")
+        ok &= df["run_atr"] <= s.max_run_atr
+    ok &= _confirmed(df, s, "mtf_up")
+    return staged_entry(cross, df, s, 1, ok)
 
 
 def _confirmed(df: pd.DataFrame, s: Strategy, col: str) -> pd.Series:
@@ -190,24 +211,27 @@ def _confirmed(df: pd.DataFrame, s: Strategy, col: str) -> pd.Series:
 
 
 def _short_entry(df: pd.DataFrame, s: Strategy) -> pd.Series:
-    """The long rule turned upside down: MACD crosses DOWN through its signal line while
+    """(Parked) The long rule turned upside down: MACD crosses DOWN through its signal line while
     ABOVE zero, and (by default) price is ABOVE the 200-day EMA, i.e. stretched too far up."""
     if s.entry == "signal_cross":
-        entry = df["cross_down"].copy()
+        cross = df["cross_down"].copy()
         if s.require_below_zero:
-            entry &= df["macd"] > s.min_macd_depth_atr * df["atr"] if s.min_macd_depth_atr else df["macd"] > 0
+            cross &= df["macd"] > s.min_macd_depth_atr * df["atr"] if s.min_macd_depth_atr else df["macd"] > 0
     elif s.entry == "zero_cross":
-        entry = df["zero_cross_down"].copy()
+        cross = df["zero_cross_down"].copy()
     else:
         raise ValueError(f"unknown entry type {s.entry!r}")
-    entry = confirmed_after(entry, df, s.confirm_bars, -1)
+    ok = pd.Series(True, index=df.index)
     if s.require_higher:
-        entry &= df["htf_down"] >= df["htf_max"]
+        ok &= df["htf_down"] >= df["htf_max"]
     side = s.short_trend_side or ("above" if s.trend_side == "below" else "below")
     if s.trend_ma and side == "above":
-        entry &= df["Close"] > df["trend_ma"]
+        ok &= df["Close"] > df["trend_ma"]
     elif s.trend_ma and side == "below":
-        entry &= df["Close"] < df["trend_ma"]
+        ok &= df["Close"] < df["trend_ma"]
     if s.max_run_atr is not None:
-        entry &= df["run_atr_down"] <= s.max_run_atr
-    return entry & _confirmed(df, s, "mtf_down")
+        ok &= df["run_atr_down"] <= s.max_run_atr
+    if s.short_market_filter:
+        ok &= df["market_down"]
+    ok &= _confirmed(df, s, "mtf_down")
+    return staged_entry(cross, df, s, -1, ok)

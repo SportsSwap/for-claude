@@ -38,6 +38,7 @@ their own positions, stops and $800-style kill switch on their half:
 | MACD | **12/144/9**: slow, catches big swings | **12/26/9**: the classic, catches short swings |
 | Buy | MACD crosses up **under zero** while price is **below** the 200-day EMA (a deep dip) | MACD crosses up **under zero** while price is **above** the 200-day EMA (a pullback in a stock that's already rising) |
 | Wait after the cross | 2 bars | 1 bar |
+| Line-up window | then up to 30 more bars for everything to agree | then up to 10 more bars |
 | Higher timeframes | 4h and daily 12/144/9 MACDs must agree | 4h and daily 12/26/9 MACDs must agree |
 | Stop | 3 × ATR | 2 × ATR |
 | Sell | The sell setup: MACD crosses down **above zero** | The sell setup, or after **10 trading days** |
@@ -52,6 +53,7 @@ Rules both systems share (each one's settings live in `config.py` → `Strategy`
 | Chart | 2h bars (1h, 4h and daily also supported) | `--interval` |
 | Confirmation | **Don't enter on the cross.** Wait N bars: the MACD must stay above its signal line and the histogram must grow on each. Crosses that fizzle straight away are skipped | `confirm_bars` |
 | Higher timeframes | The 4h and daily MACDs must be above their signal lines (last finished bar). Only timeframes longer than the chart count | `higher_tfs`, `require_higher` |
+| Line-up window | Higher timeframes turn **later** than the chart, so after the wait the system keeps watching for up to N bars, as long as the chart's MACD stays above its signal line. It buys on the **first bar where everything lines up**. One entry per cross. Without this window (0) almost no trades happen | `align_window` |
 | Buffer | Off: any cross under zero counts. Can require the cross to be N × ATR(14) below zero | `min_macd_depth_atr`, `--buffer` |
 | Lower timeframes | Counts how many of **15m / 30m / 45m** agree (their MACD above its signal line and histogram rising). Shown on every trade; doesn't block trades unless you ask | `confirm_min`, `--mtf` |
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe is tested as a variant | `trend_ma_source` |
@@ -136,7 +138,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "60 passed"
+python -m pytest -q tests        # should print "63 passed"
 ```
 
 ## Run the backtest

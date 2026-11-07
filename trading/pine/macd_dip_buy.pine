@@ -2,10 +2,10 @@
 // Two long-only MACD systems in one script. Pick one under "System"; to see both on one chart,
 // add the script twice and set one copy to Short-term.
 //   Long-term (12/144/9): MACD crosses up under zero, price BELOW the 200-day EMA (deep dip).
-//                         Wait 2 bars, 4h + daily MACDs agree. Stop 3 ATR. Hold until the sell
+//                         Wait 2 bars, then up to 30 bars for the 4h + daily MACDs to agree. Stop 3 ATR. Hold until the sell
 //                         setup (MACD crosses down ABOVE zero). Weeks to months.
 //   Short-term (12/26/9): MACD crosses up under zero, price ABOVE the 200-day EMA (pullback in
-//                         an uptrend). Wait 1 bar, 4h + daily agree. Stop 2 ATR. Sell setup or
+//                         an uptrend). Wait 1 bar, then up to 10 bars for 4h + daily to agree. Stop 2 ATR. Sell setup or
 //                         10 trading days. Days to ~2 weeks.
 //   Custom: uses every setting below as you set it.
 // Same rules as trading/config.py (LONG_TERM, SHORT_TERM), so TradingView's Strategy Tester and
@@ -54,6 +54,8 @@ shortStopMult = input.float(0.0, "Short stop N x ATR (0 = same as longs)", minva
 grpQ = "Only the best trades"
 confirmBars = input.int(2, "Wait N bars after the cross (Custom only)", minval = 0, maxval = 10, group = grpQ,
      tooltip = "After the cross, the MACD must stay on the right side of its signal line and the histogram must grow on each of these bars. Crosses that fizzle are skipped.")
+alignWin = input.int(30, "Line-up window: bars to wait for everything to agree (Custom only)", minval = 0, group = grpQ,
+     tooltip = "After the wait, keep waiting up to this many bars for the higher timeframes and other filters to agree, as long as the MACD stays above its signal line. The trade fires on the first bar where everything lines up.")
 reqHigher = input.bool(true, "Higher timeframes must agree", group = grpQ,
      tooltip = "At entry, the MACD on these timeframes (last finished bar) must be above its signal line for a buy, below for a short. Only timeframes longer than the chart count.")
 htfA = input.timeframe("240", "Higher timeframe 1", group = grpQ)
@@ -90,6 +92,7 @@ emaSideEff = isLongSys ? "Below" : isShortSys ? "Above" : emaSide
 confirmEff = isLongSys ? 2 : isShortSys ? 1 : confirmBars
 stopMultEff = isLongSys ? 3.0 : isShortSys ? 2.0 : stopMult
 holdEff = isLongSys ? 0 : isShortSys ? 10 : maxHoldDays
+alignEff = isLongSys ? 30 : isShortSys ? 10 : alignWin
 
 // ---------- Indicators ----------
 [macdLine, signalLine, hist] = ta.macd(close, fastLen, slowEff, sigLen)
@@ -162,25 +165,49 @@ needed = math.min(confirmMin, lowerCount)
 depthOkLong = minDepthAtr <= 0 ? macdLine < 0 : macdLine < -minDepthAtr * atrVal
 depthOkShort = minDepthAtr <= 0 ? macdLine > 0 : macdLine > minDepthAtr * atrVal
 crossNow = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or depthOkLong) : zeroUp
-// Wait confirmBars bars: MACD still above its signal line and the histogram growing on each.
-// (ta.* calls sit on their own lines so they run on every bar.)
-heldUp = macdLine > signalLine and hist > hist[1] ? 1 : 0
-barsSinceUp = ta.barssince(crossNow)
-heldUpSum = math.sum(heldUp, math.max(confirmEff, 1))
-trigger = confirmEff == 0 ? crossNow : barsSinceUp == confirmEff and heldUpSum == confirmEff
+// After the cross: the MACD must stay above its signal line (above zero for zero-line entries) and
+// the histogram must grow for the first confirmEff bars. Then, for up to alignEff more bars, the
+// trade fires on the FIRST bar where everything else lines up (higher timeframes, 200 EMA, ...).
+// One entry per cross.
+var int sinceUp = na
+var bool okUp = false
+var bool firedUp = false
+rightUp = entryMode == "Signal-line cross" ? macdLine > signalLine : macdLine > 0
+growUp = hist > hist[1]
+if crossNow
+    sinceUp := 0
+    okUp := true
+    firedUp := false
+else if not na(sinceUp)
+    sinceUp += 1
+if not na(sinceUp) and (not rightUp or (sinceUp >= 1 and sinceUp <= confirmEff and not growUp))
+    okUp := false
+trigger = okUp and not firedUp and not na(sinceUp) and sinceUp >= confirmEff and sinceUp <= confirmEff + alignEff
 trendOk = emaSideEff == "Off" ? true : emaSideEff == "Below" ? close < trendEma : close > trendEma
 runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
 warm = bar_index > 2 * slowEff
 allowLong = direction != "Short only"
 allowShort = direction != "Long only"
 buySignal = allowLong and trigger and higherOkLong and trendOk and runOk and upCount >= needed and warm and time >= startDate
+if buySignal
+    firedUp := true
 
 // Short: the same rule upside down.
 crossNowS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
-heldDown = macdLine < signalLine and hist < hist[1] ? 1 : 0
-barsSinceDown = ta.barssince(crossNowS)
-heldDownSum = math.sum(heldDown, math.max(confirmEff, 1))
-triggerS = confirmEff == 0 ? crossNowS : barsSinceDown == confirmEff and heldDownSum == confirmEff
+var int sinceDown = na
+var bool okDown = false
+var bool firedDown = false
+rightDown = entryMode == "Signal-line cross" ? macdLine < signalLine : macdLine < 0
+growDown = hist < hist[1]
+if crossNowS
+    sinceDown := 0
+    okDown := true
+    firedDown := false
+else if not na(sinceDown)
+    sinceDown += 1
+if not na(sinceDown) and (not rightDown or (sinceDown >= 1 and sinceDown <= confirmEff and not growDown))
+    okDown := false
+triggerS = okDown and not firedDown and not na(sinceDown) and sinceDown >= confirmEff and sinceDown <= confirmEff + alignEff
 mirrorSide = emaSideEff == "Below" ? "Above" : emaSideEff == "Above" ? "Below" : "Off"
 sSide = shortSide == "Mirror of longs" ? mirrorSide : shortSide == "Above their 200 EMA" ? "Above" :
      shortSide == "Below their 200 EMA" ? "Below" : "Off"
@@ -188,6 +215,8 @@ trendOkS = sSide == "Off" ? true : sSide == "Above" ? close > trendEma : close <
 marketOk = not useMarket or marketDown
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
 shortSignal = allowShort and triggerS and higherOkShort and trendOkS and runOkS and marketOk and downCount >= needed and warm and time >= startDate
+if shortSignal
+    firedDown := true
 
 // Crosses the buffer threw away (everything else passed), so you can see what it removed.
 inTest = warm and time >= startDate and entryMode == "Signal-line cross" and needBelowZero and minDepthAtr > 0
