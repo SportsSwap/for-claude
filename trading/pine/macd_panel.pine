@@ -1,7 +1,7 @@
 //@version=6
 // MACD 12/144/9 panel with the buffer drawn on it. Add it under the strategy (macd_dip_buy.pine).
-// The dashed lines sit N x ATR away from zero. A buy only counts if the blue line crosses up
-// BELOW the lower dashed line; a short only if it crosses down ABOVE the upper one.
+// The dotted lines sit N x ATR away from zero. A buy only counts if the blue line crosses up
+// BELOW the lower dotted line; a short only if it crosses down ABOVE the upper one.
 // Green dot = a cross deep enough to count. Grey dot = a cross the buffer skips.
 // The 200 EMA and lower-timeframe rules are not checked here; the strategy does that.
 
