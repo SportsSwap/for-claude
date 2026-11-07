@@ -37,7 +37,7 @@ def bars(rows, signal_days=(), cross_down_days=(), atr=1.0, momentum=0.0):
 @pytest.fixture
 def fake_signals(monkeypatch):
     """Make backtest.run use the prepared columns instead of computing indicators."""
-    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None: df)
+    monkeypatch.setattr(backtest, "add_signals", lambda df, s, daily=None, lower=None, interval="1d": df)
 
 
 FLAT = (100, 100.5, 99.5, 100)
@@ -342,3 +342,153 @@ def test_both_sides_share_the_position_limit(fake_signals):
     assert sorted(res.trades.ticker) == ["L_strong", "S_mid", "S_weak"]
     assert res.skipped_signals == 2
     assert dict(zip(res.trades.ticker, res.trades.side)) == {"L_strong": "long", "S_mid": "short", "S_weak": "short"}
+
+
+# --- Buffer: the cross must happen far enough from zero ---
+
+def test_buffer_blocks_crosses_just_under_zero():
+    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    df = ohlc(close, idx)
+    none = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=0.0), daily=df)
+    hit = none[none.entry_signal]
+    assert len(hit) == 1
+    depth = abs(hit.depth_atr.iloc[0])
+    assert hit.depth_atr.iloc[0] == pytest.approx(hit.macd.iloc[0] / hit.atr.iloc[0])
+    # A buffer just under the cross depth keeps it; just over removes it.
+    keep = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 0.9), daily=df)
+    drop = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 1.1), daily=df)
+    assert keep.entry_signal.sum() == 1 and not drop.entry_signal.any()
+
+
+def test_buffer_mirrors_for_shorts():
+    close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    df = ohlc(close, idx)
+    base = add_signals(df, replace(SHORT, min_macd_depth_atr=0.0), daily=df)
+    depth = base[base.short_signal].depth_atr.iloc[0]
+    assert depth > 0
+    assert add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 0.9), daily=df).short_signal.any()
+    assert not add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 1.1), daily=df).short_signal.any()
+
+
+# --- Lower-timeframe agreement ---
+
+def session_bars(day, minutes, closes):
+    start = pd.Timestamp(day) + pd.Timedelta(hours=9, minutes=30)
+    idx = pd.DatetimeIndex([start + pd.Timedelta(minutes=minutes * i) for i in range(len(closes))])
+    return ohlc(closes, idx)
+
+
+def test_resample_45m_from_15m():
+    from data import resample_session
+    m15 = session_bars("2024-03-05", 15, np.arange(26, dtype=float))   # 9:30 .. 15:45
+    m45 = resample_session(m15, 3)
+    assert [t.strftime("%H:%M") for t in m45.index][:4] == ["09:30", "10:15", "11:00", "11:45"]
+    assert m45.index[-1].strftime("%H:%M") == "15:30"          # last bar: 15:30-16:00 only
+    assert m45.Close.iloc[0] == 2 and m45.Open.iloc[1] == 3
+
+
+def test_bar_ends_cut_at_close():
+    from data import bar_ends
+    two_h = session_bars("2024-03-05", 120, [1, 2, 3, 4])
+    ends = bar_ends(two_h.index, "2h")
+    assert [t.strftime("%H:%M") for t in ends] == ["11:30", "13:30", "15:30", "16:00"]
+
+
+def test_lower_tf_uses_only_bars_closed_by_the_chart_close():
+    from strategy import lower_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    # Lower bars rise steadily, then the 45m bar that STARTS at 11:00 (ends 11:45) crashes.
+    days = pd.bdate_range("2024-03-01", periods=3)
+    m45 = pd.concat([session_bars(d, 45, (np.arange(9, dtype=float) + 9 * k) ** 3 / 10 + 100)
+                     for k, d in enumerate(days)])                   # accelerating rise
+    last_day = days[-1] + pd.Timedelta(hours=11)
+    m45.loc[last_day, ["Open", "High", "Low", "Close"]] = [0.0, 1.0, -1.0, 0.0]
+    chart = session_bars(days[-1], 120, [100.0, 100, 100, 100])
+    out = lower_tf_agreement(chart, "2h", {"45m": m45}, s)
+    # The 9:30-11:30 2h bar must use the 10:15 45m bar (rising), not the 11:00 crash bar.
+    assert out.loc[chart.index[0], "mtf_up"] == 1 and out.loc[chart.index[0], "mtf_n"] == 1
+    # The 11:30-13:30 bar sees the crash's aftermath: no longer agreeing with a buy.
+    assert out.loc[chart.index[1], "mtf_up"] == 0
+    # 15m, 30m and 45m all sit under a 2h chart, even though only 45m data was given.
+    assert (out.mtf_max == 3).all() and (out.mtf_n == 1).all()
+
+
+def test_lower_tf_missing_data_does_not_reach_back_to_old_bars():
+    from strategy import lower_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    m15 = session_bars("2024-03-01", 15, np.arange(26, dtype=float))
+    chart = session_bars("2024-03-08", 120, [1.0, 2, 3, 4])            # a week later, no 15m data
+    out = lower_tf_agreement(chart, "2h", {"15m": m15}, s)
+    assert (out.mtf_n == 0).all() and (out.mtf_up == 0).all()
+
+
+def test_confirm_filter_counts_agreeing_timeframes():
+    close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
+    idx = pd.bdate_range("2022-01-03", periods=len(close))
+    df = ohlc(close, idx)
+    base = add_signals(df, DEFAULT_STRATEGY, daily=df)
+    assert base.entry_signal.sum() == 1
+    # Fake "lower timeframe" columns via a stand-in: confirm_min with no lower data -> no trades.
+    assert not add_signals(df, replace(DEFAULT_STRATEGY, confirm_min=1), daily=df).entry_signal.any()
+    from strategy import _confirmed
+    d = base.assign(mtf_up=[2] * len(df), mtf_down=0, mtf_n=3, mtf_max=3)
+    assert _confirmed(d, replace(DEFAULT_STRATEGY, confirm_min=2), "mtf_up").all()
+    assert not _confirmed(d, replace(DEFAULT_STRATEGY, confirm_min=3), "mtf_up").any()
+    # Only one lower timeframe under this chart: needing "2" means that one must agree.
+    d1 = base.assign(mtf_up=1, mtf_down=0, mtf_n=1, mtf_max=1)
+    assert _confirmed(d1, replace(DEFAULT_STRATEGY, confirm_min=2), "mtf_up").all()
+
+
+def test_trade_log_records_depth_and_agreement(fake_signals):
+    df = bars([FLAT, FLAT, (100, 104.5, 99.5, 104)], signal_days=[0])
+    df["depth_atr"], df["mtf_up"], df["mtf_down"], df["mtf_max"] = -1.25, 2, 0, 3
+    t = backtest.run({"X": df}, S, NO_COSTS).trades.iloc[0]
+    assert t.depth_atr == -1.25 and t.mtf_agree == "2/3"
+
+
+def test_lower_tf_warmup_is_unknown_not_disagree():
+    from strategy import lower_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    m15 = session_bars("2024-03-05", 15, np.arange(26, dtype=float) ** 2)   # only 26 bars
+    chart = session_bars("2024-03-05", 120, [1.0, 2, 3, 4])
+    out = lower_tf_agreement(chart, "2h", {"15m": m15}, s)
+    # First 2h bar ends 11:30: the 15m MACD has only 8 bars (< 10 warm-up) -> unknown.
+    assert out.mtf_n.iloc[0] == 0 and out.mtf_up.iloc[0] == 0
+    assert out.mtf_n.iloc[-1] == 1 and out.mtf_up.iloc[-1] == 1
+
+
+def test_daily_chart_never_uses_yesterdays_lower_bar():
+    from strategy import lower_tf_agreement
+    s = replace(DEFAULT_STRATEGY, macd_slow=5, macd_fast=2, macd_signal=2)
+    m15 = session_bars("2024-03-04", 15, np.arange(26, dtype=float) ** 2)   # Monday only
+    daily = ohlc([1.0, 2.0], pd.DatetimeIndex(["2024-03-04", "2024-03-05"]))
+    out = lower_tf_agreement(daily, "1d", {"15m": m15}, s)
+    assert out.mtf_n.tolist() == [1, 0]                                   # Tuesday: no 15m data
+
+
+def test_load_lower_builds_45m_and_drops_unfinished_bars(tmp_path):
+    import data
+    day = pd.Timestamp.today().normalize()
+    future = day + pd.Timedelta(days=7)                                  # bars "not closed yet"
+    past = pd.bdate_range(end=day - pd.Timedelta(days=1), periods=2)
+    m15 = pd.concat([session_bars(d, 15, np.arange(26, dtype=float)) for d in list(past) + [future]])
+    m30 = pd.concat([session_bars(d, 30, np.arange(13, dtype=float)) for d in past])
+    m15.rename_axis("Date").to_csv(tmp_path / "X_15m.csv")
+    m30.rename_axis("Date").to_csv(tmp_path / "X_30m.csv")
+    out = data.load_lower(["X"], "2000-01-01", offline=True, cache_dir=tmp_path)["X"]
+    assert set(out) == {"15m", "30m", "45m"}
+    assert len(out["15m"]) == 52 and out["15m"].index.max() < future      # future day dropped
+    assert len(out["45m"]) == 18                                         # 9 x 45m bars per day
+
+
+def test_failed_download_falls_back_to_cache(tmp_path, monkeypatch):
+    import data
+    cached = session_bars("2024-03-05", 15, np.arange(26, dtype=float))
+    cached.rename_axis("Date").to_csv(tmp_path / "X_15m.csv")
+    def boom(*a, **k):
+        raise ConnectionError("offline")
+    monkeypatch.setattr(data, "_download", boom)
+    out = data.load(["X"], "2000-01-01", "15m", refresh=True, cache_dir=tmp_path)
+    assert len(out["X"]) == 26

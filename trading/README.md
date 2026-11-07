@@ -36,6 +36,8 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 |---|---|---|
 | Chart | 2h bars (1h, 4h and daily also supported) | `--interval` |
 | Entry | MACD line crosses above its signal line **while under zero**, and price is **below the 200 EMA** | `config.py` → `Strategy` |
+| Buffer | The cross only counts if the MACD is at least **0.5 × ATR(14) below zero**. Crosses hugging the zero line are mostly chop | `min_macd_depth_atr`, `--buffer` |
+| Lower timeframes | Counts how many of **15m / 30m / 45m** agree (their MACD above its signal line and histogram rising). Shown on every trade; doesn't block trades unless you ask | `confirm_min`, `--mtf` |
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe (what a "200" EMA on a 2h chart shows, about 50 trading days) is tested as a variant | `trend_ma_source` |
 | Fill | Open of the next bar (no peeking at the future) | `backtest.py` |
 | Stop | Entry − 3 × ATR(14) of the chart timeframe | `stop_atr_mult` |
@@ -82,7 +84,9 @@ short, so treat the backtest as a test of the signal, not of those instruments.
 
 | Variant | What it tests |
 |---|---|
-| Dip buy, below 200-day EMA | The default above |
+| Dip buy, below 200-day EMA | The default above (0.5 ATR buffer) |
+| Dip buy, no buffer | Any cross under zero, however close: what you had before |
+| Dip buy, 1 ATR buffer | A deeper buffer |
 | Dip buy, below 200-bar EMA | Same, using the 200 EMA of the chart timeframe instead of the daily |
 | Dip buy, no 200 EMA rule | Whether the 200 EMA filter helps at all |
 | Zero-line cross, price not run | MACD crosses above zero while price is still within 3 ATR of its 20-bar low ("MACD turned, price hasn't moved yet") |
@@ -105,7 +109,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "29 passed"
+python -m pytest -q tests        # should print "41 passed"
 ```
 
 ## Run the backtest
@@ -120,7 +124,33 @@ python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a
 python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
 python run_backtest.py --compare --group ai              # every variant on the AI list only
 python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
+python run_backtest.py --buffer 0                        # default strategy without the buffer
+python run_backtest.py --mtf 0                           # record the 15m/30m/45m count on each trade
+python run_backtest.py --mtf 2                           # only trades where 2 of 3 lower timeframes agree
 ```
+
+### The buffer and the lower-timeframe check
+
+**Buffer.** The MACD is measured in ATRs (ATR(14) of the chart timeframe), so one number works for a
+$100 stock and a $900 stock, and on 1h, 2h and 4h charts. At 0.5, a buy only counts if the blue MACD
+line is at least half an ATR below zero when it crosses up (mirror for shorts). 0.5 is a starting
+guess, not a tuned value. `--compare` runs it next to "no buffer" and "1 ATR". Keep it only if both
+0.5 and 1.0 beat no buffer, on 2h **and** on daily bars from 2018. If only one value wins, that's luck.
+
+**Lower timeframes.** A lower timeframe "agrees" with a buy when its own MACD (same 12/144/9) is above
+its signal line and its histogram rose on its last closed bar. Only lower-timeframe bars that had
+finished when the chart bar closed are used, so the test can't peek ahead.
+
+- **Yahoo keeps only 60 days of 15m and 30m bars**, so `--mtf` limits the Python test to that window:
+  a handful of trades, not enough to judge. The cache keeps growing each time you run the scanner, so
+  the history builds up. TradingView can test it further back.
+- **Lower timeframes usually agree already.** The rally that turns the 2h MACD up has normally turned
+  the 15m up hours before. So "3 of 3" may be close to always true and add little. Watch the count first
+  (`--mtf 0`, or the "x/3" next to each trade in TradingView), then switch the filter on if trades with
+  2–3 agreeing clearly beat trades with 0–1 over 30+ trades.
+
+The detailed output (`--tickers ...` or any run without `--compare`) breaks results down by how far from
+zero the cross was and by how many lower timeframes agreed, so you can see whether either one helps.
 
 Prices come from Yahoo Finance (free, cached in `data/`; add `--refresh` to re-download). **Yahoo only
 has about two years of hourly data**, which has been mostly a bull market, so dip-buying will look
@@ -159,12 +189,17 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 
 1. Open a chart (for example NVDA or SNDK) and set the timeframe to 2h (or 1h, 4h, 45m).
 2. Open the **Pine Editor** at the bottom of the screen, delete what's there, paste in the whole file, and click **Add to chart**.
+   Optional: open a new Pine Editor tab, paste `pine/macd_panel.pine`, and add it too. It's the MACD
+   panel with the buffer drawn as dotted lines: green dots are crosses deep enough to count, grey dots
+   are crosses the buffer skips.
 3. Open the **Strategy Tester** tab at the bottom. **Overview** shows the equity curve, **List of trades** shows each trade.
 4. Click the gear on the strategy to change settings. To test each variant:
 
 | Variant | Settings to change from the default |
 |---|---|
 | Dip buy, below 200-day EMA | Default, nothing to change |
+| Dip buy, no buffer | Entry → Buffer: **0** |
+| Dip buy, 1 ATR buffer | Entry → Buffer: **1** |
 | Dip buy, below 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
 | Dip buy, no 200 EMA rule | 200 EMA filter → Price must be: **Off** |
 | Zero-line cross, price not run | Entry trigger: **Zero-line cross**; Skip if price ran more than: **3**; Price must be: **Off** |
@@ -174,7 +209,13 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Short only | Entry → Trades to take: **Short only** |
 | Long + short | Entry → Trades to take: **Long and short** |
 
-Short signals show as pink triangles above the bar; buy signals as teal triangles below.
+Short signals show as pink triangles above the bar; buy signals as teal triangles below. Grey
+crosses are signals the buffer skipped because the MACD was too close to zero.
+
+**Lower timeframes:** each trade is labelled with how many of 15m/30m/45m agreed, like "Long 2/3",
+and the box at the top right shows the count right now. To make it a rule, set **Lower timeframes →
+How many must agree** to 2 or 3. Only timeframes shorter than the chart count (on a 30m chart only 15m
+does). How far back this works depends on how much 15m history your TradingView plan loads.
 
 For each stock and variant, note **Net profit**, **Max drawdown**, **Total closed trades**, **Percent
 profitable** and **Profit factor**, or just screenshot the Overview and Performance Summary.
@@ -198,15 +239,18 @@ Differences from the Python backtester:
 
 ```bash
 python scan.py --equity 1000                 # 2h bars, default strategy, your current account value
-python scan.py --interval 4h --variant 3     # 4h bars, zero-line-cross variant
+python scan.py --interval 4h --variant 5     # 4h bars, zero-line-cross variant
 python scan.py --sides both                  # buy signals and short signals
+python scan.py --mtf 2                       # only signals where 2 of 15m/30m/45m agree
 python scan.py --group ai                    # AI list only
 ```
 
 For each buy signal it prints a stop, a target and a share count, sized so that hitting the stop
 costs your risk percent of the account. It also prints a watchlist of stocks with the MACD under zero and
 curling up toward a cross. With `--sides short` or `both` it also lists short signals (stop above,
-target below) and a short watchlist: MACD above zero and rolling over. Run it after a bar closes: during market hours the newest bar is still
+target below) and a short watchlist: MACD above zero and rolling over. Each signal shows `depth_atr`
+(how far from zero the cross was) and `lower_tfs_agree` (how many of 15m/30m/45m agree right now).
+Add `--no-mtf` to skip downloading the lower timeframes. Run it after a bar closes: during market hours the newest bar is still
 forming and its signal can disappear by the close. The MACD and EMA match TradingView's formulas, so
 you can check any signal on your chart.
 

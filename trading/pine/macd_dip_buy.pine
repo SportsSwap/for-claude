@@ -1,6 +1,9 @@
 //@version=6
 // MACD 12/144/9 dip buy with a 200 EMA filter, plus an optional mirror-image short:
 // MACD crosses DOWN through its signal line while ABOVE zero, with price ABOVE the 200-day EMA.
+// Buffer: the cross must happen at least N ATRs away from zero (crosses hugging zero are chop).
+// Lower timeframes: counts how many of 15m/30m/45m agree with each trade and can require it.
+// Pair it with macd_panel.pine to see the MACD with the buffer lines drawn on it.
 // Same rules as trading/config.py, so TradingView's Strategy Tester and the Python backtester
 // can be checked against each other. Every rule is an input: open Settings to test the variants.
 
@@ -18,6 +21,8 @@ grpE = "Entry"
 direction = input.string("Long only", "Trades to take", options = ["Long only", "Short only", "Long and short"], group = grpE)
 entryMode = input.string("Signal-line cross", "Entry trigger", options = ["Signal-line cross", "Zero-line cross"], group = grpE)
 needBelowZero = input.bool(true, "Signal-line cross must happen under zero (above zero for shorts)", group = grpE)
+minDepthAtr = input.float(0.5, "Buffer: cross at least N x ATR past zero (0 = off)", minval = 0, step = 0.25, group = grpE,
+     tooltip = "0.5 means the MACD must be at least half an ATR below zero when it crosses up (above zero for shorts). A starting guess, not a tuned value.")
 maxRunAtr = input.float(0.0, "Skip if price already ran more than N ATR off its low (0 = off)", minval = 0, step = 0.5, group = grpE)
 runLookback = input.int(20, "Low lookback (bars)", minval = 2, group = grpE)
 
@@ -25,6 +30,13 @@ grpT = "200 EMA filter"
 emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
 emaSide = input.string("Below", "Price must be (longs; shorts use the opposite)", options = ["Below", "Above", "Off"], group = grpT)
+
+grpL = "Lower timeframes"
+confirmMin = input.int(0, "How many must agree (0 = just show the count)", minval = 0, maxval = 3, group = grpL,
+     tooltip = "A lower timeframe agrees with a buy when its MACD is above its signal line and its histogram rose on its last closed bar (mirror for shorts). Only timeframes shorter than the chart count.")
+tfA = input.timeframe("15", "Lower timeframe 1", group = grpL)
+tfB = input.timeframe("30", "Lower timeframe 2", group = grpL)
+tfC = input.timeframe("45", "Lower timeframe 3", group = grpL)
 
 grpX = "Exits"
 atrLen = input.int(14, "ATR length", minval = 1, group = grpX)
@@ -54,20 +66,57 @@ zeroDown = ta.crossunder(macdLine, 0)
 runAtr = (close - ta.lowest(low, runLookback)) / atrVal
 runAtrDown = (ta.highest(high, runLookback) - close) / atrVal
 
+// ---------- Lower timeframes ----------
+// +1 = agrees with a buy, -1 = agrees with a short, 0 = neither.
+lowerDir() =>
+    [m, s, h] = ta.macd(close, fastLen, slowLen, sigLen)
+    m > s and h > h[1] ? 1 : m < s and h < h[1] ? -1 : 0
+
+// Direction of the last lower-timeframe bar that had CLOSED when this chart bar closed.
+// A 45m bar can straddle the end of a 2h bar (11:00-11:45 vs 9:30-11:30); that one is skipped,
+// otherwise the backtest would peek 15 minutes into the future.
+lowerTf(simple string tf) =>
+    int d = na
+    if timeframe.in_seconds(tf) < timeframe.in_seconds()
+        [dirs, ends] = request.security_lower_tf(syminfo.tickerid, tf, [lowerDir(), time_close])
+        int n = array.size(dirs)
+        if n > 0
+            for i = n - 1 to 0
+                if array.get(ends, i) <= time_close
+                    d := array.get(dirs, i)
+                    break
+    d
+
+isLower(simple string tf) => timeframe.in_seconds(tf) < timeframe.in_seconds() ? 1 : 0
+dA = lowerTf(tfA)
+dB = lowerTf(tfB)
+dC = lowerTf(tfC)
+lowerCount = isLower(tfA) + isLower(tfB) + isLower(tfC)
+upCount = (dA == 1 ? 1 : 0) + (dB == 1 ? 1 : 0) + (dC == 1 ? 1 : 0)
+downCount = (dA == -1 ? 1 : 0) + (dB == -1 ? 1 : 0) + (dC == -1 ? 1 : 0)
+needed = math.min(confirmMin, lowerCount)
+
 // ---------- Entry rules ----------
-trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or macdLine < 0) : zeroUp
+depthOkLong = minDepthAtr <= 0 ? macdLine < 0 : macdLine < -minDepthAtr * atrVal
+depthOkShort = minDepthAtr <= 0 ? macdLine > 0 : macdLine > minDepthAtr * atrVal
+trigger = entryMode == "Signal-line cross" ? crossUp and (not needBelowZero or depthOkLong) : zeroUp
 trendOk = emaSide == "Off" ? true : emaSide == "Below" ? close < trendEma : close > trendEma
 runOk = maxRunAtr <= 0 or runAtr <= maxRunAtr
 warm = bar_index > 2 * slowLen
 allowLong = direction != "Short only"
 allowShort = direction != "Long only"
-buySignal = allowLong and trigger and trendOk and runOk and warm and time >= startDate
+buySignal = allowLong and trigger and trendOk and runOk and upCount >= needed and warm and time >= startDate
 
 // Short: the same rule upside down.
-triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or macdLine > 0) : zeroDown
+triggerS = entryMode == "Signal-line cross" ? crossDown and (not needBelowZero or depthOkShort) : zeroDown
 trendOkS = emaSide == "Off" ? true : emaSide == "Below" ? close > trendEma : close < trendEma
 runOkS = maxRunAtr <= 0 or runAtrDown <= maxRunAtr
-shortSignal = allowShort and triggerS and trendOkS and runOkS and warm and time >= startDate
+shortSignal = allowShort and triggerS and trendOkS and runOkS and downCount >= needed and warm and time >= startDate
+
+// Crosses the buffer threw away (everything else passed), so you can see what it removed.
+inTest = warm and time >= startDate and entryMode == "Signal-line cross" and needBelowZero and minDepthAtr > 0
+skippedLong = inTest and allowLong and crossUp and macdLine < 0 and not depthOkLong and trendOk and runOk
+skippedShort = inTest and allowShort and crossDown and macdLine > 0 and not depthOkShort and trendOkS and runOkS
 
 var bool killed = false
 if not killed and strategy.equity <= strategy.initial_capital * killPct / 100
@@ -83,11 +132,11 @@ var float tradeStopDist = na
 flat = strategy.position_size == 0
 if buySignal and flat and not killed and qty > 0
     tradeStopDist := stopDist
-    strategy.entry("Long", strategy.long, qty = qty)
+    strategy.entry("Long", strategy.long, qty = qty, comment = "Long " + str.tostring(upCount) + "/" + str.tostring(lowerCount))
     alert("MACD dip buy signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 else if shortSignal and flat and not killed and qty > 0
     tradeStopDist := stopDist
-    strategy.entry("Short", strategy.short, qty = qty)
+    strategy.entry("Short", strategy.short, qty = qty, comment = "Short " + str.tostring(downCount) + "/" + str.tostring(lowerCount))
     alert("MACD short signal: " + syminfo.ticker + " at " + str.tostring(close), alert.freq_once_per_bar_close)
 
 // Stop and target are measured from the actual fill price (next bar's open).
@@ -129,3 +178,13 @@ plot(inTrade ? strategy.position_avg_price - side * tradeStopDist : na, "Stop", 
 plot(inTrade and targetR > 0 ? strategy.position_avg_price + side * tradeStopDist * targetR : na, "Target", color = color.green, style = plot.style_linebr)
 plotshape(buySignal and not killed, "Buy signal", style = shape.triangleup, location = location.belowbar, color = color.teal, size = size.small)
 plotshape(shortSignal and not killed, "Short signal", style = shape.triangledown, location = location.abovebar, color = color.fuchsia, size = size.small)
+plotshape(skippedLong, "Skipped buy: too close to zero", style = shape.xcross, location = location.belowbar, color = color.gray, size = size.tiny)
+plotshape(skippedShort, "Skipped short: too close to zero", style = shape.xcross, location = location.abovebar, color = color.gray, size = size.tiny)
+
+// Lower-timeframe agreement right now, top right of the chart.
+var table info = table.new(position.top_right, 2, 2, bgcolor = color.new(color.black, 30))
+if barstate.islast
+    table.cell(info, 0, 0, "Lower TFs up", text_color = color.white)
+    table.cell(info, 1, 0, str.tostring(upCount) + "/" + str.tostring(lowerCount), text_color = upCount >= 2 ? color.lime : color.white)
+    table.cell(info, 0, 1, "Lower TFs down", text_color = color.white)
+    table.cell(info, 1, 1, str.tostring(downCount) + "/" + str.tostring(lowerCount), text_color = downCount >= 2 ? color.fuchsia : color.white)

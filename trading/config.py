@@ -58,6 +58,20 @@ class Strategy:
     entry: str = "signal_cross"
     require_below_zero: bool = True     # signal_cross only: the cross must happen under zero
                                         # (above zero for shorts)
+    # Buffer: with require_below_zero, the cross only counts if the MACD is at least this many
+    # ATRs (ATR(14) of the chart timeframe) below zero (above zero for shorts). Crosses that
+    # happen just under the zero line are mostly chop. 0 turns it off. 0.5 is a starting guess,
+    # not a tuned value: compare it with the "no buffer" and "1 ATR buffer" variants.
+    min_macd_depth_atr: float = 0.5
+
+    # Lower-timeframe check. A lower timeframe "agrees" with a buy when its own MACD
+    # (same 12/144/9 settings) is above its signal line AND its histogram rose on its last
+    # closed bar (mirror for shorts). Only timeframes shorter than the chart's count.
+    # confirm_min = how many must agree to take the trade; 0 = don't filter, just record the
+    # count on each trade. Yahoo keeps only 60 days of 15m/30m bars, so this can't be
+    # backtested over long periods in Python.
+    confirm_tfs: tuple[str, ...] = ("15m", "30m", "45m")
+    confirm_min: int = 0
 
     # Moving-average filter: the 200 EMA.
     trend_ma: int | None = 200          # None turns it off
@@ -110,6 +124,8 @@ _D = DEFAULT_STRATEGY
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
 VARIANTS = [
     _D,
+    replace(_D, name="Dip buy, no buffer (any cross under zero)", min_macd_depth_atr=0.0),
+    replace(_D, name="Dip buy, 1 ATR buffer", min_macd_depth_atr=1.0),
     replace(_D, name="Dip buy, below 200-bar EMA (as on your chart)", trend_ma_source="bars"),
     replace(_D, name="Dip buy, no 200 EMA rule", trend_ma=None),
     replace(_D, name="Zero-line cross, price not run (<3 ATR)", entry="zero_cross",

@@ -8,6 +8,8 @@
     python run_backtest.py --risk-pct 3               # risk 3% of the account per trade
     python run_backtest.py --sides both               # take the short mirror trades as well
     python run_backtest.py --sides short              # shorts only
+    python run_backtest.py --buffer 0                 # no buffer: take crosses right under zero
+    python run_backtest.py --mtf 2                    # need 2 of 15m/30m/45m to agree (last ~60 days only)
 """
 
 import argparse
@@ -40,6 +42,11 @@ def main():
                     help="largest single position as a percent of the account (default 34)")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
                     help="long, short or both (default: long). Ignored with --compare, whose variants set it")
+    ap.add_argument("--buffer", type=float, default=None,
+                    help="MACD must be at least this many ATRs past zero at the cross (default 0.5; 0 = off)")
+    ap.add_argument("--mtf", type=int, default=None, choices=[0, 1, 2, 3],
+                    help="load 15m/30m/45m bars and need this many to agree (0 = just record the count). "
+                         "Yahoo keeps only ~60 days of these, so the test is limited to that window")
     ap.add_argument("--compare", action="store_true", help="run every variant in config.VARIANTS")
     ap.add_argument("--refresh", action="store_true", help="re-download prices instead of using the cache")
     ap.add_argument("--offline", action="store_true", help="use cached CSVs only")
@@ -57,6 +64,8 @@ def main():
     bench = data.load(BENCHMARKS, daily_start, "1d", args.refresh, args.offline)
     if not prices:
         raise SystemExit("No price data loaded. Check your internet connection or the cache folder.")
+    if args.mtf is not None and not intraday:
+        raise SystemExit("--mtf needs an intraday --interval (1h, 2h or 4h).")
 
     risk = replace(DEFAULT_RISK, starting_capital=args.capital, risk_per_trade=args.risk_pct / 100,
                    max_position_pct=args.max_position_pct / 100)
@@ -69,11 +78,31 @@ def main():
         strategies = [replace(DEFAULT_STRATEGY, sides=args.sides, name=names[args.sides])]
     else:
         strategies = [DEFAULT_STRATEGY]
+    if args.buffer is not None:
+        strategies = [replace(s, min_macd_depth_atr=args.buffer,
+                              name=f"{s.name} [buffer {args.buffer:g} ATR]") for s in strategies]
+    if args.mtf:
+        strategies = [replace(s, confirm_min=args.mtf,
+                              name=f"{s.name} [{args.mtf} lower TFs agree]") for s in strategies]
+    lower = None
+    if args.mtf is not None:
+        lower = data.load_lower(args.tickers, daily_start, args.refresh, args.offline)
+        # Each lower MACD needs 2 x slow bars to warm up; start once every timeframe is ready.
+        warm = 2 * max(s.macd_slow for s in strategies)
+        ready = {}
+        for frames in lower.values():
+            for tf, df in frames.items():
+                if len(df) > warm:
+                    ready[tf] = min(ready.get(tf, df.index[warm]), df.index[warm])
+        if not ready:
+            raise SystemExit("Not enough 15m/30m/45m history for the lower-timeframe check.")
+        start = max(pd.Timestamp(start or "1900-01-01"), max(ready.values())).strftime("%Y-%m-%d")
+        print(f"Lower timeframes ready from {start}: the test is limited to that window.")
     RESULTS_DIR.mkdir(exist_ok=True)
 
     rows, first_day = [], None
     for s in strategies:
-        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None)
+        res = backtest.run(prices, s, risk, start, args.end, daily if intraday else None, lower, args.interval)
         st = backtest.stats(res)
         rows.append(st)
         if not res.equity.empty:
@@ -115,6 +144,15 @@ def print_detail(st: dict, res: backtest.Result):
                 win_rate=("pnl", lambda x: round((x > 0).mean() * 100))).round(2)
             print("\n  Longs vs shorts:")
             print("  " + by_side.to_string().replace("\n", "\n  "))
+        t = res.trades
+        if t.depth_atr.notna().any():
+            depth = pd.cut(t.depth_atr.abs(), [0, 0.5, 1, 2, float("inf")],
+                           labels=["<0.5 ATR", "0.5-1 ATR", "1-2 ATR", ">2 ATR"], include_lowest=True)
+            print("\n  By how far from zero the MACD crossed (does the buffer help?):")
+            print("  " + summarize(t.groupby(depth, observed=True)).to_string().replace("\n", "\n  "))
+        if t.mtf_agree.notna().any():
+            print("\n  By how many lower timeframes agreed (15m/30m/45m):")
+            print("  " + summarize(t.groupby("mtf_agree")).to_string().replace("\n", "\n  "))
         by_ticker = res.trades.groupby("ticker").agg(
             trades=("pnl", "size"), pnl=("pnl", "sum"),
             win_rate=("pnl", lambda x: round((x > 0).mean() * 100))).sort_values("pnl")
@@ -122,6 +160,11 @@ def print_detail(st: dict, res: backtest.Result):
         print("  " + by_ticker.to_string().replace("\n", "\n  "))
         print("\n  Exit reasons:")
         print("  " + res.trades.exit_reason.value_counts().to_string().replace("\n", "\n  "))
+
+
+def summarize(groups) -> pd.DataFrame:
+    return groups.agg(trades=("pnl", "size"), pnl=("pnl", "sum"), avg_r=("r_multiple", "mean"),
+                      win_rate=("pnl", lambda x: round((x > 0).mean() * 100))).round(2)
 
 
 if __name__ == "__main__":

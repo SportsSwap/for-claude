@@ -6,8 +6,10 @@ your chosen risk percent of the account.
 
     python scan.py                          # default strategy on 2h bars
     python scan.py --interval 4h --equity 1150
-    python scan.py --variant 3              # use VARIANTS[3] from config.py instead
+    python scan.py --variant 5              # use VARIANTS[5] from config.py instead
     python scan.py --group ai               # just the AI list
+    python scan.py --mtf 2                  # only signals where 2 of 15m/30m/45m agree
+    python scan.py --buffer 0               # no buffer: include crosses right under zero
     python scan.py --sides both             # also look for shorts: MACD cross down above zero,
                                             # price above the 200-day EMA
 
@@ -37,6 +39,11 @@ def main():
     ap.add_argument("--variant", type=int, default=None, help="index into config.VARIANTS")
     ap.add_argument("--sides", choices=["long", "short", "both"], default=None,
                     help="which signals to look for (default: what the strategy sets, long)")
+    ap.add_argument("--buffer", type=float, default=None,
+                    help="MACD must be at least this many ATRs past zero at the cross (default 0.5; 0 = off)")
+    ap.add_argument("--mtf", type=int, default=None, choices=[0, 1, 2, 3],
+                    help="need this many of 15m/30m/45m to agree (default: show the count, don't filter)")
+    ap.add_argument("--no-mtf", action="store_true", help="skip downloading 15m/30m/45m bars")
     ap.add_argument("--offline", action="store_true")
     args = ap.parse_args()
     args.tickers = args.tickers or GROUPS[args.group]
@@ -44,15 +51,25 @@ def main():
     s = VARIANTS[args.variant] if args.variant is not None else DEFAULT_STRATEGY
     if args.sides:
         s = replace(s, sides=args.sides)
+    if args.buffer is not None:
+        s = replace(s, min_macd_depth_atr=args.buffer)
+    if args.mtf is not None:
+        s = replace(s, confirm_min=args.mtf)
     r = replace(DEFAULT_RISK, starting_capital=args.equity, risk_per_trade=args.risk_pct / 100)
     start = (pd.Timestamp.today() - pd.DateOffset(years=2)).strftime("%Y-%m-%d")
     daily = data.load(args.tickers, start, "1d", refresh=not args.offline, offline=args.offline)
     prices = daily if args.interval == "1d" else data.load(
         args.tickers, start, args.interval, refresh=not args.offline, offline=args.offline)
 
+    lower = {}
+    if args.interval != "1d" and not args.no_mtf:
+        lower = data.load_lower(args.tickers, start, refresh=not args.offline, offline=args.offline)
+    elif s.confirm_min:
+        raise SystemExit("--mtf needs an intraday --interval and can't be used with --no-mtf.")
+
     signals, shorts, watch, watch_short = [], [], [], []
     for t, df in prices.items():
-        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None)
+        d = add_signals(df, s, daily.get(t) if args.interval != "1d" else None, lower.get(t), args.interval)
         last = d.iloc[-1]
         vs_ma = (last["Close"] / last["trend_ma"] - 1) * 100 if "trend_ma" in d and pd.notna(last["trend_ma"]) else None
         vs_ma = round(vs_ma, 1) if vs_ma is not None else None
@@ -72,10 +89,17 @@ def main():
                 "value": round(shares * entry, 2),
                 "risk_$": round(shares * abs(entry - stop), 2),
                 "vs_200ma_%": vs_ma,
+                "depth_atr": round(last["depth_atr"], 2),
+                "lower_tfs_agree": f"{int(last['mtf_up' if side > 0 else 'mtf_down'])}/{int(last['mtf_max'])}"
+                                   if "mtf_max" in d else "-",
             })
         hist = d["macd_hist"].iloc[-3:]
         row = {"ticker": t, "close": round(last["Close"], 2), "macd": round(last["macd"], 2),
-               "macd_hist": round(hist.iloc[-1], 2), "vs_200ma_%": vs_ma}
+               "depth_atr": round(last["depth_atr"], 2), "macd_hist": round(hist.iloc[-1], 2),
+               "vs_200ma_%": vs_ma}
+        if "mtf_max" in d:
+            row["lower_up"] = f"{int(last['mtf_up'])}/{int(last['mtf_max'])}"
+            row["lower_down"] = f"{int(last['mtf_down'])}/{int(last['mtf_max'])}"
         # Getting close to a buy: MACD under zero, histogram negative but rising for 3 bars.
         if s.sides in ("long", "both") and last["macd"] < 0 and hist.iloc[-1] < 0 and hist.is_monotonic_increasing:
             watch.append(row)
@@ -87,6 +111,9 @@ def main():
     print(f"\n{s.name}")
     print(f"MACD {s.macd_fast}/{s.macd_slow}/{s.macd_signal} on {args.interval} bars | last bar {as_of} "
           f"| account ${args.equity:,.0f}, risk {args.risk_pct:g}%")
+    print(f"Buffer: cross at least {s.min_macd_depth_atr:g} ATR past zero | lower timeframes: "
+          + (f"need {s.confirm_min} of {'/'.join(s.confirm_tfs)} to agree" if s.confirm_min
+             else "shown, not filtered"))
     if s.sides in ("long", "both"):
         if signals:
             print("\nBUY SIGNALS (enter at the next bar's open; recompute the stop from your real fill):")
