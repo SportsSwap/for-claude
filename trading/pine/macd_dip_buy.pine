@@ -1,12 +1,14 @@
 //@version=6
 // Two long-only MACD systems in one script. Pick one under "System"; to see both on one chart,
 // add the script twice and set one copy to Short-term.
-//   Long-term (12/144/9): MACD crosses up under zero, price BELOW the 200-day EMA (deep dip).
-//                         Wait 2 bars, then up to 30 bars for the 4h + daily MACDs to agree. Stop 3 ATR. Hold until the sell
-//                         setup (MACD crosses down ABOVE zero). Weeks to months.
-//   Short-term (12/26/9): MACD crosses up under zero, price ABOVE the 200-day EMA (pullback in
-//                         an uptrend). Wait 1 bar, then up to 10 bars for 4h + daily to agree. Stop 2 ATR. Sell setup or
-//                         10 trading days. Days to ~2 weeks.
+// Both only BUY while price is ABOVE the 200-day EMA, when the MACD crosses up under zero.
+//   Long-term (12/144/9): wait 2 bars, then up to 30 bars for the 4h + daily MACDs to agree.
+//                         Stop 3 ATR. Hold until the sell setup (MACD crosses down ABOVE zero).
+//                         Weeks to months.
+//   Short-term (12/26/9): wait 1 bar, then up to 10 bars for 4h + daily to agree. Stop 2 ATR.
+//                         Sell setup or 10 trading days. Days to ~2 weeks.
+// Shorts (parked, off by default) mirror it: only while price is BELOW the 200-day EMA, when the
+// MACD crosses down above zero.
 //   Custom: uses every setting below as you set it.
 // Same rules as trading/config.py (LONG_TERM, SHORT_TERM), so TradingView's Strategy Tester and
 // the Python backtester can be checked against each other.
@@ -40,12 +42,12 @@ runLookback = input.int(20, "Low lookback (bars)", minval = 2, group = grpE)
 grpT = "200 EMA filter"
 emaLen = input.int(200, "EMA length", minval = 1, group = grpT)
 emaSource = input.string("Daily", "EMA timeframe", options = ["Daily", "Chart"], group = grpT)
-emaSide = input.string("Below", "Price must be (Custom only)", options = ["Below", "Above", "Off"], group = grpT)
+emaSide = input.string("Above", "Price must be (Custom only)", options = ["Below", "Above", "Off"], group = grpT)
 
 grpS = "Shorts"
 shortSide = input.string("Mirror of longs", "Short stocks that are", group = grpS,
      options = ["Mirror of longs", "Above their 200 EMA", "Below their 200 EMA", "Either side"],
-     tooltip = "Mirror of longs: above the 200 EMA when longs need below (stretched up). Below: stocks already in a downtrend, shorting with the trend.")
+     tooltip = "Mirror of longs: longs need ABOVE the 200 EMA, so shorts need BELOW it (shorting stocks already in a downtrend).")
 useMarket = input.bool(true, "Only short when the market is below its 200-day EMA", group = grpS)
 marketSym = input.symbol("NASDAQ:QQQ", "Market index", group = grpS)
 shortRiskMult = input.float(1.0, "Short size (x normal risk)", minval = 0.1, maxval = 1, step = 0.25, group = grpS)
@@ -88,7 +90,7 @@ startDate = input.time(timestamp("2018-01-01"), "Test from", group = grpR)
 isLongSys = system == SYS_LONG
 isShortSys = system == SYS_SHORT
 slowEff = isLongSys ? 144 : isShortSys ? 26 : slowLen
-emaSideEff = isLongSys ? "Below" : isShortSys ? "Above" : emaSide
+emaSideEff = isLongSys ? "Above" : isShortSys ? "Above" : emaSide
 confirmEff = isLongSys ? 2 : isShortSys ? 1 : confirmBars
 stopMultEff = isLongSys ? 3.0 : isShortSys ? 2.0 : stopMult
 holdEff = isLongSys ? 0 : isShortSys ? 10 : maxHoldDays

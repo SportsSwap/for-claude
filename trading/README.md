@@ -36,7 +36,7 @@ their own positions, stops and $800-style kill switch on their half:
 | | **Long-term** (`LONG_TERM`) | **Short-term** (`SHORT_TERM`) |
 |---|---|---|
 | MACD | **12/144/9**: slow, catches big swings | **12/26/9**: the classic, catches short swings |
-| Buy | MACD crosses up **under zero** while price is **below** the 200-day EMA (a deep dip) | MACD crosses up **under zero** while price is **above** the 200-day EMA (a pullback in a stock that's already rising) |
+| Buy | MACD crosses up **under zero** while price is **above** the 200-day EMA | same: MACD crosses up **under zero** while price is **above** the 200-day EMA |
 | Wait after the cross | 2 bars | 1 bar |
 | Line-up window | then up to 30 more bars for everything to agree | then up to 10 more bars |
 | Higher timeframes | 4h and daily 12/144/9 MACDs must agree | 4h and daily 12/26/9 MACDs must agree |
@@ -73,14 +73,15 @@ Short selling is switched off but kept, tested and documented so it can come bac
 still works: `--sides both` (or `short`) in Python, **Entry → Trades to take** in TradingView.
 
 **Why it's parked:** in TradingView tests on 2024-2026 charts, adding shorts made the strategy
-unprofitable. These AI and chip stocks mostly went up, and the short rule bets against stocks stretched
-above their 200-day EMA, which is betting against the trend.
+unprofitable. These AI and chip stocks mostly went up. That version shorted stocks stretched ABOVE
+their 200-day EMA (against the trend); the rule is now with the trend (short only BELOW the 200-day
+EMA), which hasn't been tested yet.
 
 **What was built:**
 
 | Rule | Short |
 |---|---|
-| Entry | MACD crosses **below** its signal line **while above zero**, and price is **above the 200-day EMA** (mirror of the long-term buy) |
+| Entry | MACD crosses **below** its signal line **while above zero**, and price is **below the 200-day EMA** (mirror of the buy rule) |
 | Market filter | Only while **QQQ is below its own 200-day EMA** (yesterday's close), i.e. a falling market. In a bull market this blocks nearly every short |
 | Stop / exit | Entry + 3 × ATR; hold until the **buy setup** (MACD crosses back up **while below zero**) |
 | Flip | With longs and shorts both on, the sell setup that ends a long opens the short on the same bar (and the reverse) |
@@ -89,7 +90,7 @@ above their 200-day EMA, which is betting against the trend.
 | Short setting | Options |
 |---|---|
 | `short_market_filter` | `"QQQ"` (default) or `None` |
-| `short_trend_side` | mirror of longs (default: stock above its 200 EMA), `"below"` (short stocks already falling, with the trend), `"off"` |
+| `short_trend_side` | mirror of longs (default: stock below its 200 EMA), `"above"` (short stocks stretched up), `"off"` |
 | `short_stop_atr_mult` | a different stop for shorts (default: same as longs) |
 | `short_risk_mult` | 0.5 = shorts risk half as much |
 
@@ -107,15 +108,16 @@ earnings can cost far more than 2%. In a small cash account, the bearish alterna
 
 | Variant | What it tests |
 |---|---|
-| Dip buy, below 200-day EMA | The default above: hold until the sell setup |
+| Long-term, above 200-day EMA | The default above: hold until the sell setup |
 | Enter on the cross (no 2-bar wait) | Is waiting for confirmation worth it? |
 | No higher-timeframe check | Does making the 4h and daily agree help? |
 | Neither filter (as before) | Both filters off: more trades, lower quality? |
 | Old exits: 2R target, any MACD cross back, 15 days | The earlier, quicker exits, to see how much letting winners run changes |
 | Sell setup exit + 3 ATR trailing stop | The default, plus a stop that follows price up (gives back less, but can exit earlier) |
 | 3 ATR trailing stop only | No MACD exit at all: ride until a 3 ATR pullback from the best close |
-| Dip buy, below 200-bar EMA | Same, using the 200 EMA of the chart timeframe instead of the daily |
-| Dip buy, no 200 EMA rule | Whether the 200 EMA filter helps at all |
+| Above 200-bar EMA | Same, using the 200 EMA of the chart timeframe instead of the daily |
+| Below 200-day EMA (the old long-term rule) | Buying dips below the 200-day EMA instead, to compare |
+| No 200 EMA rule | Whether the 200 EMA filter helps at all |
 | Zero-line cross, price not run | MACD crosses above zero while price is still within 3 ATR of its 20-bar low ("MACD turned, price hasn't moved yet") |
 | Zero-line cross, any | Same without the "price hasn't moved" check |
 | Trend: MACD cross, above 200-day EMA | The opposite idea: only buy stocks already in an uptrend |
@@ -245,8 +247,9 @@ For the rows below, first set System to **Custom** (it starts from the long-term
 | Sell setup exit + 3 ATR trailing stop | Exits → Trailing stop: **3** |
 | 3 ATR trailing stop only | Exits → MACD exit: **Off**; Trailing stop: **3** |
 | With a buffer | Entry → Buffer: **0.5** (or 1) |
-| Dip buy, below 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
-| Dip buy, no 200 EMA rule | 200 EMA filter → Price must be: **Off** |
+| Above 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
+| Below 200-day EMA (old rule) | 200 EMA filter → Price must be: **Below** |
+| No 200 EMA rule | 200 EMA filter → Price must be: **Off** |
 | Zero-line cross, price not run | Entry trigger: **Zero-line cross**; Skip if price ran more than: **3**; Price must be: **Off** |
 | Zero-line cross, any | Entry trigger: **Zero-line cross**; Price must be: **Off** |
 | Trend: MACD cross above 200-day EMA | Untick "must happen under zero"; Price must be: **Above** |

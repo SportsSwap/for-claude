@@ -39,7 +39,7 @@ INTERVALS = ["1d", "1h", "2h", "4h"]
 
 @dataclass(frozen=True)
 class Strategy:
-    name: str = "Long-term: MACD 12/144/9 dip buy below 200-day EMA"
+    name: str = "Long-term: MACD 12/144/9 buy above 200-day EMA"
 
     # Which trades to take: "long" (default), "short" or "both". Shorts are PARKED: the code works
     # and is tested, but they lost money in the 2024-2026 bull market; see README "Shorts (parked)".
@@ -93,7 +93,7 @@ class Strategy:
     trend_ma: int | None = 200          # None turns it off
     trend_ma_type: str = "ema"          # "ema" or "sma"
     trend_ma_source: str = "daily"      # "daily" = 200-day EMA; "bars" = 200 EMA of the chart timeframe
-    trend_side: str = "below"           # longs: price must be "below" or "above" the average
+    trend_side: str = "above"           # longs: price must be "above" (default) or "below" the average
                                         # (shorts use the opposite side)
 
     # Shorts.
@@ -158,12 +158,15 @@ DEFAULT_STRATEGY = Strategy()
 DEFAULT_RISK = Risk()
 
 # Two long systems that run side by side, each on its own share of the account.
-#   Long-term: MACD 12/144/9, buys deep dips below the 200-day EMA, holds weeks to months.
-#   Short-term: MACD 12/26/9, buys pullbacks in stocks ABOVE their 200-day EMA, holds days to
-#   about two weeks: quicker confirmation (1 bar), tighter stop (2 ATR), 10-day time limit.
+#   Both only buy while price is ABOVE the 200-day EMA, when the MACD crosses up under zero.
+#   Long-term: MACD 12/144/9, holds weeks to months.
+#   Short-term: MACD 12/26/9, holds days to about two weeks: quicker confirmation (1 bar),
+#   tighter stop (2 ATR), 10-day time limit.
+#   (Parked) shorts mirror this: only while price is BELOW the 200-day EMA, when the MACD
+#   crosses down above zero.
 LONG_TERM = DEFAULT_STRATEGY
-SHORT_TERM = replace(DEFAULT_STRATEGY, name="Short-term: MACD 12/26/9 pullback buy above 200-day EMA",
-                     macd_slow=26, trend_side="above", confirm_bars=1, align_window=10, stop_atr_mult=2.0,
+SHORT_TERM = replace(DEFAULT_STRATEGY, name="Short-term: MACD 12/26/9 buy above 200-day EMA",
+                     macd_slow=26, confirm_bars=1, align_window=10, stop_atr_mult=2.0,
                      max_hold_days=10)
 SYSTEMS = {"long-term": LONG_TERM, "short-term": SHORT_TERM}
 SYSTEM_SPLIT = 0.5                      # share of the account for the long-term system; the rest is short-term
@@ -180,8 +183,9 @@ VARIANTS = [
             macd_exit="any", max_hold_days=15),
     replace(_D, name="Sell setup exit + 3 ATR trailing stop", trail_atr_mult=3.0),
     replace(_D, name="3 ATR trailing stop only", macd_exit="off", trail_atr_mult=3.0),
-    replace(_D, name="Dip buy, below 200-bar EMA (as on your chart)", trend_ma_source="bars"),
-    replace(_D, name="Dip buy, no 200 EMA rule", trend_ma=None),
+    replace(_D, name="Above 200-bar EMA (as on your chart)", trend_ma_source="bars"),
+    replace(_D, name="Below 200-day EMA (the old long-term rule)", trend_side="below"),
+    replace(_D, name="No 200 EMA rule", trend_ma=None),
     replace(_D, name="Zero-line cross, price not run (<3 ATR)", entry="zero_cross",
             require_below_zero=False, trend_ma=None, max_run_atr=3.0),
     replace(_D, name="Zero-line cross, any", entry="zero_cross", require_below_zero=False, trend_ma=None),

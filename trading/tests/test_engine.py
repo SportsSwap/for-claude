@@ -184,19 +184,28 @@ def ohlc(close, index):
                          "Volume": 1}, index=index)
 
 
-def test_dip_buy_requires_cross_below_zero_and_price_under_200_day():
+def low_ema(df):
+    """A 'daily' history far below the price, so the stock is ABOVE its 200-day EMA."""
+    return ohlc(np.full(len(df), 1.0), df.index)
+
+
+def high_ema(df):
+    """A 'daily' history far above the price, so the stock is BELOW its 200-day EMA."""
+    return ohlc(np.full(len(df), 10_000.0), df.index)
+
+
+def test_buy_requires_cross_below_zero_and_price_above_200_day():
     # Fall then bounce: the MACD crosses its signal line while still under zero.
     close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
     idx = pd.bdate_range("2022-01-03", periods=len(close))
     df = ohlc(close, idx)
-    d = add_signals(df, DEFAULT_STRATEGY, daily=df)
+    d = add_signals(df, DEFAULT_STRATEGY, daily=low_ema(df))
     hits = d[d.entry_signal]
     assert len(hits) >= 1
-    assert (hits.macd < 0).all() and (hits.Close < hits.trend_ma).all()
-    # Same bounce but the stock is above its 200-day average: no dip-buy signal.
-    lifted = ohlc(close + 500, idx)
-    low_daily = ohlc(np.full(len(close), 100.0), idx)
-    assert not add_signals(lifted, DEFAULT_STRATEGY, daily=low_daily).entry_signal.any()
+    assert (hits.macd < 0).all() and (hits.Close > hits.trend_ma).all()
+    # Same bounce but the stock is BELOW its 200-day average: no buy.
+    assert not add_signals(df, DEFAULT_STRATEGY, daily=high_ema(df)).entry_signal.any()
+    assert not add_signals(df, DEFAULT_STRATEGY, daily=df).entry_signal.any()     # fell below its own EMA
 
 
 def test_200_day_ema_on_intraday_bars_uses_yesterdays_value():
@@ -269,22 +278,23 @@ def short_bars(rows, signal_days=(), cross_up_days=(), atr=1.0, momentum=0.0):
     return df
 
 
-def test_short_signal_is_the_mirror_of_the_dip_buy():
+def test_short_signal_is_the_mirror_of_the_buy():
     # Rise then roll over: the MACD crosses down through its signal line while still above zero.
     close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
     idx = pd.bdate_range("2022-01-03", periods=len(close))
     df = ohlc(close, idx)
-    d = add_signals(df, SHORT, daily=df)
+    d = add_signals(df, SHORT, daily=high_ema(df))
     hits = d[d.short_signal]
     assert len(hits) >= 1
-    assert (hits.macd > 0).all() and (hits.Close > hits.trend_ma).all()
+    assert (hits.macd > 0).all() and (hits.Close < hits.trend_ma).all()
     assert not d.entry_signal.any()                         # shorts only: no longs
-    # Same roll-over but the stock is below its 200-day average: no short.
-    high_daily = ohlc(np.full(len(close), 1000.0), idx)
-    assert not add_signals(df, SHORT, daily=high_daily).short_signal.any()
+    # Same roll-over but the stock is ABOVE its 200-day average: no short.
+    assert not add_signals(df, SHORT, daily=low_ema(df)).short_signal.any()
+    assert not add_signals(df, SHORT, daily=df).short_signal.any()                # rose above its own EMA
     # The default is long only (shorts parked); "both" still shorts.
-    assert not add_signals(df, DEFAULT_STRATEGY, daily=df).short_signal.any()
-    assert add_signals(df, replace(DEFAULT_STRATEGY, sides="both", short_market_filter=None), daily=df).short_signal.any()
+    assert not add_signals(df, DEFAULT_STRATEGY, daily=high_ema(df)).short_signal.any()
+    assert add_signals(df, replace(DEFAULT_STRATEGY, sides="both", short_market_filter=None),
+                       daily=high_ema(df)).short_signal.any()
 
 
 def test_short_entry_stop_above_and_stop_hit(fake_signals):
@@ -353,14 +363,14 @@ def test_buffer_blocks_crosses_just_under_zero():
     close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
     idx = pd.bdate_range("2022-01-03", periods=len(close))
     df = ohlc(close, idx)
-    none = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=0.0), daily=df)
+    none = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=0.0), daily=low_ema(df))
     hit = none[none.entry_signal]
     assert len(hit) == 1
     depth = abs(hit.depth_atr.iloc[0])
     assert hit.depth_atr.iloc[0] == pytest.approx(hit.macd.iloc[0] / hit.atr.iloc[0])
     # A buffer just under the cross depth keeps it; just over removes it.
-    keep = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 0.9), daily=df)
-    drop = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 1.1), daily=df)
+    keep = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 0.9), daily=low_ema(df))
+    drop = add_signals(df, replace(DEFAULT_STRATEGY, min_macd_depth_atr=depth * 1.1), daily=low_ema(df))
     assert keep.entry_signal.sum() == 1 and not drop.entry_signal.any()
 
 
@@ -368,11 +378,11 @@ def test_buffer_mirrors_for_shorts():
     close = np.r_[np.linspace(100, 100, 300), np.linspace(100, 200, 60), np.linspace(200, 185, 20)]
     idx = pd.bdate_range("2022-01-03", periods=len(close))
     df = ohlc(close, idx)
-    base = add_signals(df, replace(SHORT, min_macd_depth_atr=0.0), daily=df)
+    base = add_signals(df, replace(SHORT, min_macd_depth_atr=0.0), daily=high_ema(df))
     depth = base[base.short_signal].depth_atr.iloc[0]
     assert depth > 0
-    assert add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 0.9), daily=df).short_signal.any()
-    assert not add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 1.1), daily=df).short_signal.any()
+    assert add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 0.9), daily=high_ema(df)).short_signal.any()
+    assert not add_signals(df, replace(SHORT, min_macd_depth_atr=depth * 1.1), daily=high_ema(df)).short_signal.any()
 
 
 # --- Lower-timeframe agreement ---
@@ -431,10 +441,10 @@ def test_confirm_filter_counts_agreeing_timeframes():
     close = np.r_[np.linspace(300, 300, 300), np.linspace(300, 200, 60), np.linspace(200, 215, 20)]
     idx = pd.bdate_range("2022-01-03", periods=len(close))
     df = ohlc(close, idx)
-    base = add_signals(df, DEFAULT_STRATEGY, daily=df)
+    base = add_signals(df, DEFAULT_STRATEGY, daily=low_ema(df))
     assert base.entry_signal.sum() == 1
     # Fake "lower timeframe" columns via a stand-in: confirm_min with no lower data -> no trades.
-    assert not add_signals(df, replace(DEFAULT_STRATEGY, confirm_min=1), daily=df).entry_signal.any()
+    assert not add_signals(df, replace(DEFAULT_STRATEGY, confirm_min=1), daily=low_ema(df)).entry_signal.any()
     from strategy import _confirmed
     d = base.assign(mtf_up=[2] * len(df), mtf_down=0, mtf_n=3, mtf_max=3)
     assert _confirmed(d, replace(DEFAULT_STRATEGY, confirm_min=2), "mtf_up").all()
@@ -571,12 +581,12 @@ def test_market_filter_blocks_shorts_in_a_bull_market():
     on = replace(SHORT, short_market_filter="QQQ")
     bull = ohlc(np.linspace(100, 300, len(df)), df.index)              # QQQ rising: above its EMA
     bear = ohlc(np.linspace(300, 100, len(df)), df.index)              # QQQ falling: below its EMA
-    assert not add_signals(df, on, daily=df, market=bull).short_signal.any()
-    assert add_signals(df, on, daily=df, market=bear).short_signal.any()
-    assert not add_signals(df, on, daily=df).short_signal.any()        # no market data: no shorts
+    assert not add_signals(df, on, daily=high_ema(df), market=bull).short_signal.any()
+    assert add_signals(df, on, daily=high_ema(df), market=bear).short_signal.any()
+    assert not add_signals(df, on, daily=high_ema(df)).short_signal.any()        # no market data: no shorts
     # Longs are never affected by the market filter.
-    assert add_signals(df, on, daily=df, market=bull).entry_signal.sum() == \
-        add_signals(df, replace(on, short_market_filter=None), daily=df).entry_signal.sum()
+    assert add_signals(df, on, daily=high_ema(df), market=bull).entry_signal.sum() == \
+        add_signals(df, replace(on, short_market_filter=None), daily=high_ema(df)).entry_signal.sum()
 
 
 def test_market_filter_uses_yesterdays_close():
@@ -590,7 +600,7 @@ def test_market_filter_uses_yesterdays_close():
 
 def test_short_trend_side_options():
     df = rollover()
-    base = add_signals(df, replace(SHORT, short_trend_side="off"), daily=df)
+    base = add_signals(df, replace(SHORT, short_trend_side="off"), daily=high_ema(df))
     assert base.short_signal.any()
     low_daily = ohlc(np.full(len(df), 1000.0), df.index)               # stock far below its "EMA"
     assert not add_signals(df, replace(SHORT, short_trend_side="above"), daily=low_daily).short_signal.any()
@@ -621,8 +631,8 @@ def dip_and_bounce():
 
 def test_entry_waits_for_confirmation_bars():
     df = dip_and_bounce()
-    now = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=0), daily=df)
-    wait = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=2), daily=df)
+    now = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=0), daily=low_ema(df))
+    wait = add_signals(df, replace(DEFAULT_STRATEGY, confirm_bars=2), daily=low_ema(df))
     i_now = now.index.get_loc(now[now.entry_signal].index[0])
     i_wait = wait.index.get_loc(wait[wait.entry_signal].index[0])
     assert i_wait == i_now + 2
@@ -682,8 +692,9 @@ def test_missing_higher_data_blocks_entries_on_intraday_charts():
 
 def test_two_systems_settings():
     from config import LONG_TERM, SHORT_TERM
-    assert (LONG_TERM.macd_slow, LONG_TERM.trend_side, LONG_TERM.max_hold_days) == (144, "below", None)
+    assert (LONG_TERM.macd_slow, LONG_TERM.max_hold_days) == (144, None)
     assert (SHORT_TERM.macd_slow, SHORT_TERM.trend_side, SHORT_TERM.max_hold_days) == (26, "above", 10)
+    assert LONG_TERM.trend_side == "above"
     assert SHORT_TERM.stop_atr_mult == 2.0 and SHORT_TERM.confirm_bars == 1
     assert LONG_TERM.sides == SHORT_TERM.sides == "long"
 
