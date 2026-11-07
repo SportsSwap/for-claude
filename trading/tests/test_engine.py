@@ -18,7 +18,7 @@ from data import resample_session  # noqa: E402
 from strategy import add_signals  # noqa: E402
 
 NO_COSTS = replace(DEFAULT_RISK, slippage_pct=0.0, commission_min=0.0, commission_per_share=0.0)
-S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0)
+S = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0, target_r=2.0)
 CLASSIC = replace(DEFAULT_STRATEGY, macd_slow=26, require_below_zero=False, trend_ma=None)
 
 
@@ -351,3 +351,12 @@ def test_both_sides_share_the_position_limit(fake_signals):
     assert sorted(res.trades.ticker) == ["L_strong", "S_mid", "S_weak"]
     assert res.skipped_signals == 2
     assert dict(zip(res.trades.ticker, res.trades.side)) == {"L_strong": "long", "S_mid": "short", "S_weak": "short"}
+
+
+def test_default_has_no_profit_target(fake_signals):
+    # Price runs to 4R: with no target the trade stays open (the old 2R target would have sold).
+    df = bars([FLAT, FLAT, (100, 108.5, 99.5, 108), (108, 109, 107.5, 108.5)], signal_days=[0])
+    s = replace(DEFAULT_STRATEGY, exit_on_macd_cross_down=False, max_hold_days=None, stop_atr_mult=2.0)
+    assert DEFAULT_STRATEGY.target_r is None
+    assert backtest.run({"X": df}, s, NO_COSTS).trades.iloc[0].exit_reason == "end of test"
+    assert backtest.run({"X": df}, replace(s, target_r=2.0), NO_COSTS).trades.iloc[0].exit_reason == "target"

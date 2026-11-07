@@ -75,7 +75,8 @@ class Strategy:
     # Exits.
     atr_period: int = 14
     stop_atr_mult: float = 3.0          # stop = entry -/+ 3 x ATR of the chart timeframe
-    target_r: float | None = 2.0        # take profit at 2x the risk; None = no target
+    target_r: float | None = None       # no fixed target: winners run until the MACD crosses back
+                                        # (or the stop / time stop). 2.0 = the old 2R target
     exit_on_macd_cross_down: bool = True  # longs sell on a cross down; shorts cover on a cross up
     max_hold_days: int | None = 15      # time stop in trading days; None = no limit
 
@@ -111,6 +112,7 @@ _D = DEFAULT_STRATEGY
 # Variants for --compare. Each changes one thing from the default so the effect is readable.
 VARIANTS = [
     _D,
+    replace(_D, name="With the old 2R profit target", target_r=2.0),
     replace(_D, name="Above 200-bar EMA (as on your chart)", trend_ma_source="bars"),
     replace(_D, name="Below 200-day EMA (the old rule)", trend_side="below"),
     replace(_D, name="No 200 EMA rule", trend_ma=None),

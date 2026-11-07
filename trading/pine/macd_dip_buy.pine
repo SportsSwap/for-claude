@@ -31,7 +31,7 @@ emaSide = input.string("Above", "Price must be (longs; shorts use the opposite)"
 grpX = "Exits"
 atrLen = input.int(14, "ATR length", minval = 1, group = grpX)
 stopMult = input.float(3.0, "Stop = N x ATR from entry", minval = 0.5, step = 0.5, group = grpX)
-targetR = input.float(2.0, "Target in R (0 = no target)", minval = 0, step = 0.5, group = grpX)
+targetR = input.float(0.0, "Target in R (0 = no target, sell on the MACD cross down)", minval = 0, step = 0.5, group = grpX)
 exitOnCrossDown = input.bool(true, "Exit when MACD crosses back (down for longs, up for shorts)", group = grpX)
 maxHoldDays = input.int(15, "Time stop in trading days (0 = off)", minval = 0, group = grpX)
 

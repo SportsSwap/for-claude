@@ -39,7 +39,7 @@ The default is the setup traded on TradingView: **MACD 12/144/9 on 1h–4h chart
 | 200 EMA | The 200-**day** EMA. The 200-**bar** EMA of the chart timeframe (what a "200" EMA on a 2h chart shows, about 50 trading days) is tested as a variant | `trend_ma_source` |
 | Fill | Open of the next bar (no peeking at the future) | `backtest.py` |
 | Stop | Entry − 3 × ATR(14) of the chart timeframe | `stop_atr_mult` |
-| Target | 2 × the risk (2R) | `target_r` |
+| Target | None: winners run until the MACD crosses back down (the old 2R target cut big moves short) | `target_r` |
 | Other exits | MACD crosses back below its signal line → sell at the next bar's open; 15-trading-day time stop | `exit_on_macd_cross_down`, `max_hold_days` |
 | Size | Lose 2% of the account if the stop hits; no position above ~34% of the account; fractional shares | `--risk-pct`, `--max-position-pct` |
 | Limits | Max 3 positions; no new trades once the account hits $800 | `max_positions`, `kill_switch_pct` |
@@ -55,7 +55,7 @@ The short is the buy rule turned upside down, for stocks in a downtrend:
 | Entry | MACD line crosses **below** its signal line **while above zero**, and price is **below the 200-day EMA** |
 | Fill | Sell short at the open of the next bar |
 | Stop | Entry **+** 3 × ATR(14), above the entry |
-| Target | 2R **below** the entry |
+| Target | None, same as longs |
 | Other exits | MACD crosses back **above** its signal line → buy to cover at the next bar's open; 15-trading-day time stop |
 | Size and limits | Same as longs: 2% risk, ~34% cap, and longs and shorts share the 3 position slots |
 | Extra cost | Stock-loan fee of 0.5% a year on the position's value (`short_borrow_pct_per_year`) |
@@ -83,6 +83,7 @@ short, so treat the backtest as a test of the signal, not of those instruments.
 | Variant | What it tests |
 |---|---|
 | Buy, above 200-day EMA | The default above |
+| With the old 2R profit target | Selling at 2R instead of waiting for the MACD cross down |
 | Above 200-bar EMA | Same, using the 200 EMA of the chart timeframe instead of the daily |
 | Below 200-day EMA (the old rule) | Buying dips below the 200-day EMA instead, to compare |
 | No 200 EMA rule | Whether the 200 EMA filter helps at all |
@@ -106,7 +107,7 @@ cd trading
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-python -m pytest -q tests        # should print "29 passed"
+python -m pytest -q tests        # should print "30 passed"
 ```
 
 ## Run the backtest
@@ -133,7 +134,7 @@ TradingView's 45-minute chart can't be backtested here: Yahoo keeps under 30-min
 
 - **total_return_pct / cagr_pct**: what $1,000 became, as a total and per year.
 - **max_drawdown_pct**: the worst drop from a high. This is the pain you would have sat through.
-- **win_rate_pct**: share of trades that made money. Below 50% is normal at a 2R target.
+- **win_rate_pct**: share of trades that made money. Below 50% is normal when winners are left to run.
 - **avg_r**: average result per trade, in units of what was risked. Anything above 0 means the strategy has an edge.
 - **profit_factor**: dollars won ÷ dollars lost. Above 1.3 is decent; below 1.1 is close to noise.
 - **longest_losing_streak**: how many losses in a row you need to be able to stomach.
@@ -166,6 +167,7 @@ TradingView's Strategy Tester on TradingView's own data and see every trade on y
 | Variant | Settings to change from the default |
 |---|---|
 | Buy, above 200-day EMA | Default, nothing to change |
+| With the old 2R profit target | Exits → Target in R: **2** |
 | Above 200-bar EMA | 200 EMA filter → EMA timeframe: **Chart** |
 | Below 200-day EMA (old rule) | 200 EMA filter → Price must be: **Below** |
 | No 200 EMA rule | 200 EMA filter → Price must be: **Off** |
