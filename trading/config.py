@@ -15,7 +15,22 @@ SEMIS = ["AVGO", "AMD", "TSM", "MU", "QCOM", "INTC", "ARM", "MRVL",
 HIGH_BETA = ["NFLX", "PLTR", "COIN", "MSTR", "SHOP", "UBER", "CRWD", "SNOW",
              "HOOD", "ORCL", "ADBE", "CRM", "NOW", "PANW"]
 
-UNIVERSE = MAG7 + SEMIS + HIGH_BETA
+# AI infrastructure: GPU clouds, AI servers, data-centre power/cooling, storage, AI software.
+# CRWV listed in March 2025, NBIS in October 2024 and SPCX (SpaceX) on 12 June 2026, so their
+# backtests start late and they only get signals once the 144-bar MACD has 289 bars of history.
+AI = ["CRWV", "NBIS", "DELL", "VRT", "WDC", "VST", "IBM", "SPCX"]
+
+UNIVERSE = MAG7 + SEMIS + HIGH_BETA + AI
+
+# Pick one with --group. Micron (MU) and SanDisk (SNDK) are memory/storage AI plays too,
+# so the "ai" group includes them.
+GROUPS = {
+    "all": UNIVERSE,
+    "mag7": MAG7,
+    "semis": SEMIS,
+    "high_beta": HIGH_BETA,
+    "ai": AI + ["MU", "SNDK"],
+}
 
 BENCHMARKS = ["QQQ", "SMH"]
 

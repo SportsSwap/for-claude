@@ -4,6 +4,7 @@
     python run_backtest.py --interval 4h              # 4-hour bars instead
     python run_backtest.py --interval 1d --start 2018-01-01 --compare   # daily bars, longer history
     python run_backtest.py --tickers NVDA AMD SNDK    # just these stocks
+    python run_backtest.py --group ai                 # just the AI list (see config.GROUPS)
     python run_backtest.py --risk-pct 3               # risk 3% of the account per trade
     python run_backtest.py --sides both               # take the short mirror trades as well
     python run_backtest.py --sides short              # shorts only
@@ -18,14 +19,16 @@ import pandas as pd
 
 import backtest
 import data
-from config import BENCHMARKS, DEFAULT_RISK, DEFAULT_STRATEGY, INTERVALS, UNIVERSE, VARIANTS
+from config import BENCHMARKS, DEFAULT_RISK, DEFAULT_STRATEGY, INTERVALS, GROUPS, VARIANTS
 
 RESULTS_DIR = Path(__file__).parent / "results"
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--tickers", nargs="+", default=UNIVERSE)
+    ap.add_argument("--tickers", nargs="+", default=None, help="these stocks only (overrides --group)")
+    ap.add_argument("--group", default="all", choices=list(GROUPS),
+                    help="which stock list to use (default: all)")
     ap.add_argument("--interval", default="2h", choices=INTERVALS, help="bar size (default 2h)")
     ap.add_argument("--start", default=None,
                     help="first day of the test (default: 2018-01-01 for 1d, all ~2 years for intraday)")
@@ -41,6 +44,7 @@ def main():
     ap.add_argument("--refresh", action="store_true", help="re-download prices instead of using the cache")
     ap.add_argument("--offline", action="store_true", help="use cached CSVs only")
     args = ap.parse_args()
+    args.tickers = args.tickers or GROUPS[args.group]
 
     intraday = args.interval != "1d"
     start = args.start or (None if intraday else "2018-01-01")

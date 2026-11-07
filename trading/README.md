@@ -1,7 +1,24 @@
 # MACD swing trading: backtester and scanner
 
 Step 1 of a trading assistant for a $1,000 account trading large US stocks:
-the Magnificent 7, semiconductors, and other big names that move a lot.
+the Magnificent 7, semiconductors, AI infrastructure, and other big names that move a lot.
+
+## The stock lists
+
+Set in `config.py`. Pick one with `--group` (default `all`), or name stocks with `--tickers`.
+
+| Group | Stocks |
+|---|---|
+| `mag7` | AAPL MSFT GOOGL AMZN NVDA META TSLA |
+| `semis` | AVGO AMD TSM MU QCOM INTC ARM MRVL AMAT LRCX KLAC ASML TXN ON SMCI SNDK |
+| `high_beta` | NFLX PLTR COIN MSTR SHOP UBER CRWD SNOW HOOD ORCL ADBE CRM NOW PANW |
+| `ai` | CRWV (CoreWeave) NBIS (Nebius) DELL VRT (Vertiv) WDC (Western Digital) VST (Vistra) IBM SPCX (SpaceX), plus MU and SNDK |
+
+Some of these have short price histories: CoreWeave listed in March 2025, Nebius in October 2024 and
+SpaceX on 12 June 2026. The 12/144/9 MACD needs 289 bars before it gives signals, so SpaceX gets
+none on daily bars yet (it has about 100). On 2h bars it has had signals since around September 2026.
+A 200-day EMA on a stock with under 200 days of history is not a real 200-day average either, so
+treat SpaceX's results and signals as a rough guide until it has traded for a year.
 
 The plan, in order:
 
@@ -101,6 +118,7 @@ python run_backtest.py --compare --interval 1d --start 2018-01-01   # daily bars
 python run_backtest.py --compare --risk-pct 3            # same again at 3% risk per trade
 python run_backtest.py --tickers NVDA AMD SNDK           # default strategy on a few stocks, with detail
 python run_backtest.py --sides both                      # longs and shorts, with a long-vs-short split
+python run_backtest.py --compare --group ai              # every variant on the AI list only
 python run_backtest.py --sides short --interval 4h       # shorts only, 4h bars
 ```
 
@@ -182,6 +200,7 @@ Differences from the Python backtester:
 python scan.py --equity 1000                 # 2h bars, default strategy, your current account value
 python scan.py --interval 4h --variant 3     # 4h bars, zero-line-cross variant
 python scan.py --sides both                  # buy signals and short signals
+python scan.py --group ai                    # AI list only
 ```
 
 For each buy signal it prints a stop, a target and a share count, sized so that hitting the stop

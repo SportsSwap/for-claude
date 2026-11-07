@@ -7,6 +7,7 @@ your chosen risk percent of the account.
     python scan.py                          # default strategy on 2h bars
     python scan.py --interval 4h --equity 1150
     python scan.py --variant 3              # use VARIANTS[3] from config.py instead
+    python scan.py --group ai               # just the AI list
     python scan.py --sides both             # also look for shorts: MACD cross down above zero,
                                             # price above the 200-day EMA
 
@@ -21,13 +22,15 @@ import pandas as pd
 
 import data
 from backtest import fmt_time, position_size
-from config import DEFAULT_RISK, DEFAULT_STRATEGY, INTERVALS, UNIVERSE, VARIANTS
+from config import DEFAULT_RISK, DEFAULT_STRATEGY, INTERVALS, GROUPS, VARIANTS
 from strategy import add_signals
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--tickers", nargs="+", default=UNIVERSE)
+    ap.add_argument("--tickers", nargs="+", default=None, help="these stocks only (overrides --group)")
+    ap.add_argument("--group", default="all", choices=list(GROUPS),
+                    help="which stock list to use (default: all)")
     ap.add_argument("--interval", default="2h", choices=INTERVALS)
     ap.add_argument("--equity", type=float, default=DEFAULT_RISK.starting_capital, help="current account value")
     ap.add_argument("--risk-pct", type=float, default=DEFAULT_RISK.risk_per_trade * 100)
@@ -36,6 +39,7 @@ def main():
                     help="which signals to look for (default: what the strategy sets, long)")
     ap.add_argument("--offline", action="store_true")
     args = ap.parse_args()
+    args.tickers = args.tickers or GROUPS[args.group]
 
     s = VARIANTS[args.variant] if args.variant is not None else DEFAULT_STRATEGY
     if args.sides:
