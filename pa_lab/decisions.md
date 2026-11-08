@@ -185,3 +185,11 @@ On real data, this artifact alone would have produced a false "levels work".
 
 D28. **Speed.** Detectors and setup objects are cached per (market, chart,
 dials that matter); a cached version runs in 4-90 ms on 2.5 years of 1m data.
+
+D29. **Box equals line at one touch.** A level made of a single swing has
+lo = hi, so `level_shape` = box and line give identical versions whenever
+`level_min_touches` = 1. The behavior test `line_vs_box` therefore uses
+2-touch levels (its first run compared identical sets and returned exactly
+0). In the rulebook these pairs are duplicates; the count (D18) is left as
+locked, and the funnel treats them as one version when sampling (logged in
+its notes).

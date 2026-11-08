@@ -37,7 +37,7 @@ def main(argv=None) -> int:
               f"ES {v['es_point']:+.4f}  ({time.time() - t0:.0f}s)", flush=True)
     vd = pd.DataFrame(verdicts)
     if a.only and (out / "verdicts.csv").exists():
-        old = io.read_table(out / "verdicts.csv")
+        old = io.read_table(out / "verdicts.csv", dtype={"verdict": str})  # keep "false", not False
         vd = pd.concat([old[~old.test.isin(vd.test)], vd]).set_index("test").loc[
             [n for n in behavior.TESTS if n in set(old.test) | set(vd.test)]].reset_index()
     io.write_table(vd, out / "verdicts.csv")

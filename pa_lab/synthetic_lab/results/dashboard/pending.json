@@ -1,0 +1,37 @@
+[
+ {
+  "page": "funnel_stages",
+  "section": "Funnel",
+  "waiting_for": [
+   "funnel/funnel_stages.csv"
+  ]
+ },
+ {
+  "page": "setup_judgment",
+  "section": "Funnel",
+  "waiting_for": [
+   "funnel/setup_judgment.csv"
+  ]
+ },
+ {
+  "page": "named_versions",
+  "section": "Funnel",
+  "waiting_for": [
+   "funnel/named_versions.csv"
+  ]
+ },
+ {
+  "page": "final_held_up",
+  "section": "Final test",
+  "waiting_for": [
+   "final/held_up.csv"
+  ]
+ },
+ {
+  "page": "final_setups",
+  "section": "Final test",
+  "waiting_for": [
+   "final/setup_totals.csv"
+  ]
+ }
+]

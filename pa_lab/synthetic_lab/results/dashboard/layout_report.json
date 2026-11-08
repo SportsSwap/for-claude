@@ -1,0 +1,70 @@
+{
+ "sizes": {
+  "1920x1080": {
+   "pages": 9,
+   "problems": []
+  },
+  "1280x720": {
+   "pages": 9,
+   "problems": []
+  }
+ },
+ "pages": [
+  {
+   "n": 1,
+   "key": "title",
+   "title": "Price Action Lab",
+   "screenshot": "screens/page_01.png"
+  },
+  {
+   "n": 2,
+   "key": "method",
+   "title": "The Method",
+   "screenshot": "screens/page_02.png"
+  },
+  {
+   "n": 3,
+   "key": "windows",
+   "title": "Three Windows",
+   "screenshot": "screens/page_03.png"
+  },
+  {
+   "n": 4,
+   "key": "random_entries",
+   "title": "Random Entries",
+   "screenshot": "screens/page_04.png"
+  },
+  {
+   "n": 5,
+   "key": "cheat",
+   "title": "The Cheat",
+   "screenshot": "screens/page_05.png"
+  },
+  {
+   "n": 6,
+   "key": "behavior_intro",
+   "title": "Real or Random",
+   "screenshot": "screens/page_06.png"
+  },
+  {
+   "n": 7,
+   "key": "behavior_summary",
+   "title": "Behavior Verdicts",
+   "screenshot": "screens/page_07.png"
+  },
+  {
+   "n": 8,
+   "key": "behavior_levels_vs_random",
+   "title": "Levels Against Random Lines",
+   "screenshot": "screens/page_08.png"
+  },
+  {
+   "n": 9,
+   "key": "behavior_bos_follow_20",
+   "title": "Break of Structure Follow-Through",
+   "screenshot": "screens/page_09.png"
+  }
+ ],
+ "screenshots_match_page_list": true,
+ "clean": true
+}

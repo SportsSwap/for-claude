@@ -318,7 +318,10 @@ def t_shrinking_bounces(cl):
 
 
 def t_line_vs_box(cl):
-    return cl.hold_group(_lvl_touch_df(cl, cl.lv["box"])), cl.hold_group(_lvl_touch_df(cl, cl.lv["line"]))
+    """Two-touch levels: a one-swing box has no width and equals its line."""
+    box = sg.levels(cl.mk, cl.name, K, TOL, 2, "box")
+    line = sg.levels(cl.mk, cl.name, K, TOL, 2, "line")
+    return cl.hold_group(_lvl_touch_df(cl, box)), cl.hold_group(_lvl_touch_df(cl, line))
 
 
 def t_wick_vs_close(cl):
