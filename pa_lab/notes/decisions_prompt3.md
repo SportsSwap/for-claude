@@ -114,3 +114,26 @@ stages.json). Sets still number 10,000.
 P3-13. **Signals for the common set** are not counted in `gen`: common and named
 versions are graded in full and screened by stage 1; `nq_signals` is null
 for common versions.
+
+P3-14. **What the twin stage can and cannot do.** The twin test asks whether a
+version beat random entries with the same shape. A version that reached
+stage 4 was already picked for a high net from many versions, so on pure noise
+it still beats fresh random twins most of the time: in a small dry run on the
+synthetic random walk, 31 of 52 stage-3 survivors passed stage 4 and 6 of 356
+graded versions became candidates. That is selection luck, not edge, and the
+funnel cannot remove it; only the sealed final window (Prompt 4) can. Nothing
+was tuned in response; the thresholds stay as fixed in stages.json.
+
+P3-15. **versions.jsonl** carries, per version, the id, set, name (named only),
+the NQ signal count used for the 40-signal rule (`nq_signals`, a construction
+input, not a result), the `graded` flag, and every dial. Its sha256 is in
+`versions.sha256` and in `selection_manifest.json`.
+
+P3-16. **How close the spread set got** (`results/funnel/spread_shares.csv`). Mean
+absolute gap between a dial value's share and its target: 0.021 for the spread
+set against 0.026 for unfiltered random draws of the same size. Where the
+40-signal rule bites hardest (BOS, CHoCH, trend pullback: 20-26% of draws
+reach 40 signals, 211-240 eligible for 140 places), slow charts rarely qualify,
+so chart-pair shares cannot reach 1/13 and the worst single gap is larger than
+random's (0.21 vs 0.08 for BOS). That is the rule working as written: the set
+can only spread across versions that trade enough.

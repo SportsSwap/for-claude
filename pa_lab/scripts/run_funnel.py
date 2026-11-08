@@ -54,11 +54,18 @@ def _init(markets):
         _MK[m] = Market.load(m)
 
 
-def _evict(limit=300):
+def _evict(limit=80, level_limit=120):
+    """Bound each worker's memory: candidate/object caches are dropped when they
+    grow past `limit` entries, level caches past `level_limit` (swings and
+    structure stay; they are small and reused by everything)."""
     c = sg._CACHE
     keys = [k for k in c if len(k) > 1 and k[1] in ("cand", "obj")]
     if len(keys) > limit:
         for k in keys:
+            del c[k]
+    lv = [k for k in c if len(k) > 1 and k[1] in ("lv", "fvg", "zn")]
+    if len(lv) > level_limit:
+        for k in lv:
             del c[k]
 
 
@@ -307,8 +314,9 @@ def report():
     # win rate against profit
     w = df[df.nq_trades >= 30].copy()
     w["win_rate_bin"] = pd.cut(w.nq_win_rate, np.linspace(0, 1, 11), include_lowest=True).astype(str)
+    w["profitable"] = (w.nq_net > 0).astype(float)
     g = w.groupby("win_rate_bin")
-    wr = pd.DataFrame({"versions": g.size(), "mean_net": g.nq_net.mean(), "share_profitable": g.nq_net.gt(0).mean(),
+    wr = pd.DataFrame({"versions": g.size(), "mean_net": g.nq_net.mean(), "share_profitable": g.profitable.mean(),
                        "mean_sharpe": g.nq_sharpe.mean(), "mean_avg_R": g.nq_avg_R.mean()}).reset_index()
     io.write_table(wr, out_dir() / "win_rate_vs_profit.csv")
     corr = float(np.corrcoef(w.nq_win_rate, w.nq_net)[0, 1]) if len(w) > 2 else float("nan")
@@ -325,14 +333,14 @@ def report():
             continue
         else:
             col = cm[d].astype(str)
-        key = cm[others].astype(str).agg("|".join, axis=1)
+        key = cm[others].apply(lambda col: col.map(str)).agg("|".join, axis=1)
         tab = pd.DataFrame({"key": key, "val": col, "net": cm.nq_net, "sharpe": cm.nq_sharpe, "es_net": cm.es_net})
         base_val = sorted(tab.val.unique())[0]
         base = tab[tab.val == base_val].set_index("key")
         for val in sorted(tab.val.unique()):
             if val == base_val:
                 continue
-            o = tab[tab.val == val].set_index("key").join(base, rsuffix="_base", how="inner")
+            o = tab[tab.val == val].set_index("key").join(base.add_suffix("_base"), how="inner")
             if not len(o):
                 continue
             eff.append({"rule": "entry/confirmation" if d == "entry" else d, "baseline": base_val, "value": val,
