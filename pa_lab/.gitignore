@@ -7,3 +7,6 @@ synthetic_input/
 .pytest_cache/
 __pycache__/
 *.pyc
+synthetic_lab/data/
+notes/.scratch/
+synthetic_lab/results/engine/*_trades.csv

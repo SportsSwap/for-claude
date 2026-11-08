@@ -120,3 +120,68 @@ session, Panama back-adjustment, and injected defects (gaps, holes,
 duplicates, halt-hour bars, zero volume, swapped rows). Contract ids end in
 `SYN`. It caught one bug in itself: a halt-hour copy was given the wrong
 adjustment offset, and the audit flagged the step.
+
+## Prompt 2: engine and behavior tests
+
+D20. **Engine** (`lab/engine.py`, one numba kernel). Fills and exits on 1m
+bars only. Market entry = close of the decision bar + 1 tick. Limits fill
+only when a bar trades 1 tick through, at the limit price. Targets the same.
+Hard stops at stop - 1 tick, or open - 1 tick on a gap. Close-based stops at
+the first trigger-bar close beyond the stop - 1 tick. Structure (CHoCH)
+exits at the 1m close - 1 tick. Time and roll exits at the close, no
+slippage. Stop and target in one bar: the stop. On a limit's fill bar only
+the stop can trigger (ambiguous, so a loss). $4 per round trip; half size
+halves contracts and commission. P&L is booked on the exit session; the daily
+series covers every discovery session with zeros. Sharpe = mean/sd x sqrt(252).
+
+D21. **Lab defaults the prompt leaves open:** a limit back at the level lives
+12 trigger bars and is cancelled if the stop trades first. Break setups allow
+a retest confirmation within 12 setup bars. A trend-pullback zone is armed
+50 setup bars. Levels live 500 setup bars after their last swing; zones 500;
+trend lines 300. An episode ends when a trigger bar closes 0.25 ATR through
+the band. ltf_bos must arrive within 3 trigger bars of the touch. flat_1600
+versions take no entries after 16:00. A version's next-swing target needs
+at least 1R or the signal is skipped.
+
+D22. **Confirmation 'none' with a limit entry** rests a limit at the band from
+the moment the object is known until the object expires. With a market entry
+it enters at the close of the touching trigger bar, and for break setups at
+the break bar's close.
+
+D23. **Look-ahead bug found and fixed.** pandas 3 stores timestamps in
+microseconds; the market cache assumed nanoseconds, so the "last setup bar
+closed by the decision" was looked up 16.7 hours late. The cut-at-a-random-bar
+test caught it; all timestamps now go through `.dt.as_unit("ns")`, and a
+regression test pins one minute = 60e9 ns.
+
+D24. **Random entries (engine check):** 20,000 per market, random direction,
+1 ATR (5m) stop, 2R target, each trade independent. Synthetic NQ:
+-$23.70 a trade (about -0.07R), ES -$38.09. Losing a little is right: the
+costs and the conservative fill rules on a driftless walk. The reference lab
+got -$9.80 on real NQ; the synthetic walk's volatility differs.
+
+D25. **The cheat** (`scripts/cheat_peek60.py`, a copy of the random-entry
+script choosing direction from the close 60 minutes ahead) made +$336.07 a
+trade on NQ and +$126.48 on ES, then was deleted in the same command. Its
+results stay in `results/engine/cheat_peek60*.`
+
+D26. **Behavior tests**: swing strength 3, level tolerance 0.25 ATR, levels
+from every swing (min touches 1). Touches are episodes on the same chart.
+Verdict: *true* when NQ pooled points the claimed way with a 95% interval
+excluding zero, ES pooled has the same sign and both NQ eras have the same
+sign; *split* when NQ pooled holds but ES or an era does not; *false* when NQ
+pooled does not. The claim for every test is the folk rule (sign +1); the
+metric is always A minus B, defined per test in `lab/behavior.py`.
+
+D27. **Stand-ins sit on the tick grid.** The first run on synthetic data
+said "real levels hold more than random lines" (+0.45 points of hold rate on
+NQ, +1.6 on ES). On a random walk that cannot be behavior. The cause: real
+levels are swing prices, which lie on the tick grid, so a bar that just tags
+the level counts as a touch, while a shifted line at an off-grid price needs
+a deeper poke. Shifts are now rounded to whole ticks; the effect vanishes
+(NQ +0.12 [-0.16, +0.43] points). Found on synthetic data before any real
+data existed, so this is a bug fix in the stand-in, not a moved threshold.
+On real data, this artifact alone would have produced a false "levels work".
+
+D28. **Speed.** Detectors and setup objects are cached per (market, chart,
+dials that matter); a cached version runs in 4-90 ms on 2.5 years of 1m data.
