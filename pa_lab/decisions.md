@@ -533,3 +533,13 @@ loss); the cheat +$307.68 a trade on NQ; 28 candidates; NQ candidates held up
 5 of 28 (17.9%) against 14.5% of all versions (p = 0.38); 1 of 4 working
 setups beat random trades on its own market (trend pullback NQ 4h, p = 0.02).
 That is what a random walk should give, up to chance.
+
+D38. **News calendar verified from bls.gov.** Fetched with the user's name and
+email in the User-Agent, as BLS asks of automated clients (the user approved
+this). CPI and jobs-report dates now come from the BLS release archives (224
+CPI and 226 jobs releases since 2008; 60 of each between 2021-10-01 and
+2026-10-16), FOMC from the Fed. All 96 hand-seeded dates matched. The
+archives also carry the 2025 shutdown delays (CPI 2025-10-24, jobs
+2025-11-20 and 2026-02-11). `Market.load` now requires verified dates; an
+unverified row stops the lab. The synthetic results already committed used
+the hand-seeded dates, identical through their last seeded date (Sep 2025).

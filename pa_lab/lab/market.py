@@ -115,7 +115,7 @@ class Market:
         m1 = m1[m1["session"] <= w.discovery[1]]
         rolls = io.read_table(P.clean() / f"{name}_rolls.parquet")
         try:
-            nd = news_days(require_verified=False)
+            nd = news_days()          # official dates only; unverified rows stop the lab
         except FileNotFoundError:
             nd = set()
         return Market.from_frames(name, m1, rolls, frozenset(nd), w.warmup[1], w.era2[0])

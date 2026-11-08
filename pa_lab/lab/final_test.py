@@ -202,7 +202,7 @@ def _rolls_frame(df):
 def _news():
     from .news import news_days
     try:
-        return frozenset(news_days(require_verified=False))
+        return frozenset(news_days())   # official dates only; unverified rows stop the run
     except FileNotFoundError:
         return frozenset()
 

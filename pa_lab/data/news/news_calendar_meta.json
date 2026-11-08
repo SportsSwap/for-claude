@@ -1,29 +1,28 @@
 {
-  "rows": 152,
+  "rows": 506,
   "by_event": {
-    "CPI": 48,
+    "CPI": 224,
     "FOMC": 56,
-    "NFP": 48
+    "NFP": 226
   },
   "verified_by_event": {
-    "CPI": false,
+    "CPI": true,
     "FOMC": true,
-    "NFP": false
+    "NFP": true
   },
-  "first": "2021-01-27",
+  "first": "2008-02-01",
   "last": "2027-12-08",
   "source_pages_sha256": {
-    "fomccalendars.htm": "73ae50daf5d507c9efb50e8e770cf55c5aab39216bb7a6262be45327064e971b"
+    "bls_cpi_archive.htm": "a6c6595103212f19425d454b5fa4b58f63eb4e037a5da6659b9f787c8e449b2b",
+    "bls_empsit_archive.htm": "876329bf65bbcd0b5640b9ff04307a5d79779fbd696ce36a6865c9b11b2203ef",
+    "fomccalendars.htm": "b7899fc3af4759b910f8ce9866eca581d9bacd5771a6888b0708c59f19aba34b"
   },
-  "log": [
-    "CPI: LAB_HTTP_CONTACT not set; BLS requires automated clients to identify themselves",
-    "NFP: LAB_HTTP_CONTACT not set; BLS requires automated clients to identify themselves"
-  ],
+  "log": [],
   "master_seed": 20220103,
   "amendment": 0,
   "locks": {
     "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
     "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
   },
-  "written_utc": "2026-11-08T10:22:53+00:00"
+  "written_utc": "2026-11-08T22:04:10+00:00"
 }
