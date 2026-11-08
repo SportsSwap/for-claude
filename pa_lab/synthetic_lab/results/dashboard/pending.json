@@ -1,37 +1,30 @@
 [
  {
-  "page": "funnel_stages",
-  "section": "Funnel",
-  "waiting_for": [
-   "funnel/funnel_stages.csv"
-  ]
- },
- {
-  "page": "setup_judgment",
-  "section": "Funnel",
-  "waiting_for": [
-   "funnel/setup_judgment.csv"
-  ]
- },
- {
-  "page": "named_versions",
-  "section": "Funnel",
-  "waiting_for": [
-   "funnel/named_versions.csv"
-  ]
- },
- {
-  "page": "final_held_up",
+  "page": "final_intro",
   "section": "Final test",
   "waiting_for": [
-   "final/held_up.csv"
+   "final/DONE.json"
   ]
  },
  {
-  "page": "final_setups",
+  "page": "final_held",
   "section": "Final test",
   "waiting_for": [
-   "final/setup_totals.csv"
+   "final/share_held.csv"
+  ]
+ },
+ {
+  "page": "final_working",
+  "section": "Final test",
+  "waiting_for": [
+   "final/working_vs_random.csv"
+  ]
+ },
+ {
+  "page": "final_named",
+  "section": "Final test",
+  "waiting_for": [
+   "final/named_versions.csv"
   ]
  }
 ]

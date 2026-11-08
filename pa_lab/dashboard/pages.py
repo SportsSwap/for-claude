@@ -21,6 +21,7 @@ FIXED_LABELS = [
     r"\b95% interval\b",
     r"\b2023-24\b",
     r"\b2022\b",
+    r"\b\d+(\.\d+)?R\b",          # R-multiple targets are dial values (1R, 1.5R, 2R ...), not measurements
 ]
 
 
@@ -205,29 +206,162 @@ def generic_bars(key, section, title, subtitle, rel, label_col, value_col, kind,
     return build
 
 
+def _tone(prov, t):
+    return "good" if prov.value(t) > 0 else "bad"
+
+
+FUN = "funnel/funnel.parquet"
+
+
+def p_funnel_intro(prov):
+    graded = prov.count(FUN, {"graded": True})
+    cand = prov.count(FUN, {"candidate": True})
+    work = prov.count("funnel/setup_judgment.csv", {"works": True})
+    return Page("funnel_intro", "slide", "Funnel", "Many Versions, Few Survivors",
+                "Every version through the same engine and the same five stages",
+                cards=[{"big": graded, "label": "versions graded"},
+                       {"big": cand, "label": "candidates"},
+                       {"big": work, "label": "setups that worked"}])
+
+
+def p_funnel_stages(prov):
+    need_cols(prov, FUN, ["graded", "s1", "s2", "s3", "s4", "candidate"])
+    items = []
+    st = "funnel/stages.json"
+    n_tr = prov.json(st, ["stage1_min_trades"], "int")
+    sh = prov.json(st, ["stage3_min_sharpe"], "dec2")
+    for col, label in (("graded", "graded"), ("s1", f"{n_tr} trades"), ("s2", "profitable"), ("s3", f"Sharpe {sh}"),
+                       ("s4", "beat twins"), ("candidate", "candidate")):
+        t = prov.count(FUN, {col: True})
+        items.append((label, t, prov.value(t), "cyan"))
+    svg, texts = bars(items)
+    return Page("funnel_stages", "finding", "Funnel", "The Funnel", "Versions left after each stage on NQ discovery",
+                svg, texts, [{"label": "graded", "value": items[0][1]},
+                             {"label": "candidates", "value": items[-1][1]}],
+                "Most versions lose after costs. The few left must still face the sealed window.")
+
+
+def p_setup_judgment(prov):
+    f = "funnel/setup_judgment.csv"
+    df = need_cols(prov, f, ["setup", "chart", "market", "sharpe", "works"])
+    rows = []
+    for st in sorted(df[(df.market == "NQ") & (df.chart == "1h")]["setup"].astype(str)):
+        t = prov.cell(f, {"setup": st, "chart": "1h", "market": "NQ"}, "sharpe", "num2")
+        rows.append((st.replace("_", " "), t, prov.value(t), _tone(prov, t)))
+    svg, texts = hbars(rows)
+    work = prov.count(f, {"works": True})
+    cells = prov.count(f, {})
+    return Page("setup_judgment", "finding", "Funnel", "Setups as a Whole",
+                "Sharpe of the equal-weight average of each setup's versions, NQ 1h",
+                svg, texts, [{"label": "setup, chart and market cells that worked", "value": work},
+                             {"label": "cells judged", "value": cells}],
+                "A setup works only when its average version made money every year and in both eras.")
+
+
+def p_named_funnel(prov):
+    f = "funnel/named_versions.csv"
+    df = need_cols(prov, f, ["name", "nq_net"])
+    rows = []
+    for n in df["name"].astype(str):
+        t = prov.cell(f, {"name": n}, "nq_net", "usd0")
+        rows.append((n, t, prov.value(t), _tone(prov, t)))
+    svg, texts = hbars(rows)
+    cand = prov.count(f, {"candidate": True})
+    return Page("named_funnel", "finding", "Funnel", "Named Systems",
+                "Net after costs on NQ discovery, systems as usually taught",
+                svg, texts, [{"label": "named systems that became candidates", "value": cand}],
+                "The textbook systems, run through the same engine and costs.")
+
+
+def p_rule_effects(prov):
+    f = "funnel/rule_effects.csv"
+    df = need_cols(prov, f, ["rule", "baseline", "value", "mean_sharpe_change_NQ"])
+    rows = []
+    for r, b, v in df[["rule", "baseline", "value"]].astype(str).itertuples(index=False):
+        t = prov.cell(f, {"rule": r, "value": v}, "mean_sharpe_change_NQ", "num2")
+        rows.append((f"{r}: {b} to {v}".replace("_", " "), t, prov.value(t), _tone(prov, t)))
+    svg, texts = hbars(rows[:12])
+    return Page("rule_effects", "finding", "Funnel", "Each Rule, All Else Equal",
+                "Change in NQ Sharpe when one rule changes and nothing else does",
+                svg, texts, [], "Pairs from the usual-settings grid, differing in one rule only.")
+
+
+FIN = "final/share_held.csv"
+
+
+def p_final_intro(prov):
+    return Page("final_intro", "slide", "Final test", "The Sealed Window",
+                "Opened once, after every choice was hashed",
+                cards=[{"big": "Hash", "label": "selections checked"}, {"big": "Rehearse", "label": "seal still closed"},
+                       {"big": "Unlock", "label": "once, logged"}])
+
+
+def p_final_held(prov):
+    df = need_cols(prov, FIN, ["market", "group", "share_held"])
+    rows = []
+    for g in ("all", "candidates", "set:common", "set:sampled", "set:spread"):
+        if len(df[(df.market == "NQ") & (df.group == g)]) != 1:
+            continue
+        t = prov.cell(FIN, {"market": "NQ", "group": g}, "share_held", "pct1")
+        rows.append((g.replace("set:", ""), t, prov.value(t), "cyan"))
+    svg, texts = bars(rows)
+    held_c = prov.cell(FIN, {"market": "NQ", "group": "candidates"}, "held", "int")
+    n_c = prov.cell(FIN, {"market": "NQ", "group": "candidates"}, "versions", "int")
+    v = "true" if prov.value(rows[1][1]) > prov.value(rows[0][1]) else "false"
+    return Page("final_held", "finding", "Final test", "What Held Up",
+                "Share of versions profitable with a Sharpe of half or more, NQ sealed window",
+                svg, texts, [{"label": "candidates that held", "value": held_c},
+                             {"label": "candidates", "value": n_c}],
+                "Candidates should hold up more often than versions at large. Here they "
+                + ("did." if v == "true" else "did not: their discovery edge was selection luck."), v)
+
+
+def p_final_working(prov):
+    f = "final/working_vs_random.csv"
+    df = need_cols(prov, f, ["market", "setup", "setup_chart", "real_net", "beats_random"])
+    rows = []
+    for m, st, ch in df[["market", "setup", "setup_chart"]].astype(str).itertuples(index=False):
+        t = prov.cell(f, {"market": m, "setup": st, "setup_chart": ch}, "real_net", "usd0")
+        rows.append((f"{m} {st.replace('_', ' ')} {ch}", t, prov.value(t), _tone(prov, t)))
+    svg, texts = hbars(rows)
+    beat = prov.count(f, {"beats_random": True})
+    tested = prov.count(f, {})
+    v = "true" if prov.value(beat) == prov.value(tested) and prov.value(tested) > 0 else \
+        ("split" if prov.value(beat) > 0 else "false")
+    return Page("final_working", "finding", "Final test", "Working Setups, Sealed",
+                "Net over the sealed window for each setup that worked in discovery",
+                svg, texts, [{"label": "beat matched random trades", "value": beat},
+                             {"label": "tested", "value": tested}],
+                "A setup that worked in discovery has to beat random trades on data it never saw.", v)
+
+
+def p_final_named(prov):
+    f = "final/named_versions.csv"
+    df = need_cols(prov, f, ["name", "market", "net"])
+    rows = []
+    for n in df[df.market == "NQ"]["name"].astype(str):
+        t = prov.cell(f, {"name": n, "market": "NQ"}, "net", "usd0")
+        rows.append((n, t, prov.value(t), _tone(prov, t)))
+    svg, texts = hbars(rows)
+    held = prov.count(f, {"market": "NQ", "held": True})
+    return Page("final_named", "finding", "Final test", "Named Systems, Sealed",
+                "Net after costs on the NQ sealed window", svg, texts,
+                [{"label": "named systems that held on NQ", "value": held}],
+                "The systems as taught, on sessions no rule had seen.")
+
+
 FUNNEL_PAGES = [
-    Spec("funnel_stages", "Funnel", ["funnel/funnel_stages.csv"],
-         generic_bars("funnel_stages", "Funnel", "The Funnel", "Versions left after each stage on NQ discovery",
-                      "funnel/funnel_stages.csv", "stage", "versions", "int", tone_by_sign=False,
-                      conclusion="Each stage removes versions; the last ones standing become candidates.")),
-    Spec("setup_judgment", "Funnel", ["funnel/setup_judgment.csv"],
-         generic_bars("setup_judgment", "Funnel", "Setups as a Whole", "Equal-weight net per year by setup, NQ discovery",
-                      "funnel/setup_judgment.csv", "setup", "net_per_year", "usd0", where={"market": "NQ", "chart": "all"},
-                      conclusion="A setup works only when its average version makes money in both eras.")),
-    Spec("named_versions", "Funnel", ["funnel/named_versions.csv"],
-         generic_bars("named_versions", "Funnel", "Named Systems", "Net after costs on NQ discovery",
-                      "funnel/named_versions.csv", "name", "net", "usd0", where={"market": "NQ"},
-                      conclusion="The systems as usually taught, run through the same engine.")),
+    Spec("funnel_intro", "Funnel", [FUN, "funnel/setup_judgment.csv"], p_funnel_intro),
+    Spec("funnel_stages", "Funnel", [FUN, "funnel/stages.json"], p_funnel_stages),
+    Spec("setup_judgment", "Funnel", ["funnel/setup_judgment.csv"], p_setup_judgment),
+    Spec("named_funnel", "Funnel", ["funnel/named_versions.csv"], p_named_funnel),
+    Spec("rule_effects", "Funnel", ["funnel/rule_effects.csv"], p_rule_effects),
 ]
 FINAL_PAGES = [
-    Spec("final_held_up", "Final test", ["final/held_up.csv"],
-         generic_bars("final_held_up", "Final test", "What Held Up", "Share of versions profitable with Sharpe of half or more",
-                      "final/held_up.csv", "group", "share", "pct1", where={"market": "NQ"}, tone_by_sign=False,
-                      conclusion="Measured once, on sessions no rule had seen.")),
-    Spec("final_setups", "Final test", ["final/setup_totals.csv"],
-         generic_bars("final_setups", "Final test", "Setups in the Final Window", "Equal-weight net over the sealed window, NQ",
-                      "final/setup_totals.csv", "setup", "net", "usd0", where={"market": "NQ", "chart": "all"},
-                      conclusion="Green held up, red did not.")),
+    Spec("final_intro", "Final test", ["final/DONE.json"], p_final_intro),
+    Spec("final_held", "Final test", [FIN], p_final_held),
+    Spec("final_working", "Final test", ["final/working_vs_random.csv"], p_final_working),
+    Spec("final_named", "Final test", ["final/named_versions.csv"], p_final_named),
 ]
 
 

@@ -40,6 +40,7 @@ FORMATS = {
     "pp1": lambda v: f"{_sign(round(100 * v, 1))}{abs(100 * v):.1f} pp",
     "atr2": lambda v: f"{_sign(round(v, 2))}{abs(v):.2f} ATR",
     "num2": lambda v: f"{_sign(round(v, 2))}{abs(v):.2f}",
+    "dec2": lambda v: f"{v:.2f}",        # a threshold or level, shown without a sign
     "str": lambda v: str(v),
 }
 
@@ -164,6 +165,8 @@ class Provenance:
     def _num(x):
         if isinstance(x, (int, float, decimal.Decimal)):
             return float(x)
+        if isinstance(x, str) and x.strip().lower() in ("", "nan", "none", "null"):
+            return float("nan")   # an empty CSV cell is a missing number, as the first reader sees it
         try:
             return float(x)
         except (TypeError, ValueError):
@@ -215,10 +218,11 @@ def unsourced_digits(strings, allowed_texts, fixed_patterns) -> list[str]:
     frags = sorted({t for t in allowed_texts if re.search(r"\d", t)}, key=len, reverse=True)
     pats = [re.compile(p) for p in fixed_patterns]
     bad = []
+    frag_res = [re.compile(r"(?<![\d.,])" + re.escape(f) + r"(?![\d.,]*\d)") for f in frags]
     for s in strings:
         rest = s
-        for f in frags:
-            rest = rest.replace(f, " ")
+        for f in frag_res:                # a sourced number only covers itself, never part of a longer one
+            rest = f.sub(" ", rest)
         for p in pats:
             rest = p.sub(" ", rest)
         if re.search(r"\d", rest):

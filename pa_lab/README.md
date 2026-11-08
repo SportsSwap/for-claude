@@ -58,7 +58,7 @@ python scripts/run_funnel.py report     # funnel, twins, per-setup judgment, has
 ```
 
 `--scale` shrinks the version sets uniformly when the machine is too small
-(see `notes/decisions_prompt3.md`).
+(see `decisions.md` P3-11).
 
 ## Prompt 4: the final test (once, ever)
 

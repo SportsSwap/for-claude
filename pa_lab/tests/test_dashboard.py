@@ -131,3 +131,11 @@ def test_verdict_counts_ignore_case(lab):
     prov = json.loads((lab / "results" / "dashboard" / "provenance.json").read_text())
     counts = {r["where"].get("verdict", "all"): r["text"] for r in prov if r["op"] == "count"}
     assert counts["false"] == "2" and counts["all"] == "2"
+
+
+
+def test_sourced_number_does_not_cover_part_of_a_longer_one():
+    from dashboard.provenance import unsourced_digits
+    assert unsourced_digits(["after 50 bars"], ["0"], [r"\b(10|20|50) bars\b"]) == []
+    assert unsourced_digits(["value 150"], ["5"], []) == ["value 150"]
+    assert unsourced_digits(["net +$1,234 today"], ["+$1,234"], []) == []

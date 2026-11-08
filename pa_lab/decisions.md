@@ -215,3 +215,274 @@ said "true" on the random walk (+4.3 points): a touch is scored against the
 band's far edge, so a wider band is harder to close through by construction.
 The metric is now (real box - random box) - (real line - random line), which
 cancels the width. Found on synthetic data.
+
+## Prompt 3: the funnel
+
+P3-1. **Random-draw targets.** "As often as random draws would give it" is read as:
+pick one of the 13 chart pairs uniformly, then every dial uniformly from the
+values valid in that context. The target share of each dial value is the
+average over pairs of 1/(number of valid values), zero where the value is
+excluded (e.g. `gap_middle` outside FVG). Pairs target 1/13 each.
+
+P3-2. **Greedy spread fill with the 40-signal rule.** Uniform random draws are
+counted for NQ discovery signals first (`strategy.signals`, no P&L), in rounds
+until each setup has at least 1.5x its quota of eligible (>= 40 signal)
+versions or 8 rounds pass. The greedy fill then draws 400 unused eligible
+candidates at a time and adds the one that minimises the sum of squared gaps
+between dial shares and targets. Counting signals is part of building the set,
+not a result, so it happens before versions.jsonl is hashed; no P&L is
+computed until `run`, which refuses to start if either hash changed.
+
+P3-3. **No duplicates** use a canonical key over the dials. For level setups
+with `level_min_touches == 1`, box and line are the same version (a one-swing
+level has lo == hi), so the key maps box to line (main session D29). The
+version is stored as drawn.
+
+P3-4. **Common set.** Usual settings (swing 3, both directions, trigger = setup
+chart, daily triggers on 1h, hard stop 0.1 ATR beyond the reference, hold,
+96-bar time exit, no filters) on all six charts, crossed with:
+- entries: touch setups take a resting limit at the level, a close back, or
+  an engulfing/rejection candle (`either_candle`) entered at the close; break
+  setups (breakout, BOS, CHoCH, sweep, trend-line break) take the break close
+  or a limit back at the level;
+- stops beyond the level or beyond the last swing;
+- targets 1R, 2R, 3R and the next swing;
+- no filter, or exactly one of: trend agrees (setup chart), New York
+  08:00-16:00, skip news days;
+- main variants: level setups 2 or 3 touches x line or box (flip zone: 2 or 3
+  touches x retest within 12 or 24 bars), trend line bounce or break x 2 or 3
+  touches, sweep depth 0.25 or 0.5 ATR x reclaim in 1 or 2 bars, zones of 2-
+  or 3-candle runs x fresh or not, gaps of at least 0.1 or 0.25 ATR x 24 or 96
+  bars of age; trend pullback, BOS and CHoCH have no variants.
+That gives 15,552 versions (reference lab: 14,016). Every common and named
+version is run; the funnel's stage 1 (30 trades) does the screening.
+
+P3-5. **Named versions.** Lab defaults are `funnel.USUAL` for anything left out.
+- Bare Minimum: level bounce on 15m, 2-touch line, resting limit at the level,
+  stop 0.1 ATR beyond, 2R, no confirmation, no filters.
+- Daily Version: daily levels traded from 1h, close back, stop 0.25 ATR beyond
+  the level, target the next swing, daily trend agrees.
+- Checklist: trend pullback on 1h, 15m trigger, engulfing or rejection candle,
+  4h trend agrees, New York hours, no news days, stop beyond the last swing, 2R.
+- Sweep System: sweep and reclaim on 15m, 5m trigger confirmed by a 1m break
+  of structure, stop beyond the sweep wick, next-swing target, New York open
+  09:30-11:00, no news days.
+- Zone System: fresh 3-candle supply/demand zones on 1h, resting limit at the
+  zone edge, stop 0.1 ATR beyond the zone, 3R, 4h trend agrees.
+- Entry Model: fair value gap on 5m with a 1m trigger, resting limit at the
+  gap edge, stop at the far end of the gap's middle candle (no buffer), 2R,
+  New York open, 15m trend agrees.
+
+P3-6. **Sampled set.** Per setup, 40% no filter, 40% exactly one, 20% exactly two
+(filters picked uniformly among those that apply in the context, each set to
+a random non-off value), every other dial uniform over its valid values, no
+duplicates. Only versions with >= 40 NQ discovery signals are graded and run.
+
+P3-7. **Stages** are fixed in `stages.json` (hashed with versions.jsonl):
+1) >= 30 NQ trades; 2) NQ net > 0 after costs; 3) NQ Sharpe >= 0.5;
+4) fewer than 5% of 10,000 twin sets make at least the real net;
+5) ES net > 0 and ES Sharpe >= 0.3. Candidate = 1-4, NQ net > 0 in both eras,
+and 5. Sharpe = mean/std of daily P&L over every tradable discovery session,
+zero days included, x sqrt(252).
+
+P3-8. **Twins.** Each real trade gets 100 simulated twins: same direction, a
+random entry minute (bar close) in the same 30 minutes of the ET day in a
+tradable discovery session outside a roll blackout, stop and target at the
+same distances in setup-chart ATR (as of that minute), the same holding time
+as a time exit, the same size and costs (a limit-entry trade's twins get the
+market-entry tick back). Each of the 10,000 sets picks one of the 100 twins per
+trade at random; p = share of sets whose total >= the real net. Twins run only
+for versions that pass stages 1-3, since stage 4 cannot change anything else.
+A test plants a 60-minute peek (p < 0.05) and checks random directions give
+spread-out p-values (one lucky seed of eight is allowed: an early fixed seed
+happened to be +3.6 sd).
+
+P3-9. **Judging a setup as a whole.** For each setup x setup chart x market, the
+daily P&L of every graded version is summed per session and divided by the
+number of graded versions (one contract each, equal weight; versions with no
+exit that day count as zero). It works when net > 0 in each calendar year of
+discovery (2022, 2023, Jan-Jul 2024), Sharpe >= 0.5, and net > 0 in era 1
+(2022) and era 2 (2023-01-01 to 2024-07-31).
+
+P3-10. **Rule effects.** In the common set, versions are paired when they differ
+in one rule and match on everything else; the table reports the mean change
+in NQ net and Sharpe, the share of pairs that improved, and the ES change,
+against the alphabetically first value of that rule.
+
+P3-11. **Scale-down, measured first.** A pilot of 600 uniform random draws on
+4 workers (cores shared with two other forks) measured 0.43 s wall per NQ
+signal count, 46% of draws reaching 40 signals, and 1.74 s wall per version
+for the NQ + ES run with twins. The full counts would need about 130k signal
+counts for the spread pool plus 47k for the sampled set (~21 h) and about
+77k graded runs (~37 h). To finish in about 2 hours, the spread and sampled
+sets are scaled uniformly to 3.5% (140 spread and 166 sampled per setup,
+keeping 4,000:4,733 per setup, 10 setups, the greedy fill and the 40/40/20
+filter mix). The common grid (15,552) is sampled by whole cells: 15% of its
+486 setup x chart x variant x entry cells, each kept with all 32 of its
+stop x target x filter versions, so rule-effect pairs stay intact. The six
+named versions are all kept. On the real data, run
+`run_funnel.py gen --scale 1 --common-cells 1` on a bigger machine; nothing
+else changes.
+
+P3-12. **Twin budget.** A version with 30,000 trades would need 3 million twin
+simulations, so twins per trade = min(100, 200,000 / trades), never below 20
+(`stage4_max_twin_sims_per_version`, `stage4_min_twins_per_trade` in
+stages.json). Sets still number 10,000.
+
+P3-13. **Signals for the common set** are not counted in `gen`: common and named
+versions are graded in full and screened by stage 1; `nq_signals` is null
+for common versions.
+
+P3-14. **What the twin stage can and cannot do.** The twin test asks whether a
+version beat random entries with the same shape. A version that reached
+stage 4 was already picked for a high net from many versions, so on pure noise
+it still beats fresh random twins most of the time: in a small dry run on the
+synthetic random walk, 31 of 52 stage-3 survivors passed stage 4 and 6 of 356
+graded versions became candidates. That is selection luck, not edge, and the
+funnel cannot remove it; only the sealed final window (Prompt 4) can. Nothing
+was tuned in response; the thresholds stay as fixed in stages.json.
+
+P3-15. **versions.jsonl** carries, per version, the id, set, name (named only),
+the NQ signal count used for the 40-signal rule (`nq_signals`, a construction
+input, not a result), the `graded` flag, and every dial. Its sha256 is in
+`versions.sha256` and in `selection_manifest.json`.
+
+P3-16. **How close the spread set got** (`results/funnel/spread_shares.csv`). Mean
+absolute gap between a dial value's share and its target: 0.021 for the spread
+set against 0.026 for unfiltered random draws of the same size. Where the
+40-signal rule bites hardest (BOS, CHoCH, trend pullback: 20-26% of draws
+reach 40 signals, 211-240 eligible for 140 places), slow charts rarely qualify,
+so chart-pair shares cannot reach 1/13 and the worst single gap is larger than
+random's (0.21 vs 0.08 for BOS). That is the rule working as written: the set
+can only spread across versions that trade enough.
+
+## Prompt 4: the final test
+
+
+P4-1. **One code path.** `lab.final_test.run(source)` runs both the rehearsal
+and the real test. `source` changes only where bars come from
+(`load_frames`) and where results go (`results/final_rehearsal/` or
+`results/final/`). Everything else, from complete-session filtering and
+market build to versions, engine, costs and tables, is shared.
+
+P4-2. **Pre-flight before any unlock.** It checks the lock ledger
+(`verify_locks`), every file named in `results/funnel/selection_manifest.json`
+(versions, stages, candidates, working setups, named versions), and
+`versions.jsonl` against `versions.sha256`. Any difference stops the run
+before the guard is touched.
+
+P4-3. **Runs once.** The real run refuses when `results/final/` holds anything
+or when the access log already shows a `final_test` unlock. It also needs a
+`REHEARSAL_OK.json` whose selection hashes match the current ones, so a
+rehearsal must have passed on exactly these selections.
+
+P4-4. **One unlock.** Inside one `guard.unlock("final_test")` (also needs
+`LAB_UNLOCK=final_test`), the run reads `data/sealed/MANIFEST.json`, checks
+every sealed file's sha256 against it (stopping if any differs), and reads
+both markets' sealed bars and rolls. Then it relocks. All computing happens
+after the relock. The guard logs the open, the reads and the close.
+
+P4-5. **Warm-up.** Discovery bars from the first of the month three months
+before the final window (2024-05-01 for a 2024-08-01 start) warm the
+detectors. Sessions before the window are not traded: Market tradable =
+window sessions only, and era = calendar year.
+
+P4-6. **Complete sessions.** A session is kept only if it has a bar opening at
+15:59 ET or later. A dropped session becomes an extra roll at its first bar's
+time: open positions close at the last bar before it, and the usual 60-minute
+no-entry rule applies. That hour is usually the 17:00 halt, so in practice
+only the forced exit bites. Dropped sessions are listed in `summary.json`.
+
+P4-7. **Rehearsal.** The last month of discovery (2024-07-01 to 2024-07-31),
+with its own three-month warm-up, prices shifted up by 1,000 points (a whole
+number of ticks), run on a seeded subset: named versions plus an even spread
+across setups (60 by default). Any version error fails the rehearsal.
+
+P4-8. **Held up.** A version holds on a market when its net is above zero after
+costs and its Sharpe is at least 0.5 over that market's final window. A setup
+on a chart holds when the equal-weight average daily P&L of its versions made
+money in every calendar year of the window and its Sharpe is at least 0.5.
+
+P4-9. **Matched random trades for working setups.** Up to 40 of the setup's
+versions are drawn (seeded) and their final-window trades pooled, capped at
+3,000 trades. Each trade gets a twin with the same direction, a random entry
+minute in the same 30 minutes of the day (window sessions, outside roll
+blackouts), the same stop and target distances in 5m ATR, the same holding
+time and the same engine costs. There are 1,000 twin sets (the funnel uses
+10,000; 1,000 keeps the run inside an hour). The setup beats random when fewer
+than 5% of sets make at least as much. Twins enter at market, so a
+limit-entry trade's twin pays one tick of entry slippage the real trade did
+not.
+
+P4-10. **Best usual-settings version.** For each setup, the `set == "common"`
+version with the best NQ discovery Sharpe in `results/funnel/metrics_NQ.parquet`
+(ties broken on net), reported on both markets.
+
+P4-11. **Dials in common.** For every dial value: its share among the versions
+that held on a market, its share among all versions, and the lift (held / all).
+
+P4-12. **Saved results.** `metrics_{NQ,ES}.parquet` (every version: trades, net,
+per trade, win rate, avg R, Sharpe, net per year, held, candidate, error) and
+`daily/{market}/{setup}.parquet` (id, day, pnl; non-zero days only, float32)
+plus the tables. `DONE.json` holds the sha256 of every result file. Dates use
+a column named `day`: the guard treats `session` / `ts_event` columns dated
+in the final window as sealed market data.
+
+P4-13. **Later analyses** call `lab.final_test.load_final_results()`. It reads
+only `results/final/` and checks each file against `DONE.json` first.
+
+P4-14. **Parallel run.** Versions are sorted by setup and chart, then run in
+chunks of 150 on a fork pool (one worker per core) that shares the
+already-built markets. Each chunk clears the strategy cache to bound memory.
+
+## Prompt 5: the dashboard
+
+P5-1. **Inputs.** The builder reads only `<LAB_ROOT>/results/`. `Provenance.path()` refuses any
+path outside it or under `data/`; a test spies on every path the build opens.
+
+P5-2. **Provenance.** Every number on screen is created by `Provenance.json/cell/count`, which
+records file, row, column, format, value and the text shown in `provenance.json`. Before
+anything is written, `verify()` re-reads every value with a second reader on a different code
+path (CSV: `csv.DictReader` vs pandas with string dtype; JSON: `json` with Decimal floats;
+parquet: `pyarrow` vs pandas) and refuses on any difference in value or text. Counts are a
+recorded operation (`count where verdict = false`), recomputed by the second reader.
+
+P5-3. **Unsourced digits.** Every visible string on every page, and every text node in the final
+HTML (scripts and styles excluded), must have its digits covered by a recorded text or one of
+these fixed labels: chart names `1m 5m 15m 1h 4h`, test horizons `10/20/50 bars`, `95% interval`,
+era names `2022` and `2023-24`. The amber card badges (1, 2, 3...) are ordinals and are skipped
+by element class `badge-n`. The page counter `N / M` is drawn by script at run time.
+
+P5-4. **Formats.** Dollars `-$23.70`; rates `32.4%`; differences of rates in percentage points
+`+0.1 pp` (not "pts", which reads as index points); behaviour moves `+0.03 ATR`. Minus is a
+plain hyphen. No em or en dashes anywhere; the build refuses one.
+
+P5-5. **Verdicts.** `true / split / false` map to the badges `survived / split / didn't survive`.
+Verdict values are compared case-insensitively because `verdicts.csv` was seen holding both
+`false` and `False`.
+
+P5-6. **Layout.** 1920x1080 stage scaled to the window. Findings: chart at x 96-1276, y 330-990;
+stats and conclusion at x 1340-1824, y 330-702, so the facecam corner (x 1400-1920, y 712-1080)
+stays empty. `check_layout.js` (headless Chromium via Node Playwright; the Python package is not
+installed) checks every page at 1920x1080 and 1280x720 for anything off stage, anything in the
+corner, text overflow, a wrapped subtitle and page scrolling, screenshots every page at
+1920x1080, and `check_layout.py` confirms screenshot count and titles match `pages.json`.
+
+P5-7. **Pending pages.** Funnel and final pages name the files and columns they expect in
+`dashboard/pages.py` (`FUNNEL_PAGES`, `FINAL_PAGES`). Until those exist the page is listed in
+`pending.json`, not drawn. If prompts 3 and 4 write different names, edit those specs.
+
+P5-8. **Synthetic label.** When `LAB_ROOT` is `synthetic_lab`, every eyebrow carries
+"SYNTHETIC DATA DEMO" and the title slide carries a banner saying real files are not yet ingested.
+
+P5-9. **Funnel and final pages read the files as written** (main session).
+Stage counts are recorded counts over `funnel/funnel.parquet` (stages are
+cumulative); stage thresholds in labels come from `funnel/stages.json`;
+rule-effect labels name the baseline ("news: skip to trade"). R-multiple
+targets (2R, 3R) are dial names on the fixed-label list.
+
+P5-10. **Digit scan tightened** (main session). A sourced number now covers
+only itself, never part of a longer number: before, a sourced "0" turned
+"50 bars" into "5 bars" and any sourced "5" would have approved every 5 on
+the page. The second reader treats an empty CSV cell as a missing number,
+as the first reader does.
