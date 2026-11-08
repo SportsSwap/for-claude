@@ -10,3 +10,5 @@ __pycache__/
 synthetic_lab/data/
 notes/.scratch/
 synthetic_lab/results/engine/*_trades.csv
+vendor_cache/
+vendor_input/

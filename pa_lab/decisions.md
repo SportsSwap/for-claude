@@ -543,3 +543,26 @@ archives also carry the 2025 shutdown delays (CPI 2025-10-24, jobs
 2025-11-20 and 2026-02-11). `Market.load` now requires verified dates; an
 unverified row stops the lab. The synthetic results already committed used
 the hand-seeded dates, identical through their last seeded date (Sep 2025).
+
+## Real data, free source
+
+D39. **Dukascopy index CFDs stand in for NQ and ES futures** because the user
+chose not to pay for CME data. NQ <- USATECHIDXUSD (Nasdaq 100 CFD), ES <-
+USA500IDXUSD (S&P 500 CFD), 1-minute bid and ask candles from
+datafeed.dukascopy.com averaged into mid bars (`scripts/fetch_dukascopy.py`,
+generic User-Agent, one kept-alive connection; parallel connections were
+being closed). What differs from the prompt's inputs:
+- prices are the CFD's, not the futures'; levels differ by the basis but
+  moves in points are close, so the NQ/ES point values ($20/$50) and tick
+  (0.25) still turn points into dollars;
+- volume is tick volume, not contracts (only the audit's zero-volume count
+  uses it);
+- no contract rolls, so the rolls files are empty, the roll blackout never
+  fires, and there is no unadjusted file or adjustment-step audit;
+- the CFD trades 18:00-16:15 ET (1,335 minutes a session), not to 17:00, so
+  the last 45 minutes of each futures session are missing; nominal chart
+  times are unchanged and the final test's complete-session rule (a bar at
+  15:59 or later) still holds.
+Every result on this data says "CFD stand-in" in its decisions and the deck.
+The stated windows apply: warm-up from 2021-10-01, discovery 2022-01-03 to
+2024-07-31, final window 2024-08-01 to the last session fetched (2026-11-06).
