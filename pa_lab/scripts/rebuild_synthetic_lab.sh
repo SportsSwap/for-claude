@@ -34,7 +34,8 @@ python scripts/run_final_test.py check
 python scripts/run_final_test.py rehearse
 LAB_UNLOCK=final_test python scripts/run_final_test.py run > synthetic_lab/results/final_run.log 2>&1
 
-say "prompt 5: dashboard"
+say "prompt 5: analysis of saved final results, then the dashboard"
+python scripts/analyze_final.py > /dev/null
 python -m dashboard.build
 python -m dashboard.check_layout
 say "done"

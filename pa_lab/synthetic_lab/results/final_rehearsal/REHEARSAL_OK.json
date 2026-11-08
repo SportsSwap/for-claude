@@ -1,0 +1,17 @@
+{
+  "selection_hashes": {
+    "versions.jsonl": "92bca1c9026647ea900d4f1c68b5a5cbd60b6baa340c34c119707c21bd99c3f5",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "c36a7c7d413ea3dfbfb4b2770739988e2c6782343bdba1dcb01cd2f889737d0c",
+    "working_setups.json": "84cbbffc3496e24162d8cd653be9efed6f86d3031a34f4ee93e48eadbe4cc789",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "versions": 56,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T21:34:24+00:00"
+}

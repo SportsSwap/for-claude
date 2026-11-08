@@ -1,0 +1,13 @@
+name,id,market,trades,net,sharpe,held
+Entry Model,N-entry_model,NQ,9,864.0,1.6678880658547508,True
+Entry Model,N-entry_model,ES,17,82.0,0.24168891471566772,False
+Bare Minimum,N-bare_minimum,NQ,29,-583.0823825000843,-2.7699719495803916,False
+Bare Minimum,N-bare_minimum,ES,37,-1121.1198555831725,-13.645317734376567,False
+Daily Version,N-daily_version,NQ,0,0.0,0.0,False
+Daily Version,N-daily_version,ES,2,-1944.3453812214175,-4.88493736404381,False
+Zone System,N-zone_system,NQ,1,-1859.320025833571,-3.3844564489065974,False
+Zone System,N-zone_system,ES,2,2081.30356411538,2.768023167668419,True
+Sweep System,N-sweep_system,NQ,7,-550.1022048559826,-0.6743684702829905,False
+Sweep System,N-sweep_system,ES,13,-2108.1492731558246,-6.36198259245772,False
+Checklist,N-checklist,NQ,1,1446.2343285811367,3.384456448906598,True
+Checklist,N-checklist,ES,0,0.0,0.0,False

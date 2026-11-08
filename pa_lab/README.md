@@ -74,11 +74,14 @@ the guard, and refuses to run again. Later analysis reads `results/final/` only.
 ## Prompt 5: the dashboard
 
 ```bash
+python scripts/analyze_final.py         # tests on saved final results only -> results/analysis/
 python -m dashboard.build               # refuses if any number lacks a source
 python -m dashboard.check_layout        # headless Chromium at 1920x1080 and 1280x720
 ```
 
 ## Synthetic demo
+
+`bash scripts/rebuild_synthetic_lab.sh` rebuilds it from nothing and reruns every prompt (about an hour).
 
 Until real files arrive, everything runs with `LAB_ROOT=$PWD/synthetic_lab`
 on a synthetic random walk. Its results are committed under

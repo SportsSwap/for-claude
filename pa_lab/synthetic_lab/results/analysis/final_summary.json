@@ -1,0 +1,68 @@
+{
+  "alpha": 0.05,
+  "candidates": {
+    "NQ": {
+      "held": 5,
+      "versions": 28,
+      "share": 0.17857142857142858,
+      "all_share": 0.14476119955572012,
+      "p_value": 0.3820316763383398,
+      "beats_all": false
+    },
+    "ES": {
+      "held": 2,
+      "versions": 28,
+      "share": 0.07142857142857142,
+      "all_share": 0.06682710107367641,
+      "p_value": 0.5666821690114476,
+      "beats_all": false
+    }
+  },
+  "working": {
+    "tested": 4,
+    "beat_random": 1,
+    "verdict": "split",
+    "rows": [
+      {
+        "setup": "bos_continuation",
+        "chart": "4h",
+        "market": "NQ",
+        "p_value": 0.114,
+        "beats_random": false,
+        "real_net": 357442.09233932174
+      },
+      {
+        "setup": "fair_value_gap",
+        "chart": "4h",
+        "market": "NQ",
+        "p_value": 0.776,
+        "beats_random": false,
+        "real_net": -251189.36601413373
+      },
+      {
+        "setup": "flip_zone",
+        "chart": "1h",
+        "market": "NQ",
+        "p_value": 0.055,
+        "beats_random": false,
+        "real_net": 201286.94251310188
+      },
+      {
+        "setup": "trend_pullback",
+        "chart": "4h",
+        "market": "NQ",
+        "p_value": 0.02,
+        "beats_random": true,
+        "real_net": 976868.6725058359
+      }
+    ]
+  },
+  "candidates_verdict": "false",
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T21:51:26+00:00"
+}

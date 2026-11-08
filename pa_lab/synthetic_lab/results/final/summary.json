@@ -1,0 +1,123 @@
+{
+  "source": "final",
+  "warmup_start": "2024-05-01",
+  "window": [
+    "2024-08-01",
+    "2026-10-16"
+  ],
+  "sealed_manifest_sha256": {
+    "NQ_1m.parquet": "72eb17b40d508e8b4880848d554c08d8c2292eb251756fe984e989c1dc826fc4",
+    "NQ_1m_unadjusted.parquet": "1b10dbd84acc190e13d36997360f45651475aea6e9f19d72c571ab34a449f9d3",
+    "NQ_rolls.parquet": "a2e19e2e014ab5449da0efe4ffafadaae6bb4a2a23b5593215de3adcda7ca972",
+    "ES_1m.parquet": "df01115784cd6d6534e255f03628c429f3905fd0f3a1a69fb34055e1228be056",
+    "ES_1m_unadjusted.parquet": "9450342c037e223b3fbe3ed4d46d04b01ad9c9c0736e9f03e529b69d347d6421",
+    "ES_rolls.parquet": "0f669c63c896f45a8116d58a108d20620c362298c3c68ea4ef907dd678b2c789",
+    "audit_final.json": "04a1cc15c82c0aa04feb32b385634df65bd9d2c156b75a774c8ed514da3f7a01"
+  },
+  "versions": 5402,
+  "errors": 0,
+  "dropped_sessions": {
+    "NQ": [],
+    "ES": []
+  },
+  "selection_hashes": {
+    "versions.jsonl": "92bca1c9026647ea900d4f1c68b5a5cbd60b6baa340c34c119707c21bd99c3f5",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "c36a7c7d413ea3dfbfb4b2770739988e2c6782343bdba1dcb01cd2f889737d0c",
+    "working_setups.json": "84cbbffc3496e24162d8cd653be9efed6f86d3031a34f4ee93e48eadbe4cc789",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "share_held": [
+    {
+      "market": "NQ",
+      "group": "all",
+      "versions": 5402,
+      "held": 782,
+      "share_held": 0.14476119955572012
+    },
+    {
+      "market": "NQ",
+      "group": "candidates",
+      "versions": 28,
+      "held": 5,
+      "share_held": 0.17857142857142858
+    },
+    {
+      "market": "NQ",
+      "group": "set:common",
+      "versions": 2336,
+      "held": 345,
+      "share_held": 0.14768835616438356
+    },
+    {
+      "market": "NQ",
+      "group": "set:named",
+      "versions": 6,
+      "held": 3,
+      "share_held": 0.5
+    },
+    {
+      "market": "NQ",
+      "group": "set:sampled",
+      "versions": 1660,
+      "held": 228,
+      "share_held": 0.13734939759036144
+    },
+    {
+      "market": "NQ",
+      "group": "set:spread",
+      "versions": 1400,
+      "held": 206,
+      "share_held": 0.14714285714285713
+    },
+    {
+      "market": "ES",
+      "group": "all",
+      "versions": 5402,
+      "held": 361,
+      "share_held": 0.06682710107367641
+    },
+    {
+      "market": "ES",
+      "group": "candidates",
+      "versions": 28,
+      "held": 2,
+      "share_held": 0.07142857142857142
+    },
+    {
+      "market": "ES",
+      "group": "set:common",
+      "versions": 2336,
+      "held": 169,
+      "share_held": 0.0723458904109589
+    },
+    {
+      "market": "ES",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "ES",
+      "group": "set:sampled",
+      "versions": 1660,
+      "held": 127,
+      "share_held": 0.07650602409638554
+    },
+    {
+      "market": "ES",
+      "group": "set:spread",
+      "versions": 1400,
+      "held": 65,
+      "share_held": 0.04642857142857143
+    }
+  ],
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T21:50:28+00:00"
+}

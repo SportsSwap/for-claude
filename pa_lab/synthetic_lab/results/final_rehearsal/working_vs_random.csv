@@ -1,0 +1,7 @@
+market,setup,setup_chart,versions_used,real_trades,distinct_entries,real_net,twin_mean_net,twin_p95_net,p_value,beats_random,sets
+NQ,bos_continuation,4h,2,5,5.0,-1396.4676258550753,-194.92030056317176,1775.7350714311096,0.856,False,1000.0
+ES,bos_continuation,4h,2,0,,0.0,,,,,
+NQ,fair_value_gap,4h,1,2,2.0,-2743.0,-67.29703814212196,3655.793684547247,0.999,False,1000.0
+ES,fair_value_gap,4h,1,1,1.0,321.0,-35.81869426040066,924.9797379177344,0.246,False,1000.0
+NQ,trend_pullback,4h,1,0,,0.0,,,,,
+ES,trend_pullback,4h,1,0,,0.0,,,,,

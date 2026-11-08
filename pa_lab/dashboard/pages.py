@@ -296,6 +296,9 @@ def p_final_intro(prov):
                        {"big": "Unlock", "label": "once, logged"}])
 
 
+AN = "analysis/final_summary.json"
+
+
 def p_final_held(prov):
     df = need_cols(prov, FIN, ["market", "group", "share_held"])
     rows = []
@@ -305,34 +308,36 @@ def p_final_held(prov):
         t = prov.cell(FIN, {"market": "NQ", "group": g}, "share_held", "pct1")
         rows.append((g.replace("set:", ""), t, prov.value(t), "cyan"))
     svg, texts = bars(rows)
-    held_c = prov.cell(FIN, {"market": "NQ", "group": "candidates"}, "held", "int")
-    n_c = prov.cell(FIN, {"market": "NQ", "group": "candidates"}, "versions", "int")
-    v = "true" if prov.value(rows[1][1]) > prov.value(rows[0][1]) else "false"
+    held_c = prov.json(AN, ["candidates", "NQ", "held"], "int")
+    pval = prov.json(AN, ["candidates", "NQ", "p_value"], "dec2")
+    v = str(prov.json(AN, ["candidates_verdict"], "str", shown=False)).lower()
     return Page("final_held", "finding", "Final test", "What Held Up",
                 "Share of versions profitable with a Sharpe of half or more, NQ sealed window",
                 svg, texts, [{"label": "candidates that held", "value": held_c},
-                             {"label": "candidates", "value": n_c}],
-                "Candidates should hold up more often than versions at large. Here they "
-                + ("did." if v == "true" else "did not: their discovery edge was selection luck."), v)
+                             {"label": "p, candidates against all versions", "value": pval}],
+                "Candidates held up "
+                + ("clearly more often than versions at large." if v == "true"
+                   else "no more often than versions at large: their discovery edge did not carry over."), v)
 
 
 def p_final_working(prov):
     f = "final/working_vs_random.csv"
-    df = need_cols(prov, f, ["market", "setup", "setup_chart", "real_net", "beats_random"])
+    need_cols(prov, f, ["market", "setup", "setup_chart", "real_net"])
     rows = []
-    for m, st, ch in df[["market", "setup", "setup_chart"]].astype(str).itertuples(index=False):
-        t = prov.cell(f, {"market": m, "setup": st, "setup_chart": ch}, "real_net", "usd0")
-        rows.append((f"{m} {st.replace('_', ' ')} {ch}", t, prov.value(t), _tone(prov, t)))
+    for w in prov._json(AN)["working"]["rows"]:
+        t = prov.cell(f, {"market": w["market"], "setup": w["setup"], "setup_chart": w["chart"]}, "real_net", "usd0")
+        rows.append((f"{w['market']} {w['setup'].replace('_', ' ')} {w['chart']}", t, prov.value(t), _tone(prov, t)))
+    if not rows:
+        raise Pending(f"{AN} lists no working setups")
     svg, texts = hbars(rows)
-    beat = prov.count(f, {"beats_random": True})
-    tested = prov.count(f, {})
-    v = "true" if prov.value(beat) == prov.value(tested) and prov.value(tested) > 0 else \
-        ("split" if prov.value(beat) > 0 else "false")
+    beat = prov.json(AN, ["working", "beat_random"], "int")
+    tested = prov.json(AN, ["working", "tested"], "int")
+    v = str(prov.json(AN, ["working", "verdict"], "str", shown=False)).lower()
     return Page("final_working", "finding", "Final test", "Working Setups, Sealed",
-                "Net over the sealed window for each setup that worked in discovery",
+                "Net over the sealed window on the market where each setup worked in discovery",
                 svg, texts, [{"label": "beat matched random trades", "value": beat},
-                             {"label": "tested", "value": tested}],
-                "A setup that worked in discovery has to beat random trades on data it never saw.", v)
+                             {"label": "working setups tested", "value": tested}],
+                "Each must beat random trades with the same shape on data it never saw.", v)
 
 
 def p_final_named(prov):
@@ -359,8 +364,8 @@ FUNNEL_PAGES = [
 ]
 FINAL_PAGES = [
     Spec("final_intro", "Final test", ["final/DONE.json"], p_final_intro),
-    Spec("final_held", "Final test", [FIN], p_final_held),
-    Spec("final_working", "Final test", ["final/working_vs_random.csv"], p_final_working),
+    Spec("final_held", "Final test", [FIN, AN], p_final_held),
+    Spec("final_working", "Final test", ["final/working_vs_random.csv", AN], p_final_working),
     Spec("final_named", "Final test", ["final/named_versions.csv"], p_final_named),
 ]
 

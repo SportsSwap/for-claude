@@ -515,3 +515,21 @@ v1 synthetic final run used the old method.
 D35. **The synthetic lab is rebuilt on generator v2** and every prompt rerun
 on it (`--wick-model noise` rebuilds v1). The v1 results stay in git
 history at the commit before the rebuild.
+
+D36. **Final-page verdicts rest on a test, not a bigger bar.** The first deck
+called candidates "survived" whenever their held-up share beat the overall
+share (17.9% against 14.5% from 28 candidates on v2). `scripts/analyze_final.py`
+now reads only saved results and writes `results/analysis/final_summary.json`:
+a one-sided binomial test of the candidates' held count against the
+all-versions share per market (survived only when NQ p < 0.05 and ES points
+the same way), and a tally of working setups against random trades on the
+market where each worked in discovery (all = survived, some = split, none =
+didn't survive). The deck takes its badges from that file.
+
+D37. **Synthetic lab v2 results** (scale 0.035, 4,953 versions): all 23
+behavior tests false; random entries -$25.12 a trade on ES and +$0.03 on NQ
+(+0.20 +/- 0.21 points before commission, within noise of the expected small
+loss); the cheat +$307.68 a trade on NQ; 28 candidates; NQ candidates held up
+5 of 28 (17.9%) against 14.5% of all versions (p = 0.38); 1 of 4 working
+setups beat random trades on its own market (trend pullback NQ 4h, p = 0.02).
+That is what a random walk should give, up to chance.
