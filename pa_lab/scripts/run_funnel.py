@@ -94,7 +94,7 @@ def _run_chunk(args):
                 daily[m].append(pd.DataFrame({"id": vid, "session": nz.index, "pnl": nz.to_numpy()}))
             if m == "NQ" and met["trades"] >= st["stage1_min_trades"] and met["net"] > 0 \
                     and met["sharpe"] >= st["stage3_min_sharpe"]:
-                t = fn.twin_test(mk, v, tr, st["stage4_twin_sets"], st["stage4_twins_per_trade"], f"twins:{vid}")
+                t = fn.twin_test(mk, v, tr, st["stage4_twin_sets"], fn.twins_per_trade(len(tr)), f"twins:{vid}")
                 twins.append({"id": vid, "twin_p": t["p"], "twin_mean": t["twin_mean"], "twin_p95": t["twin_p95"]})
         _evict()
     for m in ("NQ", "ES"):
@@ -110,7 +110,7 @@ def _pool(workers, markets):
 
 
 # =========================================================================== gen
-def gen(scale: float, workers: int, pool_factor: float = 1.5, max_rounds: int = 8):
+def gen(scale: float, workers: int, common_cells: float = 1.0, pool_factor: float = 1.5, max_rounds: int = 8):
     t_start = time.time()
     n_spread = max(10, int(round(FULL_SPREAD_PER_SETUP * scale)))
     n_sampled = max(10, int(round(FULL_SAMPLED_PER_SETUP * scale)))
@@ -163,16 +163,22 @@ def gen(scale: float, workers: int, pool_factor: float = 1.5, max_rounds: int = 
         log("counting signals for the sampled set")
         count([v for s in fn.SETUPS for v in sampled[s]])
         common = fn.common_versions()
+        n_common_full = len(common)
+        if common_cells < 1.0:
+            cells = sorted({fn.common_cell(v) for v in common})
+            gc = rng("funnel:common_cells")
+            keep = {cells[i] for i in gc.choice(len(cells), max(1, int(round(common_cells * len(cells)))), replace=False)}
+            common = [v for v in common if fn.common_cell(v) in keep]
         named = {name: v for name, (_, v) in fn.NAMED.items()}
-        log(f"counting signals for the common set ({len(common)}) and named versions")
-        count(common + list(named.values()))
+        log(f"common set: {len(common)} of {n_common_full}; counting signals for named versions")
+        count(list(named.values()))
     # write versions.jsonl
     lines = []
     def add(vid, set_, v, name=None):
         assert fn.dials.is_valid(fn.SPEC, v), v
-        n = sig_cache[fn.key_of(v)]
+        n = sig_cache.get(fn.key_of(v))
         rec = {"id": vid, "set": set_, **({"name": name} if name else {}), "nq_signals": n,
-               "graded": bool(set_ in ("common", "named") or n >= fn.STAGES["min_signals_to_grade"]),
+               "graded": bool(set_ in ("common", "named") or (n or 0) >= fn.STAGES["min_signals_to_grade"]),
                **fn.config_of(v)}
         lines.append(json.dumps(rec, sort_keys=True, default=str))
     for s in fn.SETUPS:
@@ -202,7 +208,8 @@ def gen(scale: float, workers: int, pool_factor: float = 1.5, max_rounds: int = 
             shares.append({"setup": s, "dial": d, "value": str(x), "target": sp.target[i], "spread": got[i],
                            "random_draw_same_n": rnd[i]})
     io.write_table(pd.DataFrame(shares), out_dir() / "spread_shares.csv")
-    summary = {"scale": scale, "spread_per_setup": n_spread, "sampled_per_setup": n_sampled,
+    summary = {"scale": scale, "common_cells_share": common_cells, "common_full_grid": n_common_full,
+               "spread_per_setup": n_spread, "sampled_per_setup": n_sampled,
                "spread_draws_checked": drawn, "spread_eligible": {s: len(eligible[s]) for s in fn.SETUPS},
                "counts": {k: sum(1 for l in lines if json.loads(l)["set"] == k) for k in ("spread", "named", "common", "sampled")},
                "graded": sum(1 for l in lines if json.loads(l)["graded"]),
@@ -398,11 +405,12 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("phase", choices=["gen", "run", "report"])
     ap.add_argument("--scale", type=float, default=1.0)
+    ap.add_argument("--common-cells", type=float, default=1.0)
     ap.add_argument("--workers", type=int, default=os.cpu_count() or 4)
     ap.add_argument("--limit", type=int, default=None)
     a = ap.parse_args(argv)
     if a.phase == "gen":
-        gen(a.scale, a.workers)
+        gen(a.scale, a.workers, a.common_cells)
     elif a.phase == "run":
         run(a.workers, a.limit)
     else:
