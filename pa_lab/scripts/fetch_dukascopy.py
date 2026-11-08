@@ -56,7 +56,7 @@ def fetch(sym: str, day: dt.date, side: str, cache: Path) -> bytes:
     if p.exists():
         return p.read_bytes()
     url = URL.format(sym=sym, y=day.year, m=day.month - 1, d=day.day, side=side)  # month is 0-based
-    for attempt in range(12):
+    for attempt in range(40):            # ~3 hours of cool-downs before giving up on one file
         wait = MIN_INTERVAL - (time.time() - _last[0])
         if wait > 0:
             time.sleep(wait)
