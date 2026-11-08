@@ -1,6 +1,6 @@
 # Deck pages
 
-Synthetic data demo: True
+Data: Synthetic data demo
 
 ## 1. Price Action Lab
 

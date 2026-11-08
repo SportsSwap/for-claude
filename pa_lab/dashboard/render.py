@@ -146,7 +146,7 @@ def hbars(rows, w=1180, h=640) -> tuple[str, list]:
 
 # --------------------------------------------------------------------------- pages
 def page_html(p: Page, i: int, synthetic: bool) -> str:
-    eyebrow = p.section.upper() + (" · SYNTHETIC DATA DEMO" if synthetic else "")
+    eyebrow = p.section.upper() + (f" · {synthetic.upper()}" if synthetic else "")   # synthetic = data label
     if p.kind == "slide":
         cards = "".join(
             f'<div class="card rise" style="--d:{0.25 + 0.15 * k:.2f}s"><div class="badge-n">{k + 1}</div>'

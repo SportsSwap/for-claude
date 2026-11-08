@@ -119,9 +119,15 @@ def build(root: Path | None = None) -> dict:
     results = root / "results"
     synthetic = root.name == "synthetic_lab"
     prov, built, pending = collect(results)
-    if synthetic and built:
-        built[0].banner = "Synthetic data demo · real NQ and ES files not yet ingested"
-    html = document(built, synthetic, "Price Action Lab")
+    label, banner = "", ""
+    if synthetic:
+        label, banner = "Synthetic data demo", "Synthetic data demo · real NQ and ES files not yet ingested"
+    elif (results / "data_source.json").exists():   # a saved result written by the run, never data/
+        src = json.loads((results / "data_source.json").read_text())
+        label, banner = src["label"], src["banner"]
+    if banner and built:
+        built[0].banner = banner
+    html = document(built, label, "Price Action Lab")
     check(prov, built, html)                       # raises before anything is written
     out = results / "dashboard"
     out.mkdir(parents=True, exist_ok=True)
@@ -131,7 +137,7 @@ def build(root: Path | None = None) -> dict:
               "numbers": prov.texts(p.key), "conclusion": p.conclusion,
               "verdict": p.verdict} for i, p in enumerate(built)]
     (out / "pages.json").write_text(json.dumps(plist, indent=1) + "\n")
-    md = ["# Deck pages", "", f"Synthetic data demo: {synthetic}", ""]
+    md = ["# Deck pages", "", f"Data: {label or 'as ingested'}", ""]
     for x in plist:
         md += [f"## {x['n']}. {x['title']}", "", f"- section: {x['section']}", f"- subtitle: {x['subtitle']}",
                f"- numbers: {', '.join(x['numbers']) or '-'}", f"- conclusion: {x['conclusion'] or '-'}",

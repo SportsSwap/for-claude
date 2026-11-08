@@ -46,14 +46,23 @@ def _session() -> requests.Session:
     return _local.s
 
 
+MIN_INTERVAL = 1.0      # seconds between requests (set by --min-interval)
+COOL_DOWN = 300         # seconds to wait after the server starts refusing
+_last = [0.0]
+
+
 def fetch(sym: str, day: dt.date, side: str, cache: Path) -> bytes:
     p = cache / sym / f"{day.isoformat()}_{side}.bi5"
     if p.exists():
         return p.read_bytes()
     url = URL.format(sym=sym, y=day.year, m=day.month - 1, d=day.day, side=side)  # month is 0-based
-    for attempt in range(8):
+    for attempt in range(12):
+        wait = MIN_INTERVAL - (time.time() - _last[0])
+        if wait > 0:
+            time.sleep(wait)
+        _last[0] = time.time()
         try:
-            r = _session().get(url, timeout=60)
+            r = _session().get(url, timeout=30)
             if r.status_code in (200, 404):
                 body = r.content if r.status_code == 200 else b""
                 p.parent.mkdir(parents=True, exist_ok=True)
@@ -61,7 +70,9 @@ def fetch(sym: str, day: dt.date, side: str, cache: Path) -> bytes:
                 return body
         except requests.RequestException:
             _local.__dict__.pop("s", None)      # drop a broken connection
-        time.sleep(min(2 ** attempt, 30))
+        pause = 10 if attempt < 2 else COOL_DOWN   # a refusal streak means slow down for minutes, not seconds
+        print(f"  refused ({url.rsplit('/', 5)[-5:]}), waiting {pause}s", flush=True)
+        time.sleep(pause)
     raise RuntimeError(f"failed after retries: {url}")
 
 
@@ -99,7 +110,10 @@ def main(argv=None) -> int:
     ap.add_argument("--cache", type=Path, default=Path("vendor_cache/dukascopy"))
     ap.add_argument("--start", default="2021-09-26")
     ap.add_argument("--end", default="2026-11-06")
+    ap.add_argument("--min-interval", type=float, default=1.0, help="seconds between requests")
     a = ap.parse_args(argv)
+    global MIN_INTERVAL
+    MIN_INTERVAL = a.min_interval
     days = [d.date() for d in pd.date_range(a.start, a.end, freq="D") if d.weekday() != 5]  # no Saturday trading
     a.out.mkdir(parents=True, exist_ok=True)
     for mkt, sym in INSTR.items():
