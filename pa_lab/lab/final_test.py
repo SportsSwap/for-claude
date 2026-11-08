@@ -352,10 +352,18 @@ def twins_test(mk: Market, trades: pd.DataFrame, stream: str, n_sets: int = TWIN
     all_b = mk.et_min // 30
     pools = {b: np.flatnonzero(pool_ok & (all_b == b)) for b in np.unique(bucket)}
     n = len(tr)
-    T = np.empty((n_sets, n), np.int64)
-    for k in range(n):
+    # Trades pooled from several versions often share an entry: one twin minute per
+    # distinct (entry minute, side), so the twins keep the real trades' overlap and
+    # the test does not treat 40 copies of one trade as 40 independent draws.
+    key = pd.MultiIndex.from_arrays([e, side])
+    uniq, inv = np.unique(np.asarray(key.codes).T, axis=0, return_inverse=True)
+    inv = np.asarray(inv).ravel()
+    first = np.array([np.flatnonzero(inv == u)[0] for u in range(len(uniq))])
+    U = np.empty((n_sets, len(uniq)), np.int64)
+    for u, k in enumerate(first):
         p = pools[bucket[k]]
-        T[:, k] = g.choice(p, n_sets) if len(p) else -1
+        U[:, u] = g.choice(p, n_sets) if len(p) else -1
+    T = U[:, inv]
     t = T.ravel()
     good = t >= 0
     S = np.repeat(side[None, :], n_sets, 0).ravel()
@@ -373,7 +381,8 @@ def twins_test(mk: Market, trades: pd.DataFrame, stream: str, n_sets: int = TWIN
     res = engine.run(mk, o, independent=True)
     totals = res.groupby("tag")["dollars"].sum().reindex(range(n_sets), fill_value=0.0).to_numpy()
     real = float(tr["dollars"].sum())
-    return {"real_trades": int(n), "real_net": real, "twin_mean_net": float(totals.mean()),
+    return {"real_trades": int(n), "distinct_entries": int(len(uniq)), "real_net": real,
+            "twin_mean_net": float(totals.mean()),
             "twin_p95_net": float(np.percentile(totals, 95)), "p_value": float((totals >= real).mean()),
             "beats_random": bool((totals >= real).mean() < 0.05), "sets": int(n_sets)}
 

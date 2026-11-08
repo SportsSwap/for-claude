@@ -281,3 +281,35 @@ Synthetic data demo: True
 - numbers: +0.26, +3.99, +1.00, +1.49, +2.10, +1.25, +1.32, -1.20, +0.44, -11.41, +0.35, -1.93, -0.10
 - conclusion: Pairs from the usual-settings grid, differing in one rule only.
 - verdict: -
+
+## 36. The Sealed Window
+
+- section: Final test
+- subtitle: Opened once, after every choice was hashed
+- numbers: -
+- conclusion: -
+- verdict: -
+
+## 37. What Held Up
+
+- section: Final test
+- subtitle: Share of versions profitable with a Sharpe of half or more, NQ sealed window
+- numbers: 18.2%, 36.1%, 17.8%, 19.1%, 18.0%, 26, 72
+- conclusion: Candidates should hold up more often than versions at large. Here they did.
+- verdict: true
+
+## 38. Working Setups, Sealed
+
+- section: Final test
+- subtitle: Net over the sealed window for each setup that worked in discovery
+- numbers: +$229,137, -$27,512, -$379,966, -$145,736, 1, 4
+- conclusion: A setup that worked in discovery has to beat random trades on data it never saw.
+- verdict: split
+
+## 39. Named Systems, Sealed
+
+- section: Final test
+- subtitle: Net after costs on the NQ sealed window
+- numbers: -$8,062, -$16,460, -$29,176, -$64,530, -$22,273, +$15,496, 0
+- conclusion: The systems as taught, on sessions no rule had seen.
+- verdict: -

@@ -20,6 +20,7 @@ from lab.sessions import session_bounds  # noqa: E402
 MARKETS = {"NQ": dict(p0=16000.0, sigma=0.00035, spread=(60, 160)),
            "ES": dict(p0=4500.0, sigma=0.00025, spread=(15, 45))}
 TICK = 0.25
+SUB = 8          # sub-steps per minute for path-consistent wicks
 MONTH_CODE = {3: "H", 6: "M", 9: "U", 12: "Z"}
 HOLIDAYS = {(1, 1), (7, 4), (12, 25)}
 
@@ -49,7 +50,7 @@ def next_contract(y: int, m: int) -> tuple[int, int]:
     return (y + 1, 3) if m == 12 else (y, m + 3)
 
 
-def make_market(mkt: str, start: str, end: str, defects: bool):
+def make_market(mkt: str, start: str, end: str, defects: bool, wick_model: str = "path"):
     cfg = MARKETS[mkt]
     sess = sessions(start, end)
     b = session_bounds(sess)
@@ -59,13 +60,26 @@ def make_market(mkt: str, start: str, end: str, defects: bool):
     ts = pd.to_datetime(ts, utc=True)
     n = len(ts)
     g = rng(f"synthetic:{mkt}")
-    r = g.normal(0, cfg["sigma"], n)
-    close = cfg["p0"] * np.exp(np.cumsum(r))
-    close = np.round(close / TICK) * TICK
-    open_ = np.r_[cfg["p0"], close[:-1]]
-    wig = np.round(np.abs(g.normal(0, cfg["sigma"] * cfg["p0"] * 0.6, (2, n))) / TICK) * TICK
-    high = np.maximum(open_, close) + wig[0]
-    low = np.minimum(open_, close) - wig[1]
+    if wick_model == "noise":
+        # v1 (the committed synthetic_lab): wicks are independent noise around a close path.
+        # Flaw: a wick says nothing about where price goes next, so targets and limits
+        # filled on wicks harvest free noise while close-based stops ignore it (decisions D33).
+        r = g.normal(0, cfg["sigma"], n)
+        close = cfg["p0"] * np.exp(np.cumsum(r))
+        close = np.round(close / TICK) * TICK
+        open_ = np.r_[cfg["p0"], close[:-1]]
+        wig = np.round(np.abs(g.normal(0, cfg["sigma"] * cfg["p0"] * 0.6, (2, n))) / TICK) * TICK
+        high = np.maximum(open_, close) + wig[0]
+        low = np.minimum(open_, close) - wig[1]
+    else:
+        # v2: every minute is SUB steps of one random-walk path; high and low are the
+        # path's own extremes, so a wick is price that really traded on the way to the close.
+        steps = g.normal(0, cfg["sigma"] / np.sqrt(SUB), (n, SUB))
+        lpath = np.log(cfg["p0"]) + np.cumsum(steps.ravel()).reshape(n, SUB)
+        lopen = np.r_[np.log(cfg["p0"]), lpath[:-1, -1]]
+        px = np.round(np.exp(np.column_stack([lopen, lpath])) / TICK) * TICK
+        open_, close = px[:, 0], px[:, -1]
+        high, low = px.max(axis=1), px.min(axis=1)
     vol = g.integers(5, 2000, n)
 
     # rolls and contracts
@@ -128,10 +142,12 @@ def main(argv=None) -> int:
     ap.add_argument("--end", default="2026-10-16")
     ap.add_argument("--defects", action="store_true")
     ap.add_argument("--format", choices=["parquet", "csv"], default="parquet")
+    ap.add_argument("--wick-model", choices=["path", "noise"], default="path",
+                    help="path: wicks from an intraminute path (default); noise: v1, kept to rebuild synthetic_lab")
     a = ap.parse_args(argv)
     a.out.mkdir(parents=True, exist_ok=True)
     for m in MARKETS:
-        adj, unadj, rolls = make_market(m, a.start, a.end, a.defects)
+        adj, unadj, rolls = make_market(m, a.start, a.end, a.defects, a.wick_model)
         ext = a.format
         w = (lambda df, p: df.to_parquet(p, index=False)) if ext == "parquet" else (lambda df, p: df.to_csv(p, index=False))
         w(adj, a.out / f"{m}_1m_backadjusted.{ext}")

@@ -141,3 +141,23 @@ def test_complete_sessions_and_dropped_session_as_roll():
     assert mk.roll_exit_idx.tolist() == [last_a]                 # positions close before the dropped session
     # the hour before the dropped session's 18:00 open is the 17:00 halt, so no bar falls in the blackout
     assert not mk.no_entry.any()
+
+
+
+def test_twins_share_a_minute_when_real_trades_share_an_entry():
+    """Two versions taking the same trade must not count as two independent draws."""
+    import numpy as np
+    import pandas as pd
+    from lab import final_test as ft
+    from lab.market import Market
+    from lab.sessions import session_date
+    import make_synthetic
+    adj, _, rolls = make_synthetic.make_market("NQ", "2021-10-01", "2021-12-31", False)
+    adj["session"] = session_date(adj["ts_event"])
+    mk = Market.from_frames("NQ", adj, rolls)
+    e = np.array([20000, 20000, 30000])
+    tr = pd.DataFrame({"entry_idx": e, "exit_idx": e + 30, "side": [1, 1, -1], "entry_px": mk.c[e],
+                       "stop": mk.c[e] - np.array([20, 20, -20]), "target": mk.c[e] + np.array([40, 40, -40]),
+                       "size": 1.0, "dollars": [100.0, 100.0, -50.0]})
+    r = ft.twins_test(mk, tr, "test:twins", n_sets=50)
+    assert r["real_trades"] == 3 and r["distinct_entries"] == 2

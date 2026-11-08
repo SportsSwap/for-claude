@@ -486,3 +486,32 @@ only itself, never part of a longer number: before, a sourced "0" turned
 "50 bars" into "5 bars" and any sourced "5" would have approved every 5 on
 the page. The second reader treats an empty CSV cell as a missing number,
 as the first reader does.
+
+## After the first full synthetic run
+
+D33. **The first synthetic generator had a flaw the funnel found.** On the v1
+random walk, candidates held up in the sealed window twice as often as
+other versions (NQ 36% against 18%; non-candidates with similar trade counts
+21%, about 3 sd apart), and change of character on NQ 1h "beat random
+trades". A look-ahead leak would survive removing the wicks; it did not. On
+fresh v1 paths the 72 candidates made +0.5 and +2.1 gross points a trade
+with wicks and -4.0 and -2.7 with high = max(open, close), low = min(open,
+close). Cause: v1 drew each 1m wick as noise independent of where price went
+next, so targets and limits filled on a wick harvested free noise while
+close-based stops ignored it. Candidates leaned that way: 64% close-based
+stops (27% overall) and 62% limit entries (42%). Generator v2 builds each
+minute from 8 steps of one random-walk path, so a wick is price that really
+traded; on fresh v2 paths the same candidates make -1.4 and -2.4 gross points
+a trade (19-26 of 72 positive). Real data has no such flaw, but the
+close-stop / wick-target asymmetry is worth watching on it.
+
+D34. **Pooled twins share an entry minute.** The final test pools up to 40
+versions of a working setup; versions often take the same trade. Twins were
+drawn per trade, so 40 copies of one trade counted as 40 independent draws
+and the pooled p-value was too confident. Twins are now drawn per distinct
+(entry minute, side) and shared. Fixed before any real seal was opened; the
+v1 synthetic final run used the old method.
+
+D35. **The synthetic lab is rebuilt on generator v2** and every prompt rerun
+on it (`--wick-model noise` rebuilds v1). The v1 results stay in git
+history at the commit before the rebuild.

@@ -9368,5 +9368,325 @@
   "value": -0.10059925905912485,
   "text": "-0.10",
   "shown": true
+ },
+ {
+  "id": 591,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=all (row 0)",
+  "column": "share_held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "all"
+  },
+  "format": "pct1",
+  "value": 0.18215475749722326,
+  "text": "18.2%",
+  "shown": true
+ },
+ {
+  "id": 592,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=candidates (row 1)",
+  "column": "share_held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "candidates"
+  },
+  "format": "pct1",
+  "value": 0.3611111111111111,
+  "text": "36.1%",
+  "shown": true
+ },
+ {
+  "id": 593,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=set:common (row 2)",
+  "column": "share_held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "set:common"
+  },
+  "format": "pct1",
+  "value": 0.1776541095890411,
+  "text": "17.8%",
+  "shown": true
+ },
+ {
+  "id": 594,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=set:sampled (row 4)",
+  "column": "share_held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "set:sampled"
+  },
+  "format": "pct1",
+  "value": 0.19096385542168676,
+  "text": "19.1%",
+  "shown": true
+ },
+ {
+  "id": 595,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=set:spread (row 5)",
+  "column": "share_held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "set:spread"
+  },
+  "format": "pct1",
+  "value": 0.18,
+  "text": "18.0%",
+  "shown": true
+ },
+ {
+  "id": 596,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=candidates (row 1)",
+  "column": "held",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "candidates"
+  },
+  "format": "int",
+  "value": 26.0,
+  "text": "26",
+  "shown": true
+ },
+ {
+  "id": 597,
+  "page": "final_held",
+  "file": "final/share_held.csv",
+  "row": "market=NQ;group=candidates (row 1)",
+  "column": "versions",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "group": "candidates"
+  },
+  "format": "int",
+  "value": 72.0,
+  "text": "72",
+  "shown": true
+ },
+ {
+  "id": 598,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "market=NQ;setup=choch_reversal;setup_chart=1h (row 0)",
+  "column": "real_net",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "setup": "choch_reversal",
+   "setup_chart": "1h"
+  },
+  "format": "usd0",
+  "value": 229137.42760502547,
+  "text": "+$229,137",
+  "shown": true
+ },
+ {
+  "id": 599,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "market=ES;setup=choch_reversal;setup_chart=1h (row 1)",
+  "column": "real_net",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "setup": "choch_reversal",
+   "setup_chart": "1h"
+  },
+  "format": "usd0",
+  "value": -27511.728382808527,
+  "text": "-$27,512",
+  "shown": true
+ },
+ {
+  "id": 600,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "market=NQ;setup=trend_line;setup_chart=1h (row 2)",
+  "column": "real_net",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "setup": "trend_line",
+   "setup_chart": "1h"
+  },
+  "format": "usd0",
+  "value": -379966.14525249467,
+  "text": "-$379,966",
+  "shown": true
+ },
+ {
+  "id": 601,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "market=ES;setup=trend_line;setup_chart=1h (row 3)",
+  "column": "real_net",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "setup": "trend_line",
+   "setup_chart": "1h"
+  },
+  "format": "usd0",
+  "value": -145735.67395369208,
+  "text": "-$145,736",
+  "shown": true
+ },
+ {
+  "id": 602,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "*",
+  "column": "beats_random",
+  "op": "count",
+  "where": {
+   "beats_random": true
+  },
+  "format": "int",
+  "value": 1,
+  "text": "1",
+  "shown": true
+ },
+ {
+  "id": 603,
+  "page": "final_working",
+  "file": "final/working_vs_random.csv",
+  "row": "*",
+  "column": "",
+  "op": "count",
+  "where": {},
+  "format": "int",
+  "value": 4,
+  "text": "4",
+  "shown": true
+ },
+ {
+  "id": 604,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Entry Model;market=NQ (row 0)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Entry Model",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": -8062.0,
+  "text": "-$8,062",
+  "shown": true
+ },
+ {
+  "id": 605,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Bare Minimum;market=NQ (row 2)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Bare Minimum",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": -16459.62977723706,
+  "text": "-$16,460",
+  "shown": true
+ },
+ {
+  "id": 606,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Zone System;market=NQ (row 4)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Zone System",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": -29175.638108096653,
+  "text": "-$29,176",
+  "shown": true
+ },
+ {
+  "id": 607,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Daily Version;market=NQ (row 6)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Daily Version",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": -64529.77519171801,
+  "text": "-$64,530",
+  "shown": true
+ },
+ {
+  "id": 608,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Sweep System;market=NQ (row 8)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Sweep System",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": -22273.166545829576,
+  "text": "-$22,273",
+  "shown": true
+ },
+ {
+  "id": 609,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "name=Checklist;market=NQ (row 10)",
+  "column": "net",
+  "op": "cell",
+  "where": {
+   "name": "Checklist",
+   "market": "NQ"
+  },
+  "format": "usd0",
+  "value": 15496.416255005897,
+  "text": "+$15,496",
+  "shown": true
+ },
+ {
+  "id": 610,
+  "page": "final_named",
+  "file": "final/named_versions.csv",
+  "row": "*",
+  "column": "market,held",
+  "op": "count",
+  "where": {
+   "market": "NQ",
+   "held": true
+  },
+  "format": "int",
+  "value": 0,
+  "text": "0",
+  "shown": true
  }
 ]

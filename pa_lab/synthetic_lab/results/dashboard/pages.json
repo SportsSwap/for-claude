@@ -626,5 +626,68 @@
   ],
   "conclusion": "Pairs from the usual-settings grid, differing in one rule only.",
   "verdict": null
+ },
+ {
+  "n": 36,
+  "key": "final_intro",
+  "section": "Final test",
+  "title": "The Sealed Window",
+  "subtitle": "Opened once, after every choice was hashed",
+  "numbers": [],
+  "conclusion": "",
+  "verdict": null
+ },
+ {
+  "n": 37,
+  "key": "final_held",
+  "section": "Final test",
+  "title": "What Held Up",
+  "subtitle": "Share of versions profitable with a Sharpe of half or more, NQ sealed window",
+  "numbers": [
+   "18.2%",
+   "36.1%",
+   "17.8%",
+   "19.1%",
+   "18.0%",
+   "26",
+   "72"
+  ],
+  "conclusion": "Candidates should hold up more often than versions at large. Here they did.",
+  "verdict": "true"
+ },
+ {
+  "n": 38,
+  "key": "final_working",
+  "section": "Final test",
+  "title": "Working Setups, Sealed",
+  "subtitle": "Net over the sealed window for each setup that worked in discovery",
+  "numbers": [
+   "+$229,137",
+   "-$27,512",
+   "-$379,966",
+   "-$145,736",
+   "1",
+   "4"
+  ],
+  "conclusion": "A setup that worked in discovery has to beat random trades on data it never saw.",
+  "verdict": "split"
+ },
+ {
+  "n": 39,
+  "key": "final_named",
+  "section": "Final test",
+  "title": "Named Systems, Sealed",
+  "subtitle": "Net after costs on the NQ sealed window",
+  "numbers": [
+   "-$8,062",
+   "-$16,460",
+   "-$29,176",
+   "-$64,530",
+   "-$22,273",
+   "+$15,496",
+   "0"
+  ],
+  "conclusion": "The systems as taught, on sessions no rule had seen.",
+  "verdict": null
  }
 ]
