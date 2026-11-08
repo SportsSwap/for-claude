@@ -1,0 +1,23 @@
+{
+  "_comment": "Frozen data thresholds. Locked by sha256 in config/amendments.json. Change only through a numbered amendment written before looking at any result it affects.",
+  "markets": ["NQ", "ES"],
+  "session": {"open_et": "18:00", "close_et": "17:00", "halt_hour_et": 17},
+  "audit": {
+    "gap_minutes": [1, 5, 60],
+    "max_conflicting_duplicates": 0,
+    "max_ohlc_invalid_frac": 0.0,
+    "max_unexplained_adjustment_steps": 0,
+    "adjustment_step_tolerance_points": 0.01,
+    "roll_spread_match_tolerance_points": 0.01,
+    "max_contract_changes_off_roll": 0,
+    "max_session_set_mismatch_nq_es": 0
+  },
+  "rolls": {"no_entry_minutes_before_roll": 60},
+  "atr": {"length": 14, "method": "wilder"},
+  "charts": {
+    "minutes": {"1m": 1, "5m": 5, "15m": 15, "1h": 60},
+    "four_hour_starts_et": ["18:00", "22:00", "02:00", "06:00", "10:00", "14:00"],
+    "daily": "whole session"
+  },
+  "news": {"events": ["CPI", "NFP", "FOMC"], "release_time_et": {"CPI": "08:30", "NFP": "08:30", "FOMC": "14:00"}}
+}

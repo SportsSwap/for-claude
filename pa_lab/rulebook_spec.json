@@ -1,0 +1,930 @@
+{
+  "version": 1,
+  "charts": [
+    "1m",
+    "5m",
+    "15m",
+    "1h",
+    "4h",
+    "daily"
+  ],
+  "chart_pairs": [
+    [
+      "1m",
+      "1m"
+    ],
+    [
+      "5m",
+      "5m"
+    ],
+    [
+      "5m",
+      "1m"
+    ],
+    [
+      "15m",
+      "15m"
+    ],
+    [
+      "15m",
+      "5m"
+    ],
+    [
+      "15m",
+      "1m"
+    ],
+    [
+      "1h",
+      "1h"
+    ],
+    [
+      "1h",
+      "15m"
+    ],
+    [
+      "1h",
+      "5m"
+    ],
+    [
+      "4h",
+      "4h"
+    ],
+    [
+      "4h",
+      "1h"
+    ],
+    [
+      "4h",
+      "15m"
+    ],
+    [
+      "daily",
+      "1h"
+    ]
+  ],
+  "dials": {
+    "swing_strength": {
+      "group": "detector",
+      "meaning": "Bars on each side a swing high/low must out-reach to count as a confirmed swing.",
+      "values": [
+        {
+          "value": 2,
+          "meaning": "2 bars each side: fast, many swings"
+        },
+        {
+          "value": 3,
+          "meaning": "3 bars each side"
+        },
+        {
+          "value": 5,
+          "meaning": "5 bars each side"
+        },
+        {
+          "value": 8,
+          "meaning": "8 bars each side: slow, only major swings"
+        }
+      ]
+    },
+    "level_tol_atr": {
+      "group": "detector",
+      "meaning": "Swings within this many ATR of each other cluster into one level.",
+      "values": [
+        {
+          "value": 0.1,
+          "meaning": "tight cluster: 0.1 ATR"
+        },
+        {
+          "value": 0.25,
+          "meaning": "medium cluster: 0.25 ATR"
+        },
+        {
+          "value": 0.5,
+          "meaning": "wide cluster: 0.5 ATR"
+        }
+      ]
+    },
+    "level_min_touches": {
+      "group": "detector",
+      "meaning": "Swings a cluster needs before it is a level.",
+      "values": [
+        {
+          "value": 1,
+          "meaning": "a single swing is a level"
+        },
+        {
+          "value": 2,
+          "meaning": "two touches"
+        },
+        {
+          "value": 3,
+          "meaning": "three touches"
+        },
+        {
+          "value": 4,
+          "meaning": "four touches"
+        }
+      ]
+    },
+    "level_shape": {
+      "group": "detector",
+      "meaning": "How a level is drawn.",
+      "values": [
+        {
+          "value": "line",
+          "meaning": "one price: the mean of the clustered swings"
+        },
+        {
+          "value": "box",
+          "meaning": "a band from the lowest to the highest clustered swing"
+        }
+      ]
+    },
+    "trendline_min_touches": {
+      "group": "detector",
+      "meaning": "Swings a trend line must pass through (within tolerance).",
+      "values": [
+        {
+          "value": 2,
+          "meaning": "two swings define the line"
+        },
+        {
+          "value": 3,
+          "meaning": "a third swing confirms it"
+        },
+        {
+          "value": 4,
+          "meaning": "four swings"
+        }
+      ]
+    },
+    "trendline_tol_atr": {
+      "group": "detector",
+      "meaning": "How far a swing may sit from the line and still count as a touch.",
+      "values": [
+        {
+          "value": 0.1,
+          "meaning": "0.1 ATR"
+        },
+        {
+          "value": 0.25,
+          "meaning": "0.25 ATR"
+        },
+        {
+          "value": 0.5,
+          "meaning": "0.5 ATR"
+        }
+      ]
+    },
+    "zone_run_candles": {
+      "group": "detector",
+      "meaning": "Length of the same-direction candle run that leaves a supply/demand zone.",
+      "values": [
+        {
+          "value": 2,
+          "meaning": "2-candle run"
+        },
+        {
+          "value": 3,
+          "meaning": "3-candle run"
+        },
+        {
+          "value": 4,
+          "meaning": "4-candle run"
+        },
+        {
+          "value": 5,
+          "meaning": "5-candle run"
+        }
+      ]
+    },
+    "zone_span_atr": {
+      "group": "detector",
+      "meaning": "Minimum distance the run must cover, in ATR, for its base to be a zone.",
+      "values": [
+        {
+          "value": 1.5,
+          "meaning": "run covers at least 1.5 ATR"
+        },
+        {
+          "value": 2.0,
+          "meaning": "at least 2 ATR"
+        },
+        {
+          "value": 2.5,
+          "meaning": "at least 2.5 ATR"
+        },
+        {
+          "value": 3.0,
+          "meaning": "at least 3 ATR"
+        }
+      ]
+    },
+    "fvg_min_gap_atr": {
+      "group": "detector",
+      "meaning": "Smallest three-candle fair value gap kept (candle 1 wick to candle 3 wick).",
+      "values": [
+        {
+          "value": 0.0,
+          "meaning": "any gap"
+        },
+        {
+          "value": 0.1,
+          "meaning": "gap at least 0.1 ATR"
+        },
+        {
+          "value": 0.25,
+          "meaning": "gap at least 0.25 ATR"
+        }
+      ]
+    },
+    "retest_window_bars": {
+      "group": "setup",
+      "meaning": "Flip zone: setup-chart bars allowed between the break and the retest.",
+      "values": [
+        {
+          "value": 6,
+          "meaning": "retest within 6 bars"
+        },
+        {
+          "value": 12,
+          "meaning": "within 12 bars"
+        },
+        {
+          "value": 24,
+          "meaning": "within 24 bars"
+        },
+        {
+          "value": 48,
+          "meaning": "within 48 bars"
+        }
+      ]
+    },
+    "sweep_depth_max_atr": {
+      "group": "setup",
+      "meaning": "Sweep and reclaim: deepest allowed poke beyond the level, in ATR.",
+      "values": [
+        {
+          "value": 0.25,
+          "meaning": "shallow sweep, up to 0.25 ATR"
+        },
+        {
+          "value": 0.5,
+          "meaning": "up to 0.5 ATR"
+        },
+        {
+          "value": 1.0,
+          "meaning": "deep sweep, up to 1 ATR"
+        }
+      ]
+    },
+    "reclaim_bars": {
+      "group": "setup",
+      "meaning": "Sweep and reclaim: setup-chart bars allowed to close back inside the level.",
+      "values": [
+        {
+          "value": 1,
+          "meaning": "reclaim on the sweep bar itself"
+        },
+        {
+          "value": 2,
+          "meaning": "within 2 bars"
+        },
+        {
+          "value": 3,
+          "meaning": "within 3 bars"
+        }
+      ]
+    },
+    "trendline_event": {
+      "group": "setup",
+      "meaning": "Trend line: trade the touch or the break.",
+      "values": [
+        {
+          "value": "bounce",
+          "meaning": "trade a touch of the line in the line's direction"
+        },
+        {
+          "value": "break",
+          "meaning": "trade the first close through the line"
+        }
+      ]
+    },
+    "zone_fresh_only": {
+      "group": "setup",
+      "meaning": "Supply/demand zone: only the first return counts.",
+      "values": [
+        {
+          "value": "yes",
+          "meaning": "first touch only; a zone is spent once touched"
+        },
+        {
+          "value": "no",
+          "meaning": "any touch until price closes through the zone"
+        }
+      ]
+    },
+    "fvg_max_age_bars": {
+      "group": "setup",
+      "meaning": "Fair value gap: setup-chart bars a gap stays tradable.",
+      "values": [
+        {
+          "value": 24,
+          "meaning": "gap expires after 24 bars"
+        },
+        {
+          "value": 96,
+          "meaning": "gap expires after 96 bars"
+        }
+      ]
+    },
+    "direction": {
+      "group": "shared",
+      "meaning": "Which side the version may trade.",
+      "values": [
+        {
+          "value": "long",
+          "meaning": "longs only"
+        },
+        {
+          "value": "short",
+          "meaning": "shorts only"
+        },
+        {
+          "value": "both",
+          "meaning": "longs and shorts"
+        }
+      ]
+    },
+    "confirmation": {
+      "group": "shared",
+      "meaning": "What the trigger chart must print at the level before entry.",
+      "values": [
+        {
+          "value": "none",
+          "meaning": "enter on the touch/break itself"
+        },
+        {
+          "value": "close_back",
+          "meaning": "a trigger bar closes back on the trade side of the level"
+        },
+        {
+          "value": "rejection_wick",
+          "meaning": "a trigger bar with a wick into the level of at least half its range"
+        },
+        {
+          "value": "engulfing",
+          "meaning": "a trigger bar whose body engulfs the prior bar's body, in trade direction"
+        },
+        {
+          "value": "either_candle",
+          "meaning": "rejection wick or engulfing, whichever comes first"
+        },
+        {
+          "value": "ltf_bos",
+          "meaning": "a break of structure in trade direction on the chart below the trigger chart"
+        }
+      ]
+    },
+    "entry": {
+      "group": "shared",
+      "meaning": "How the order is placed once confirmed.",
+      "values": [
+        {
+          "value": "close",
+          "meaning": "market at the confirming bar's close"
+        },
+        {
+          "value": "limit_at_level",
+          "meaning": "limit order back at the level; cancelled if not filled by the time exit"
+        }
+      ]
+    },
+    "stop_mode": {
+      "group": "shared",
+      "meaning": "How the stop is triggered.",
+      "values": [
+        {
+          "value": "hard",
+          "meaning": "stop order: filled when any trade bar trades through it"
+        },
+        {
+          "value": "close_based",
+          "meaning": "exit at the close of the first trigger bar that closes beyond it"
+        }
+      ]
+    },
+    "stop_ref": {
+      "group": "shared",
+      "meaning": "What the stop sits beyond.",
+      "values": [
+        {
+          "value": "beyond_level",
+          "meaning": "the far side of the level/zone/line"
+        },
+        {
+          "value": "touch_wick",
+          "meaning": "the extreme of the bar(s) that touched the level"
+        },
+        {
+          "value": "last_swing",
+          "meaning": "the last confirmed swing against the trade"
+        },
+        {
+          "value": "gap_middle",
+          "meaning": "the far end of the fair value gap's middle candle (FVG only)"
+        }
+      ]
+    },
+    "stop_buffer_atr": {
+      "group": "shared",
+      "meaning": "Extra room added beyond the stop reference, in ATR.",
+      "values": [
+        {
+          "value": 0.0,
+          "meaning": "no buffer"
+        },
+        {
+          "value": 0.1,
+          "meaning": "0.1 ATR"
+        },
+        {
+          "value": 0.25,
+          "meaning": "0.25 ATR"
+        }
+      ]
+    },
+    "target": {
+      "group": "shared",
+      "meaning": "Profit target.",
+      "values": [
+        {
+          "value": "1R",
+          "meaning": "1 x risk"
+        },
+        {
+          "value": "1.5R",
+          "meaning": "1.5 x risk"
+        },
+        {
+          "value": "2R",
+          "meaning": "2 x risk"
+        },
+        {
+          "value": "3R",
+          "meaning": "3 x risk"
+        },
+        {
+          "value": "4R",
+          "meaning": "4 x risk"
+        },
+        {
+          "value": "5R",
+          "meaning": "5 x risk"
+        },
+        {
+          "value": "next_swing",
+          "meaning": "the next confirmed swing in trade direction (skip if under 1R)"
+        }
+      ]
+    },
+    "management": {
+      "group": "shared",
+      "meaning": "What happens between entry and exit.",
+      "values": [
+        {
+          "value": "hold",
+          "meaning": "hold to stop, target or time exit"
+        },
+        {
+          "value": "exit_on_choch",
+          "meaning": "also exit at the close of a trigger-chart change of character against the trade"
+        }
+      ]
+    },
+    "time_exit": {
+      "group": "shared",
+      "meaning": "Latest exit if neither stop nor target is hit.",
+      "values": [
+        {
+          "value": "flat_1600",
+          "meaning": "flat at the 16:00 ET bar close"
+        },
+        {
+          "value": "bars_24",
+          "meaning": "after 24 trigger-chart bars"
+        },
+        {
+          "value": "bars_96",
+          "meaning": "after 96 trigger-chart bars"
+        }
+      ]
+    },
+    "trend_filter": {
+      "group": "filter",
+      "meaning": "Trade only when this chart's trend (last two swing highs and lows) agrees.",
+      "values": [
+        {
+          "value": "off",
+          "meaning": "no trend filter"
+        },
+        {
+          "value": "setup_chart",
+          "meaning": "trend on the setup chart agrees"
+        },
+        {
+          "value": "one_up",
+          "meaning": "trend on the next chart up agrees"
+        },
+        {
+          "value": "daily",
+          "meaning": "daily trend agrees"
+        }
+      ]
+    },
+    "skip_choppy": {
+      "group": "filter",
+      "meaning": "Skip days the prior session was choppy (|close-open| < 30% of its range).",
+      "values": [
+        {
+          "value": "off",
+          "meaning": "trade every day"
+        },
+        {
+          "value": "on",
+          "meaning": "skip after a choppy session"
+        }
+      ]
+    },
+    "skip_run": {
+      "group": "filter",
+      "meaning": "Skip trades in the direction of a run of same-direction daily closes.",
+      "values": [
+        {
+          "value": "off",
+          "meaning": "no run filter"
+        },
+        {
+          "value": "3d",
+          "meaning": "skip with a 3-day run"
+        },
+        {
+          "value": "5d",
+          "meaning": "skip with a 5-day run"
+        }
+      ]
+    },
+    "fresh_breakouts_only": {
+      "group": "filter",
+      "meaning": "Only the first close through a level since the level formed.",
+      "values": [
+        {
+          "value": "off",
+          "meaning": "any break"
+        },
+        {
+          "value": "on",
+          "meaning": "first break only"
+        }
+      ]
+    },
+    "news": {
+      "group": "filter",
+      "meaning": "What to do on CPI, jobs-report and FOMC days.",
+      "values": [
+        {
+          "value": "trade",
+          "meaning": "trade normally"
+        },
+        {
+          "value": "skip",
+          "meaning": "no new entries that session"
+        },
+        {
+          "value": "half",
+          "meaning": "half position size that session"
+        }
+      ]
+    },
+    "session": {
+      "group": "filter",
+      "meaning": "Entry time window (ET).",
+      "values": [
+        {
+          "value": "all",
+          "meaning": "any time in the session"
+        },
+        {
+          "value": "london_ny",
+          "meaning": "03:00 to 16:00"
+        },
+        {
+          "value": "ny",
+          "meaning": "08:00 to 16:00"
+        },
+        {
+          "value": "ny_open",
+          "meaning": "09:30 to 11:00"
+        }
+      ]
+    },
+    "pullback_depth": {
+      "group": "filter",
+      "meaning": "Retracement of the last impulse leg on the setup chart.",
+      "values": [
+        {
+          "value": "any",
+          "meaning": "no depth filter"
+        },
+        {
+          "value": "shallow",
+          "meaning": "under 50% of the leg"
+        },
+        {
+          "value": "deep",
+          "meaning": "50% to 100% of the leg"
+        }
+      ]
+    },
+    "gap_confluence": {
+      "group": "filter",
+      "meaning": "Entry level must sit inside an unfilled setup-chart fair value gap.",
+      "values": [
+        {
+          "value": "off",
+          "meaning": "no gap needed"
+        },
+        {
+          "value": "on",
+          "meaning": "gap confluence required"
+        }
+      ]
+    }
+  },
+  "common_dials": [
+    "swing_strength",
+    "direction",
+    "confirmation",
+    "entry",
+    "stop_mode",
+    "stop_ref",
+    "stop_buffer_atr",
+    "target",
+    "management",
+    "time_exit",
+    "trend_filter",
+    "skip_choppy",
+    "skip_run",
+    "fresh_breakouts_only",
+    "news",
+    "session",
+    "pullback_depth",
+    "gap_confluence"
+  ],
+  "setups": {
+    "level_bounce": {
+      "meaning": "Price returns to a support/resistance level and rejects it.",
+      "dials": [
+        "level_tol_atr",
+        "level_min_touches",
+        "level_shape"
+      ]
+    },
+    "breakout": {
+      "meaning": "First close through a level (BOS-style), trade in break direction.",
+      "dials": [
+        "level_tol_atr",
+        "level_min_touches",
+        "level_shape"
+      ]
+    },
+    "flip_zone": {
+      "meaning": "A broken level is retested from the other side and holds.",
+      "dials": [
+        "level_tol_atr",
+        "level_min_touches",
+        "level_shape",
+        "retest_window_bars"
+      ]
+    },
+    "trend_pullback": {
+      "meaning": "In a trend, price pulls back then the trigger chart resumes the trend.",
+      "dials": []
+    },
+    "trend_line": {
+      "meaning": "A trend line through swings is touched or broken.",
+      "dials": [
+        "trendline_min_touches",
+        "trendline_tol_atr",
+        "trendline_event"
+      ]
+    },
+    "bos_continuation": {
+      "meaning": "Break of structure with the trend; enter on the continuation.",
+      "dials": []
+    },
+    "choch_reversal": {
+      "meaning": "Change of character: first close past the last swing against the trend.",
+      "dials": []
+    },
+    "sweep_reclaim": {
+      "meaning": "Price pokes beyond a level, then closes back inside it.",
+      "dials": [
+        "level_tol_atr",
+        "level_min_touches",
+        "level_shape",
+        "sweep_depth_max_atr",
+        "reclaim_bars"
+      ]
+    },
+    "supply_demand_zone": {
+      "meaning": "Price returns to the base of a strong candle run.",
+      "dials": [
+        "zone_run_candles",
+        "zone_span_atr",
+        "zone_fresh_only"
+      ]
+    },
+    "fair_value_gap": {
+      "meaning": "Price returns into a three-candle imbalance.",
+      "dials": [
+        "fvg_min_gap_atr",
+        "fvg_max_age_bars"
+      ]
+    }
+  },
+  "exclusions": [
+    {
+      "id": "X1",
+      "if": {
+        "setup_chart": [
+          "4h",
+          "daily"
+        ]
+      },
+      "forbid": {
+        "time_exit": [
+          "flat_1600"
+        ]
+      },
+      "why": "A flat-at-16:00 exit cuts a 4h or daily setup before it can play out."
+    },
+    {
+      "id": "X2",
+      "if": {
+        "trigger_chart": [
+          "1m"
+        ]
+      },
+      "forbid": {
+        "confirmation": [
+          "ltf_bos"
+        ]
+      },
+      "why": "There is no chart below 1m for a lower-chart break of structure."
+    },
+    {
+      "id": "X3",
+      "if": {
+        "setup_chart": [
+          "daily"
+        ]
+      },
+      "forbid": {
+        "trend_filter": [
+          "one_up",
+          "daily"
+        ]
+      },
+      "why": "No chart above daily, and 'daily' would repeat 'setup_chart'."
+    },
+    {
+      "id": "X4",
+      "if": {
+        "setup_chart": [
+          "4h"
+        ]
+      },
+      "forbid": {
+        "trend_filter": [
+          "one_up"
+        ]
+      },
+      "why": "One chart up from 4h is daily, which the 'daily' value already covers."
+    },
+    {
+      "id": "X5",
+      "if": {
+        "trigger_chart": [
+          "4h"
+        ]
+      },
+      "forbid": {
+        "session": [
+          "ny_open"
+        ]
+      },
+      "why": "Only one 4h close (10:00) falls inside 09:30-11:00, so the window is not a filter but a single bar."
+    },
+    {
+      "id": "X6",
+      "if_not": {
+        "setup": [
+          "fair_value_gap"
+        ]
+      },
+      "forbid": {
+        "stop_ref": [
+          "gap_middle"
+        ]
+      },
+      "why": "Only a fair value gap has a middle candle."
+    },
+    {
+      "id": "X7",
+      "if": {
+        "setup": [
+          "fair_value_gap"
+        ]
+      },
+      "forbid": {
+        "gap_confluence": [
+          "on"
+        ]
+      },
+      "why": "The setup already is a gap; confluence with itself is no filter."
+    },
+    {
+      "id": "X8",
+      "if_not": {
+        "setup": [
+          "breakout",
+          "flip_zone"
+        ]
+      },
+      "forbid": {
+        "fresh_breakouts_only": [
+          "on"
+        ]
+      },
+      "why": "Fresh-breakout filter only applies to setups built on a level break."
+    },
+    {
+      "id": "X9",
+      "if_not": {
+        "setup": [
+          "trend_pullback",
+          "flip_zone",
+          "bos_continuation"
+        ]
+      },
+      "forbid": {
+        "pullback_depth": [
+          "shallow",
+          "deep"
+        ]
+      },
+      "why": "Pullback depth only applies to setups entered on a pullback."
+    }
+  ],
+  "fixed_rules": {
+    "swing": "A swing high is a bar whose high is above the highs of `swing_strength` bars on each side; confirmed only once the right-side bars have closed.",
+    "trend": "Up when the last two confirmed swing highs and lows are both higher; down when both lower; otherwise range.",
+    "break_of_structure": "The first close beyond the last confirmed swing in the direction of the trend.",
+    "change_of_character": "The first close beyond the last confirmed swing against the trend.",
+    "atr": "Wilder's 14-bar ATR of the chart in use, computed only from bars before the current one.",
+    "higher_chart_use": "A higher-chart bar is visible only from its close (ts_avail).",
+    "roll": "No entries in the 60 minutes before a roll; an open trade closes at the close of the last bar before it.",
+    "warmup": "Warm-up sessions build detector state only; nothing is traded.",
+    "time_exit_bars": "bars_24 / bars_96 count trigger-chart bars from the entry bar."
+  },
+  "count": {
+    "total": 592111296000,
+    "by_setup": {
+      "level_bounce": 15362887680,
+      "breakout": 30725775360,
+      "flip_zone": 368709304320,
+      "trend_pullback": 1920360960,
+      "trend_line": 11522165760,
+      "bos_continuation": 1920360960,
+      "choch_reversal": 640120320,
+      "sweep_reclaim": 138265989120,
+      "supply_demand_zone": 20483850240,
+      "fair_value_gap": 2560481280
+    },
+    "by_chart_pair": {
+      "1m->1m": 48335616000,
+      "5m->5m": 58002739200,
+      "5m->1m": 48335616000,
+      "15m->15m": 58002739200,
+      "15m->5m": 58002739200,
+      "15m->1m": 48335616000,
+      "1h->1h": 58002739200,
+      "1h->15m": 58002739200,
+      "1h->5m": 58002739200,
+      "4h->4h": 21751027200,
+      "4h->1h": 29001369600,
+      "4h->15m": 29001369600,
+      "daily->1h": 19334246400
+    }
+  }
+}

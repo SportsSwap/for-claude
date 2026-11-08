@@ -1,0 +1,17 @@
+{
+  "amendments": [
+    {
+      "n": 0,
+      "utc": "2026-11-08T10:06:57+00:00",
+      "reason": "Baseline: thresholds and rulebook as set up by the data prompt.",
+      "changed": [
+        "config/thresholds.json",
+        "rulebook_spec.json"
+      ],
+      "hashes": {
+        "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+        "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+      }
+    }
+  ]
+}

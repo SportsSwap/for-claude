@@ -1,0 +1,29 @@
+{
+  "rows": 152,
+  "by_event": {
+    "CPI": 48,
+    "FOMC": 56,
+    "NFP": 48
+  },
+  "verified_by_event": {
+    "CPI": false,
+    "FOMC": true,
+    "NFP": false
+  },
+  "first": "2021-01-27",
+  "last": "2027-12-08",
+  "source_pages_sha256": {
+    "fomccalendars.htm": "73ae50daf5d507c9efb50e8e770cf55c5aab39216bb7a6262be45327064e971b"
+  },
+  "log": [
+    "CPI: LAB_HTTP_CONTACT not set; BLS requires automated clients to identify themselves",
+    "NFP: LAB_HTTP_CONTACT not set; BLS requires automated clients to identify themselves"
+  ],
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T10:22:53+00:00"
+}
