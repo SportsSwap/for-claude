@@ -548,10 +548,12 @@ the hand-seeded dates, identical through their last seeded date (Sep 2025).
 
 D39. **Dukascopy index CFDs stand in for NQ and ES futures** because the user
 chose not to pay for CME data. NQ <- USATECHIDXUSD (Nasdaq 100 CFD), ES <-
-USA500IDXUSD (S&P 500 CFD), 1-minute bid and ask candles from
-datafeed.dukascopy.com averaged into mid bars (`scripts/fetch_dukascopy.py`,
-generic User-Agent, one kept-alive connection; parallel connections were
-being closed). What differs from the prompt's inputs:
+USA500IDXUSD (S&P 500 CFD), 1-minute bid candles from datafeed.dukascopy.com (`scripts/fetch_dukascopy.py`,
+generic User-Agent, one kept-alive connection, one request a second, five-minute
+cool-downs). Dukascopy rate-limits hard (about 5 files a minute sustained), so
+bid only halves the ~6,400 daily files; the CFD bid-ask spread is about a point,
+negligible at 1-minute scale (`--mid` averages bid and ask). HistData.com was
+considered and rejected: its download needs a script-made token. What differs from the prompt's inputs:
 - prices are the CFD's, not the futures'; levels differ by the basis but
   moves in points are close, so the NQ/ES point values ($20/$50) and tick
   (0.25) still turn points into dollars;

@@ -5,7 +5,7 @@
 NQ <- USATECHIDXUSD (Nasdaq 100 CFD), ES <- USA500IDXUSD (S&P 500 CFD).
 Each UTC day is one LZMA file of 24-byte big-endian records: seconds from
 00:00 UTC, open, close, low, high (int32, price x 1000) and volume (float32,
-tick volume). Bid and ask files are averaged into a mid bar. Minutes with
+tick volume). Bid candles by default; --mid averages bid and ask. Minutes with
 zero volume (market closed) are dropped. The output is the lab's input
 format: <M>_1m_backadjusted.parquet with one constant contract id, and an
 empty <M>_rolls.csv (a CFD never rolls).
@@ -88,16 +88,21 @@ def decode(blob: bytes, day: dt.date) -> pd.DataFrame:
                          "close": a["c"] / SCALE, "volume": a["v"].astype(float)})
 
 
+SIDES = ("BID",)   # bid only by default: halves the requests; the CFD spread is about a point (D39)
+
+
 def one_day(sym, day, cache):
-    bid = decode(fetch(sym, day, "BID", cache), day)
-    ask = decode(fetch(sym, day, "ASK", cache), day)
-    if bid.empty or ask.empty:
+    bars = [decode(fetch(sym, day, side, cache), day) for side in SIDES]
+    if any(b.empty for b in bars):
         return None
-    m = bid.merge(ask, on="ts_event", suffixes=("_b", "_a"))
-    out = pd.DataFrame({"ts_event": m.ts_event})
-    for c in ("open", "high", "low", "close"):
-        out[c] = (m[f"{c}_b"] + m[f"{c}_a"]) / 2
-    out["volume"] = m["volume_b"] + m["volume_a"]
+    if len(bars) == 1:
+        out = bars[0].copy()
+    else:
+        m = bars[0].merge(bars[1], on="ts_event", suffixes=("_b", "_a"))
+        out = pd.DataFrame({"ts_event": m.ts_event})
+        for c in ("open", "high", "low", "close"):
+            out[c] = (m[f"{c}_b"] + m[f"{c}_a"]) / 2
+        out["volume"] = m["volume_b"] + m["volume_a"]
     out = out[out.volume > 0]
     out["high"] = out[["open", "high", "close"]].max(axis=1)   # mid of extremes can sit inside the body
     out["low"] = out[["open", "low", "close"]].min(axis=1)
@@ -111,9 +116,11 @@ def main(argv=None) -> int:
     ap.add_argument("--start", default="2021-09-26")
     ap.add_argument("--end", default="2026-11-06")
     ap.add_argument("--min-interval", type=float, default=1.0, help="seconds between requests")
+    ap.add_argument("--mid", action="store_true", help="average bid and ask (twice the requests)")
     a = ap.parse_args(argv)
-    global MIN_INTERVAL
+    global MIN_INTERVAL, SIDES
     MIN_INTERVAL = a.min_interval
+    SIDES = ("BID", "ASK") if a.mid else ("BID",)
     days = [d.date() for d in pd.date_range(a.start, a.end, freq="D") if d.weekday() != 5]  # no Saturday trading
     a.out.mkdir(parents=True, exist_ok=True)
     for mkt, sym in INSTR.items():
