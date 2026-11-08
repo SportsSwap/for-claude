@@ -1,0 +1,13 @@
+market,group,versions,held,share_held
+NQ,all,56,18,0.32142857142857145
+NQ,candidates,0,0,
+NQ,set:common,21,6,0.2857142857142857
+NQ,set:named,6,2,0.3333333333333333
+NQ,set:sampled,15,3,0.2
+NQ,set:spread,14,7,0.5
+ES,all,56,13,0.23214285714285715
+ES,candidates,0,0,
+ES,set:common,21,3,0.14285714285714285
+ES,set:named,6,3,0.5
+ES,set:sampled,15,4,0.26666666666666666
+ES,set:spread,14,3,0.21428571428571427

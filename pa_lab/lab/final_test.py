@@ -432,6 +432,23 @@ def _read_optional_json(path: Path, default):
     return io.read_json(path) if path.exists() else default
 
 
+def read_selections(fd: Path | None = None) -> tuple[set, list, list]:
+    """Candidates (ids), working setups ({setup, chart, market}) and named versions
+    ({name, id}), accepting the funnel's wrapped shapes ({"candidates": [...]},
+    {"working": [...]}, {"named": [...]}) or bare lists."""
+    fd = fd or funnel_dir()
+    c = _read_optional_json(fd / "candidates.json", [])
+    c = c.get("candidates", []) if isinstance(c, dict) else c
+    cand = {x["id"] if isinstance(x, dict) else x for x in c}
+    w = _read_optional_json(fd / "working_setups.json", [])
+    w = w.get("working", []) if isinstance(w, dict) else w
+    work = [{"setup": x["setup"], "chart": x["chart"], "market": x["market"]} for x in w]
+    n = _read_optional_json(fd / "named_versions.json", [])
+    n = n.get("named", []) if isinstance(n, dict) else n
+    named = [{"name": x.get("name"), "id": x.get("id")} for x in n]
+    return cand, work, named
+
+
 def run(source: str = "final", versions: list[dict] | None = None, workers: int | None = None,
         twin_sets: int = TWIN_SETS) -> dict:
     """The final test. source="rehearsal" changes only where the bars come from
@@ -448,9 +465,7 @@ def run(source: str = "final", versions: list[dict] | None = None, workers: int 
     if versions is None:
         versions = all_versions
     fd = funnel_dir()
-    candidates = set(_read_optional_json(fd / "candidates.json", []))
-    working = _read_optional_json(fd / "working_setups.json", [])
-    named = _read_optional_json(fd / "named_versions.json", [])
+    candidates, working, named = read_selections(fd)
 
     loaded = load_frames(source)                      # the only switch on `source`
     warm, start, end = window_for(source)
@@ -569,7 +584,7 @@ def run(source: str = "final", versions: list[dict] | None = None, workers: int 
 def rehearsal_subset(n: int = REHEARSAL_VERSIONS) -> list[dict]:
     """Named versions plus an even, seeded spread across setups."""
     vs = read_versions()
-    named = {x.get("id") for x in _read_optional_json(funnel_dir() / "named_versions.json", [])}
+    named = {x["id"] for x in read_selections()[2]}
     out = [v for v in vs if v.get("id") in named]
     rest = [v for v in vs if v.get("id") not in named]
     by_setup: dict = {}
