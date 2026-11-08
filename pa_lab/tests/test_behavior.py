@@ -61,3 +61,12 @@ def test_verdict_rule():
     assert bh.verdict(dict(nq, era2=-0.01), dict(point=0.02))[0] == "split"
     assert bh.verdict(dict(nq, lo=-0.01), dict(point=0.02))[0] == "false"
     assert bh.verdict(dict(nq, point=-0.05, lo=-0.09, hi=-0.01), dict(point=0.02))[0] == "false"
+
+
+def test_difference_of_differences():
+    S = 50
+    sess = np.repeat(np.arange(S), 10)
+    mk = lambda v: bh.Group(np.full(len(sess), v), sess, np.full(len(sess), "x", dtype=object))  # noqa: E731
+    st = bh.diff_stats(mk(0.7), mk(0.6), bh.boot_weights(S, "d"), np.ones(S, int), mk(0.5), mk(0.45))
+    assert np.isclose(st["point"], (0.7 - 0.6) - (0.5 - 0.45))
+    assert np.isclose(st["lo"], st["point"]) and np.isclose(st["hi"], st["point"])

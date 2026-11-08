@@ -193,3 +193,25 @@ lo = hi, so `level_shape` = box and line give identical versions whenever
 0). In the rulebook these pairs are duplicates; the count (D18) is left as
 locked, and the funnel treats them as one version when sampling (logged in
 its notes).
+
+D30. **Gap-fill stand-in matches distance.** With the prompt's 1-3 ATR shifted
+bands, `fvg_fill` said "true" on the random walk (+21.7 points: 89% of gaps
+filled within 50 bars against 68% of random bands), uniformly on every chart
+and both markets. A new gap sits right behind price while the stand-in sits
+1-3 ATR away, so the test measured distance. The fill stand-in is now the gap
+mirrored across the formation close (same size, same distance, other side).
+`fvg_hold` keeps the prompt's shifted bands. Found on synthetic data.
+
+D31. **False positives on noise, kept as found.** On the synthetic random walk
+`rejection_at_levels` came out *true* (NQ +0.041 ATR [+0.013, +0.071], ES
++0.004) and `engulfing_at_levels` *split*. Both are NQ-only, driven by the
+15m chart, with per-chart signs flipping, which is what 23 tests on noise
+produce by chance. The verdict rule asks ES only for the same sign, so an ES
+effect of zero can confirm. The rule is the prompt's and stays; read any
+"true" on real data with this base rate in mind.
+
+D32. **Box against line is a difference of differences.** After D29 the test
+said "true" on the random walk (+4.3 points): a touch is scored against the
+band's far edge, so a wider band is harder to close through by construction.
+The metric is now (real box - random box) - (real line - random line), which
+cancels the width. Found on synthetic data.

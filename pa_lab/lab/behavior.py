@@ -142,27 +142,33 @@ def boot_weights(n_sess: int, stream: str) -> np.ndarray:
     return g.multinomial(n_sess, np.full(n_sess, 1.0 / n_sess), size=N_BOOT).astype(np.float64)
 
 
-def diff_stats(A: Group, B: Group, W: np.ndarray, era: np.ndarray) -> dict:
+def diff_stats(A: Group, B: Group, W: np.ndarray, era: np.ndarray, C: Group | None = None,
+               D: Group | None = None) -> dict:
+    """mean(A) - mean(B), or (mean(A) - mean(B)) - (mean(C) - mean(D)) when C and D are given."""
     S = W.shape[1]
     def sums(G):
         s = np.bincount(G.sess, weights=G.value, minlength=S)
         n = np.bincount(G.sess, minlength=S).astype(float)
         return s, n
-    sa, na = sums(A)
-    sb, nb = sums(B)
-    if na.sum() == 0 or nb.sum() == 0:
-        return dict(n_a=int(na.sum()), n_b=int(nb.sum()), mean_a=np.nan, mean_b=np.nan, point=np.nan,
-                    lo=np.nan, hi=np.nan, era1=np.nan, era2=np.nan)
-    point = sa.sum() / na.sum() - sb.sum() / nb.sum()
+    groups = [A, B] + ([C, D] if C is not None else [])
+    sn = [sums(G) for G in groups]
+    sign = [1, -1, -1, 1][:len(groups)]
+    if any(n.sum() == 0 for _, n in sn):
+        return dict(n_a=int(sn[0][1].sum()), n_b=int(sn[1][1].sum()), mean_a=np.nan, mean_b=np.nan,
+                    point=np.nan, lo=np.nan, hi=np.nan, era1=np.nan, era2=np.nan)
+    point = sum(g * s.sum() / n.sum() for g, (s, n) in zip(sign, sn))
     with np.errstate(invalid="ignore", divide="ignore"):
-        bs = (W @ sa) / (W @ na) - (W @ sb) / (W @ nb)
+        bs = sum(g * (W @ s) / (W @ n) for g, (s, n) in zip(sign, sn))
     bs = bs[np.isfinite(bs)]
+    (sa, na), (sb, nb) = sn[0], sn[1]
     out = dict(n_a=int(na.sum()), n_b=int(nb.sum()), mean_a=sa.sum() / na.sum(), mean_b=sb.sum() / nb.sum(),
                point=point, lo=float(np.percentile(bs, 2.5)), hi=float(np.percentile(bs, 97.5)))
     for e in (1, 2):
         m = era == e
-        a_n, b_n = na[m].sum(), nb[m].sum()
-        out[f"era{e}"] = (sa[m].sum() / a_n - sb[m].sum() / b_n) if a_n and b_n else np.nan
+        if all(n[m].sum() for _, n in sn):
+            out[f"era{e}"] = sum(g * s[m].sum() / n[m].sum() for g, (s, n) in zip(sign, sn))
+        else:
+            out[f"era{e}"] = np.nan
     return out
 
 
@@ -318,10 +324,14 @@ def t_shrinking_bounces(cl):
 
 
 def t_line_vs_box(cl):
-    """Two-touch levels: a one-swing box has no width and equals its line."""
+    """Box minus line hold rate, beyond what the same widths give random stand-ins:
+    (real box - random box) - (real line - random line). A wider band is harder to
+    close through by construction, so the raw box-minus-line gap is mechanical.
+    Two-touch levels: a one-swing box has no width and equals its line."""
     box = sg.levels(cl.mk, cl.name, K, TOL, 2, "box")
     line = sg.levels(cl.mk, cl.name, K, TOL, 2, "line")
-    return cl.hold_group(_lvl_touch_df(cl, box)), cl.hold_group(_lvl_touch_df(cl, line))
+    return (cl.hold_group(_lvl_touch_df(cl, box)), cl.hold_group(_lvl_touch_df(cl, cl.random_levels(box))),
+            cl.hold_group(_lvl_touch_df(cl, line)), cl.hold_group(_lvl_touch_df(cl, cl.random_levels(line))))
 
 
 def t_wick_vs_close(cl):
@@ -429,11 +439,14 @@ def t_fvg_hold(cl):
 
 
 def t_fvg_fill(cl):
-    """Share of gaps price trades back into within 50 bars, against random bands of the same size."""
+    """Share of gaps price trades back into within 50 bars, against a band of the
+    same size at the same distance from the formation close on the other side
+    (a fill is about distance; a 1-3 ATR shifted band would be farther away)."""
     ch = cl.ch
     g = _gaps(cl)
     m = cl.trad[g.born]
-    lo, hi = _random_bands(cl, g.born, g.end, g.lo, g.hi)
+    c0 = ch.c[g.born]
+    lo, hi = 2 * c0 - g.hi, 2 * c0 - g.lo
     def filled(lo_, hi_):
         out = np.zeros(len(g.born))
         for i in range(len(g.born)):
@@ -530,7 +543,7 @@ TESTS = {
     "hold_by_touch_count": (t_hold_by_touch_count, 1, "hold rate", "A level's 3rd+ touch holds more often than its 1st."),
     "wall_or_target": (t_wall_or_target, 1, "hold rate", "A level touched 3+ times acts as a wall (holds more than a random line touched as often), not a target."),
     "shrinking_bounces": (t_shrinking_bounces, 1, "break rate", "After two shrinking bounces, the next touch breaks more often."),
-    "line_vs_box": (t_line_vs_box, 1, "hold rate", "A level drawn as a box holds more often than one drawn as a line."),
+    "line_vs_box": (t_line_vs_box, 1, "hold rate, difference of differences", "A level drawn as a box holds more often than one drawn as a line, beyond what the width alone gives."),
     "wick_vs_close_through": (t_wick_vs_close, 1, "20-bar move (ATR)", "A wick through a level is followed by more move in the level's favour than a close through it."),
     "flip_zones": (t_flip_zones, 1, "hold rate", "A broken level holds from the other side more often than a random line."),
     "bos_follow_10": (make_follow(det.BOS, 10), 1, "10-bar move (ATR)", "A break of structure is followed by more move its way than random bars, at 10 bars."),
@@ -557,13 +570,14 @@ def run_test(name, markets: dict, charts=CHARTS):
     rows = {}
     for mname, mk in markets.items():
         W = boot_weights(len(mk.sessions), f"boot:{name}:{mname}")
-        As, Bs = [], []
+        parts = []
         for chart in charts:
             cl = ChartLab(mk, chart, name)
-            A, B = fn(cl)
-            As.append(A); Bs.append(B)
-            rows[(mname, chart)] = diff_stats(A, B, W, mk.era)
-        rows[(mname, "pooled")] = diff_stats(Group.cat(As), Group.cat(Bs), W, mk.era)
+            gs = fn(cl)
+            parts.append(gs)
+            rows[(mname, chart)] = diff_stats(*gs[:2], W, mk.era, *gs[2:])
+        pooled = [Group.cat([p[i] for p in parts]) for i in range(len(parts[0]))]
+        rows[(mname, "pooled")] = diff_stats(*pooled[:2], W, mk.era, *pooled[2:])
     table = pd.DataFrame([{"market": m, "chart": c, **v} for (m, c), v in rows.items()])
     v, why = verdict(rows[("NQ", "pooled")], rows[("ES", "pooled")], claim)
     return table, {"test": name, "claim": text, "metric": f"{metric}: A minus B", "verdict": v, "why": why,
