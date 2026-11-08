@@ -1,0 +1,39 @@
+{
+  "check": "random_entries",
+  "n_requested": 20000,
+  "stop": "1 ATR (5m)",
+  "target": "2R",
+  "results": {
+    "NQ": {
+      "trades": 20000,
+      "per_trade_dollars": 0.03,
+      "total_dollars": 505.71,
+      "win_rate": 0.3432,
+      "per_trade_points_before_costs": 0.201,
+      "exit_reasons": {
+        "stop": 13136,
+        "target": 6861,
+        "roll": 3
+      }
+    },
+    "ES": {
+      "trades": 20000,
+      "per_trade_dollars": -25.12,
+      "total_dollars": -502331.9,
+      "win_rate": 0.3329,
+      "per_trade_points_before_costs": -0.422,
+      "exit_reasons": {
+        "stop": 13339,
+        "target": 6655,
+        "roll": 6
+      }
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T20:50:05+00:00"
+}

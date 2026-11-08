@@ -1,0 +1,33 @@
+{
+  "markets": {
+    "NQ": {
+      "conflicting_duplicates": true,
+      "ohlc_invalid_frac": true,
+      "contract_changes_off_roll": true,
+      "adjustment_steps_only_at_rolls": true,
+      "no_weekend_sessions_after_clean": true
+    },
+    "ES": {
+      "conflicting_duplicates": true,
+      "ohlc_invalid_frac": true,
+      "contract_changes_off_roll": true,
+      "adjustment_steps_only_at_rolls": true,
+      "no_weekend_sessions_after_clean": true
+    }
+  },
+  "sessions": {
+    "every_window_has_sessions": true,
+    "nq_es_same_sessions": true,
+    "sessions_never_exceed_weekdays": true
+  },
+  "nq_es_session_mismatch_open_windows": [],
+  "nq_es_session_mismatch_total": 0,
+  "pass": true,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-08T20:49:45+00:00"
+}
