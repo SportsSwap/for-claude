@@ -33,6 +33,8 @@ STAGES = {
     "stage3_min_sharpe": 0.5,
     "stage4_twin_sets": 10000,
     "stage4_twins_per_trade": 100,
+    "stage4_max_twin_sims_per_version": 200000,
+    "stage4_min_twins_per_trade": 20,
     "stage4_max_share_of_sets_as_good": 0.05,
     "stage5_es_min_net_dollars_exclusive": 0.0,
     "stage5_es_min_sharpe": 0.3,
@@ -232,6 +234,19 @@ VARIANTS = {
 TOUCH_ENTRIES = [("limit_at_level", "none"), ("close", "close_back"), ("close", "either_candle")]
 BREAK_ENTRIES = [("close", "none"), ("limit_at_level", "none")]
 COMMON_FILTERS = [{}, {"trend_filter": "setup_chart"}, {"session": "ny"}, {"news": "skip"}]
+
+
+def twins_per_trade(n_trades: int, st: dict = STAGES) -> int:
+    """100 twins per trade, fewer for very active versions so a version costs at most
+    `stage4_max_twin_sims_per_version` simulations (never fewer than the minimum)."""
+    cap = st["stage4_max_twin_sims_per_version"] // max(n_trades, 1)
+    return int(max(st["stage4_min_twins_per_trade"], min(st["stage4_twins_per_trade"], cap)))
+
+
+def common_cell(v: dict) -> tuple:
+    """A cell of the common grid: everything but stop, target and the one filter."""
+    return (v["setup"], v["setup_chart"], v["entry"], v["confirmation"]) + tuple(
+        str(v[k]) for k in sg._setup_keys(v["setup"]))
 
 
 def common_versions() -> list[dict]:

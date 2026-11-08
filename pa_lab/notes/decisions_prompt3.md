@@ -90,3 +90,27 @@ P3-10. **Rule effects.** In the common set, versions are paired when they differ
 in one rule and match on everything else; the table reports the mean change
 in NQ net and Sharpe, the share of pairs that improved, and the ES change,
 against the alphabetically first value of that rule.
+
+P3-11. **Scale-down, measured first.** A pilot of 600 uniform random draws on
+4 workers (cores shared with two other forks) measured 0.43 s wall per NQ
+signal count, 46% of draws reaching 40 signals, and 1.74 s wall per version
+for the NQ + ES run with twins. The full counts would need about 130k signal
+counts for the spread pool plus 47k for the sampled set (~21 h) and about
+77k graded runs (~37 h). To finish in about 2 hours, the spread and sampled
+sets are scaled uniformly to 3.5% (140 spread and 166 sampled per setup,
+keeping 4,000:4,733 per setup, 10 setups, the greedy fill and the 40/40/20
+filter mix). The common grid (15,552) is sampled by whole cells: 15% of its
+486 setup x chart x variant x entry cells, each kept with all 32 of its
+stop x target x filter versions, so rule-effect pairs stay intact. The six
+named versions are all kept. On the real data, run
+`run_funnel.py gen --scale 1 --common-cells 1` on a bigger machine; nothing
+else changes.
+
+P3-12. **Twin budget.** A version with 30,000 trades would need 3 million twin
+simulations, so twins per trade = min(100, 200,000 / trades), never below 20
+(`stage4_max_twin_sims_per_version`, `stage4_min_twins_per_trade` in
+stages.json). Sets still number 10,000.
+
+P3-13. **Signals for the common set** are not counted in `gen`: common and named
+versions are graded in full and screened by stage 1; `nq_signals` is null
+for common versions.
