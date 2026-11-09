@@ -274,8 +274,10 @@ if not na(decisionBar) and bar_index &gt;= decisionBar + TIME_BARS
     if pending
         strategy.cancel_all()
         pending := false
+        alert(&quot;PALab FVG &quot; + syminfo.ticker + &quot;: time is up, CANCEL the unfilled limit order&quot;, alert.freq_once_per_bar_close)
     if strategy.position_size != 0
         strategy.close_all(comment=&quot;time exit&quot;)
+        alert(&quot;PALab FVG &quot; + syminfo.ticker + &quot;: time is up, CLOSE the open trade at market&quot;, alert.freq_once_per_bar_close)
     decisionBar := na
 if pending and strategy.position_size != 0
     pending := false
@@ -295,6 +297,9 @@ if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size ==
             pending := true
             decisionBar := bar_index
             placedLong := true
+            alert(&quot;PALab FVG &quot; + syminfo.ticker + &quot;: BUY LIMIT 1 at &quot; + str.tostring(near, format.mintick) +
+                 &quot; | stop &quot; + str.tostring(stop, format.mintick) + &quot; | target &quot; + str.tostring(near + TARGET_R * risk, format.mintick) +
+                 &quot; | cancel or close after 96 hourly bars (about 4 days)&quot;, alert.freq_once_per_bar_close)
         else if dHigh &lt; dLow2 and dLow2 - dHigh &gt;= MIN_GAP_ATR * dAtrPrior and dClose &lt; dHigh
             float near = dHigh
             float stop = dLow2 + STOP_BUF * dAtrPrior
@@ -304,6 +309,9 @@ if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size ==
             pending := true
             decisionBar := bar_index
             placedShort := true
+            alert(&quot;PALab FVG &quot; + syminfo.ticker + &quot;: SELL LIMIT 1 at &quot; + str.tostring(near, format.mintick) +
+                 &quot; | stop &quot; + str.tostring(stop, format.mintick) + &quot; | target &quot; + str.tostring(near - TARGET_R * risk, format.mintick) +
+                 &quot; | cancel or close after 96 hourly bars (about 4 days)&quot;, alert.freq_once_per_bar_close)
 
 plotshape(placedLong, &quot;Gap: buy limit placed&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
 plotshape(placedShort, &quot;Gap: sell limit placed&quot;, shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)

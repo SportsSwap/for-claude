@@ -42,8 +42,10 @@ if not na(decisionBar) and bar_index >= decisionBar + TIME_BARS
     if pending
         strategy.cancel_all()
         pending := false
+        alert("PALab FVG " + syminfo.ticker + ": time is up, CANCEL the unfilled limit order", alert.freq_once_per_bar_close)
     if strategy.position_size != 0
         strategy.close_all(comment="time exit")
+        alert("PALab FVG " + syminfo.ticker + ": time is up, CLOSE the open trade at market", alert.freq_once_per_bar_close)
     decisionBar := na
 if pending and strategy.position_size != 0
     pending := false
@@ -63,6 +65,9 @@ if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size ==
             pending := true
             decisionBar := bar_index
             placedLong := true
+            alert("PALab FVG " + syminfo.ticker + ": BUY LIMIT 1 at " + str.tostring(near, format.mintick) +
+                 " | stop " + str.tostring(stop, format.mintick) + " | target " + str.tostring(near + TARGET_R * risk, format.mintick) +
+                 " | cancel or close after 96 hourly bars (about 4 days)", alert.freq_once_per_bar_close)
         else if dHigh < dLow2 and dLow2 - dHigh >= MIN_GAP_ATR * dAtrPrior and dClose < dHigh
             float near = dHigh
             float stop = dLow2 + STOP_BUF * dAtrPrior
@@ -72,6 +77,9 @@ if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size ==
             pending := true
             decisionBar := bar_index
             placedShort := true
+            alert("PALab FVG " + syminfo.ticker + ": SELL LIMIT 1 at " + str.tostring(near, format.mintick) +
+                 " | stop " + str.tostring(stop, format.mintick) + " | target " + str.tostring(near - TARGET_R * risk, format.mintick) +
+                 " | cancel or close after 96 hourly bars (about 4 days)", alert.freq_once_per_bar_close)
 
 plotshape(placedLong, "Gap: buy limit placed", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
 plotshape(placedShort, "Gap: sell limit placed", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
