@@ -1,0 +1,22 @@
+{
+  "TQQQ": {
+    "days": 1284,
+    "daily_return_corr": 0.9997,
+    "tracking_error_daily_pct": 0.106,
+    "drag_per_year_pct": 8.6,
+    "start_price": 32.9,
+    "end_synthetic": 51.64,
+    "end_real": 52.25,
+    "bars": 506265
+  },
+  "SPXL": {
+    "days": 1284,
+    "daily_return_corr": 0.9995,
+    "tracking_error_daily_pct": 0.098,
+    "drag_per_year_pct": 5.9,
+    "start_price": 113.02,
+    "end_synthetic": 244.79,
+    "end_real": 246.75,
+    "bars": 506057
+  }
+}

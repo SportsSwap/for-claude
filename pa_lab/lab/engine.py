@@ -176,7 +176,7 @@ def run(mk, orders: dict, trig_close=None, struct_up=None, struct_dn=None,
 
 def costs(mk, tr: pd.DataFrame) -> pd.DataFrame:
     tr["points"] = (tr["exit_px"] - tr["entry_px"]) * tr["side"]
-    tr["commission"] = COMMISSION_RT * tr["size"]
+    tr["commission"] = getattr(mk, "commission_rt", COMMISSION_RT) * tr["size"]
     tr["dollars"] = tr["points"] * mk.pv * tr["size"] - tr["commission"]
     risk = (tr["entry_px"] - tr["stop"]).abs() * mk.pv * tr["size"]
     tr["R"] = tr["dollars"] / risk.where(risk > 0)

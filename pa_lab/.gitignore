@@ -13,3 +13,8 @@ synthetic_lab/results/engine/*_trades.csv
 vendor_cache/
 vendor_input/
 results/engine/*_trades.csv
+tqqq_lab/data/raw/
+tqqq_lab/data/clean/
+tqqq_lab/data/sealed/
+tqqq_lab/data/windows.json
+tqqq_lab/results/engine/*_trades.csv

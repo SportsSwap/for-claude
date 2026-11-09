@@ -1,0 +1,4 @@
+{
+  "NQ": {"label": "TQQQ (rebuilt 3x Nasdaq 100)", "tick": 0.01, "point_value": 1.0, "commission_rt": 0.0, "notional": 10000},
+  "ES": {"label": "SPXL (rebuilt 3x S&P 500)", "tick": 0.01, "point_value": 1.0, "commission_rt": 0.0, "notional": 10000}
+}

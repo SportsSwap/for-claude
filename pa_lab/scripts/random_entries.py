@@ -39,7 +39,8 @@ def random_orders(mk: Market, n: int, stream: str, peek: int = 0):
     else:
         side = g.choice(np.array([-1, 1]), len(t))
     px = mk.c[t]
-    return dict(t=t, side=side, stop=px - side * atr, target=px + side * 2 * atr)
+    size = mk.notional / (mk.pv * px) if getattr(mk, "notional", 0.0) else np.ones(len(t))
+    return dict(t=t, side=side, stop=px - side * atr, target=px + side * 2 * atr, size=size)
 
 
 def main(argv=None) -> int:

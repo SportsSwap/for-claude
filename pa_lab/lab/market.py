@@ -22,6 +22,16 @@ SPEC = {"NQ": {"tick": 0.25, "point_value": 20.0}, "ES": {"tick": 0.25, "point_v
 COMMISSION_RT = 4.0
 
 
+def instrument_spec(name: str) -> dict | None:
+    """Per-lab override of tick, point value, commission and trade size:
+    data/instrument_spec.json, e.g. {"NQ": {"tick": 0.01, "point_value": 1, "commission_rt": 0,
+    "notional": 10000, "label": "TQQQ"}}. Absent: the futures defaults above."""
+    path = P.data() / "instrument_spec.json"
+    if not path.exists():
+        return None
+    return io.read_json(path).get(name)
+
+
 @dataclass
 class Chart:
     name: str
@@ -58,6 +68,8 @@ class Market:
     news: np.ndarray          # per session: news day
     era: np.ndarray           # per session: 1 / 2 / 0 (warm-up)
     charts: dict = field(default_factory=dict)
+    commission_rt: float = COMMISSION_RT   # per unit of size, round trip
+    notional: float = 0.0                  # >0: size each trade to this many dollars (ETFs)
 
     @property
     def n(self) -> int:
@@ -87,11 +99,13 @@ class Market:
         era = np.array([0 if not t else (2 if era2_start and d >= era2_start else 1)
                         for d, t in zip(sess_dates, tradable)])
         news = np.array([d in news_days for d in sess_dates])
-        spec = SPEC.get(name, {"tick": 0.25, "point_value": 1.0})
+        spec = instrument_spec(name) or SPEC.get(name, {"tick": 0.25, "point_value": 1.0})
         mk = Market(name, tick or spec["tick"], pv or spec["point_value"], m1,
                     m1["open"].to_numpy(float), m1["high"].to_numpy(float), m1["low"].to_numpy(float),
                     m1["close"].to_numpy(float), m1["ts_event"].dt.as_unit("ns").astype("int64").to_numpy(),
                     et_min, sess, sess_dates, tradable, no_entry, roll_exit, flat, news, era)
+        mk.commission_rt = float(spec.get("commission_rt", COMMISSION_RT))
+        mk.notional = float(spec.get("notional", 0.0))
         for name_ in ch.ORDER:
             mk.charts[name_] = mk._chart(name_)
         return mk

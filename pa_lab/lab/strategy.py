@@ -562,12 +562,15 @@ def orders(mk, version: dict) -> tuple[dict, dict]:
             keep &= ~(ok & (((side == 1) & f[f"up{nn}"][dd]) | ((side == -1) & f[f"dn{nn}"][dd])))
     if v["fresh_breakouts_only"] == "on":
         keep &= cd.fresh
-    size = np.ones(len(t))
+    notional = getattr(mk, "notional", 0.0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        base = np.where(entry_ref > 0, notional / (mk.pv * entry_ref), 0.0) if notional else np.ones(len(t))
+    size = base.copy()                   # 1 contract, or a fixed dollar amount of shares (ETFs)
     news = mk.news[mk.sess[t]]
     if v["news"] == "skip":
         keep &= ~news
     elif v["news"] == "half":
-        size = np.where(news, 0.5, 1.0)
+        size = np.where(news, 0.5 * base, base)
     w = SESSION_WINDOWS[v["session"]]
     if w:
         m = (mk.et_min[t] + 1) % 1440
