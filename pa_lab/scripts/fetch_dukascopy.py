@@ -51,6 +51,29 @@ COOL_DOWN = 300         # seconds to wait after the server starts refusing
 _last = [0.0]
 
 
+def try_fetch(sym: str, day: dt.date, side: str, cache: Path, tries: int = 2) -> bool:
+    """Up to `tries` quick attempts; True when the file is cached. Failures wait for a later pass."""
+    p = cache / sym / f"{day.isoformat()}_{side}.bi5"
+    if p.exists():
+        return True
+    url = URL.format(sym=sym, y=day.year, m=day.month - 1, d=day.day, side=side)  # month is 0-based
+    for _ in range(tries):
+        wait = MIN_INTERVAL - (time.time() - _last[0])
+        if wait > 0:
+            time.sleep(wait)
+        _last[0] = time.time()
+        try:
+            r = _session().get(url, timeout=30)
+            if r.status_code in (200, 404):
+                p.parent.mkdir(parents=True, exist_ok=True)
+                p.write_bytes(r.content if r.status_code == 200 else b"")
+                return True
+        except requests.RequestException:
+            _local.__dict__.pop("s", None)
+        time.sleep(10)
+    return False
+
+
 def fetch(sym: str, day: dt.date, side: str, cache: Path) -> bytes:
     p = cache / sym / f"{day.isoformat()}_{side}.bi5"
     if p.exists():
@@ -123,21 +146,31 @@ def main(argv=None) -> int:
     SIDES = ("BID", "ASK") if a.mid else ("BID",)
     days = [d.date() for d in pd.date_range(a.start, a.end, freq="D") if d.weekday() != 5]  # no Saturday trading
     a.out.mkdir(parents=True, exist_ok=True)
-    for mkt, sym in INSTR.items():
-        t0 = time.time()
-        parts = []
-        for i, d in enumerate(days):
-            parts.append(one_day(sym, d, a.cache))
+    todo = [(sym, d, side) for sym in INSTR.values() for d in days for side in SIDES]
+    t0, n_pass = time.time(), 0
+    while True:
+        missing = [x for x in todo if not (a.cache / x[0] / f"{x[1].isoformat()}_{x[2]}.bi5").exists()]
+        if not missing:
+            break
+        n_pass += 1
+        got = 0
+        for i, (sym, d, side) in enumerate(missing):
+            got += try_fetch(sym, d, side, a.cache)
             if i % 100 == 99:
-                print(f"  {mkt} {d} ({i + 1}/{len(days)}, {time.time() - t0:.0f}s)", flush=True)
+                print(f"  pass {n_pass}: {i + 1}/{len(missing)} tried, {got} new ({time.time() - t0:.0f}s)", flush=True)
+        print(f"pass {n_pass} done: {got} of {len(missing)} fetched ({time.time() - t0:.0f}s)", flush=True)
+        if got == 0:
+            print("  no progress this pass; waiting 10 minutes", flush=True)
+            time.sleep(600)
+    for mkt, sym in INSTR.items():
+        parts = [one_day(sym, d, a.cache) for d in days]
         df = pd.concat([p for p in parts if p is not None and len(p)], ignore_index=True)
         df = df.sort_values("ts_event").reset_index(drop=True)
         df["contract"] = sym
         df.to_parquet(a.out / f"{mkt}_1m_backadjusted.parquet", index=False)
         pd.DataFrame(columns=["roll_time_utc", "old_contract", "new_contract", "spread"]).to_csv(
             a.out / f"{mkt}_rolls.csv", index=False)
-        print(f"{mkt} <- {sym}: {len(df):,} bars, {df.ts_event.min()} .. {df.ts_event.max()} ({time.time() - t0:.0f}s)",
-              flush=True)
+        print(f"{mkt} <- {sym}: {len(df):,} bars, {df.ts_event.min()} .. {df.ts_event.max()}", flush=True)
     return 0
 
 
