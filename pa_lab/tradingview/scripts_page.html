@@ -2,19 +2,19 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* layout: one narrow column, two script cards, code scrolls inside its own box */
+/* layout: one narrow column of script cards, code scrolls inside its own box */
 :root {
-  --bg: #f4f6f8; --surface: #ffffff; --fg: #17202a; --muted: #5a6776;
-  --line: #d9e0e7; --accent: #0f7b6c; --accent-fg: #ffffff; --code-bg: #0f1720; --code-fg: #d7e2ec;
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #17202a; --muted: #5a6776; --line: #d9e0e7;
+  --accent: #0f7b6c; --accent-fg: #ffffff; --warn: #9a5b00; --code-bg: #0f1720; --code-fg: #d7e2ec;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0;
-  --line: #243040; --accent: #3cc2ad; --accent-fg: #06221d; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark } }
+  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0; --line: #243040;
+  --accent: #3cc2ad; --accent-fg: #06221d; --warn: #e7a94a; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark } }
 :root[data-theme="dark"] {
-  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0;
-  --line: #243040; --accent: #3cc2ad; --accent-fg: #06221d; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark }
+  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0; --line: #243040;
+  --accent: #3cc2ad; --accent-fg: #06221d; --warn: #e7a94a; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark }
 body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 16px; line-height: 1.55;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 48px; }
 main { max-width: 860px; margin: 0 auto; display: grid; gap: 28px; }
@@ -25,13 +25,15 @@ h1 { font-size: 1.75rem; margin: 0; text-wrap: balance; }
 .script-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: space-between; }
 .titles { min-width: 0; }
 h2 { font-size: 1.2rem; margin: 0; }
-.setup { margin: 6px 0 0; }
-.chip { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.02em; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.setup { margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chip, .badge { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.02em; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.badge.ok { color: var(--accent); border-color: var(--accent); }
+.badge.warn { color: var(--warn); border-color: var(--warn); }
 .desc { margin: 0; max-width: 65ch; }
 .stats { margin: 0; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
 .copy { font: 600 0.95rem var(--sans); background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 8px; padding: 10px 18px; cursor: pointer; min-width: 140px; }
 .copy:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
-.codewrap { overflow-x: auto; max-height: 420px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; min-width: 0; }
+.codewrap { overflow: auto; max-height: 420px; background: var(--code-bg); border-radius: 8px; min-width: 0; }
 pre { margin: 0; padding: 14px 16px; }
 code { font-family: var(--mono); font-size: 0.8rem; color: var(--code-fg); white-space: pre; }
 .note { color: var(--muted); font-size: 0.9rem; margin: 0; max-width: 65ch; }
@@ -39,19 +41,19 @@ code { font-family: var(--mono); font-size: 0.8rem; color: var(--code-fg); white
 <main>
   <header>
     <h1>PA Lab Pine Scripts</h1>
-    <p class="lede">The two strategies that held up in the lab's final test, in the versions confirmed working in TradingView. Press Copy, then paste into TradingView's Pine Editor and click Add to chart.</p>
+    <p class="lede">The strategies from the lab, ready for TradingView. Press Copy, then paste into the Pine Editor and click Add to chart.</p>
   </header>
   <ol class="howto">
-    <li>Open NQ1! (or MNQ1! for the micro contract) in TradingView.</li>
-    <li>Set the chart timeframe shown on each card.</li>
+    <li>Open the symbol shown on the card.</li>
+    <li>Set the chart timeframe shown on the card.</li>
     <li>Pine Editor, paste, Add to chart. Results show in the Strategy Tester tab.</li>
   </ol>
-  
+
 <section class="script" aria-labelledby="breakout-h">
   <header class="script-head">
     <div class="titles">
       <h2 id="breakout-h">15-minute level breakout</h2>
-      <p class="setup"><span class="chip">15-minute chart · NQ1! or MNQ1!</span></p>
+      <p class="setup"><span class="chip">15-minute chart · NQ1! or MNQ1!</span> <span class="badge ok">Tested</span></p>
     </div>
     <button class="copy" type="button" id="breakout-btn" data-target="breakout-code">Copy code</button>
   </header>
@@ -218,12 +220,11 @@ if barstate.islast
          style=label.style_label_down, color=color.new(color.gray, 20), textcolor=color.white, size=size.small)
 </code></pre></div>
 </section>
-  
 <section class="script" aria-labelledby="fvg-h">
   <header class="script-head">
     <div class="titles">
       <h2 id="fvg-h">Daily fair value gap</h2>
-      <p class="setup"><span class="chip">1-hour chart · NQ1! or MNQ1!</span></p>
+      <p class="setup"><span class="chip">1-hour chart · NQ1! or MNQ1!</span> <span class="badge ok">Tested</span></p>
     </div>
     <button class="copy" type="button" id="fvg-btn" data-target="fvg-code">Copy code</button>
   </header>
@@ -308,13 +309,112 @@ plotshape(placedLong, &quot;Gap: buy limit placed&quot;, shape.triangleup, locat
 plotshape(placedShort, &quot;Gap: sell limit placed&quot;, shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
 </code></pre></div>
 </section>
-  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy's Properties.</p>
+<section class="script" aria-labelledby="fvgetf-h">
+  <header class="script-head">
+    <div class="titles">
+      <h2 id="fvgetf-h">Daily fair value gap on TQQQ / SQQQ</h2>
+      <p class="setup"><span class="chip">1-hour chart · TQQQ, SQQQ or QQQ</span> <span class="badge warn">Not tested by the lab</span></p>
+    </div>
+    <button class="copy" type="button" id="fvgetf-btn" data-target="fvgetf-code">Copy code</button>
+  </header>
+  <p class="desc">The same daily gap signals, read from NQ futures in the background, traded in the ETF on your chart. On TQQQ it takes the long signals, on SQQQ the short signals (as a buy of SQQQ). Prices are converted with the ETF's 3x leverage; each trade is $10,000 of the ETF. Gaps seen after NQ's 5pm close are acted on the next morning, when the ETF opens.</p>
+  <p class="stats">Paper trade first: this adaptation has only TradingView's own backtest behind it.</p>
+  <div class="codewrap"><pre><code id="fvgetf-code">//@version=6
+// Price Action Lab: daily fair value gap (C-fair_value_gap-00364) traded on a Nasdaq ETF.
+// Signals come from NQ futures (read in the background); trades go into this chart&#x27;s ETF:
+//   TQQQ chart: NQ long signals buy TQQQ.   SQQQ chart: NQ short signals buy SQQQ.   QQQ: longs, 1x.
+// NQ prices (limit, stop, target) are converted to ETF prices with the ETF&#x27;s leverage.
+// NOT TESTED BY THE LAB: the lab tested NQ itself. Paper trade before risking money.
+// ETFs trade 9:30-16:00 New York, so a gap seen after NQ&#x27;s 17:00 close is acted on next morning.
+strategy(&quot;PA Lab Daily FVG on ETF&quot;, shorttitle=&quot;PALab FVG ETF&quot;, overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.cash, default_qty_value=10000,
+     commission_type=strategy.commission.percent, commission_value=0.0, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
+
+// ---------------------------------------------------------------- dials (from the lab)
+float MIN_GAP_ATR = 0.1
+float STOP_BUF    = 0.1
+float TARGET_R    = 3.0
+int   HOLD_DAYS   = 4      // NQ&#x27;s 96 hourly bars are about 4 sessions: exit at the 4th ETF close
+bool  SKIP_NEWS   = true
+string NQ = input.symbol(&quot;CME_MINI:NQ1!&quot;, &quot;Signal market&quot;)
+
+if timeframe.period != &quot;60&quot;
+    runtime.error(&quot;Put this strategy on a 1-hour chart of TQQQ, SQQQ or QQQ.&quot;)
+
+float LEV = syminfo.ticker == &quot;SQQQ&quot; ? -3.0 : syminfo.ticker == &quot;TQQQ&quot; ? 3.0 : syminfo.ticker == &quot;QQQ&quot; ? 1.0 : na
+if na(LEV)
+    runtime.error(&quot;Use this on TQQQ, SQQQ or QQQ.&quot;)
+int WANT = LEV &gt; 0 ? 1 : -1                 // which NQ signal this ETF takes
+
+var array&lt;int&gt; NEWS = array.new&lt;int&gt;()
+if barstate.isfirst
+    for s in str.split(&quot;20210903,20210914,20210922,20211008,20211013,20211103,20211105,20211110,20211203,20211210,20211215,20220107,20220112,20220126,20220204,20220210,20220304,20220310,20220316,20220401,20220412,20220504,20220506,20220511,20220603,20220610,20220615,20220708,20220713,20220727,20220805,20220810,20220902,20220913,20220921,20221007,20221013,20221102,20221104,20221110,20221202,20221213,20221214,20230106,20230112,20230201,20230203,20230214,20230310,20230314,20230322,20230407,20230412,20230503,20230505,20230510,20230602,20230613,20230614,20230707,20230712,20230726,20230804,20230810,20230901,20230913,20230920,20231006,20231012,20231101,20231103,20231114,20231208,20231212,20231213,20240105,20240111,20240131,20240202,20240213,20240308,20240312,20240320,20240405,20240410,20240501,20240503,20240515,20240607,20240612,20240705,20240711,20240731,20240802,20240814,20240906,20240911,20240918,20241004,20241010,20241101,20241107,20241113,20241206,20241211,20241218,20250110,20250115,20250129,20250207,20250212,20250307,20250312,20250319,20250404,20250410,20250502,20250507,20250513,20250606,20250611,20250618,20250703,20250715,20250730,20250801,20250812,20250905,20250911,20250917,20251024,20251029,20251120,20251210,20251216,20251218,20260109,20260113,20260128,20260211,20260213,20260306,20260311,20260318,20260403,20260410,20260429,20260508,20260512,20260605,20260610,20260617,20260702,20260714,20260729,20260807,20260812,20260904,20260911,20260916,20261002,20261014,20261028,20261106,20261110,20261204,20261209,20261210,20270108,20270113,20270127,20270205,20270211,20270305,20270310,20270317,20270402,20270413,20270428,20270507,20270512,20270604,20270609,20270610,20270702,20270714,20270728,20270806,20270811,20270903,20270914,20270915,20271008,20271014,20271027,20271105,20271110,20271203,20271208,20271210&quot;, &quot;,&quot;)
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- NQ: last completed daily bar, and NQ now
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(NQ, &quot;D&quot;,
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+float nqNow = request.security(NQ, timeframe.period, close)
+bool newDay = ta.change(dDay) != 0
+
+toEtf(float nqPrice) =&gt;
+    close * (1 + LEV * (nqPrice / nqNow - 1))
+
+// ---------------------------------------------------------------- state
+var bool pending = false
+var int daysHeld = 0
+bool sessionClose = hour(time_close, &quot;America/New_York&quot;) == 16 and minute(time_close, &quot;America/New_York&quot;) == 0
+if pending or strategy.position_size != 0
+    if sessionClose
+        daysHeld += 1
+    if sessionClose and daysHeld &gt;= HOLD_DAYS
+        strategy.cancel_all()
+        strategy.close_all(comment=&quot;time exit&quot;)
+        pending := false
+if pending and strategy.position_size != 0
+    pending := false
+if not pending and strategy.position_size == 0
+    daysHeld := 0
+
+// ---------------------------------------------------------------- signal from NQ, order in the ETF
+bool placed = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and not na(nqNow) and strategy.position_size == 0 and not pending
+    int day = year(dDay, &quot;UTC&quot;) * 10000 + month(dDay, &quot;UTC&quot;) * 100 + dayofmonth(dDay, &quot;UTC&quot;)
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    int sig = 0
+    float near = na
+    float stop = na
+    if not news
+        if dLow &gt; dHigh2 and dLow - dHigh2 &gt;= MIN_GAP_ATR * dAtrPrior and dClose &gt; dLow
+            sig := 1
+            near := dLow
+            stop := dHigh2 - STOP_BUF * dAtrPrior
+        else if dHigh &lt; dLow2 and dLow2 - dHigh &gt;= MIN_GAP_ATR * dAtrPrior and dClose &lt; dHigh
+            sig := -1
+            near := dHigh
+            stop := dLow2 + STOP_BUF * dAtrPrior
+    if sig == WANT
+        float target = near + TARGET_R * (near - stop)
+        float eNear = toEtf(near)
+        float eStop = toEtf(stop)
+        float eTarget = toEtf(target)
+        if eNear &lt; close and eStop &lt; eNear and eTarget &gt; eNear      // a buy limit under price, sane levels
+            strategy.entry(&quot;Buy&quot;, strategy.long, limit=eNear)
+            strategy.exit(&quot;Exit&quot;, &quot;Buy&quot;, stop=eStop, limit=eTarget)
+            pending := true
+            daysHeld := 0
+            placed := true
+
+plotshape(placed, &quot;Buy limit placed&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
+</code></pre></div>
+</section>
+  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy's Properties. News dates are built in through December 2027.</p>
 </main>
 <script>
 document.querySelectorAll(".copy").forEach(btn => {
   btn.addEventListener("click", () => {
     const el = document.getElementById(btn.dataset.target);
-    const text = el.textContent;
     const done = () => { btn.textContent = "Copied"; setTimeout(() => (btn.textContent = "Copy code"), 1800); };
     const fallback = () => {
       const r = document.createRange(); r.selectNodeContents(el);
@@ -322,7 +422,7 @@ document.querySelectorAll(".copy").forEach(btn => {
       btn.textContent = "Selected: press Ctrl+C";
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(fallback);
+      navigator.clipboard.writeText(el.textContent).then(done).catch(fallback);
     } else { fallback(); }
   });
 });

@@ -274,6 +274,97 @@ plotshape(placedShort, "Gap: sell limit placed", shape.triangledown, location.ab
 """
 
 
+FVG_ETF = """//@version=6
+// Price Action Lab: daily fair value gap ({vid}) traded on a Nasdaq ETF.
+// Signals come from NQ futures (read in the background); trades go into this chart's ETF:
+//   TQQQ chart: NQ long signals buy TQQQ.   SQQQ chart: NQ short signals buy SQQQ.   QQQ: longs, 1x.
+// NQ prices (limit, stop, target) are converted to ETF prices with the ETF's leverage.
+// NOT TESTED BY THE LAB: the lab tested NQ itself. Paper trade before risking money.
+// ETFs trade 9:30-16:00 New York, so a gap seen after NQ's 17:00 close is acted on next morning.
+strategy("PA Lab Daily FVG on ETF", shorttitle="PALab FVG ETF", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.cash, default_qty_value=10000,
+     commission_type=strategy.commission.percent, commission_value=0.0, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
+
+// ---------------------------------------------------------------- dials (from the lab)
+float MIN_GAP_ATR = {min_gap}
+float STOP_BUF    = {buf}
+float TARGET_R    = {target}
+int   HOLD_DAYS   = 4      // NQ's 96 hourly bars are about 4 sessions: exit at the 4th ETF close
+bool  SKIP_NEWS   = {skip_news}
+string NQ = input.symbol("CME_MINI:NQ1!", "Signal market")
+
+if timeframe.period != "60"
+    runtime.error("Put this strategy on a 1-hour chart of TQQQ, SQQQ or QQQ.")
+
+float LEV = syminfo.ticker == "SQQQ" ? -3.0 : syminfo.ticker == "TQQQ" ? 3.0 : syminfo.ticker == "QQQ" ? 1.0 : na
+if na(LEV)
+    runtime.error("Use this on TQQQ, SQQQ or QQQ.")
+int WANT = LEV > 0 ? 1 : -1                 // which NQ signal this ETF takes
+
+var array<int> NEWS = array.new<int>()
+if barstate.isfirst
+    for s in str.split("{news}", ",")
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- NQ: last completed daily bar, and NQ now
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(NQ, "D",
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+float nqNow = request.security(NQ, timeframe.period, close)
+bool newDay = ta.change(dDay) != 0
+
+toEtf(float nqPrice) =>
+    close * (1 + LEV * (nqPrice / nqNow - 1))
+
+// ---------------------------------------------------------------- state
+var bool pending = false
+var int daysHeld = 0
+bool sessionClose = hour(time_close, "America/New_York") == 16 and minute(time_close, "America/New_York") == 0
+if pending or strategy.position_size != 0
+    if sessionClose
+        daysHeld += 1
+    if sessionClose and daysHeld >= HOLD_DAYS
+        strategy.cancel_all()
+        strategy.close_all(comment="time exit")
+        pending := false
+if pending and strategy.position_size != 0
+    pending := false
+if not pending and strategy.position_size == 0
+    daysHeld := 0
+
+// ---------------------------------------------------------------- signal from NQ, order in the ETF
+bool placed = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and not na(nqNow) and strategy.position_size == 0 and not pending
+    int day = year(dDay, "UTC") * 10000 + month(dDay, "UTC") * 100 + dayofmonth(dDay, "UTC")
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    int sig = 0
+    float near = na
+    float stop = na
+    if not news
+        if dLow > dHigh2 and dLow - dHigh2 >= MIN_GAP_ATR * dAtrPrior and dClose > dLow
+            sig := 1
+            near := dLow
+            stop := dHigh2 - STOP_BUF * dAtrPrior
+        else if dHigh < dLow2 and dLow2 - dHigh >= MIN_GAP_ATR * dAtrPrior and dClose < dHigh
+            sig := -1
+            near := dHigh
+            stop := dLow2 + STOP_BUF * dAtrPrior
+    if sig == WANT
+        float target = near + TARGET_R * (near - stop)
+        float eNear = toEtf(near)
+        float eStop = toEtf(stop)
+        float eTarget = toEtf(target)
+        if eNear < close and eStop < eNear and eTarget > eNear      // a buy limit under price, sane levels
+            strategy.entry("Buy", strategy.long, limit=eNear)
+            strategy.exit("Exit", "Buy", stop=eStop, limit=eTarget)
+            pending := true
+            daysHeld := 0
+            placed := true
+
+plotshape(placed, "Buy limit placed", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
+"""
+
+
 def main() -> int:
     out = ROOT / "tradingview"
     out.mkdir(exist_ok=True)
@@ -291,6 +382,9 @@ def main() -> int:
         min_gap=f["fvg_min_gap_atr"], buf=f["stop_buffer_atr"], target=float(f["target"].rstrip("R")),
         timebars=int(f["time_exit"].split("_")[1]), skip_news="true" if f["news"] == "skip" else "false",
         news=news))
+    (out / "palab_daily_fvg_etf_1h.pine").write_text(FVG_ETF.format(
+        vid="C-fair_value_gap-00364", min_gap=f["fvg_min_gap_atr"], buf=f["stop_buffer_atr"],
+        target=float(f["target"].rstrip("R")), skip_news="true" if f["news"] == "skip" else "false", news=news))
     print("wrote", [p.name for p in out.glob("*.pine")], "news days:", news.count(",") + 1)
     return 0
 

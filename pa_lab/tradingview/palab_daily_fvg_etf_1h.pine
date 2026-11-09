@@ -1,0 +1,88 @@
+//@version=6
+// Price Action Lab: daily fair value gap (C-fair_value_gap-00364) traded on a Nasdaq ETF.
+// Signals come from NQ futures (read in the background); trades go into this chart's ETF:
+//   TQQQ chart: NQ long signals buy TQQQ.   SQQQ chart: NQ short signals buy SQQQ.   QQQ: longs, 1x.
+// NQ prices (limit, stop, target) are converted to ETF prices with the ETF's leverage.
+// NOT TESTED BY THE LAB: the lab tested NQ itself. Paper trade before risking money.
+// ETFs trade 9:30-16:00 New York, so a gap seen after NQ's 17:00 close is acted on next morning.
+strategy("PA Lab Daily FVG on ETF", shorttitle="PALab FVG ETF", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.cash, default_qty_value=10000,
+     commission_type=strategy.commission.percent, commission_value=0.0, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
+
+// ---------------------------------------------------------------- dials (from the lab)
+float MIN_GAP_ATR = 0.1
+float STOP_BUF    = 0.1
+float TARGET_R    = 3.0
+int   HOLD_DAYS   = 4      // NQ's 96 hourly bars are about 4 sessions: exit at the 4th ETF close
+bool  SKIP_NEWS   = true
+string NQ = input.symbol("CME_MINI:NQ1!", "Signal market")
+
+if timeframe.period != "60"
+    runtime.error("Put this strategy on a 1-hour chart of TQQQ, SQQQ or QQQ.")
+
+float LEV = syminfo.ticker == "SQQQ" ? -3.0 : syminfo.ticker == "TQQQ" ? 3.0 : syminfo.ticker == "QQQ" ? 1.0 : na
+if na(LEV)
+    runtime.error("Use this on TQQQ, SQQQ or QQQ.")
+int WANT = LEV > 0 ? 1 : -1                 // which NQ signal this ETF takes
+
+var array<int> NEWS = array.new<int>()
+if barstate.isfirst
+    for s in str.split("20210903,20210914,20210922,20211008,20211013,20211103,20211105,20211110,20211203,20211210,20211215,20220107,20220112,20220126,20220204,20220210,20220304,20220310,20220316,20220401,20220412,20220504,20220506,20220511,20220603,20220610,20220615,20220708,20220713,20220727,20220805,20220810,20220902,20220913,20220921,20221007,20221013,20221102,20221104,20221110,20221202,20221213,20221214,20230106,20230112,20230201,20230203,20230214,20230310,20230314,20230322,20230407,20230412,20230503,20230505,20230510,20230602,20230613,20230614,20230707,20230712,20230726,20230804,20230810,20230901,20230913,20230920,20231006,20231012,20231101,20231103,20231114,20231208,20231212,20231213,20240105,20240111,20240131,20240202,20240213,20240308,20240312,20240320,20240405,20240410,20240501,20240503,20240515,20240607,20240612,20240705,20240711,20240731,20240802,20240814,20240906,20240911,20240918,20241004,20241010,20241101,20241107,20241113,20241206,20241211,20241218,20250110,20250115,20250129,20250207,20250212,20250307,20250312,20250319,20250404,20250410,20250502,20250507,20250513,20250606,20250611,20250618,20250703,20250715,20250730,20250801,20250812,20250905,20250911,20250917,20251024,20251029,20251120,20251210,20251216,20251218,20260109,20260113,20260128,20260211,20260213,20260306,20260311,20260318,20260403,20260410,20260429,20260508,20260512,20260605,20260610,20260617,20260702,20260714,20260729,20260807,20260812,20260904,20260911,20260916,20261002,20261014,20261028,20261106,20261110,20261204,20261209,20261210,20270108,20270113,20270127,20270205,20270211,20270305,20270310,20270317,20270402,20270413,20270428,20270507,20270512,20270604,20270609,20270610,20270702,20270714,20270728,20270806,20270811,20270903,20270914,20270915,20271008,20271014,20271027,20271105,20271110,20271203,20271208,20271210", ",")
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- NQ: last completed daily bar, and NQ now
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(NQ, "D",
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+float nqNow = request.security(NQ, timeframe.period, close)
+bool newDay = ta.change(dDay) != 0
+
+toEtf(float nqPrice) =>
+    close * (1 + LEV * (nqPrice / nqNow - 1))
+
+// ---------------------------------------------------------------- state
+var bool pending = false
+var int daysHeld = 0
+bool sessionClose = hour(time_close, "America/New_York") == 16 and minute(time_close, "America/New_York") == 0
+if pending or strategy.position_size != 0
+    if sessionClose
+        daysHeld += 1
+    if sessionClose and daysHeld >= HOLD_DAYS
+        strategy.cancel_all()
+        strategy.close_all(comment="time exit")
+        pending := false
+if pending and strategy.position_size != 0
+    pending := false
+if not pending and strategy.position_size == 0
+    daysHeld := 0
+
+// ---------------------------------------------------------------- signal from NQ, order in the ETF
+bool placed = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and not na(nqNow) and strategy.position_size == 0 and not pending
+    int day = year(dDay, "UTC") * 10000 + month(dDay, "UTC") * 100 + dayofmonth(dDay, "UTC")
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    int sig = 0
+    float near = na
+    float stop = na
+    if not news
+        if dLow > dHigh2 and dLow - dHigh2 >= MIN_GAP_ATR * dAtrPrior and dClose > dLow
+            sig := 1
+            near := dLow
+            stop := dHigh2 - STOP_BUF * dAtrPrior
+        else if dHigh < dLow2 and dLow2 - dHigh >= MIN_GAP_ATR * dAtrPrior and dClose < dHigh
+            sig := -1
+            near := dHigh
+            stop := dLow2 + STOP_BUF * dAtrPrior
+    if sig == WANT
+        float target = near + TARGET_R * (near - stop)
+        float eNear = toEtf(near)
+        float eStop = toEtf(stop)
+        float eTarget = toEtf(target)
+        if eNear < close and eStop < eNear and eTarget > eNear      // a buy limit under price, sane levels
+            strategy.entry("Buy", strategy.long, limit=eNear)
+            strategy.exit("Exit", "Buy", stop=eStop, limit=eTarget)
+            pending := true
+            daysHeld := 0
+            placed := true
+
+plotshape(placed, "Buy limit placed", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
