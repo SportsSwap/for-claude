@@ -1,0 +1,60 @@
+{
+  "alpha": 0.05,
+  "candidates": {
+    "NQ": {
+      "held": 13,
+      "versions": 53,
+      "share": 0.24528301886792453,
+      "all_share": 0.12106627175120326,
+      "p_value": 0.0092581597381932,
+      "beats_all": true
+    },
+    "ES": {
+      "held": 8,
+      "versions": 53,
+      "share": 0.1509433962264151,
+      "all_share": 0.07330618289522399,
+      "p_value": 0.03824784502456362,
+      "beats_all": true
+    }
+  },
+  "working": {
+    "tested": 3,
+    "beat_random": 0,
+    "verdict": "false",
+    "rows": [
+      {
+        "setup": "breakout",
+        "chart": "daily",
+        "market": "ES",
+        "p_value": 0.517,
+        "beats_random": false,
+        "real_net": 23133.77923027144
+      },
+      {
+        "setup": "fair_value_gap",
+        "chart": "4h",
+        "market": "ES",
+        "p_value": 0.655,
+        "beats_random": false,
+        "real_net": -138970.5663263814
+      },
+      {
+        "setup": "fair_value_gap",
+        "chart": "daily",
+        "market": "ES",
+        "p_value": 0.472,
+        "beats_random": false,
+        "real_net": 59318.369389782805
+      }
+    ]
+  },
+  "candidates_verdict": "true",
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T06:28:03+00:00"
+}

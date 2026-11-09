@@ -581,3 +581,19 @@ value gap daily 11, 4h 8). Setups that work as a whole: three, all on ES
 what separates that from an edge. Named systems: none became a candidate.
 The deck banner no longer cites "D39": the digit scan correctly refused an
 unsourced number in my own label.
+
+D41. **Final test on real data (CFD stand-ins), run once at the user's "go".**
+One unlock (2026-11-09 06:10:43 UTC, relocked 06:10:45), 586 sealed sessions,
+every version of every set on NQ and ES.
+- Candidates held up about twice as often as versions at large: NQ 13 of 53
+  (24.5%) vs 12.1% (binomial p = 0.009); ES 8 of 53 (15.1%) vs 7.3% (p = 0.038).
+  The funnel's selection carried information into unseen data.
+- The three setups that worked as a whole in discovery (all ES) did not beat
+  matched random trades on ES in the sealed window (0 of 3). On NQ they made
+  money, but so did their random twins: the market rose from 2024 to 2026.
+- Seven candidates held on both markets, almost all trading both directions:
+  the 15m breakout C-breakout-00051 (941 NQ trades, Sharpe 0.72 NQ / 0.59 ES)
+  and five daily fair-value-gap versions (about 50 trades each, Sharpe 0.6-1.0).
+- No named textbook system held up.
+These are CFD results; a version worth trading should be checked on CME
+futures data and paper traded before any money is at risk.

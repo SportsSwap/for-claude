@@ -1,11 +1,11 @@
 {
  "sizes": {
   "1920x1080": {
-   "pages": 35,
+   "pages": 39,
    "problems": []
   },
   "1280x720": {
-   "pages": 35,
+   "pages": 39,
    "problems": []
   }
  },
@@ -219,6 +219,30 @@
    "key": "rule_effects",
    "title": "Each Rule, All Else Equal",
    "screenshot": "screens/page_35.png"
+  },
+  {
+   "n": 36,
+   "key": "final_intro",
+   "title": "The Sealed Window",
+   "screenshot": "screens/page_36.png"
+  },
+  {
+   "n": 37,
+   "key": "final_held",
+   "title": "What Held Up",
+   "screenshot": "screens/page_37.png"
+  },
+  {
+   "n": 38,
+   "key": "final_working",
+   "title": "Working Setups, Sealed",
+   "screenshot": "screens/page_38.png"
+  },
+  {
+   "n": 39,
+   "key": "final_named",
+   "title": "Named Systems, Sealed",
+   "screenshot": "screens/page_39.png"
   }
  ],
  "screenshots_match_page_list": true,

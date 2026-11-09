@@ -1,0 +1,173 @@
+{
+  "source": "final",
+  "warmup_start": "2024-05-01",
+  "window": [
+    "2024-08-01",
+    "2026-11-06"
+  ],
+  "sealed_manifest_sha256": {
+    "NQ_1m.parquet": "5ae74192fadb0ff22cbe37a5d01692fc26fa9a568cde1a407641ffae61793abf",
+    "NQ_rolls.parquet": "224252adc9adafff23e30accb1082401726b55ce40d7b38bd89dcce982653fcf",
+    "ES_1m.parquet": "44955ac2b83566145ba4e381debf3f884a96f6255a54d434683a1950b84767d0",
+    "ES_rolls.parquet": "224252adc9adafff23e30accb1082401726b55ce40d7b38bd89dcce982653fcf",
+    "audit_final.json": "9d150836aa0d53ecd4fb43a1d8b854e126e1c5777ea3703310ceeb4eadd1cc52"
+  },
+  "versions": 5402,
+  "errors": 0,
+  "dropped_sessions": {
+    "NQ": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-11-29",
+      "2024-12-24",
+      "2025-01-09",
+      "2025-01-20",
+      "2025-02-17",
+      "2025-05-26",
+      "2025-06-19",
+      "2025-07-03",
+      "2025-07-04",
+      "2025-09-01",
+      "2025-11-27",
+      "2025-11-28",
+      "2025-12-24",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07"
+    ],
+    "ES": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-11-29",
+      "2024-12-24",
+      "2025-01-09",
+      "2025-01-20",
+      "2025-02-17",
+      "2025-05-26",
+      "2025-06-19",
+      "2025-07-03",
+      "2025-07-04",
+      "2025-09-01",
+      "2025-11-27",
+      "2025-11-28",
+      "2025-12-24",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07"
+    ]
+  },
+  "selection_hashes": {
+    "versions.jsonl": "bfc82e22e93c5a8519654c00c23176c71af0170a1989ccf7152e9f8856a39b7d",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "687db5fc02adde60189ebddd9485f507153c6fc3b6bf5bd8000c548500c3b208",
+    "working_setups.json": "9adba48bebc73101c883583281d2b34cb77957fede759e861c29dda02c9293e2",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "share_held": [
+    {
+      "market": "NQ",
+      "group": "all",
+      "versions": 5402,
+      "held": 654,
+      "share_held": 0.12106627175120326
+    },
+    {
+      "market": "NQ",
+      "group": "candidates",
+      "versions": 53,
+      "held": 13,
+      "share_held": 0.24528301886792453
+    },
+    {
+      "market": "NQ",
+      "group": "set:common",
+      "versions": 2336,
+      "held": 282,
+      "share_held": 0.12071917808219178
+    },
+    {
+      "market": "NQ",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "NQ",
+      "group": "set:sampled",
+      "versions": 1660,
+      "held": 189,
+      "share_held": 0.11385542168674699
+    },
+    {
+      "market": "NQ",
+      "group": "set:spread",
+      "versions": 1400,
+      "held": 183,
+      "share_held": 0.13071428571428573
+    },
+    {
+      "market": "ES",
+      "group": "all",
+      "versions": 5402,
+      "held": 396,
+      "share_held": 0.07330618289522399
+    },
+    {
+      "market": "ES",
+      "group": "candidates",
+      "versions": 53,
+      "held": 8,
+      "share_held": 0.1509433962264151
+    },
+    {
+      "market": "ES",
+      "group": "set:common",
+      "versions": 2336,
+      "held": 146,
+      "share_held": 0.0625
+    },
+    {
+      "market": "ES",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "ES",
+      "group": "set:sampled",
+      "versions": 1660,
+      "held": 141,
+      "share_held": 0.08493975903614458
+    },
+    {
+      "market": "ES",
+      "group": "set:spread",
+      "versions": 1400,
+      "held": 109,
+      "share_held": 0.07785714285714286
+    }
+  ],
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T06:27:56+00:00"
+}

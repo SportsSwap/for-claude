@@ -281,3 +281,35 @@ Data: Dukascopy CFD stand-in data
 - numbers: +0.28, +2.80, +0.99, +1.45, +1.71, +0.75, +1.04, -0.47, +1.62, -9.51, +0.86, -2.68, +1.31
 - conclusion: Pairs from the usual-settings grid, differing in one rule only.
 - verdict: -
+
+## 36. The Sealed Window
+
+- section: Final test
+- subtitle: Opened once, after every choice was hashed
+- numbers: -
+- conclusion: -
+- verdict: -
+
+## 37. What Held Up
+
+- section: Final test
+- subtitle: Share of versions profitable with a Sharpe of half or more, NQ sealed window
+- numbers: 12.1%, 24.5%, 12.1%, 11.4%, 13.1%, 13, 0.01
+- conclusion: Candidates held up clearly more often than versions at large.
+- verdict: true
+
+## 38. Working Setups, Sealed
+
+- section: Final test
+- subtitle: Net over the sealed window on the market where each setup worked in discovery
+- numbers: +$23,134, -$138,971, +$59,318, 0, 3
+- conclusion: Each must beat random trades with the same shape on data it never saw.
+- verdict: false
+
+## 39. Named Systems, Sealed
+
+- section: Final test
+- subtitle: Net after costs on the NQ sealed window
+- numbers: +$9,313, -$33,946, -$29,444, +$5,398, -$15,156, -$28,535, 0
+- conclusion: The systems as taught, on sessions no rule had seen.
+- verdict: -
