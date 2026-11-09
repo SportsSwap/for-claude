@@ -1,0 +1,17 @@
+{
+  "candidate_rule": "stages 1-4 on NQ, net > 0 in era 1 (2022) and era 2 (2023-01-01..2024-07-31) on NQ, and stage 5 on ES",
+  "min_signals_to_grade": 40,
+  "setup_min_sharpe": 0.5,
+  "setup_works_rule": "equal-weight average daily P&L of all graded versions of a setup on one chart and market: net > 0 in every calendar year, Sharpe >= 0.5, net > 0 in era 1 and in era 2",
+  "sharpe": "mean / std of daily P&L over every tradable discovery session (zero days included) x sqrt(252)",
+  "stage1_min_trades": 30,
+  "stage2_min_net_dollars_exclusive": 0.0,
+  "stage3_min_sharpe": 0.5,
+  "stage4_max_share_of_sets_as_good": 0.05,
+  "stage4_max_twin_sims_per_version": 200000,
+  "stage4_min_twins_per_trade": 20,
+  "stage4_twin_sets": 10000,
+  "stage4_twins_per_trade": 100,
+  "stage5_es_min_net_dollars_exclusive": 0.0,
+  "stage5_es_min_sharpe": 0.3
+}
