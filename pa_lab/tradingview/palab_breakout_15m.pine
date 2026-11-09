@@ -1,0 +1,152 @@
+//@version=6
+// Price Action Lab survivor: C-breakout-00051
+// Survived the lab's sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
+// NQ 941 trades, +$112,064, Sharpe 0.72; ES 993 trades, +$45,704, Sharpe 0.59.
+// Dials are fixed by the lab. Changing any value tests a different, untested version.
+// Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
+// Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
+// bar that hits both stop and target it may not assume the stop first (the lab does).
+// Paper trade before risking money.
+strategy("PA Lab 15m Level Breakout", shorttitle="PALab Breakout", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
+     backtest_fill_limits_assumption=1, max_lines_count=100)
+
+// ---------------------------------------------------------------- dials (from the lab)
+int   SWING     = 3       // swing strength: bars each side
+float TOL_ATR   = 0.25    // swings within this many ATR form one level
+int   TOUCHES   = 3       // swings a level needs
+int   LIFE      = 500     // bars a level lives after its last swing
+float STOP_BUF  = 0.1     // stop buffer beyond the last swing, in ATR
+float TARGET_R  = 1.0     // target in multiples of risk
+int   TIME_BARS = 96      // exit after this many 15m bars
+int   SESS_FROM = 480     // entries only when the bar closes 08:00 ...
+int   SESS_TO   = 960     // ... to 16:00 New York time
+
+if timeframe.period != "15"
+    runtime.error("Put this strategy on a 15-minute chart (NQ1! or ES1!).")
+
+float atrPrior = ta.atr(14)[1]          // Wilder ATR through the previous bar only
+
+// ---------------------------------------------------------------- swings (confirmed SWING bars later)
+isPivotHigh() =>
+    bool ok = true
+    float c = high[SWING]
+    for j = 1 to SWING
+        if not (c > high[SWING + j]) or not (c >= high[SWING - j])
+            ok := false
+    ok
+
+isPivotLow() =>
+    bool ok = true
+    float c = low[SWING]
+    for j = 1 to SWING
+        if not (c < low[SWING + j]) or not (c <= low[SWING - j])
+            ok := false
+    ok
+
+bool pivotHigh = isPivotHigh()          // evaluated on every bar
+bool pivotLow  = isPivotLow()
+bool newHigh = bar_index > 2 * SWING and pivotHigh
+bool newLow  = bar_index > 2 * SWING and pivotLow
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+
+// ---------------------------------------------------------------- levels: clusters of swings
+var array<float> clSum  = array.new<float>()
+var array<int>   clN    = array.new<int>()
+var array<int>   clLast = array.new<int>()
+var array<float> lvPrice = array.new<float>()
+var array<int>   lvBorn  = array.new<int>()
+
+addSwing(float p, float a) =>
+    if not na(a)
+        int best = -1
+        float bestD = 1e18
+        int n = array.size(clSum)
+        if n > 0
+            for i = 0 to n - 1
+                if bar_index - array.get(clLast, i) <= LIFE
+                    float d = math.abs(p - array.get(clSum, i) / array.get(clN, i))
+                    if d <= TOL_ATR * a and d < bestD
+                        best := i
+                        bestD := d
+        if best < 0
+            array.push(clSum, p)
+            array.push(clN, 1)
+            array.push(clLast, bar_index)
+            best := array.size(clSum) - 1
+        else
+            array.set(clSum, best, array.get(clSum, best) + p)
+            array.set(clN, best, array.get(clN, best) + 1)
+            array.set(clLast, best, bar_index)
+        if array.get(clN, best) >= TOUCHES
+            array.push(lvPrice, array.get(clSum, best) / array.get(clN, best))
+            array.push(lvBorn, bar_index)
+            array.remove(clSum, best)
+            array.remove(clN, best)
+            array.remove(clLast, best)
+        int m = array.size(clSum)
+        if m > 0
+            for i = m - 1 to 0
+                if bar_index - array.get(clLast, i) > LIFE
+                    array.remove(clSum, i)
+                    array.remove(clN, i)
+                    array.remove(clLast, i)
+    true
+
+if newHigh
+    lastSwingHigh := high[SWING]
+    addSwing(high[SWING], atrPrior)
+if newLow
+    lastSwingLow := low[SWING]
+    addSwing(low[SWING], atrPrior)
+
+// ---------------------------------------------------------------- breaks: first close through a level
+int breakDir = 0
+float breakLevel = na
+int nl = array.size(lvPrice)
+if nl > 0
+    for i = nl - 1 to 0
+        if bar_index - array.get(lvBorn, i) > LIFE
+            array.remove(lvPrice, i)
+            array.remove(lvBorn, i)
+nl := array.size(lvPrice)
+if nl > 0
+    for i = 0 to nl - 1
+        float lv = array.get(lvPrice, i)
+        if breakDir == 0 and bar_index > array.get(lvBorn, i)
+            if close[1] < lv and close > lv
+                breakDir := 1
+                breakLevel := lv
+            else if close[1] > lv and close < lv
+                breakDir := -1
+                breakLevel := lv
+
+// ---------------------------------------------------------------- entries and exits
+int closeMin = hour(time_close, "America/New_York") * 60 + minute(time_close, "America/New_York")
+bool inSession = closeMin >= SESS_FROM and closeMin <= SESS_TO
+var int entryBar = na
+
+if strategy.position_size != 0 and not na(entryBar) and bar_index >= entryBar + TIME_BARS
+    strategy.close_all(comment="time exit")
+    entryBar := na
+
+if strategy.position_size == 0 and breakDir != 0 and inSession and not na(atrPrior)
+    if breakDir == 1 and not na(lastSwingLow)
+        float stop = lastSwingLow - STOP_BUF * atrPrior
+        float risk = close - stop
+        if risk >= syminfo.mintick
+            strategy.entry("Long", strategy.long)
+            strategy.exit("Long exit", "Long", stop=stop, limit=close + TARGET_R * risk)
+            entryBar := bar_index
+    else if breakDir == -1 and not na(lastSwingHigh)
+        float stop = lastSwingHigh + STOP_BUF * atrPrior
+        float risk = stop - close
+        if risk >= syminfo.mintick
+            strategy.entry("Short", strategy.short)
+            strategy.exit("Short exit", "Short", stop=stop, limit=close - TARGET_R * risk)
+            entryBar := bar_index
+
+plotshape(breakDir == 1 and inSession, "Break up", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
+plotshape(breakDir == -1 and inSession, "Break down", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)

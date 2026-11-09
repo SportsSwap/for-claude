@@ -1,0 +1,97 @@
+//@version=6
+// Price Action Lab survivor: C-fair_value_gap-00364
+// Survived the lab's sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
+// NQ 50 trades, +$100,990, Sharpe 1.01; ES 49 trades, +$39,679, Sharpe 0.84.
+// Dials are fixed by the lab. Changing any value tests a different, untested version.
+// Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
+// Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
+// bar that hits both stop and target it may not assume the stop first (the lab does).
+// Paper trade before risking money.
+strategy("PA Lab Daily Fair Value Gap, 1h", shorttitle="PALab Daily FVG", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
+     backtest_fill_limits_assumption=1)
+
+// ---------------------------------------------------------------- dials (from the lab)
+float MIN_GAP_ATR = 0.1   // smallest daily gap kept, in daily ATR
+float STOP_BUF    = 0.1   // stop beyond the gap's far edge, in daily ATR
+float TARGET_R    = 3.0   // target in multiples of risk
+int   TIME_BARS   = 96    // the limit lives, and a trade is closed after, this many 1h bars
+bool  SKIP_NEWS   = true  // no gap formed on a CPI, jobs-report or FOMC day is traded
+
+if timeframe.period != "60"
+    runtime.error("Put this strategy on a 1-hour chart (NQ1! or ES1!).")
+
+// News days (CPI, jobs report, FOMC), YYYYMMDD, from the lab's verified calendar
+var array<int> NEWS = array.new<int>()
+if barstate.isfirst
+    for s in str.split("20210903,20210914,20210922,20211008,20211013,20211103,20211105,20211110,20211203,20211210,20211215,20220107,20220112,20220126,20220204,20220210,20220304,20220310,20220316,20220401,20220412,20220504,20220506,20220511,20220603,20220610,20220615,20220708,20220713,20220727,20220805,20220810,20220902,20220913,20220921,20221007,20221013,20221102,20221104,20221110,20221202,20221213,20221214,20230106,20230112,20230201,20230203,20230214,20230310,20230314,20230322,20230407,20230412,20230503,20230505,20230510,20230602,20230613,20230614,20230707,20230712,20230726,20230804,20230810,20230901,20230913,20230920,20231006,20231012,20231101,20231103,20231114,20231208,20231212,20231213,20240105,20240111,20240131,20240202,20240213,20240308,20240312,20240320,20240405,20240410,20240501,20240503,20240515,20240607,20240612,20240705,20240711,20240731,20240802,20240814,20240906,20240911,20240918,20241004,20241010,20241101,20241107,20241113,20241206,20241211,20241218,20250110,20250115,20250129,20250207,20250212,20250307,20250312,20250319,20250404,20250410,20250502,20250507,20250513,20250606,20250611,20250618,20250703,20250715,20250730,20250801,20250812,20250905,20250911,20250917,20251024,20251029,20251120,20251210,20251216,20251218,20260109,20260113,20260128,20260211,20260213,20260306,20260311,20260318,20260403,20260410,20260429,20260508,20260512,20260605,20260610,20260617,20260702,20260714,20260729,20260807,20260812,20260904,20260911,20260916,20261002,20261014,20261028,20261106,20261110,20261204,20261209,20261210,20270108,20270113,20270127,20270205,20270211,20270305,20270310,20270317,20270402,20270413,20270428,20270507,20270512,20270604,20270609,20270610,20270702,20270714,20270728,20270806,20270811,20270903,20270914,20270915,20271008,20271014,20271027,20271105,20271110,20271203,20271208,20271210", ",")
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- daily bars built from the session (18:00-17:00 ET)
+var float sHigh = na
+var float sLow = na
+if session.isfirstbar or na(sHigh)
+    sHigh := high
+    sLow := low
+else
+    sHigh := math.max(sHigh, high)
+    sLow := math.min(sLow, low)
+
+var array<float> dH = array.new<float>()
+var array<float> dL = array.new<float>()
+var array<float> dC = array.new<float>()
+var float atrState = na      // Wilder ATR over completed daily bars
+var int nDays = 0
+var float trSum = 0.0
+
+// ---------------------------------------------------------------- the strategy state
+var int decisionBar = na     // bar where the current order or trade was decided
+var bool pending = false
+
+if not na(decisionBar) and bar_index >= decisionBar + TIME_BARS
+    if pending
+        strategy.cancel_all()
+        pending := false
+    if strategy.position_size != 0
+        strategy.close_all(comment="time exit")
+    decisionBar := na
+if pending and strategy.position_size != 0
+    pending := false
+
+if session.islastbar
+    float atrPrior = atrState                 // ATR through the previous day only
+    array.push(dH, sHigh)
+    array.push(dL, sLow)
+    array.push(dC, close)
+    int n = array.size(dH)
+    float pc = n > 1 ? array.get(dC, n - 2) : na
+    float tr = na(pc) ? sHigh - sLow : math.max(sHigh - sLow, math.abs(sHigh - pc), math.abs(sLow - pc))
+    nDays += 1
+    if nDays <= 14
+        trSum += tr
+        if nDays == 14
+            atrState := trSum / 14
+    else
+        atrState := (atrState * 13 + tr) / 14
+    int day = year(time_tradingday, "UTC") * 10000 + month(time_tradingday, "UTC") * 100 + dayofmonth(time_tradingday, "UTC")
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    if n >= 3 and not na(atrPrior) and not news and strategy.position_size == 0 and not pending
+        float h2 = array.get(dH, n - 3)
+        float l2 = array.get(dL, n - 3)
+        if sLow > h2 and sLow - h2 >= MIN_GAP_ATR * atrPrior and close > sLow
+            float near = sLow
+            float stop = h2 - STOP_BUF * atrPrior
+            float risk = near - stop
+            strategy.entry("Long", strategy.long, limit=near)
+            strategy.exit("Long exit", "Long", stop=stop, limit=near + TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
+        else if sHigh < l2 and l2 - sHigh >= MIN_GAP_ATR * atrPrior and close < sHigh
+            float near = sHigh
+            float stop = l2 + STOP_BUF * atrPrior
+            float risk = stop - near
+            strategy.entry("Short", strategy.short, limit=near)
+            strategy.exit("Short exit", "Short", stop=stop, limit=near - TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
