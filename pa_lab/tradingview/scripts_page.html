@@ -313,12 +313,12 @@ plotshape(placedShort, &quot;Gap: sell limit placed&quot;, shape.triangledown, l
   <header class="script-head">
     <div class="titles">
       <h2 id="fvgetf-h">Daily fair value gap on TQQQ / SQQQ</h2>
-      <p class="setup"><span class="chip">1-hour chart · TQQQ, SQQQ or QQQ</span> <span class="badge warn">Not tested by the lab</span></p>
+      <p class="setup"><span class="chip">1-hour chart · TQQQ, SQQQ or QQQ</span> <span class="badge warn">Weak in the lab</span></p>
     </div>
     <button class="copy" type="button" id="fvgetf-btn" data-target="fvgetf-code">Copy code</button>
   </header>
   <p class="desc">The same daily gap signals, read from NQ futures in the background, traded in the ETF on your chart. On TQQQ it takes the long signals, on SQQQ the short signals (as a buy of SQQQ). Prices are converted with the ETF's 3x leverage; each trade is $10,000 of the ETF. Gaps seen after NQ's 5pm close are acted on the next morning, when the ETF opens.</p>
-  <p class="stats">Paper trade first: this adaptation has only TradingView's own backtest behind it.</p>
+  <p class="stats">Lab, 2022 to Jul 2024, NQ signals traded in rebuilt TQQQ: 41 trades, Sharpe 0.36 (the same signals on NQ: 1.13). Not validated on 2024-26. MNQ is the better route.</p>
   <div class="codewrap"><pre><code id="fvgetf-code">//@version=6
 // Price Action Lab: daily fair value gap (C-fair_value_gap-00364) traded on a Nasdaq ETF.
 // Signals come from NQ futures (read in the background); trades go into this chart&#x27;s ETF:

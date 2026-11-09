@@ -11,9 +11,9 @@ CARDS = [
     ("fvg", "Daily fair value gap", "1-hour chart · NQ1! or MNQ1!", "Tested",
      "After each daily close, a three-day gap gets a limit order at its near edge, with the stop beyond the far edge and a target of three times the risk. The order lives, and any trade closes, after 96 hourly bars. Gaps formed on CPI, jobs-report or Fed days are skipped.",
      "Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84", "palab_daily_fvg_1h.pine"),
-    ("fvgetf", "Daily fair value gap on TQQQ / SQQQ", "1-hour chart · TQQQ, SQQQ or QQQ", "Not tested by the lab",
+    ("fvgetf", "Daily fair value gap on TQQQ / SQQQ", "1-hour chart · TQQQ, SQQQ or QQQ", "Weak in the lab",
      "The same daily gap signals, read from NQ futures in the background, traded in the ETF on your chart. On TQQQ it takes the long signals, on SQQQ the short signals (as a buy of SQQQ). Prices are converted with the ETF's 3x leverage; each trade is $10,000 of the ETF. Gaps seen after NQ's 5pm close are acted on the next morning, when the ETF opens.",
-     "Paper trade first: this adaptation has only TradingView's own backtest behind it.", "palab_daily_fvg_etf_1h.pine"),
+     "Lab, 2022 to Jul 2024, NQ signals traded in rebuilt TQQQ: 41 trades, Sharpe 0.36 (the same signals on NQ: 1.13). Not validated on 2024-26. MNQ is the better route.", "palab_daily_fvg_etf_1h.pine"),
 ]
 
 
