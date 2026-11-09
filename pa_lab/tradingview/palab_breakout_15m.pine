@@ -11,7 +11,7 @@
 strategy("PA Lab 15m Level Breakout", shorttitle="PALab Breakout", overlay=true,
      process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
-     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0, max_lines_count=100)
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0, max_bars_back=600)
 
 // ---------------------------------------------------------------- dials (from the lab)
 int   SWING     = 3       // swing strength: bars each side
@@ -30,26 +30,14 @@ if timeframe.period != "15"
 float atrPrior = ta.atr(14)[1]          // Wilder ATR through the previous bar only
 
 // ---------------------------------------------------------------- swings (confirmed SWING bars later)
-isPivotHigh() =>
-    bool ok = true
-    float c = high[SWING]
-    for j = 1 to SWING
-        if not (c > high[SWING + j]) or not (c >= high[SWING - j])
-            ok := false
-    ok
-
-isPivotLow() =>
-    bool ok = true
-    float c = low[SWING]
-    for j = 1 to SWING
-        if not (c < low[SWING + j]) or not (c <= low[SWING - j])
-            ok := false
-    ok
-
-bool pivotHigh = isPivotHigh()          // evaluated on every bar
-bool pivotLow  = isPivotLow()
-bool newHigh = bar_index > 2 * SWING and pivotHigh
-bool newLow  = bar_index > 2 * SWING and pivotLow
+// The bar SWING bars ago is a swing high when its high beats the SWING highs before it
+// and is at least as high as the SWING highs after it (no loops: built-ins only).
+float maxBefore = ta.highest(high, SWING)[SWING + 1]
+float maxAfter  = ta.highest(high, SWING)
+float minBefore = ta.lowest(low, SWING)[SWING + 1]
+float minAfter  = ta.lowest(low, SWING)
+bool newHigh = bar_index > 2 * SWING and high[SWING] > maxBefore and high[SWING] >= maxAfter
+bool newLow  = bar_index > 2 * SWING and low[SWING] < minBefore and low[SWING] <= minAfter
 var float lastSwingHigh = na
 var float lastSwingLow  = na
 
