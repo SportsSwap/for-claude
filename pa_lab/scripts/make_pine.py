@@ -49,13 +49,14 @@ HEADER = """//@version=6
 // Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
 // Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
 // bar that hits both stop and target it may not assume the stop first (the lab does).
+// Margin is not modelled (one contract, as in the lab).
 // Paper trade before risking money.
 """
 
 BREAKOUT = HEADER + r"""strategy("PA Lab 15m Level Breakout", shorttitle="PALab Breakout", overlay=true,
      process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
-     backtest_fill_limits_assumption=1, max_lines_count=100)
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0, max_lines_count=100)
 
 // ---------------------------------------------------------------- dials (from the lab)
 int   SWING     = {swing}       // swing strength: bars each side
@@ -200,7 +201,7 @@ plotshape(breakDir == -1 and inSession, "Break down", shape.triangledown, locati
 FVG = HEADER + r"""strategy("PA Lab Daily Fair Value Gap, 1h", shorttitle="PALab Daily FVG", overlay=true,
      process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
-     backtest_fill_limits_assumption=1)
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
 
 // ---------------------------------------------------------------- dials (from the lab)
 float MIN_GAP_ATR = {min_gap}   // smallest daily gap kept, in daily ATR
@@ -218,22 +219,10 @@ if barstate.isfirst
     for s in str.split("{news}", ",")
         array.push(NEWS, int(str.tonumber(s)))
 
-// ---------------------------------------------------------------- daily bars built from the session (18:00-17:00 ET)
-var float sHigh = na
-var float sLow = na
-if session.isfirstbar or na(sHigh)
-    sHigh := high
-    sLow := low
-else
-    sHigh := math.max(sHigh, high)
-    sLow := math.min(sLow, low)
-
-var array<float> dH = array.new<float>()
-var array<float> dL = array.new<float>()
-var array<float> dC = array.new<float>()
-var float atrState = na      // Wilder ATR over completed daily bars
-var int nDays = 0
-var float trSum = 0.0
+// ---------------------------------------------------------------- the last completed daily bar (no repainting)
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(syminfo.tickerid, "D",
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+bool newDay = ta.change(dDay) != 0     // a daily bar has just completed
 
 // ---------------------------------------------------------------- the strategy state
 var int decisionBar = na     // bar where the current order or trade was decided
@@ -249,42 +238,33 @@ if not na(decisionBar) and bar_index >= decisionBar + TIME_BARS
 if pending and strategy.position_size != 0
     pending := false
 
-if session.islastbar
-    float atrPrior = atrState                 // ATR through the previous day only
-    array.push(dH, sHigh)
-    array.push(dL, sLow)
-    array.push(dC, close)
-    int n = array.size(dH)
-    float pc = n > 1 ? array.get(dC, n - 2) : na
-    float tr = na(pc) ? sHigh - sLow : math.max(sHigh - sLow, math.abs(sHigh - pc), math.abs(sLow - pc))
-    nDays += 1
-    if nDays <= 14
-        trSum += tr
-        if nDays == 14
-            atrState := trSum / 14
-    else
-        atrState := (atrState * 13 + tr) / 14
-    int day = year(time_tradingday, "UTC") * 10000 + month(time_tradingday, "UTC") * 100 + dayofmonth(time_tradingday, "UTC")
+bool placedLong = false
+bool placedShort = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size == 0 and not pending
+    int day = year(dDay, "UTC") * 10000 + month(dDay, "UTC") * 100 + dayofmonth(dDay, "UTC")
     bool news = SKIP_NEWS and array.includes(NEWS, day)
-    if n >= 3 and not na(atrPrior) and not news and strategy.position_size == 0 and not pending
-        float h2 = array.get(dH, n - 3)
-        float l2 = array.get(dL, n - 3)
-        if sLow > h2 and sLow - h2 >= MIN_GAP_ATR * atrPrior and close > sLow
-            float near = sLow
-            float stop = h2 - STOP_BUF * atrPrior
+    if not news
+        if dLow > dHigh2 and dLow - dHigh2 >= MIN_GAP_ATR * dAtrPrior and dClose > dLow
+            float near = dLow
+            float stop = dHigh2 - STOP_BUF * dAtrPrior
             float risk = near - stop
             strategy.entry("Long", strategy.long, limit=near)
             strategy.exit("Long exit", "Long", stop=stop, limit=near + TARGET_R * risk)
             pending := true
             decisionBar := bar_index
-        else if sHigh < l2 and l2 - sHigh >= MIN_GAP_ATR * atrPrior and close < sHigh
-            float near = sHigh
-            float stop = l2 + STOP_BUF * atrPrior
+            placedLong := true
+        else if dHigh < dLow2 and dLow2 - dHigh >= MIN_GAP_ATR * dAtrPrior and dClose < dHigh
+            float near = dHigh
+            float stop = dLow2 + STOP_BUF * dAtrPrior
             float risk = stop - near
             strategy.entry("Short", strategy.short, limit=near)
             strategy.exit("Short exit", "Short", stop=stop, limit=near - TARGET_R * risk)
             pending := true
             decisionBar := bar_index
+            placedShort := true
+
+plotshape(placedLong, "Gap: buy limit placed", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
+plotshape(placedShort, "Gap: sell limit placed", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
 """
 
 

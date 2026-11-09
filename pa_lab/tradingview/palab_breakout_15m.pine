@@ -6,11 +6,12 @@
 // Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
 // Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
 // bar that hits both stop and target it may not assume the stop first (the lab does).
+// Margin is not modelled (one contract, as in the lab).
 // Paper trade before risking money.
 strategy("PA Lab 15m Level Breakout", shorttitle="PALab Breakout", overlay=true,
      process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
      commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
-     backtest_fill_limits_assumption=1, max_lines_count=100)
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0, max_lines_count=100)
 
 // ---------------------------------------------------------------- dials (from the lab)
 int   SWING     = 3       // swing strength: bars each side
