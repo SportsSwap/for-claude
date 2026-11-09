@@ -93,16 +93,30 @@ var array<int>   clLast = array.new<int>()
 var array<float> lvPrice = array.new<float>()
 var array<int>   lvBorn  = array.new<int>()
 
-addSwing(float p, float a) =>
-    if not na(a)
+var int nSwings = 0
+var int nLevelsMade = 0
+var int nBreaks = 0
+
+// new swings this bar (a bar can confirm a swing high and a swing low)
+array<float> fresh = array.new<float>()
+if newHigh
+    lastSwingHigh := high[SWING]
+    array.push(fresh, high[SWING])
+if newLow
+    lastSwingLow := low[SWING]
+    array.push(fresh, low[SWING])
+
+if array.size(fresh) > 0 and not na(atrPrior)
+    for p in fresh
+        nSwings += 1
         int best = -1
-        float bestD = 1e18
+        float bestD = 1.0e18
         int n = array.size(clSum)
         if n > 0
             for i = 0 to n - 1
                 if bar_index - array.get(clLast, i) <= LIFE
                     float d = math.abs(p - array.get(clSum, i) / array.get(clN, i))
-                    if d <= TOL_ATR * a and d < bestD
+                    if d <= TOL_ATR * atrPrior and d < bestD
                         best := i
                         bestD := d
         if best < 0
@@ -117,6 +131,7 @@ addSwing(float p, float a) =>
         if array.get(clN, best) >= TOUCHES
             array.push(lvPrice, array.get(clSum, best) / array.get(clN, best))
             array.push(lvBorn, bar_index)
+            nLevelsMade += 1
             array.remove(clSum, best)
             array.remove(clN, best)
             array.remove(clLast, best)
@@ -127,14 +142,6 @@ addSwing(float p, float a) =>
                     array.remove(clSum, i)
                     array.remove(clN, i)
                     array.remove(clLast, i)
-    true
-
-if newHigh
-    lastSwingHigh := high[SWING]
-    addSwing(high[SWING], atrPrior)
-if newLow
-    lastSwingLow := low[SWING]
-    addSwing(low[SWING], atrPrior)
 
 // ---------------------------------------------------------------- breaks: first close through a level
 int breakDir = 0
@@ -182,8 +189,19 @@ if strategy.position_size == 0 and breakDir != 0 and inSession and not na(atrPri
             strategy.exit("Short exit", "Short", stop=stop, limit=close - TARGET_R * risk)
             entryBar := bar_index
 
-plotshape(breakDir == 1 and inSession, "Break up", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
-plotshape(breakDir == -1 and inSession, "Break down", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
+if breakDir != 0
+    nBreaks += 1
+
+plotshape(breakDir == 1 and inSession, "Break up", shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
+plotshape(breakDir == -1 and inSession, "Break down", shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.small)
+
+// status label on the last bar: shows where the logic stops if nothing trades
+var label status = na
+if barstate.islast
+    label.delete(status)
+    status := label.new(bar_index, high, "swings " + str.tostring(nSwings) + " | levels made " + str.tostring(nLevelsMade) +
+         " | live levels " + str.tostring(array.size(lvPrice)) + " | breaks " + str.tostring(nBreaks),
+         style=label.style_label_down, color=color.new(color.gray, 20), textcolor=color.white, size=size.small)
 """
 
 FVG = HEADER + r"""strategy("PA Lab Daily Fair Value Gap, 1h", shorttitle="PALab Daily FVG", overlay=true,
