@@ -1,0 +1,4 @@
+train,test,best_id,best_train_sharpe,best_train_net,best_test_net,best_test_sharpe,best_test_trades,top10_test_net_mean,all_test_net_median,share_versions_profitable_in_test
+2022-01-01..2022-12-31,2023-01-01..2023-06-30,R-breakout-00093,2.87,6773.0,-989.0,-1.07,8,-173.0,-523.0,0.199
+2022-07-01..2023-06-30,2023-07-01..2023-12-31,R-breakout-00160,2.57,3612.0,730.0,2.43,8,117.0,-392.0,0.186
+2023-01-01..2023-12-31,2024-01-01..2024-07-31,S-trend_pullback-00014,2.39,1503.0,-81.0,-0.3,18,20.0,-385.0,0.203

@@ -623,3 +623,12 @@ versions at large (TQQQ 5.4% vs 8.2%, p = 0.82; SPXL 8.1% vs 10.1%), and 1 of
 5 working setups beat random trades, on SPXL. The lab finds no reliable
 TQQQ-native strategy; picking from the final-window winners now would be
 hindsight.
+
+D45. **Walk-forward optimization on TQQQ does not work.** All 5,216 versions,
+NQ signals traded in rebuilt TQQQ at $10,000 a trade, discovery data only.
+Three folds (optimize on 12 months, trade the pick on the next 6-7 unseen):
+the best pick by training Sharpe (2.39-2.87) made -$989, +$730, -$81 on its
+unseen months: -3.4% of a $10k account over 19 months (Sharpe -0.19); the top
+10 averaged about zero; about 80% of versions lost money in each unseen
+period. Picking the highest backtest return on TQQQ selects luck. The NQ
+survivors (D41) remain the only versions that held on unseen data.
