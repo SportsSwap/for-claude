@@ -1,0 +1,48 @@
+{
+  "scale": 0.1,
+  "common_cells_share": 0.4,
+  "common_full_grid": 15552,
+  "spread_per_setup": 400,
+  "sampled_per_setup": 473,
+  "spread_draws_checked": {
+    "level_bounce": 1200,
+    "breakout": 1600,
+    "flip_zone": 2400,
+    "trend_pullback": 3200,
+    "trend_line": 3200,
+    "bos_continuation": 3200,
+    "choch_reversal": 3200,
+    "sweep_reclaim": 1200,
+    "supply_demand_zone": 2000,
+    "fair_value_gap": 1200
+  },
+  "spread_eligible": {
+    "level_bounce": 689,
+    "breakout": 694,
+    "flip_zone": 708,
+    "trend_pullback": 649,
+    "trend_line": 543,
+    "bos_continuation": 421,
+    "choch_reversal": 459,
+    "sweep_reclaim": 624,
+    "supply_demand_zone": 602,
+    "fair_value_gap": 848
+  },
+  "counts": {
+    "spread": 4000,
+    "named": 6,
+    "common": 6208,
+    "sampled": 4730
+  },
+  "graded": 12916,
+  "versions_sha256": "319632b02d30b8ccbb1845f38fdc1e63a89ad8066ab2330b1816f0f7e11529b5",
+  "stages_sha256": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+  "wall_seconds": 864.3,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T07:56:16+00:00"
+}

@@ -597,3 +597,29 @@ every version of every set on NQ and ES.
 - No named textbook system held up.
 These are CFD results; a version worth trading should be checked on CME
 futures data and paper traded before any money is at risk.
+
+## TQQQ
+
+D42. **TQQQ and SPXL rebuilt from index data.** No free 1-minute TQQQ history
+exists, so `scripts/make_leveraged_etf.py` rebuilds TQQQ (3x Nasdaq 100) and
+SPXL (3x S&P 500) minute by minute during regular hours from the Dukascopy
+CFDs, resetting daily, with a fitted fee and financing drag (8.6%/yr TQQQ,
+5.9%/yr SPXL). Against real daily closes from Yahoo: return correlation
+0.9997 / 0.9995, daily tracking error 0.11% / 0.10%. The TQQQ lab
+(`tqqq_lab/`) puts TQQQ in the NQ slot and SPXL (replication) in the ES slot,
+sizes every trade to $10,000 of the ETF, no commission, $0.01 tick.
+
+D43. **NQ signals traded in TQQQ (discovery only).** Orders move to the
+first ETF minute after the decision, prices convert at 3x. The 15m breakout
+falls from Sharpe 1.27 on NQ to -0.07 in TQQQ (ETF slippage is about ten
+times larger relative to its 1R edge; signals before 09:30 wait for the
+open); the daily FVG keeps 0.36 (NQ 1.13). The sealed window cannot be used
+for this test: it would mean reading the NQ seal a second time.
+
+D44. **The funnel on TQQQ's own chart does not carry over.** 12,916 versions
+(scale 0.1, common cells 0.4): 37 candidates. In the final window (not blind:
+the same Nasdaq path as the NQ final test) candidates held up less often than
+versions at large (TQQQ 5.4% vs 8.2%, p = 0.82; SPXL 8.1% vs 10.1%), and 1 of
+5 working setups beat random trades, on SPXL. The lab finds no reliable
+TQQQ-native strategy; picking from the final-window winners now would be
+hindsight.

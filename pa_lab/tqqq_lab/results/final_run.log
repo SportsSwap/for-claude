@@ -1,0 +1,95 @@
+{
+  "source": "final",
+  "window": [
+    "2024-08-01",
+    "2026-11-06"
+  ],
+  "versions": 14944,
+  "errors": 0,
+  "share_held": [
+    {
+      "market": "NQ",
+      "group": "all",
+      "versions": 14944,
+      "held": 1224,
+      "share_held": 0.08190578158458243
+    },
+    {
+      "market": "NQ",
+      "group": "candidates",
+      "versions": 37,
+      "held": 2,
+      "share_held": 0.05405405405405406
+    },
+    {
+      "market": "NQ",
+      "group": "set:common",
+      "versions": 6208,
+      "held": 457,
+      "share_held": 0.07361469072164949
+    },
+    {
+      "market": "NQ",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "NQ",
+      "group": "set:sampled",
+      "versions": 4730,
+      "held": 437,
+      "share_held": 0.09238900634249471
+    },
+    {
+      "market": "NQ",
+      "group": "set:spread",
+      "versions": 4000,
+      "held": 330,
+      "share_held": 0.0825
+    },
+    {
+      "market": "ES",
+      "group": "all",
+      "versions": 14944,
+      "held": 1515,
+      "share_held": 0.10137847965738758
+    },
+    {
+      "market": "ES",
+      "group": "candidates",
+      "versions": 37,
+      "held": 3,
+      "share_held": 0.08108108108108109
+    },
+    {
+      "market": "ES",
+      "group": "set:common",
+      "versions": 6208,
+      "held": 653,
+      "share_held": 0.1051868556701031
+    },
+    {
+      "market": "ES",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "ES",
+      "group": "set:sampled",
+      "versions": 4730,
+      "held": 480,
+      "share_held": 0.1014799154334038
+    },
+    {
+      "market": "ES",
+      "group": "set:spread",
+      "versions": 4000,
+      "held": 382,
+      "share_held": 0.0955
+    }
+  ]
+}

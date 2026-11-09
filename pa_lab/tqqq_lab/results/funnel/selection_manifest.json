@@ -1,0 +1,28 @@
+{
+  "files": {
+    "versions.jsonl": "319632b02d30b8ccbb1845f38fdc1e63a89ad8066ab2330b1816f0f7e11529b5",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "33864c797c6361e2a73491812942cee43be6b557b27adf14439cb82ad8e4f276",
+    "working_setups.json": "5b827bdc24c5bcedee1cd8e79868f4bf97998359be982eb457e55eef5685073e",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "funnel_counts_nq": {
+    "graded": 12916,
+    "s1": 10965,
+    "s2": 1749,
+    "s3": 527,
+    "s4": 106,
+    "candidate": 37,
+    "s5": 1964,
+    "both_eras": 997
+  },
+  "win_rate_profit_corr": 0.06709706430473625,
+  "working_setups": 5,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T08:04:51+00:00"
+}

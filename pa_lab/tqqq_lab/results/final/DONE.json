@@ -1,0 +1,43 @@
+{
+  "files": {
+    "metrics_NQ.parquet": "eb62d7d12c4c408f30fb30bbc0863e98940100079b51db7c5c37acd2994e8171",
+    "daily/NQ/bos_continuation.parquet": "e38722c70b064cc70a9b2eb83bae605be91ce8211fa116b7f8bbea9ba4c13626",
+    "daily/NQ/breakout.parquet": "8e7c2febb1dd6814562f956fc44d9e9b8d0113407b048d52ebdceeed3a9b2aba",
+    "daily/NQ/choch_reversal.parquet": "21a59d63f6a3538a2a6a4dcbb004dca100d35344f9377f06d818206f9f165816",
+    "daily/NQ/fair_value_gap.parquet": "332458e25983c4889bb6d6798bf56d961583c8bf19871be840bc374e305acc2f",
+    "daily/NQ/flip_zone.parquet": "a3c0678f259432e69a2d712e17ff4b9eb913cee5dc12eaeb2d5280051c4d5a39",
+    "daily/NQ/level_bounce.parquet": "0ca74c5ad588594da806243db9951f78c0dfa6c92741fb3491fe5b8bbd2afab1",
+    "daily/NQ/supply_demand_zone.parquet": "97d87e46e61004c1bd05ac15a20cf49308621c7269fc3688a2089b3937cd53da",
+    "daily/NQ/sweep_reclaim.parquet": "ec14df705db1787ef8f4cdbf4527fbf9a837933840cc6249cbd7cebe4182e5eb",
+    "daily/NQ/trend_line.parquet": "f9eb0142bd8bca0a179fe50f836711df463ada998972739ab83eb001a31f3b7a",
+    "daily/NQ/trend_pullback.parquet": "730aab13d0b1e7c971475a70e57562e66bda516b872f32fb82c6fa89868df45d",
+    "setup_chart_year_NQ.csv": "534aab4be7de79f96aa7eed62d738d54affed26e34bf1a480d5d588aed7f355e",
+    "metrics_ES.parquet": "e47a929ba1615da1de3f9689afef5bb40b24c533b69a7a9477385ca6e0ed70c5",
+    "daily/ES/bos_continuation.parquet": "dc2e0c31634f474f63a1fdf743197ae2b8ac1cbe8b6a083c33444a9f9a92cb6b",
+    "daily/ES/breakout.parquet": "a07accb6411f12c96384bd9004e81f5df2c509c7c529aab440651acafd7518d3",
+    "daily/ES/choch_reversal.parquet": "7f21f03b7339a151540252bb71195fe7a3e36f19d5b8b8a992d659244e6b6b69",
+    "daily/ES/fair_value_gap.parquet": "2b87e19eeae3e6db1f2dfd5d9a92e39cdef649c36b437a4a9160ee4d62ed025f",
+    "daily/ES/flip_zone.parquet": "cf48d5083f36d71c971c84bb4e9455797bc9dc421b6e94ff5526d99f590bfc95",
+    "daily/ES/level_bounce.parquet": "19a7fecfb6068959bfd028132ac8453ce9c36fa653c3878ca15b914df1dd4f3f",
+    "daily/ES/supply_demand_zone.parquet": "961e2411bdcf050d6340e833cccfde9961a584c16c3853e57a309e65118a9f15",
+    "daily/ES/sweep_reclaim.parquet": "0d4c2b65b1da4d90b81bb1bb67f9f97439817d0d5d07828e3d2112d67dcabc3f",
+    "daily/ES/trend_line.parquet": "dc9545ec749cc77e483e82ef553878bdf56871ca45779f7448d141966633a763",
+    "daily/ES/trend_pullback.parquet": "e3f3b063d971b0b4c96838365f0eaae6da36de47927c5c6d5af696de810a6418",
+    "setup_chart_year_ES.csv": "e6cce9112c5d7ad2d95864a4d81d9fdaf7572b616b6d294b49bc2a0ed7d4ff4c",
+    "share_held.csv": "c8760e53d8387b4e7c98aa51b8cb8102b14364e200754eb408d900f4ae942e92",
+    "chart_made_money.csv": "0fa5a5539e644372a3fda7e650fd74afbf1022ad89330035524dad9a5f4e4411",
+    "working_vs_random.csv": "728e4262b26d5c09f1c37650e6744534fedeeb1b4fa2be6f04be73cfe431ec41",
+    "best_common_by_setup.csv": "77897ff637645bc021e614ae684b68a5728abd8a90e05863f27b2e254dc2fdea",
+    "named_versions.csv": "5fe2ea05f8caa003a10544eda6f34265dba514d52fb6240737bd9559f9db31be",
+    "dials_held_in_common.csv": "55f409b81e41506a16c2b76aab10918cceba2139b123240c8750148d24424b78",
+    "summary.json": "ca8768b98baf9f62787afefa9bc30f75fc1a227378918d1b4c3e8bb321fe4dda"
+  },
+  "errors": 0,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T08:13:28+00:00"
+}

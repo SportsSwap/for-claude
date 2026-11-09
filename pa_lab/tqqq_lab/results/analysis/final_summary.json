@@ -1,0 +1,76 @@
+{
+  "alpha": 0.05,
+  "candidates": {
+    "NQ": {
+      "held": 2,
+      "versions": 37,
+      "share": 0.05405405405405406,
+      "all_share": 0.08190578158458243,
+      "p_value": 0.8178684743225795,
+      "beats_all": false
+    },
+    "ES": {
+      "held": 3,
+      "versions": 37,
+      "share": 0.08108108108108109,
+      "all_share": 0.10137847965738758,
+      "p_value": 0.7384868421742732,
+      "beats_all": false
+    }
+  },
+  "working": {
+    "tested": 5,
+    "beat_random": 1,
+    "verdict": "split",
+    "rows": [
+      {
+        "setup": "bos_continuation",
+        "chart": "daily",
+        "market": "ES",
+        "p_value": 0.6,
+        "beats_random": false,
+        "real_net": -2457.391980389789
+      },
+      {
+        "setup": "bos_continuation",
+        "chart": "daily",
+        "market": "NQ",
+        "p_value": 0.885,
+        "beats_random": false,
+        "real_net": -17172.684694142285
+      },
+      {
+        "setup": "choch_reversal",
+        "chart": "1h",
+        "market": "ES",
+        "p_value": 0.599,
+        "beats_random": false,
+        "real_net": -4092.8848386729906
+      },
+      {
+        "setup": "fair_value_gap",
+        "chart": "daily",
+        "market": "ES",
+        "p_value": 0.333,
+        "beats_random": false,
+        "real_net": 16070.903355332346
+      },
+      {
+        "setup": "level_bounce",
+        "chart": "4h",
+        "market": "ES",
+        "p_value": 0.003,
+        "beats_random": true,
+        "real_net": 49919.318093132315
+      }
+    ]
+  },
+  "candidates_verdict": "false",
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T08:13:29+00:00"
+}

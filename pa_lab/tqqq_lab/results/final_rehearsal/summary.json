@@ -1,0 +1,125 @@
+{
+  "source": "rehearsal",
+  "warmup_start": "2024-04-01",
+  "window": [
+    "2024-07-01",
+    "2024-07-31"
+  ],
+  "price_shift_points": 1000.0,
+  "versions": 56,
+  "errors": 0,
+  "dropped_sessions": {
+    "NQ": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04"
+    ],
+    "ES": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04"
+    ]
+  },
+  "selection_hashes": {
+    "versions.jsonl": "319632b02d30b8ccbb1845f38fdc1e63a89ad8066ab2330b1816f0f7e11529b5",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "33864c797c6361e2a73491812942cee43be6b557b27adf14439cb82ad8e4f276",
+    "working_setups.json": "5b827bdc24c5bcedee1cd8e79868f4bf97998359be982eb457e55eef5685073e",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "share_held": [
+    {
+      "market": "NQ",
+      "group": "all",
+      "versions": 56,
+      "held": 12,
+      "share_held": 0.21428571428571427
+    },
+    {
+      "market": "NQ",
+      "group": "candidates",
+      "versions": 0,
+      "held": 0,
+      "share_held": NaN
+    },
+    {
+      "market": "NQ",
+      "group": "set:common",
+      "versions": 22,
+      "held": 7,
+      "share_held": 0.3181818181818182
+    },
+    {
+      "market": "NQ",
+      "group": "set:named",
+      "versions": 6,
+      "held": 2,
+      "share_held": 0.3333333333333333
+    },
+    {
+      "market": "NQ",
+      "group": "set:sampled",
+      "versions": 15,
+      "held": 1,
+      "share_held": 0.06666666666666667
+    },
+    {
+      "market": "NQ",
+      "group": "set:spread",
+      "versions": 13,
+      "held": 2,
+      "share_held": 0.15384615384615385
+    },
+    {
+      "market": "ES",
+      "group": "all",
+      "versions": 56,
+      "held": 10,
+      "share_held": 0.17857142857142858
+    },
+    {
+      "market": "ES",
+      "group": "candidates",
+      "versions": 0,
+      "held": 0,
+      "share_held": NaN
+    },
+    {
+      "market": "ES",
+      "group": "set:common",
+      "versions": 22,
+      "held": 4,
+      "share_held": 0.18181818181818182
+    },
+    {
+      "market": "ES",
+      "group": "set:named",
+      "versions": 6,
+      "held": 2,
+      "share_held": 0.3333333333333333
+    },
+    {
+      "market": "ES",
+      "group": "set:sampled",
+      "versions": 15,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "ES",
+      "group": "set:spread",
+      "versions": 13,
+      "held": 4,
+      "share_held": 0.3076923076923077
+    }
+  ],
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T08:04:56+00:00"
+}

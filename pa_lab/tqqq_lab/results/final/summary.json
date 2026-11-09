@@ -1,0 +1,171 @@
+{
+  "source": "final",
+  "warmup_start": "2024-05-01",
+  "window": [
+    "2024-08-01",
+    "2026-11-06"
+  ],
+  "sealed_manifest_sha256": {
+    "NQ_1m.parquet": "ed42c8e901170a578c05df16fa8d453ffbc5f29c794bf02be013b654b250698d",
+    "NQ_rolls.parquet": "224252adc9adafff23e30accb1082401726b55ce40d7b38bd89dcce982653fcf",
+    "ES_1m.parquet": "2d2447cc15cdfe23f44963133809d477ebeae147d3b8ae1476b463bfcffc32a7",
+    "ES_rolls.parquet": "224252adc9adafff23e30accb1082401726b55ce40d7b38bd89dcce982653fcf",
+    "audit_final.json": "f9f6b91fc938e2dfb2a9d81f065c6d60063c9c6513e936067e25797ba7740163"
+  },
+  "versions": 14944,
+  "errors": 0,
+  "dropped_sessions": {
+    "NQ": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-11-29",
+      "2024-12-24",
+      "2025-01-20",
+      "2025-02-17",
+      "2025-05-26",
+      "2025-06-19",
+      "2025-07-03",
+      "2025-07-04",
+      "2025-09-01",
+      "2025-11-27",
+      "2025-11-28",
+      "2025-12-24",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07"
+    ],
+    "ES": [
+      "2024-05-27",
+      "2024-06-19",
+      "2024-07-03",
+      "2024-07-04",
+      "2024-09-02",
+      "2024-11-28",
+      "2024-11-29",
+      "2024-12-24",
+      "2025-01-20",
+      "2025-02-17",
+      "2025-05-26",
+      "2025-06-19",
+      "2025-07-03",
+      "2025-07-04",
+      "2025-09-01",
+      "2025-11-27",
+      "2025-11-28",
+      "2025-12-24",
+      "2026-01-19",
+      "2026-02-16",
+      "2026-05-25",
+      "2026-06-19",
+      "2026-07-03",
+      "2026-09-07"
+    ]
+  },
+  "selection_hashes": {
+    "versions.jsonl": "319632b02d30b8ccbb1845f38fdc1e63a89ad8066ab2330b1816f0f7e11529b5",
+    "stages.json": "5015c2fdd95b41c284436bfdcfffdf36e2987a4aea1ae425480314cd4e25bf00",
+    "candidates.json": "33864c797c6361e2a73491812942cee43be6b557b27adf14439cb82ad8e4f276",
+    "working_setups.json": "5b827bdc24c5bcedee1cd8e79868f4bf97998359be982eb457e55eef5685073e",
+    "named_versions.json": "6d81cdb863222473850bc3869c8aeddf2192c3734f8affe1b0d96746aa35c68d"
+  },
+  "share_held": [
+    {
+      "market": "NQ",
+      "group": "all",
+      "versions": 14944,
+      "held": 1224,
+      "share_held": 0.08190578158458243
+    },
+    {
+      "market": "NQ",
+      "group": "candidates",
+      "versions": 37,
+      "held": 2,
+      "share_held": 0.05405405405405406
+    },
+    {
+      "market": "NQ",
+      "group": "set:common",
+      "versions": 6208,
+      "held": 457,
+      "share_held": 0.07361469072164949
+    },
+    {
+      "market": "NQ",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "NQ",
+      "group": "set:sampled",
+      "versions": 4730,
+      "held": 437,
+      "share_held": 0.09238900634249471
+    },
+    {
+      "market": "NQ",
+      "group": "set:spread",
+      "versions": 4000,
+      "held": 330,
+      "share_held": 0.0825
+    },
+    {
+      "market": "ES",
+      "group": "all",
+      "versions": 14944,
+      "held": 1515,
+      "share_held": 0.10137847965738758
+    },
+    {
+      "market": "ES",
+      "group": "candidates",
+      "versions": 37,
+      "held": 3,
+      "share_held": 0.08108108108108109
+    },
+    {
+      "market": "ES",
+      "group": "set:common",
+      "versions": 6208,
+      "held": 653,
+      "share_held": 0.1051868556701031
+    },
+    {
+      "market": "ES",
+      "group": "set:named",
+      "versions": 6,
+      "held": 0,
+      "share_held": 0.0
+    },
+    {
+      "market": "ES",
+      "group": "set:sampled",
+      "versions": 4730,
+      "held": 480,
+      "share_held": 0.1014799154334038
+    },
+    {
+      "market": "ES",
+      "group": "set:spread",
+      "versions": 4000,
+      "held": 382,
+      "share_held": 0.0955
+    }
+  ],
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T08:13:28+00:00"
+}

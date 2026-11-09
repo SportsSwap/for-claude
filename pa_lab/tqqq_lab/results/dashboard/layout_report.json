@@ -1,0 +1,250 @@
+{
+ "sizes": {
+  "1920x1080": {
+   "pages": 39,
+   "problems": []
+  },
+  "1280x720": {
+   "pages": 39,
+   "problems": []
+  }
+ },
+ "pages": [
+  {
+   "n": 1,
+   "key": "title",
+   "title": "Price Action Lab",
+   "screenshot": "screens/page_01.png"
+  },
+  {
+   "n": 2,
+   "key": "method",
+   "title": "The Method",
+   "screenshot": "screens/page_02.png"
+  },
+  {
+   "n": 3,
+   "key": "windows",
+   "title": "Three Windows",
+   "screenshot": "screens/page_03.png"
+  },
+  {
+   "n": 4,
+   "key": "random_entries",
+   "title": "Random Entries",
+   "screenshot": "screens/page_04.png"
+  },
+  {
+   "n": 5,
+   "key": "cheat",
+   "title": "The Cheat",
+   "screenshot": "screens/page_05.png"
+  },
+  {
+   "n": 6,
+   "key": "behavior_intro",
+   "title": "Real or Random",
+   "screenshot": "screens/page_06.png"
+  },
+  {
+   "n": 7,
+   "key": "behavior_summary",
+   "title": "Behavior Verdicts",
+   "screenshot": "screens/page_07.png"
+  },
+  {
+   "n": 8,
+   "key": "behavior_levels_vs_random",
+   "title": "Levels Against Random Lines",
+   "screenshot": "screens/page_08.png"
+  },
+  {
+   "n": 9,
+   "key": "behavior_hold_by_touch_count",
+   "title": "Hold Rate by Touch Count",
+   "screenshot": "screens/page_09.png"
+  },
+  {
+   "n": 10,
+   "key": "behavior_wall_or_target",
+   "title": "Wall or Target",
+   "screenshot": "screens/page_10.png"
+  },
+  {
+   "n": 11,
+   "key": "behavior_shrinking_bounces",
+   "title": "Shrinking Bounces",
+   "screenshot": "screens/page_11.png"
+  },
+  {
+   "n": 12,
+   "key": "behavior_line_vs_box",
+   "title": "Line Against Box",
+   "screenshot": "screens/page_12.png"
+  },
+  {
+   "n": 13,
+   "key": "behavior_wick_vs_close_through",
+   "title": "Wick Through Against Close Through",
+   "screenshot": "screens/page_13.png"
+  },
+  {
+   "n": 14,
+   "key": "behavior_flip_zones",
+   "title": "Flip Zones",
+   "screenshot": "screens/page_14.png"
+  },
+  {
+   "n": 15,
+   "key": "behavior_bos_follow_10",
+   "title": "Break of Structure Follow-Through",
+   "screenshot": "screens/page_15.png"
+  },
+  {
+   "n": 16,
+   "key": "behavior_bos_follow_20",
+   "title": "Break of Structure Follow-Through",
+   "screenshot": "screens/page_16.png"
+  },
+  {
+   "n": 17,
+   "key": "behavior_bos_follow_50",
+   "title": "Break of Structure Follow-Through",
+   "screenshot": "screens/page_17.png"
+  },
+  {
+   "n": 18,
+   "key": "behavior_choch_follow_10",
+   "title": "Change of Character Follow-Through",
+   "screenshot": "screens/page_18.png"
+  },
+  {
+   "n": 19,
+   "key": "behavior_choch_follow_20",
+   "title": "Change of Character Follow-Through",
+   "screenshot": "screens/page_19.png"
+  },
+  {
+   "n": 20,
+   "key": "behavior_choch_follow_50",
+   "title": "Change of Character Follow-Through",
+   "screenshot": "screens/page_20.png"
+  },
+  {
+   "n": 21,
+   "key": "behavior_sweeps_vs_closes",
+   "title": "Sweeps Against Closes Through",
+   "screenshot": "screens/page_21.png"
+  },
+  {
+   "n": 22,
+   "key": "behavior_trend_start_sweep",
+   "title": "Trends That Start With a Sweep",
+   "screenshot": "screens/page_22.png"
+  },
+  {
+   "n": 23,
+   "key": "behavior_trend_lines",
+   "title": "Trend Lines",
+   "screenshot": "screens/page_23.png"
+  },
+  {
+   "n": 24,
+   "key": "behavior_fvg_hold",
+   "title": "Fair Value Gaps Holding",
+   "screenshot": "screens/page_24.png"
+  },
+  {
+   "n": 25,
+   "key": "behavior_fvg_fill",
+   "title": "Fair Value Gaps Filling",
+   "screenshot": "screens/page_25.png"
+  },
+  {
+   "n": 26,
+   "key": "behavior_zones_first_vs_later",
+   "title": "Zones, First Return",
+   "screenshot": "screens/page_26.png"
+  },
+  {
+   "n": 27,
+   "key": "behavior_zones_vs_random",
+   "title": "Zones Against Random Bands",
+   "screenshot": "screens/page_27.png"
+  },
+  {
+   "n": 28,
+   "key": "behavior_pullback_depth",
+   "title": "Pullback Depth",
+   "screenshot": "screens/page_28.png"
+  },
+  {
+   "n": 29,
+   "key": "behavior_engulfing_at_levels",
+   "title": "Engulfing Candles at Levels",
+   "screenshot": "screens/page_29.png"
+  },
+  {
+   "n": 30,
+   "key": "behavior_rejection_at_levels",
+   "title": "Rejection Candles at Levels",
+   "screenshot": "screens/page_30.png"
+  },
+  {
+   "n": 31,
+   "key": "funnel_intro",
+   "title": "Many Versions, Few Survivors",
+   "screenshot": "screens/page_31.png"
+  },
+  {
+   "n": 32,
+   "key": "funnel_stages",
+   "title": "The Funnel",
+   "screenshot": "screens/page_32.png"
+  },
+  {
+   "n": 33,
+   "key": "setup_judgment",
+   "title": "Setups as a Whole",
+   "screenshot": "screens/page_33.png"
+  },
+  {
+   "n": 34,
+   "key": "named_funnel",
+   "title": "Named Systems",
+   "screenshot": "screens/page_34.png"
+  },
+  {
+   "n": 35,
+   "key": "rule_effects",
+   "title": "Each Rule, All Else Equal",
+   "screenshot": "screens/page_35.png"
+  },
+  {
+   "n": 36,
+   "key": "final_intro",
+   "title": "The Sealed Window",
+   "screenshot": "screens/page_36.png"
+  },
+  {
+   "n": 37,
+   "key": "final_held",
+   "title": "What Held Up",
+   "screenshot": "screens/page_37.png"
+  },
+  {
+   "n": 38,
+   "key": "final_working",
+   "title": "Working Setups, Sealed",
+   "screenshot": "screens/page_38.png"
+  },
+  {
+   "n": 39,
+   "key": "final_named",
+   "title": "Named Systems, Sealed",
+   "screenshot": "screens/page_39.png"
+  }
+ ],
+ "screenshots_match_page_list": true,
+ "clean": true
+}

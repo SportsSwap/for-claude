@@ -18,7 +18,7 @@ fi
 python - <<'PY'
 from lab import io
 from lab.config import P, stamp
-io.write_json({"label": "TQQQ rebuilt from Nasdaq 100 data", "banner": "TQQQ rebuilt from Nasdaq 100 data · final window not blind", **stamp()},
+io.write_json({"label": "TQQQ rebuilt from Nasdaq index data", "banner": "TQQQ rebuilt from Nasdaq index data · final window not blind", **stamp()},
               P.results() / "data_source.json")
 PY
 say "engine checks and behavior tests"

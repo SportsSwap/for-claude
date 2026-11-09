@@ -1,0 +1,9 @@
+market,setup,setup_chart,versions_used,real_trades,real_net,p_value,twin_mean_net,distinct_entries,twin_p95_net,beats_random,sets
+NQ,bos_continuation,daily,2,0,0.0,,,,,,
+ES,bos_continuation,daily,2,1,-4.734640912557878,1.0,0.30113850832471467,1.0,8.680175006356775,False,1000.0
+NQ,choch_reversal,1h,1,1,0.8722282524414459,0.201,-0.18901668282255435,1.0,1.1377299557304599,False,1000.0
+ES,choch_reversal,1h,1,0,0.0,,,,,,
+NQ,fair_value_gap,daily,2,1,-19.908593264867214,0.767,-10.500608497682158,1.0,12.245429047834579,False,1000.0
+ES,fair_value_gap,daily,2,3,9.87868323941369,0.382,-1.64464642023553,3.0,81.55364773812511,False,1000.0
+NQ,level_bounce,4h,1,0,0.0,,,,,,
+ES,level_bounce,4h,1,0,0.0,,,,,,
