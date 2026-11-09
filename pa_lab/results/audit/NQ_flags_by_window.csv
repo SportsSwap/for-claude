@@ -1,0 +1,4 @@
+window,rows,sessions,f_duplicate,f_duplicate_conflict,f_out_of_order,f_ohlc_invalid,f_zero_volume,f_halt_hour,f_weekend_session,f_gap_gt_1m,f_gap_gt_5m,f_gap_gt_60m
+discovery,883162,666,0,0,0,0,0,0,0,71,34,3
+outside,5340,4,0,0,0,0,0,0,0,0,0,0
+warmup,86350,65,0,0,0,0,0,0,0,1,0,0

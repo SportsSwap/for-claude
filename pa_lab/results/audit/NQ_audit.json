@@ -1,0 +1,43 @@
+{
+  "market": "NQ",
+  "checks": {
+    "conflicting_duplicates": true,
+    "ohlc_invalid_frac": true,
+    "contract_changes_off_roll": true,
+    "adjustment_steps_only_at_rolls": true,
+    "no_weekend_sessions_after_clean": true
+  },
+  "dropped_in_cleaning": {
+    "duplicate_rows": 0,
+    "halt_hour_bars": 0,
+    "weekend_session_bars": 0,
+    "ohlc_invalid_bars": 0
+  },
+  "contracts": {
+    "contract_changes": 0,
+    "changes_off_roll": [],
+    "changes_wrong_ids": [],
+    "rolls": 0
+  },
+  "adjustment": {
+    "skipped": "no unadjusted file"
+  },
+  "gap_minutes_distribution_open_windows": {
+    "count": 72.0,
+    "mean": 9.23611111111111,
+    "std": 23.5679975519177,
+    "min": 2.0,
+    "25%": 2.0,
+    "50%": 5.0,
+    "75%": 7.0,
+    "max": 176.0
+  },
+  "note": "counts for the final window are in data/sealed/audit_final.json",
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-09T04:57:03+00:00"
+}
