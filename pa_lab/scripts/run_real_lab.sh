@@ -24,7 +24,7 @@ import json, sys
 from lab import io
 from lab.config import P, stamp
 label = sys.argv[1]
-io.write_json({"label": label, "banner": f"{label} · see decisions.md D39", **stamp()},
+io.write_json({"label": label, "banner": f"{label} · not CME futures", **stamp()},
               P.results() / "data_source.json")
 EOF
 

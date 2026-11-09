@@ -568,3 +568,16 @@ considered and rejected: its download needs a script-made token. What differs fr
 Every result on this data says "CFD stand-in" in its decisions and the deck.
 The stated windows apply: warm-up from 2021-10-01, discovery 2022-01-03 to
 2024-07-31, final window 2024-08-01 to the last session fetched (2026-11-06).
+
+D40. **Real-data discovery results (CFD stand-ins), before the final test.**
+Funnel at the same scale as the synthetic run (4,886 graded versions):
+4,462 with 30+ trades, 1,200 profitable after costs, 410 with Sharpe >= 0.5,
+210 beat matched random trades, 53 candidates. Unlike the v1 synthetic run,
+candidates lean toward hard stops (83% vs 73% overall), not the close-based
+stops a wick artifact would favour. Candidates cluster on slow charts (fair
+value gap daily 11, 4h 8). Setups that work as a whole: three, all on ES
+(fair value gap 4h and daily, breakout daily). Slow-chart winners from a
+2022 bear and a 2023-24 bull can be riding the trend; the sealed window is
+what separates that from an edge. Named systems: none became a candidate.
+The deck banner no longer cites "D39": the digit scan correctly refused an
+unsourced number in my own label.

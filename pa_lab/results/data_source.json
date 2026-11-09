@@ -1,6 +1,6 @@
 {
   "label": "Dukascopy CFD stand-in data",
-  "banner": "Dukascopy CFD stand-in data \u00b7 see decisions.md D39",
+  "banner": "Dukascopy CFD stand-in data \u00b7 not CME futures",
   "master_seed": 20220103,
   "amendment": 0,
   "locks": {

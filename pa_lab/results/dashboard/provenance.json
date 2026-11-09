@@ -1,0 +1,9372 @@
+[
+ {
+  "id": 0,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=warmup (row 0)",
+  "column": "sessions",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "warmup"
+  },
+  "format": "int",
+  "value": 65.0,
+  "text": "65",
+  "shown": true
+ },
+ {
+  "id": 1,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=warmup (row 0)",
+  "column": "start",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "warmup"
+  },
+  "format": "str",
+  "value": "2021-10-01",
+  "text": "2021-10-01",
+  "shown": true
+ },
+ {
+  "id": 2,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=warmup (row 0)",
+  "column": "end",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "warmup"
+  },
+  "format": "str",
+  "value": "2021-12-31",
+  "text": "2021-12-31",
+  "shown": true
+ },
+ {
+  "id": 3,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=discovery (row 1)",
+  "column": "sessions",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "discovery"
+  },
+  "format": "int",
+  "value": 666.0,
+  "text": "666",
+  "shown": true
+ },
+ {
+  "id": 4,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=discovery (row 1)",
+  "column": "start",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "discovery"
+  },
+  "format": "str",
+  "value": "2022-01-03",
+  "text": "2022-01-03",
+  "shown": true
+ },
+ {
+  "id": 5,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=discovery (row 1)",
+  "column": "end",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "discovery"
+  },
+  "format": "str",
+  "value": "2024-07-31",
+  "text": "2024-07-31",
+  "shown": true
+ },
+ {
+  "id": 6,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=final (row 4)",
+  "column": "sessions",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "final"
+  },
+  "format": "int",
+  "value": 586.0,
+  "text": "586",
+  "shown": true
+ },
+ {
+  "id": 7,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=final (row 4)",
+  "column": "start",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "final"
+  },
+  "format": "str",
+  "value": "2024-08-01",
+  "text": "2024-08-01",
+  "shown": true
+ },
+ {
+  "id": 8,
+  "page": "windows",
+  "file": "session_counts.csv",
+  "row": "market=NQ;window=final (row 4)",
+  "column": "end",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "window": "final"
+  },
+  "format": "str",
+  "value": "2026-11-06",
+  "text": "2026-11-06",
+  "shown": true
+ },
+ {
+  "id": 9,
+  "page": "random_entries",
+  "file": "engine/random_entries.json",
+  "row": "results/NQ/per_trade_dollars",
+  "column": "per_trade_dollars",
+  "op": "json",
+  "where": {},
+  "format": "usd",
+  "value": -13.8,
+  "text": "-$13.80",
+  "shown": true
+ },
+ {
+  "id": 10,
+  "page": "random_entries",
+  "file": "engine/random_entries.json",
+  "row": "results/ES/per_trade_dollars",
+  "column": "per_trade_dollars",
+  "op": "json",
+  "where": {},
+  "format": "usd",
+  "value": -33.67,
+  "text": "-$33.67",
+  "shown": true
+ },
+ {
+  "id": 11,
+  "page": "random_entries",
+  "file": "engine/random_entries.json",
+  "row": "results/NQ/win_rate",
+  "column": "win_rate",
+  "op": "json",
+  "where": {},
+  "format": "pct1",
+  "value": 0.3305,
+  "text": "33.1%",
+  "shown": true
+ },
+ {
+  "id": 12,
+  "page": "cheat",
+  "file": "engine/cheat_peek60.json",
+  "row": "results/NQ/per_trade_dollars",
+  "column": "per_trade_dollars",
+  "op": "json",
+  "where": {},
+  "format": "usd",
+  "value": 204.46,
+  "text": "+$204.46",
+  "shown": true
+ },
+ {
+  "id": 13,
+  "page": "cheat",
+  "file": "engine/cheat_peek60.json",
+  "row": "results/ES/per_trade_dollars",
+  "column": "per_trade_dollars",
+  "op": "json",
+  "where": {},
+  "format": "usd",
+  "value": 100.66,
+  "text": "+$100.66",
+  "shown": true
+ },
+ {
+  "id": 14,
+  "page": "cheat",
+  "file": "engine/cheat_peek60.json",
+  "row": "results/NQ/win_rate",
+  "column": "win_rate",
+  "op": "json",
+  "where": {},
+  "format": "pct1",
+  "value": 0.5762,
+  "text": "57.6%",
+  "shown": true
+ },
+ {
+  "id": 15,
+  "page": "behavior_summary",
+  "file": "behavior/verdicts.csv",
+  "row": "*",
+  "column": "verdict",
+  "op": "count",
+  "where": {
+   "verdict": "true"
+  },
+  "format": "int",
+  "value": 2,
+  "text": "2",
+  "shown": true
+ },
+ {
+  "id": 16,
+  "page": "behavior_summary",
+  "file": "behavior/verdicts.csv",
+  "row": "*",
+  "column": "verdict",
+  "op": "count",
+  "where": {
+   "verdict": "split"
+  },
+  "format": "int",
+  "value": 0,
+  "text": "0",
+  "shown": true
+ },
+ {
+  "id": 17,
+  "page": "behavior_summary",
+  "file": "behavior/verdicts.csv",
+  "row": "*",
+  "column": "verdict",
+  "op": "count",
+  "where": {
+   "verdict": "false"
+  },
+  "format": "int",
+  "value": 21,
+  "text": "21",
+  "shown": true
+ },
+ {
+  "id": 18,
+  "page": "behavior_summary",
+  "file": "behavior/verdicts.csv",
+  "row": "*",
+  "column": "",
+  "op": "count",
+  "where": {},
+  "format": "int",
+  "value": 23,
+  "text": "23",
+  "shown": true
+ },
+ {
+  "id": 19,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0013369153720607097,
+  "text": "-0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 20,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.005139420621489687,
+  "text": "-0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 21,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.002450666226110394,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 22,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.0016279794990092245,
+  "text": "-0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 23,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.008293550357799422,
+  "text": "-0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 24,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.00448419662718382,
+  "text": "+0.4 pp",
+  "shown": false
+ },
+ {
+  "id": 25,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.0012035883668088942,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 26,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.011554577836944448,
+  "text": "-1.2 pp",
+  "shown": false
+ },
+ {
+  "id": 27,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.014457858727905561,
+  "text": "+1.4 pp",
+  "shown": false
+ },
+ {
+  "id": 28,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.005025981877086749,
+  "text": "+0.5 pp",
+  "shown": true
+ },
+ {
+  "id": 29,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.01689741691674896,
+  "text": "-1.7 pp",
+  "shown": false
+ },
+ {
+  "id": 30,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.02697468723872832,
+  "text": "+2.7 pp",
+  "shown": false
+ },
+ {
+  "id": 31,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.017891027378693414,
+  "text": "-1.8 pp",
+  "shown": true
+ },
+ {
+  "id": 32,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.08835257388696179,
+  "text": "-8.8 pp",
+  "shown": false
+ },
+ {
+  "id": 33,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.048707201042887005,
+  "text": "+4.9 pp",
+  "shown": false
+ },
+ {
+  "id": 34,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0011894786612817176,
+  "text": "-0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 35,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.004636944050783376,
+  "text": "-0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 36,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.002245026644500395,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 37,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.002836647697127659,
+  "text": "-0.3 pp",
+  "shown": true
+ },
+ {
+  "id": 38,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.006103419467008051,
+  "text": "-0.6 pp",
+  "shown": false
+ },
+ {
+  "id": 39,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/levels_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0003738246185650937,
+  "text": "0.0 pp",
+  "shown": false
+ },
+ {
+  "id": 40,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/verdicts.csv",
+  "row": "test=levels_vs_random (row 0)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "levels_vs_random"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 41,
+  "page": "behavior_levels_vs_random",
+  "file": "behavior/verdicts.csv",
+  "row": "test=levels_vs_random (row 0)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "levels_vs_random"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 42,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.020786438721259348,
+  "text": "+2.1 pp",
+  "shown": true
+ },
+ {
+  "id": 43,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.013338056276061664,
+  "text": "+1.3 pp",
+  "shown": false
+ },
+ {
+  "id": 44,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.028056126136008535,
+  "text": "+2.8 pp",
+  "shown": false
+ },
+ {
+  "id": 45,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.013455803065242189,
+  "text": "+1.3 pp",
+  "shown": true
+ },
+ {
+  "id": 46,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.0016342111570211329,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 47,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.0244733412678272,
+  "text": "+2.4 pp",
+  "shown": false
+ },
+ {
+  "id": 48,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.017228774229474553,
+  "text": "+1.7 pp",
+  "shown": true
+ },
+ {
+  "id": 49,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.004129086158809239,
+  "text": "-0.4 pp",
+  "shown": false
+ },
+ {
+  "id": 50,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.03808524921541554,
+  "text": "+3.8 pp",
+  "shown": false
+ },
+ {
+  "id": 51,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.035463697376449055,
+  "text": "+3.5 pp",
+  "shown": true
+ },
+ {
+  "id": 52,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.005112008878015737,
+  "text": "-0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 53,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.07256239401076915,
+  "text": "+7.3 pp",
+  "shown": false
+ },
+ {
+  "id": 54,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.03332159065006113,
+  "text": "-3.3 pp",
+  "shown": true
+ },
+ {
+  "id": 55,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.1419097001901493,
+  "text": "-14.2 pp",
+  "shown": false
+ },
+ {
+  "id": 56,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.07391870160985717,
+  "text": "+7.4 pp",
+  "shown": false
+ },
+ {
+  "id": 57,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.018867910540200816,
+  "text": "+1.9 pp",
+  "shown": true
+ },
+ {
+  "id": 58,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.011678993264650295,
+  "text": "+1.2 pp",
+  "shown": false
+ },
+ {
+  "id": 59,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.025431482491449935,
+  "text": "+2.5 pp",
+  "shown": false
+ },
+ {
+  "id": 60,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.01127287558813489,
+  "text": "+1.1 pp",
+  "shown": true
+ },
+ {
+  "id": 61,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.004396019718560094,
+  "text": "+0.4 pp",
+  "shown": false
+ },
+ {
+  "id": 62,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/hold_by_touch_count.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.017930205969945996,
+  "text": "+1.8 pp",
+  "shown": false
+ },
+ {
+  "id": 63,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/verdicts.csv",
+  "row": "test=hold_by_touch_count (row 1)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "hold_by_touch_count"
+  },
+  "format": "str",
+  "value": "true",
+  "text": "true",
+  "shown": false
+ },
+ {
+  "id": 64,
+  "page": "behavior_hold_by_touch_count",
+  "file": "behavior/verdicts.csv",
+  "row": "test=hold_by_touch_count (row 1)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "hold_by_touch_count"
+  },
+  "format": "str",
+  "value": "NQ pooled points the claimed way with an interval excluding zero; ES agrees; both eras agree.",
+  "text": "NQ pooled points the claimed way with an interval excluding zero; ES agrees; both eras agree.",
+  "shown": true
+ },
+ {
+  "id": 65,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.0022427957872272475,
+  "text": "+0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 66,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0020264831119995966,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 67,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.006771626068984863,
+  "text": "+0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 68,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.0010444939713933343,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 69,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.005840372956386374,
+  "text": "-0.6 pp",
+  "shown": false
+ },
+ {
+  "id": 70,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.008345183338524272,
+  "text": "+0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 71,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.001388399786216743,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 72,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.013011713929139215,
+  "text": "-1.3 pp",
+  "shown": false
+ },
+ {
+  "id": 73,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.0155397387183068,
+  "text": "+1.6 pp",
+  "shown": false
+ },
+ {
+  "id": 74,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.011682149436809397,
+  "text": "+1.2 pp",
+  "shown": true
+ },
+ {
+  "id": 75,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.013048491000750773,
+  "text": "-1.3 pp",
+  "shown": false
+ },
+ {
+  "id": 76,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.03606530985114404,
+  "text": "+3.6 pp",
+  "shown": false
+ },
+ {
+  "id": 77,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.003848698665077366,
+  "text": "+0.4 pp",
+  "shown": true
+ },
+ {
+  "id": 78,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.07924529879557839,
+  "text": "-7.9 pp",
+  "shown": false
+ },
+ {
+  "id": 79,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.08862646118047238,
+  "text": "+8.9 pp",
+  "shown": false
+ },
+ {
+  "id": 80,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0020661978237997425,
+  "text": "+0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 81,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0017557757783711893,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 82,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.006199794512906245,
+  "text": "+0.6 pp",
+  "shown": false
+ },
+ {
+  "id": 83,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0016280960431870883,
+  "text": "+0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 84,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.001890860767173777,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 85,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/wall_or_target.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.005089841537294334,
+  "text": "+0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 86,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/verdicts.csv",
+  "row": "test=wall_or_target (row 2)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "wall_or_target"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 87,
+  "page": "behavior_wall_or_target",
+  "file": "behavior/verdicts.csv",
+  "row": "test=wall_or_target (row 2)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "wall_or_target"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 88,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.014141220129474052,
+  "text": "+1.4 pp",
+  "shown": true
+ },
+ {
+  "id": 89,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0006221622108391163,
+  "text": "-0.1 pp",
+  "shown": false
+ },
+ {
+  "id": 90,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.030199962227712557,
+  "text": "+3.0 pp",
+  "shown": false
+ },
+ {
+  "id": 91,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.03652466228862339,
+  "text": "+3.7 pp",
+  "shown": true
+ },
+ {
+  "id": 92,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.01098208884355214,
+  "text": "+1.1 pp",
+  "shown": false
+ },
+ {
+  "id": 93,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.06270016070826578,
+  "text": "+6.3 pp",
+  "shown": false
+ },
+ {
+  "id": 94,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.00020254136107789034,
+  "text": "0.0 pp",
+  "shown": true
+ },
+ {
+  "id": 95,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.04930750108034991,
+  "text": "-4.9 pp",
+  "shown": false
+ },
+ {
+  "id": 96,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.052293668920392944,
+  "text": "+5.2 pp",
+  "shown": false
+ },
+ {
+  "id": 97,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.000616074704249514,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 98,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.07520860208061861,
+  "text": "-7.5 pp",
+  "shown": false
+ },
+ {
+  "id": 99,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.08484206293969035,
+  "text": "+8.5 pp",
+  "shown": false
+ },
+ {
+  "id": 100,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.21029281277728484,
+  "text": "-21.0 pp",
+  "shown": true
+ },
+ {
+  "id": 101,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.41805690893805647,
+  "text": "-41.8 pp",
+  "shown": false
+ },
+ {
+  "id": 102,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.007002758420441213,
+  "text": "+0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 103,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.017884375649730666,
+  "text": "+1.8 pp",
+  "shown": true
+ },
+ {
+  "id": 104,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0034381902767565337,
+  "text": "+0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 105,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.03219771568720629,
+  "text": "+3.2 pp",
+  "shown": false
+ },
+ {
+  "id": 106,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.024973814452131093,
+  "text": "+2.5 pp",
+  "shown": true
+ },
+ {
+  "id": 107,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.012759046663962503,
+  "text": "+1.3 pp",
+  "shown": false
+ },
+ {
+  "id": 108,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/shrinking_bounces.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.03759275995990126,
+  "text": "+3.8 pp",
+  "shown": false
+ },
+ {
+  "id": 109,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/verdicts.csv",
+  "row": "test=shrinking_bounces (row 3)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "shrinking_bounces"
+  },
+  "format": "str",
+  "value": "true",
+  "text": "true",
+  "shown": false
+ },
+ {
+  "id": 110,
+  "page": "behavior_shrinking_bounces",
+  "file": "behavior/verdicts.csv",
+  "row": "test=shrinking_bounces (row 3)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "shrinking_bounces"
+  },
+  "format": "str",
+  "value": "NQ pooled points the claimed way with an interval excluding zero; ES agrees; both eras agree.",
+  "text": "NQ pooled points the claimed way with an interval excluding zero; ES agrees; both eras agree.",
+  "shown": true
+ },
+ {
+  "id": 111,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.0006924229399369874,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 112,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0027898145166285167,
+  "text": "-0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 113,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.0044876969476462586,
+  "text": "+0.4 pp",
+  "shown": false
+ },
+ {
+  "id": 114,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.003754822049394424,
+  "text": "+0.4 pp",
+  "shown": true
+ },
+ {
+  "id": 115,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.003092401335227943,
+  "text": "-0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 116,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.010770548599072345,
+  "text": "+1.1 pp",
+  "shown": false
+ },
+ {
+  "id": 117,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.008212279270931544,
+  "text": "+0.8 pp",
+  "shown": true
+ },
+ {
+  "id": 118,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.005398721851981568,
+  "text": "-0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 119,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.022158622087946347,
+  "text": "+2.2 pp",
+  "shown": false
+ },
+ {
+  "id": 120,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.010220987850962537,
+  "text": "-1.0 pp",
+  "shown": true
+ },
+ {
+  "id": 121,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.034763614124951395,
+  "text": "-3.5 pp",
+  "shown": false
+ },
+ {
+  "id": 122,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.013965092314665329,
+  "text": "+1.4 pp",
+  "shown": false
+ },
+ {
+  "id": 123,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.058755998655909525,
+  "text": "+5.9 pp",
+  "shown": true
+ },
+ {
+  "id": 124,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.04583642002074846,
+  "text": "-4.6 pp",
+  "shown": false
+ },
+ {
+  "id": 125,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.167026985682703,
+  "text": "+16.7 pp",
+  "shown": false
+ },
+ {
+  "id": 126,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0016697232965022235,
+  "text": "+0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 127,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.001423363456207917,
+  "text": "-0.1 pp",
+  "shown": false
+ },
+ {
+  "id": 128,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0048543949196460075,
+  "text": "+0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 129,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0015486597382136091,
+  "text": "+0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 130,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0015089640463591346,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 131,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/line_vs_box.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.004646624950568262,
+  "text": "+0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 132,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/verdicts.csv",
+  "row": "test=line_vs_box (row 4)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "line_vs_box"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 133,
+  "page": "behavior_line_vs_box",
+  "file": "behavior/verdicts.csv",
+  "row": "test=line_vs_box (row 4)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "line_vs_box"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 134,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.026206846135381393,
+  "text": "+0.03 ATR",
+  "shown": true
+ },
+ {
+  "id": 135,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.0651566161176232,
+  "text": "-0.07 ATR",
+  "shown": false
+ },
+ {
+  "id": 136,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.11660636187906528,
+  "text": "+0.12 ATR",
+  "shown": false
+ },
+ {
+  "id": 137,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.026061069695008585,
+  "text": "+0.03 ATR",
+  "shown": true
+ },
+ {
+  "id": 138,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.1117840622799834,
+  "text": "-0.11 ATR",
+  "shown": false
+ },
+ {
+  "id": 139,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.17099085420642743,
+  "text": "+0.17 ATR",
+  "shown": false
+ },
+ {
+  "id": 140,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.21665300997514603,
+  "text": "+0.22 ATR",
+  "shown": true
+ },
+ {
+  "id": 141,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.010089394194840774,
+  "text": "-0.01 ATR",
+  "shown": false
+ },
+ {
+  "id": 142,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.44872142971809437,
+  "text": "+0.45 ATR",
+  "shown": false
+ },
+ {
+  "id": 143,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.39971050254160784,
+  "text": "+0.40 ATR",
+  "shown": true
+ },
+ {
+  "id": 144,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.02256788738956577,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 145,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.8009945567719884,
+  "text": "+0.80 ATR",
+  "shown": false
+ },
+ {
+  "id": 146,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.31406260731839436,
+  "text": "+0.31 ATR",
+  "shown": true
+ },
+ {
+  "id": 147,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.361832997075052,
+  "text": "-0.36 ATR",
+  "shown": false
+ },
+ {
+  "id": 148,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.9718036950862137,
+  "text": "+0.97 ATR",
+  "shown": false
+ },
+ {
+  "id": 149,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.042734011746885465,
+  "text": "+0.04 ATR",
+  "shown": true
+ },
+ {
+  "id": 150,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.04509217483972546,
+  "text": "-0.05 ATR",
+  "shown": false
+ },
+ {
+  "id": 151,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.1331343797262056,
+  "text": "+0.13 ATR",
+  "shown": false
+ },
+ {
+  "id": 152,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.013355909969769184,
+  "text": "+0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 153,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.05819633689195268,
+  "text": "-0.06 ATR",
+  "shown": false
+ },
+ {
+  "id": 154,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/wick_vs_close_through.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.08664821183060666,
+  "text": "+0.09 ATR",
+  "shown": false
+ },
+ {
+  "id": 155,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/verdicts.csv",
+  "row": "test=wick_vs_close_through (row 5)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "wick_vs_close_through"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 156,
+  "page": "behavior_wick_vs_close_through",
+  "file": "behavior/verdicts.csv",
+  "row": "test=wick_vs_close_through (row 5)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "wick_vs_close_through"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 157,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0010802078082321476,
+  "text": "-0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 158,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.009524266957746233,
+  "text": "-1.0 pp",
+  "shown": false
+ },
+ {
+  "id": 159,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.0072649628888558785,
+  "text": "+0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 160,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.0028241944013549514,
+  "text": "+0.3 pp",
+  "shown": true
+ },
+ {
+  "id": 161,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.011702600621650863,
+  "text": "-1.2 pp",
+  "shown": false
+ },
+ {
+  "id": 162,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.017570534537708137,
+  "text": "+1.8 pp",
+  "shown": false
+ },
+ {
+  "id": 163,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.0059058653070721,
+  "text": "+0.6 pp",
+  "shown": true
+ },
+ {
+  "id": 164,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.022282357307059217,
+  "text": "-2.2 pp",
+  "shown": false
+ },
+ {
+  "id": 165,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.03363972824673118,
+  "text": "+3.4 pp",
+  "shown": false
+ },
+ {
+  "id": 166,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.011905391798137044,
+  "text": "+1.2 pp",
+  "shown": true
+ },
+ {
+  "id": 167,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.04292979605653845,
+  "text": "-4.3 pp",
+  "shown": false
+ },
+ {
+  "id": 168,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.06115174735926309,
+  "text": "+6.1 pp",
+  "shown": false
+ },
+ {
+  "id": 169,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.08516783762685404,
+  "text": "+8.5 pp",
+  "shown": true
+ },
+ {
+  "id": 170,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.04478938477951637,
+  "text": "-4.5 pp",
+  "shown": false
+ },
+ {
+  "id": 171,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.21439019789884178,
+  "text": "+21.4 pp",
+  "shown": false
+ },
+ {
+  "id": 172,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0007532291605301111,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 173,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.007284798667343812,
+  "text": "-0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 174,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.008921688761489703,
+  "text": "+0.9 pp",
+  "shown": false
+ },
+ {
+  "id": 175,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.00043191808373505003,
+  "text": "0.0 pp",
+  "shown": true
+ },
+ {
+  "id": 176,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.008418455734082637,
+  "text": "-0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 177,
+  "page": "behavior_flip_zones",
+  "file": "behavior/flip_zones.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0074503464750127766,
+  "text": "+0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 178,
+  "page": "behavior_flip_zones",
+  "file": "behavior/verdicts.csv",
+  "row": "test=flip_zones (row 6)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "flip_zones"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 179,
+  "page": "behavior_flip_zones",
+  "file": "behavior/verdicts.csv",
+  "row": "test=flip_zones (row 6)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "flip_zones"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 180,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.04569022337730787,
+  "text": "-0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 181,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.1314376126023791,
+  "text": "-0.13 ATR",
+  "shown": false
+ },
+ {
+  "id": 182,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.04276728522933227,
+  "text": "+0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 183,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.2361504847661205,
+  "text": "-0.24 ATR",
+  "shown": true
+ },
+ {
+  "id": 184,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.45144499801683197,
+  "text": "-0.45 ATR",
+  "shown": false
+ },
+ {
+  "id": 185,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.023978957763059573,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 186,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.048782556806101406,
+  "text": "-0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 187,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.4254924835113288,
+  "text": "-0.43 ATR",
+  "shown": false
+ },
+ {
+  "id": 188,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.32740137635758265,
+  "text": "+0.33 ATR",
+  "shown": false
+ },
+ {
+  "id": 189,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.13132718520283204,
+  "text": "+0.13 ATR",
+  "shown": true
+ },
+ {
+  "id": 190,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.2711894902256064,
+  "text": "-0.27 ATR",
+  "shown": false
+ },
+ {
+  "id": 191,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.5231209169752973,
+  "text": "+0.52 ATR",
+  "shown": false
+ },
+ {
+  "id": 192,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.8504937051664813,
+  "text": "+0.85 ATR",
+  "shown": true
+ },
+ {
+  "id": 193,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.22936812314100954,
+  "text": "-0.23 ATR",
+  "shown": false
+ },
+ {
+  "id": 194,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.8841377592942008,
+  "text": "+1.88 ATR",
+  "shown": false
+ },
+ {
+  "id": 195,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.08154294946015055,
+  "text": "-0.08 ATR",
+  "shown": true
+ },
+ {
+  "id": 196,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.16998537389913124,
+  "text": "-0.17 ATR",
+  "shown": false
+ },
+ {
+  "id": 197,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.004252907891985119,
+  "text": "0.00 ATR",
+  "shown": false
+ },
+ {
+  "id": 198,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.0498840183689353,
+  "text": "-0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 199,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.14263225080784192,
+  "text": "-0.14 ATR",
+  "shown": false
+ },
+ {
+  "id": 200,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/bos_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.03868273707275103,
+  "text": "+0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 201,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_10 (row 7)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_10"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 202,
+  "page": "behavior_bos_follow_10",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_10 (row 7)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_10"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 203,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.04176066764249684,
+  "text": "+0.04 ATR",
+  "shown": true
+ },
+ {
+  "id": 204,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.11309678056860545,
+  "text": "-0.11 ATR",
+  "shown": false
+ },
+ {
+  "id": 205,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.19023237472952642,
+  "text": "+0.19 ATR",
+  "shown": false
+ },
+ {
+  "id": 206,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.1124925383356116,
+  "text": "-0.11 ATR",
+  "shown": true
+ },
+ {
+  "id": 207,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.45562551352075725,
+  "text": "-0.46 ATR",
+  "shown": false
+ },
+ {
+  "id": 208,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.20714348146491682,
+  "text": "+0.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 209,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.19930868852594918,
+  "text": "-0.20 ATR",
+  "shown": true
+ },
+ {
+  "id": 210,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.6750373033206565,
+  "text": "-0.68 ATR",
+  "shown": false
+ },
+ {
+  "id": 211,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.24334070954100245,
+  "text": "+0.24 ATR",
+  "shown": false
+ },
+ {
+  "id": 212,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.30961017258451673,
+  "text": "+0.31 ATR",
+  "shown": true
+ },
+ {
+  "id": 213,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.2794045992907457,
+  "text": "-0.28 ATR",
+  "shown": false
+ },
+ {
+  "id": 214,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.9074140842945413,
+  "text": "+0.91 ATR",
+  "shown": false
+ },
+ {
+  "id": 215,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.495927839626833,
+  "text": "+1.50 ATR",
+  "shown": true
+ },
+ {
+  "id": 216,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.1957615984336513,
+  "text": "+0.20 ATR",
+  "shown": false
+ },
+ {
+  "id": 217,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 2.7495463804203064,
+  "text": "+2.75 ATR",
+  "shown": false
+ },
+ {
+  "id": 218,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.0033116668389400576,
+  "text": "0.00 ATR",
+  "shown": true
+ },
+ {
+  "id": 219,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.14724057416504027,
+  "text": "-0.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 220,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.14503272002062764,
+  "text": "+0.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 221,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.0920107092995538,
+  "text": "-0.09 ATR",
+  "shown": true
+ },
+ {
+  "id": 222,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.2274003091949314,
+  "text": "-0.23 ATR",
+  "shown": false
+ },
+ {
+  "id": 223,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/bos_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.04454540834653462,
+  "text": "+0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 224,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_20 (row 8)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_20"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 225,
+  "page": "behavior_bos_follow_20",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_20 (row 8)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_20"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 226,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.13650420688822423,
+  "text": "-0.14 ATR",
+  "shown": true
+ },
+ {
+  "id": 227,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.42449475340128756,
+  "text": "-0.42 ATR",
+  "shown": false
+ },
+ {
+  "id": 228,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.1519090208010503,
+  "text": "+0.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 229,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.1280329128554858,
+  "text": "+0.13 ATR",
+  "shown": true
+ },
+ {
+  "id": 230,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.4582599263004045,
+  "text": "-0.46 ATR",
+  "shown": false
+ },
+ {
+  "id": 231,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.7364214810164744,
+  "text": "+0.74 ATR",
+  "shown": false
+ },
+ {
+  "id": 232,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.8086586625924239,
+  "text": "-0.81 ATR",
+  "shown": true
+ },
+ {
+  "id": 233,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -1.6365583221342175,
+  "text": "-1.64 ATR",
+  "shown": false
+ },
+ {
+  "id": 234,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.0033525659236186512,
+  "text": "0.00 ATR",
+  "shown": false
+ },
+ {
+  "id": 235,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.8168834558171383,
+  "text": "+0.82 ATR",
+  "shown": true
+ },
+ {
+  "id": 236,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.19967708745643328,
+  "text": "-0.20 ATR",
+  "shown": false
+ },
+ {
+  "id": 237,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 1.8597689040699252,
+  "text": "+1.86 ATR",
+  "shown": false
+ },
+ {
+  "id": 238,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.6074138088608434,
+  "text": "+1.61 ATR",
+  "shown": true
+ },
+ {
+  "id": 239,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.6892830075986892,
+  "text": "-0.69 ATR",
+  "shown": false
+ },
+ {
+  "id": 240,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 4.2218353969821285,
+  "text": "+4.22 ATR",
+  "shown": false
+ },
+ {
+  "id": 241,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.09441323274420858,
+  "text": "-0.09 ATR",
+  "shown": true
+ },
+ {
+  "id": 242,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.3420853262299897,
+  "text": "-0.34 ATR",
+  "shown": false
+ },
+ {
+  "id": 243,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.1662250960942063,
+  "text": "+0.17 ATR",
+  "shown": false
+ },
+ {
+  "id": 244,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.14001886124871538,
+  "text": "-0.14 ATR",
+  "shown": true
+ },
+ {
+  "id": 245,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.37619637293418756,
+  "text": "-0.38 ATR",
+  "shown": false
+ },
+ {
+  "id": 246,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/bos_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.09674270017203498,
+  "text": "+0.10 ATR",
+  "shown": false
+ },
+ {
+  "id": 247,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_50 (row 9)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_50"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 248,
+  "page": "behavior_bos_follow_50",
+  "file": "behavior/verdicts.csv",
+  "row": "test=bos_follow_50 (row 9)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "bos_follow_50"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 249,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.012583782080340285,
+  "text": "-0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 250,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.09622691776733401,
+  "text": "-0.10 ATR",
+  "shown": false
+ },
+ {
+  "id": 251,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.07744012434241054,
+  "text": "+0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 252,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.02182215719994737,
+  "text": "-0.02 ATR",
+  "shown": true
+ },
+ {
+  "id": 253,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.2083124507712917,
+  "text": "-0.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 254,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.16249822232325267,
+  "text": "+0.16 ATR",
+  "shown": false
+ },
+ {
+  "id": 255,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.0908875351713976,
+  "text": "+0.09 ATR",
+  "shown": true
+ },
+ {
+  "id": 256,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.2648928936691089,
+  "text": "-0.26 ATR",
+  "shown": false
+ },
+ {
+  "id": 257,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.44071744112771305,
+  "text": "+0.44 ATR",
+  "shown": false
+ },
+ {
+  "id": 258,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.05518237968198475,
+  "text": "-0.06 ATR",
+  "shown": true
+ },
+ {
+  "id": 259,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.5441078860971232,
+  "text": "-0.54 ATR",
+  "shown": false
+ },
+ {
+  "id": 260,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.43498233504411493,
+  "text": "+0.43 ATR",
+  "shown": false
+ },
+ {
+  "id": 261,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.5530839030094331,
+  "text": "-0.55 ATR",
+  "shown": true
+ },
+ {
+  "id": 262,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -1.5036385082955073,
+  "text": "-1.50 ATR",
+  "shown": false
+ },
+ {
+  "id": 263,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.44632669137271624,
+  "text": "+0.45 ATR",
+  "shown": false
+ },
+ {
+  "id": 264,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.011137284042178694,
+  "text": "-0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 265,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.08335157177695736,
+  "text": "-0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 266,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.06588720303125242,
+  "text": "+0.07 ATR",
+  "shown": false
+ },
+ {
+  "id": 267,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.035881086362127876,
+  "text": "+0.04 ATR",
+  "shown": true
+ },
+ {
+  "id": 268,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.035146257246433055,
+  "text": "-0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 269,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/choch_follow_10.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.11456226625172913,
+  "text": "+0.11 ATR",
+  "shown": false
+ },
+ {
+  "id": 270,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_10 (row 10)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_10"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 271,
+  "page": "behavior_choch_follow_10",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_10 (row 10)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_10"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 272,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.04664873466273044,
+  "text": "-0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 273,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.1666841393122065,
+  "text": "-0.17 ATR",
+  "shown": false
+ },
+ {
+  "id": 274,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.07290991016009342,
+  "text": "+0.07 ATR",
+  "shown": false
+ },
+ {
+  "id": 275,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.09989668144165277,
+  "text": "-0.10 ATR",
+  "shown": true
+ },
+ {
+  "id": 276,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.34812661949760304,
+  "text": "-0.35 ATR",
+  "shown": false
+ },
+ {
+  "id": 277,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.1412886752521204,
+  "text": "+0.14 ATR",
+  "shown": false
+ },
+ {
+  "id": 278,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.3149241227337449,
+  "text": "+0.31 ATR",
+  "shown": true
+ },
+ {
+  "id": 279,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.12178851380590723,
+  "text": "-0.12 ATR",
+  "shown": false
+ },
+ {
+  "id": 280,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.756962907535205,
+  "text": "+0.76 ATR",
+  "shown": false
+ },
+ {
+  "id": 281,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.6377759148735563,
+  "text": "-0.64 ATR",
+  "shown": true
+ },
+ {
+  "id": 282,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -1.4009230716806218,
+  "text": "-1.40 ATR",
+  "shown": false
+ },
+ {
+  "id": 283,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.17505105980406774,
+  "text": "+0.18 ATR",
+  "shown": false
+ },
+ {
+  "id": 284,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.24375752034760712,
+  "text": "+0.24 ATR",
+  "shown": true
+ },
+ {
+  "id": 285,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -1.3087295942135884,
+  "text": "-1.31 ATR",
+  "shown": false
+ },
+ {
+  "id": 286,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.756467690890569,
+  "text": "+1.76 ATR",
+  "shown": false
+ },
+ {
+  "id": 287,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.04801511516762198,
+  "text": "-0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 288,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.15740346406363745,
+  "text": "-0.16 ATR",
+  "shown": false
+ },
+ {
+  "id": 289,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.06302279417087224,
+  "text": "+0.06 ATR",
+  "shown": false
+ },
+ {
+  "id": 290,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.09229614266747568,
+  "text": "+0.09 ATR",
+  "shown": true
+ },
+ {
+  "id": 291,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.021082171222316894,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 292,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/choch_follow_20.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.2089912637255966,
+  "text": "+0.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 293,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_20 (row 11)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_20"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 294,
+  "page": "behavior_choch_follow_20",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_20 (row 11)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_20"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 295,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.15601151580808714,
+  "text": "+0.16 ATR",
+  "shown": true
+ },
+ {
+  "id": 296,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.043336531497342075,
+  "text": "-0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 297,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.356449158857676,
+  "text": "+0.36 ATR",
+  "shown": false
+ },
+ {
+  "id": 298,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.12685933433178337,
+  "text": "-0.13 ATR",
+  "shown": true
+ },
+ {
+  "id": 299,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.49604613980475837,
+  "text": "-0.50 ATR",
+  "shown": false
+ },
+ {
+  "id": 300,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.26713965484053703,
+  "text": "+0.27 ATR",
+  "shown": false
+ },
+ {
+  "id": 301,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.3948600737566214,
+  "text": "+0.39 ATR",
+  "shown": true
+ },
+ {
+  "id": 302,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.34724481578425265,
+  "text": "-0.35 ATR",
+  "shown": false
+ },
+ {
+  "id": 303,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 1.1699198718014352,
+  "text": "+1.17 ATR",
+  "shown": false
+ },
+ {
+  "id": 304,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.262059663005005,
+  "text": "-0.26 ATR",
+  "shown": true
+ },
+ {
+  "id": 305,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -1.375925675341919,
+  "text": "-1.38 ATR",
+  "shown": false
+ },
+ {
+  "id": 306,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.8683425140334707,
+  "text": "+0.87 ATR",
+  "shown": false
+ },
+ {
+  "id": 307,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.094044427601686,
+  "text": "+1.09 ATR",
+  "shown": true
+ },
+ {
+  "id": 308,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -1.2195996725667002,
+  "text": "-1.22 ATR",
+  "shown": false
+ },
+ {
+  "id": 309,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 3.502566490006674,
+  "text": "+3.50 ATR",
+  "shown": false
+ },
+ {
+  "id": 310,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.09965852945455042,
+  "text": "+0.10 ATR",
+  "shown": true
+ },
+ {
+  "id": 311,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.07818099599837652,
+  "text": "-0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 312,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.26605767635080785,
+  "text": "+0.27 ATR",
+  "shown": false
+ },
+ {
+  "id": 313,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.10775149433306189,
+  "text": "+0.11 ATR",
+  "shown": true
+ },
+ {
+  "id": 314,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.06887864379630003,
+  "text": "-0.07 ATR",
+  "shown": false
+ },
+ {
+  "id": 315,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/choch_follow_50.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.2864099582898872,
+  "text": "+0.29 ATR",
+  "shown": false
+ },
+ {
+  "id": 316,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_50 (row 12)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_50"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 317,
+  "page": "behavior_choch_follow_50",
+  "file": "behavior/verdicts.csv",
+  "row": "test=choch_follow_50 (row 12)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "choch_follow_50"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 318,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.010162663273333986,
+  "text": "+0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 319,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.03976921098112515,
+  "text": "-0.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 320,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.06149487027505301,
+  "text": "+0.06 ATR",
+  "shown": false
+ },
+ {
+  "id": 321,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.05482841693936642,
+  "text": "+0.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 322,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.027793425886510948,
+  "text": "-0.03 ATR",
+  "shown": false
+ },
+ {
+  "id": 323,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.13632565120783488,
+  "text": "+0.14 ATR",
+  "shown": false
+ },
+ {
+  "id": 324,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.11360355485618805,
+  "text": "+0.11 ATR",
+  "shown": true
+ },
+ {
+  "id": 325,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.02386490079385573,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 326,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.25071534491957265,
+  "text": "+0.25 ATR",
+  "shown": false
+ },
+ {
+  "id": 327,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.15291716360617985,
+  "text": "+0.15 ATR",
+  "shown": true
+ },
+ {
+  "id": 328,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.09909401983299441,
+  "text": "-0.10 ATR",
+  "shown": false
+ },
+ {
+  "id": 329,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.3999099819691227,
+  "text": "+0.40 ATR",
+  "shown": false
+ },
+ {
+  "id": 330,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.12138168751050557,
+  "text": "+0.12 ATR",
+  "shown": true
+ },
+ {
+  "id": 331,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.4185280190728462,
+  "text": "-0.42 ATR",
+  "shown": false
+ },
+ {
+  "id": 332,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.6534387515441062,
+  "text": "+0.65 ATR",
+  "shown": false
+ },
+ {
+  "id": 333,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.02765029971313288,
+  "text": "+0.03 ATR",
+  "shown": true
+ },
+ {
+  "id": 334,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.023938369098965715,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 335,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.07836470024365465,
+  "text": "+0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 336,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.01285187056247145,
+  "text": "+0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 337,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.03478888654996544,
+  "text": "-0.03 ATR",
+  "shown": false
+ },
+ {
+  "id": 338,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/sweeps_vs_closes.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.0614851854078302,
+  "text": "+0.06 ATR",
+  "shown": false
+ },
+ {
+  "id": 339,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/verdicts.csv",
+  "row": "test=sweeps_vs_closes (row 13)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "sweeps_vs_closes"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 340,
+  "page": "behavior_sweeps_vs_closes",
+  "file": "behavior/verdicts.csv",
+  "row": "test=sweeps_vs_closes (row 13)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "sweeps_vs_closes"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 341,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.18461913468988808,
+  "text": "+0.18 ATR",
+  "shown": true
+ },
+ {
+  "id": 342,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.19120956089224297,
+  "text": "-0.19 ATR",
+  "shown": false
+ },
+ {
+  "id": 343,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.567992835708466,
+  "text": "+0.57 ATR",
+  "shown": false
+ },
+ {
+  "id": 344,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.17971804436799532,
+  "text": "+0.18 ATR",
+  "shown": true
+ },
+ {
+  "id": 345,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.5361843294909446,
+  "text": "-0.54 ATR",
+  "shown": false
+ },
+ {
+  "id": 346,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.9075851548522095,
+  "text": "+0.91 ATR",
+  "shown": false
+ },
+ {
+  "id": 347,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.29180804284504025,
+  "text": "-0.29 ATR",
+  "shown": true
+ },
+ {
+  "id": 348,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -2.2109468703155564,
+  "text": "-2.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 349,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 1.4348985732439086,
+  "text": "+1.43 ATR",
+  "shown": false
+ },
+ {
+  "id": 350,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 1.110430217886878,
+  "text": "+1.11 ATR",
+  "shown": true
+ },
+ {
+  "id": 351,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.8395663938855581,
+  "text": "-0.84 ATR",
+  "shown": false
+ },
+ {
+  "id": 352,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 2.9534412228410063,
+  "text": "+2.95 ATR",
+  "shown": false
+ },
+ {
+  "id": 353,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 3.94639787134275,
+  "text": "+3.95 ATR",
+  "shown": true
+ },
+ {
+  "id": 354,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 2.44045172364266,
+  "text": "+2.44 ATR",
+  "shown": false
+ },
+ {
+  "id": 355,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 5.4399462112920505,
+  "text": "+5.44 ATR",
+  "shown": false
+ },
+ {
+  "id": 356,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.1926275013244766,
+  "text": "+0.19 ATR",
+  "shown": true
+ },
+ {
+  "id": 357,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.14902827286696196,
+  "text": "-0.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 358,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.5380534747587067,
+  "text": "+0.54 ATR",
+  "shown": false
+ },
+ {
+  "id": 359,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.16506059460421268,
+  "text": "+0.17 ATR",
+  "shown": true
+ },
+ {
+  "id": 360,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.20874150855547918,
+  "text": "-0.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 361,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/trend_start_sweep.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.5440906651431309,
+  "text": "+0.54 ATR",
+  "shown": false
+ },
+ {
+  "id": 362,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/verdicts.csv",
+  "row": "test=trend_start_sweep (row 14)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "trend_start_sweep"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 363,
+  "page": "behavior_trend_start_sweep",
+  "file": "behavior/verdicts.csv",
+  "row": "test=trend_start_sweep (row 14)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "trend_start_sweep"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 364,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.0022244805553059965,
+  "text": "-0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 365,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.007820157096368878,
+  "text": "-0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 366,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.003386729624296154,
+  "text": "+0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 367,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.013131279679404861,
+  "text": "-1.3 pp",
+  "shown": true
+ },
+ {
+  "id": 368,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.024033738984792996,
+  "text": "-2.4 pp",
+  "shown": false
+ },
+ {
+  "id": 369,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.0018630247877371607,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 370,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.014578806036479486,
+  "text": "+1.5 pp",
+  "shown": true
+ },
+ {
+  "id": 371,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.009924304503003394,
+  "text": "-1.0 pp",
+  "shown": false
+ },
+ {
+  "id": 372,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.04166513893557791,
+  "text": "+4.2 pp",
+  "shown": false
+ },
+ {
+  "id": 373,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.012411053231874414,
+  "text": "+1.2 pp",
+  "shown": true
+ },
+ {
+  "id": 374,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.03053209524254164,
+  "text": "-3.1 pp",
+  "shown": false
+ },
+ {
+  "id": 375,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.05661916859610342,
+  "text": "+5.7 pp",
+  "shown": false
+ },
+ {
+  "id": 376,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.008630952380952406,
+  "text": "+0.9 pp",
+  "shown": true
+ },
+ {
+  "id": 377,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.12057588284181145,
+  "text": "-12.1 pp",
+  "shown": false
+ },
+ {
+  "id": 378,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.1445693076081007,
+  "text": "+14.5 pp",
+  "shown": false
+ },
+ {
+  "id": 379,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0035957248225485516,
+  "text": "-0.4 pp",
+  "shown": true
+ },
+ {
+  "id": 380,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.008534911903735665,
+  "text": "-0.9 pp",
+  "shown": false
+ },
+ {
+  "id": 381,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0012987871255953837,
+  "text": "+0.1 pp",
+  "shown": false
+ },
+ {
+  "id": 382,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.012518395856533415,
+  "text": "-1.3 pp",
+  "shown": true
+ },
+ {
+  "id": 383,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.017282502879243072,
+  "text": "-1.7 pp",
+  "shown": false
+ },
+ {
+  "id": 384,
+  "page": "behavior_trend_lines",
+  "file": "behavior/trend_lines.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.007640720500677435,
+  "text": "-0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 385,
+  "page": "behavior_trend_lines",
+  "file": "behavior/verdicts.csv",
+  "row": "test=trend_lines (row 15)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "trend_lines"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 386,
+  "page": "behavior_trend_lines",
+  "file": "behavior/verdicts.csv",
+  "row": "test=trend_lines (row 15)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "trend_lines"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 387,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.00838291370732791,
+  "text": "-0.8 pp",
+  "shown": true
+ },
+ {
+  "id": 388,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.018574981421872135,
+  "text": "-1.9 pp",
+  "shown": false
+ },
+ {
+  "id": 389,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.0023711272540843284,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 390,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.028662119702904443,
+  "text": "-2.9 pp",
+  "shown": true
+ },
+ {
+  "id": 391,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.04705250600863881,
+  "text": "-4.7 pp",
+  "shown": false
+ },
+ {
+  "id": 392,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.009630227855306149,
+  "text": "-1.0 pp",
+  "shown": false
+ },
+ {
+  "id": 393,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.0020766773162939067,
+  "text": "-0.2 pp",
+  "shown": true
+ },
+ {
+  "id": 394,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.03327169088262644,
+  "text": "-3.3 pp",
+  "shown": false
+ },
+ {
+  "id": 395,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.026635602830670752,
+  "text": "+2.7 pp",
+  "shown": false
+ },
+ {
+  "id": 396,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.046910986448338354,
+  "text": "+4.7 pp",
+  "shown": true
+ },
+ {
+  "id": 397,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.01593793258554112,
+  "text": "-1.6 pp",
+  "shown": false
+ },
+ {
+  "id": 398,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.10971981740339286,
+  "text": "+11.0 pp",
+  "shown": false
+ },
+ {
+  "id": 399,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.03451178451178449,
+  "text": "+3.5 pp",
+  "shown": true
+ },
+ {
+  "id": 400,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.10152091702623621,
+  "text": "-10.2 pp",
+  "shown": false
+ },
+ {
+  "id": 401,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.167641637268365,
+  "text": "+16.8 pp",
+  "shown": false
+ },
+ {
+  "id": 402,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.011779561430845575,
+  "text": "-1.2 pp",
+  "shown": true
+ },
+ {
+  "id": 403,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.02122153411888664,
+  "text": "-2.1 pp",
+  "shown": false
+ },
+ {
+  "id": 404,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0015603503428075185,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 405,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.00946432148068288,
+  "text": "-0.9 pp",
+  "shown": true
+ },
+ {
+  "id": 406,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.018792476130806847,
+  "text": "-1.9 pp",
+  "shown": false
+ },
+ {
+  "id": 407,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/fvg_hold.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0001192945845700622,
+  "text": "0.0 pp",
+  "shown": false
+ },
+ {
+  "id": 408,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/verdicts.csv",
+  "row": "test=fvg_hold (row 16)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "fvg_hold"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 409,
+  "page": "behavior_fvg_hold",
+  "file": "behavior/verdicts.csv",
+  "row": "test=fvg_hold (row 16)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "fvg_hold"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 410,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.002716903754966027,
+  "text": "+0.3 pp",
+  "shown": true
+ },
+ {
+  "id": 411,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.002962713334151898,
+  "text": "-0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 412,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.008266284533418652,
+  "text": "+0.8 pp",
+  "shown": false
+ },
+ {
+  "id": 413,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.006101746624971427,
+  "text": "-0.6 pp",
+  "shown": true
+ },
+ {
+  "id": 414,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.015120098295653308,
+  "text": "-1.5 pp",
+  "shown": false
+ },
+ {
+  "id": 415,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.002343360328055807,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 416,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.019646924829157086,
+  "text": "-2.0 pp",
+  "shown": true
+ },
+ {
+  "id": 417,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.03759689796095823,
+  "text": "-3.8 pp",
+  "shown": false
+ },
+ {
+  "id": 418,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.0016985837968007047,
+  "text": "-0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 419,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.03311965811965811,
+  "text": "-3.3 pp",
+  "shown": true
+ },
+ {
+  "id": 420,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.06941999780943733,
+  "text": "-6.9 pp",
+  "shown": false
+ },
+ {
+  "id": 421,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.0031392412653572085,
+  "text": "+0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 422,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.023391812865497075,
+  "text": "+2.3 pp",
+  "shown": true
+ },
+ {
+  "id": 423,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": -0.04192248034052377,
+  "text": "-4.2 pp",
+  "shown": false
+ },
+ {
+  "id": 424,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.09144347063978957,
+  "text": "+9.1 pp",
+  "shown": false
+ },
+ {
+  "id": 425,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0012335888624548375,
+  "text": "-0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 426,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.007004825118956693,
+  "text": "-0.7 pp",
+  "shown": false
+ },
+ {
+  "id": 427,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.004407607665672607,
+  "text": "+0.4 pp",
+  "shown": false
+ },
+ {
+  "id": 428,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.00028178439971127123,
+  "text": "0.0 pp",
+  "shown": true
+ },
+ {
+  "id": 429,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.005422874681030745,
+  "text": "-0.5 pp",
+  "shown": false
+ },
+ {
+  "id": 430,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/fvg_fill.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.005932206432834147,
+  "text": "+0.6 pp",
+  "shown": false
+ },
+ {
+  "id": 431,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/verdicts.csv",
+  "row": "test=fvg_fill (row 17)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "fvg_fill"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 432,
+  "page": "behavior_fvg_fill",
+  "file": "behavior/verdicts.csv",
+  "row": "test=fvg_fill (row 17)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "fvg_fill"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 433,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.00033261513600857384,
+  "text": "0.0 pp",
+  "shown": true
+ },
+ {
+  "id": 434,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.015396182691833215,
+  "text": "-1.5 pp",
+  "shown": false
+ },
+ {
+  "id": 435,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.01629971016549665,
+  "text": "+1.6 pp",
+  "shown": false
+ },
+ {
+  "id": 436,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.010017776716237048,
+  "text": "-1.0 pp",
+  "shown": true
+ },
+ {
+  "id": 437,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.03939218833524808,
+  "text": "-3.9 pp",
+  "shown": false
+ },
+ {
+  "id": 438,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.018122017865557102,
+  "text": "+1.8 pp",
+  "shown": false
+ },
+ {
+  "id": 439,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.04752217935833847,
+  "text": "-4.8 pp",
+  "shown": true
+ },
+ {
+  "id": 440,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.09674829484949914,
+  "text": "-9.7 pp",
+  "shown": false
+ },
+ {
+  "id": 441,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.0030134148245804285,
+  "text": "+0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 442,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.02777777777777779,
+  "text": "+2.8 pp",
+  "shown": true
+ },
+ {
+  "id": 443,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.06673975544843912,
+  "text": "-6.7 pp",
+  "shown": false
+ },
+ {
+  "id": 444,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.12364149637655943,
+  "text": "+12.4 pp",
+  "shown": false
+ },
+ {
+  "id": 445,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.5544354838709677,
+  "text": "+55.4 pp",
+  "shown": true
+ },
+ {
+  "id": 446,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.292827380952381,
+  "text": "+29.3 pp",
+  "shown": false
+ },
+ {
+  "id": 447,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.8076951951951952,
+  "text": "+80.8 pp",
+  "shown": false
+ },
+ {
+  "id": 448,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.003759356575991246,
+  "text": "-0.4 pp",
+  "shown": true
+ },
+ {
+  "id": 449,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0180043068448824,
+  "text": "-1.8 pp",
+  "shown": false
+ },
+ {
+  "id": 450,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.009762870370532499,
+  "text": "+1.0 pp",
+  "shown": false
+ },
+ {
+  "id": 451,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.017234584854263435,
+  "text": "+1.7 pp",
+  "shown": true
+ },
+ {
+  "id": 452,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.0024901627203308433,
+  "text": "+0.2 pp",
+  "shown": false
+ },
+ {
+  "id": 453,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/zones_first_vs_later.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.032198683041331326,
+  "text": "+3.2 pp",
+  "shown": false
+ },
+ {
+  "id": 454,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/verdicts.csv",
+  "row": "test=zones_first_vs_later (row 18)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "zones_first_vs_later"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 455,
+  "page": "behavior_zones_first_vs_later",
+  "file": "behavior/verdicts.csv",
+  "row": "test=zones_first_vs_later (row 18)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "zones_first_vs_later"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 456,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.004486820620480558,
+  "text": "-0.4 pp",
+  "shown": true
+ },
+ {
+  "id": 457,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": -0.024380083626802773,
+  "text": "-2.4 pp",
+  "shown": false
+ },
+ {
+  "id": 458,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "pp1",
+  "value": 0.014022762551734465,
+  "text": "+1.4 pp",
+  "shown": false
+ },
+ {
+  "id": 459,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.0009965411036680916,
+  "text": "+0.1 pp",
+  "shown": true
+ },
+ {
+  "id": 460,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": -0.030830097781608976,
+  "text": "-3.1 pp",
+  "shown": false
+ },
+ {
+  "id": 461,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "pp1",
+  "value": 0.03388082297523801,
+  "text": "+3.4 pp",
+  "shown": false
+ },
+ {
+  "id": 462,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.042947519457367744,
+  "text": "-4.3 pp",
+  "shown": true
+ },
+ {
+  "id": 463,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": -0.10940887858986385,
+  "text": "-10.9 pp",
+  "shown": false
+ },
+ {
+  "id": 464,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "pp1",
+  "value": 0.022485520321005755,
+  "text": "+2.2 pp",
+  "shown": false
+ },
+ {
+  "id": 465,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.06129476584022031,
+  "text": "-6.1 pp",
+  "shown": true
+ },
+ {
+  "id": 466,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": -0.17648779850923424,
+  "text": "-17.6 pp",
+  "shown": false
+ },
+ {
+  "id": 467,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "pp1",
+  "value": 0.0615123798965262,
+  "text": "+6.2 pp",
+  "shown": false
+ },
+ {
+  "id": 468,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.3125,
+  "text": "+31.2 pp",
+  "shown": true
+ },
+ {
+  "id": 469,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.0,
+  "text": "0.0 pp",
+  "shown": false
+ },
+ {
+  "id": 470,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "pp1",
+  "value": 0.6233804430863255,
+  "text": "+62.3 pp",
+  "shown": false
+ },
+ {
+  "id": 471,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.006097526711161816,
+  "text": "-0.6 pp",
+  "shown": true
+ },
+ {
+  "id": 472,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.022498437942270952,
+  "text": "-2.2 pp",
+  "shown": false
+ },
+ {
+  "id": 473,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.01006243721888509,
+  "text": "+1.0 pp",
+  "shown": false
+ },
+ {
+  "id": 474,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.013252411632791117,
+  "text": "+1.3 pp",
+  "shown": true
+ },
+ {
+  "id": 475,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": -0.0030421230161518263,
+  "text": "-0.3 pp",
+  "shown": false
+ },
+ {
+  "id": 476,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/zones_vs_random.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "pp1",
+  "value": 0.030373078482734808,
+  "text": "+3.0 pp",
+  "shown": false
+ },
+ {
+  "id": 477,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/verdicts.csv",
+  "row": "test=zones_vs_random (row 19)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "zones_vs_random"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 478,
+  "page": "behavior_zones_vs_random",
+  "file": "behavior/verdicts.csv",
+  "row": "test=zones_vs_random (row 19)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "zones_vs_random"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 479,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.37253185844767917,
+  "text": "-0.37 ATR",
+  "shown": true
+ },
+ {
+  "id": 480,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.7948473374966383,
+  "text": "-0.79 ATR",
+  "shown": false
+ },
+ {
+  "id": 481,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.046769553247040026,
+  "text": "+0.05 ATR",
+  "shown": false
+ },
+ {
+  "id": 482,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.1886459557564275,
+  "text": "+0.19 ATR",
+  "shown": true
+ },
+ {
+  "id": 483,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.7210462704323163,
+  "text": "-0.72 ATR",
+  "shown": false
+ },
+ {
+  "id": 484,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 1.1472570446370522,
+  "text": "+1.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 485,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -1.1388430615966358,
+  "text": "-1.14 ATR",
+  "shown": true
+ },
+ {
+  "id": 486,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -2.637696688089905,
+  "text": "-2.64 ATR",
+  "shown": false
+ },
+ {
+  "id": 487,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.30920464343641313,
+  "text": "+0.31 ATR",
+  "shown": false
+ },
+ {
+  "id": 488,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.1561330150399992,
+  "text": "+0.16 ATR",
+  "shown": true
+ },
+ {
+  "id": 489,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -2.147475480943564,
+  "text": "-2.15 ATR",
+  "shown": false
+ },
+ {
+  "id": 490,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 2.450555390878474,
+  "text": "+2.45 ATR",
+  "shown": false
+ },
+ {
+  "id": 491,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -2.3189498262942574,
+  "text": "-2.32 ATR",
+  "shown": true
+ },
+ {
+  "id": 492,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -6.735019734365569,
+  "text": "-6.74 ATR",
+  "shown": false
+ },
+ {
+  "id": 493,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 2.0377150956593733,
+  "text": "+2.04 ATR",
+  "shown": false
+ },
+ {
+  "id": 494,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.26876015810287485,
+  "text": "-0.27 ATR",
+  "shown": true
+ },
+ {
+  "id": 495,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.6471995167050386,
+  "text": "-0.65 ATR",
+  "shown": false
+ },
+ {
+  "id": 496,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.08677281627647791,
+  "text": "+0.09 ATR",
+  "shown": false
+ },
+ {
+  "id": 497,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.16952612508729775,
+  "text": "-0.17 ATR",
+  "shown": true
+ },
+ {
+  "id": 498,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.5624981556117664,
+  "text": "-0.56 ATR",
+  "shown": false
+ },
+ {
+  "id": 499,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/pullback_depth.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.22269987091447582,
+  "text": "+0.22 ATR",
+  "shown": false
+ },
+ {
+  "id": 500,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/verdicts.csv",
+  "row": "test=pullback_depth (row 20)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "pullback_depth"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 501,
+  "page": "behavior_pullback_depth",
+  "file": "behavior/verdicts.csv",
+  "row": "test=pullback_depth (row 20)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "pullback_depth"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 502,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.0011684666031573296,
+  "text": "0.00 ATR",
+  "shown": true
+ },
+ {
+  "id": 503,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.28354289934892685,
+  "text": "-0.28 ATR",
+  "shown": false
+ },
+ {
+  "id": 504,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.27187046949321,
+  "text": "+0.27 ATR",
+  "shown": false
+ },
+ {
+  "id": 505,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.014070152236074357,
+  "text": "+0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 506,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.5868660337686198,
+  "text": "-0.59 ATR",
+  "shown": false
+ },
+ {
+  "id": 507,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.6798874961011131,
+  "text": "+0.68 ATR",
+  "shown": false
+ },
+ {
+  "id": 508,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.22311028871762592,
+  "text": "+0.22 ATR",
+  "shown": true
+ },
+ {
+  "id": 509,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.5998646366742556,
+  "text": "-0.60 ATR",
+  "shown": false
+ },
+ {
+  "id": 510,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 1.1433109698374555,
+  "text": "+1.14 ATR",
+  "shown": false
+ },
+ {
+  "id": 511,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.1389554150891248,
+  "text": "-0.14 ATR",
+  "shown": true
+ },
+ {
+  "id": 512,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -1.261039034989332,
+  "text": "-1.26 ATR",
+  "shown": false
+ },
+ {
+  "id": 513,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.9890478349095159,
+  "text": "+0.99 ATR",
+  "shown": false
+ },
+ {
+  "id": 514,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 1.0486967511081995,
+  "text": "+1.05 ATR",
+  "shown": true
+ },
+ {
+  "id": 515,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.3804777730222276,
+  "text": "-0.38 ATR",
+  "shown": false
+ },
+ {
+  "id": 516,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 2.502004731642847,
+  "text": "+2.50 ATR",
+  "shown": false
+ },
+ {
+  "id": 517,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.017616645781685907,
+  "text": "+0.02 ATR",
+  "shown": true
+ },
+ {
+  "id": 518,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.22413320795042713,
+  "text": "-0.22 ATR",
+  "shown": false
+ },
+ {
+  "id": 519,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.2645018663648664,
+  "text": "+0.26 ATR",
+  "shown": false
+ },
+ {
+  "id": 520,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.17954627860096975,
+  "text": "+0.18 ATR",
+  "shown": true
+ },
+ {
+  "id": 521,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.017697653887956438,
+  "text": "-0.02 ATR",
+  "shown": false
+ },
+ {
+  "id": 522,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/engulfing_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.3840117413639598,
+  "text": "+0.38 ATR",
+  "shown": false
+ },
+ {
+  "id": 523,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/verdicts.csv",
+  "row": "test=engulfing_at_levels (row 21)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "engulfing_at_levels"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 524,
+  "page": "behavior_engulfing_at_levels",
+  "file": "behavior/verdicts.csv",
+  "row": "test=engulfing_at_levels (row 21)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "engulfing_at_levels"
+  },
+  "format": "str",
+  "value": "NQ pooled has an interval that includes zero.",
+  "text": "NQ pooled has an interval that includes zero.",
+  "shown": true
+ },
+ {
+  "id": 525,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.007375186470541185,
+  "text": "-0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 526,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": -0.10618996372391962,
+  "text": "-0.11 ATR",
+  "shown": false
+ },
+ {
+  "id": 527,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=5m (row 0)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "5m"
+  },
+  "format": "atr2",
+  "value": 0.09083144415342238,
+  "text": "+0.09 ATR",
+  "shown": false
+ },
+ {
+  "id": 528,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.056394246561654954,
+  "text": "-0.06 ATR",
+  "shown": true
+ },
+ {
+  "id": 529,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": -0.2124144745910124,
+  "text": "-0.21 ATR",
+  "shown": false
+ },
+ {
+  "id": 530,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=15m (row 1)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "15m"
+  },
+  "format": "atr2",
+  "value": 0.10657075245582187,
+  "text": "+0.11 ATR",
+  "shown": false
+ },
+ {
+  "id": 531,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.2100080257702137,
+  "text": "+0.21 ATR",
+  "shown": true
+ },
+ {
+  "id": 532,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": -0.0011667246469790492,
+  "text": "0.00 ATR",
+  "shown": false
+ },
+ {
+  "id": 533,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=1h (row 2)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "1h"
+  },
+  "format": "atr2",
+  "value": 0.42608547444416506,
+  "text": "+0.43 ATR",
+  "shown": false
+ },
+ {
+  "id": 534,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.03953472341769098,
+  "text": "+0.04 ATR",
+  "shown": true
+ },
+ {
+  "id": 535,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": -0.37324527851603745,
+  "text": "-0.37 ATR",
+  "shown": false
+ },
+ {
+  "id": 536,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=4h (row 3)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "4h"
+  },
+  "format": "atr2",
+  "value": 0.45845590141114667,
+  "text": "+0.46 ATR",
+  "shown": false
+ },
+ {
+  "id": 537,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.08245105340361414,
+  "text": "+0.08 ATR",
+  "shown": true
+ },
+ {
+  "id": 538,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": -0.732038788391888,
+  "text": "-0.73 ATR",
+  "shown": false
+ },
+ {
+  "id": 539,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=daily (row 4)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "daily"
+  },
+  "format": "atr2",
+  "value": 0.9849910023395128,
+  "text": "+0.98 ATR",
+  "shown": false
+ },
+ {
+  "id": 540,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.00683917552322102,
+  "text": "-0.01 ATR",
+  "shown": true
+ },
+ {
+  "id": 541,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.09288250210644379,
+  "text": "-0.09 ATR",
+  "shown": false
+ },
+ {
+  "id": 542,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=NQ;chart=pooled (row 5)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "NQ",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.0826680586925873,
+  "text": "+0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 543,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "point",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.004668254250878117,
+  "text": "0.00 ATR",
+  "shown": true
+ },
+ {
+  "id": 544,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "lo",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": -0.08902788914035471,
+  "text": "-0.09 ATR",
+  "shown": false
+ },
+ {
+  "id": 545,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/rejection_at_levels.csv",
+  "row": "market=ES;chart=pooled (row 11)",
+  "column": "hi",
+  "op": "cell",
+  "where": {
+   "market": "ES",
+   "chart": "pooled"
+  },
+  "format": "atr2",
+  "value": 0.07929490263180497,
+  "text": "+0.08 ATR",
+  "shown": false
+ },
+ {
+  "id": 546,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/verdicts.csv",
+  "row": "test=rejection_at_levels (row 22)",
+  "column": "verdict",
+  "op": "cell",
+  "where": {
+   "test": "rejection_at_levels"
+  },
+  "format": "str",
+  "value": "false",
+  "text": "false",
+  "shown": false
+ },
+ {
+  "id": 547,
+  "page": "behavior_rejection_at_levels",
+  "file": "behavior/verdicts.csv",
+  "row": "test=rejection_at_levels (row 22)",
+  "column": "why",
+  "op": "cell",
+  "where": {
+   "test": "rejection_at_levels"
+  },
+  "format": "str",
+  "value": "NQ pooled points the other way.",
+  "text": "NQ pooled points the other way.",
+  "shown": true
+ },
+ {
+  "id": 548,
+  "page": "funnel_intro",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "graded",
+  "op": "count",
+  "where": {
+   "graded": true
+  },
+  "format": "int",
+  "value": 4886,
+  "text": "4,886",
+  "shown": true
+ },
+ {
+  "id": 549,
+  "page": "funnel_intro",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "candidate",
+  "op": "count",
+  "where": {
+   "candidate": true
+  },
+  "format": "int",
+  "value": 53,
+  "text": "53",
+  "shown": true
+ },
+ {
+  "id": 550,
+  "page": "funnel_intro",
+  "file": "funnel/setup_judgment.csv",
+  "row": "*",
+  "column": "works",
+  "op": "count",
+  "where": {
+   "works": true
+  },
+  "format": "int",
+  "value": 3,
+  "text": "3",
+  "shown": true
+ },
+ {
+  "id": 551,
+  "page": "funnel_stages",
+  "file": "funnel/stages.json",
+  "row": "stage1_min_trades",
+  "column": "stage1_min_trades",
+  "op": "json",
+  "where": {},
+  "format": "int",
+  "value": 30,
+  "text": "30",
+  "shown": true
+ },
+ {
+  "id": 552,
+  "page": "funnel_stages",
+  "file": "funnel/stages.json",
+  "row": "stage3_min_sharpe",
+  "column": "stage3_min_sharpe",
+  "op": "json",
+  "where": {},
+  "format": "dec2",
+  "value": 0.5,
+  "text": "0.50",
+  "shown": true
+ },
+ {
+  "id": 553,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "graded",
+  "op": "count",
+  "where": {
+   "graded": true
+  },
+  "format": "int",
+  "value": 4886,
+  "text": "4,886",
+  "shown": true
+ },
+ {
+  "id": 554,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "s1",
+  "op": "count",
+  "where": {
+   "s1": true
+  },
+  "format": "int",
+  "value": 4462,
+  "text": "4,462",
+  "shown": true
+ },
+ {
+  "id": 555,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "s2",
+  "op": "count",
+  "where": {
+   "s2": true
+  },
+  "format": "int",
+  "value": 1200,
+  "text": "1,200",
+  "shown": true
+ },
+ {
+  "id": 556,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "s3",
+  "op": "count",
+  "where": {
+   "s3": true
+  },
+  "format": "int",
+  "value": 410,
+  "text": "410",
+  "shown": true
+ },
+ {
+  "id": 557,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "s4",
+  "op": "count",
+  "where": {
+   "s4": true
+  },
+  "format": "int",
+  "value": 210,
+  "text": "210",
+  "shown": true
+ },
+ {
+  "id": 558,
+  "page": "funnel_stages",
+  "file": "funnel/funnel.parquet",
+  "row": "*",
+  "column": "candidate",
+  "op": "count",
+  "where": {
+   "candidate": true
+  },
+  "format": "int",
+  "value": 53,
+  "text": "53",
+  "shown": true
+ },
+ {
+  "id": 559,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=bos_continuation;chart=1h;market=NQ (row 3)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "bos_continuation",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -0.935264108432886,
+  "text": "-0.94",
+  "shown": true
+ },
+ {
+  "id": 560,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=breakout;chart=1h;market=NQ (row 13)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "breakout",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -1.144652197558591,
+  "text": "-1.14",
+  "shown": true
+ },
+ {
+  "id": 561,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=choch_reversal;chart=1h;market=NQ (row 25)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "choch_reversal",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": 0.5923410032821863,
+  "text": "+0.59",
+  "shown": true
+ },
+ {
+  "id": 562,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=fair_value_gap;chart=1h;market=NQ (row 35)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "fair_value_gap",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -0.18474756714030494,
+  "text": "-0.18",
+  "shown": true
+ },
+ {
+  "id": 563,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=flip_zone;chart=1h;market=NQ (row 47)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "flip_zone",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -0.3233704459042709,
+  "text": "-0.32",
+  "shown": true
+ },
+ {
+  "id": 564,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=level_bounce;chart=1h;market=NQ (row 59)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "level_bounce",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -2.022821967422253,
+  "text": "-2.02",
+  "shown": true
+ },
+ {
+  "id": 565,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=supply_demand_zone;chart=1h;market=NQ (row 71)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "supply_demand_zone",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -0.28282367691647914,
+  "text": "-0.28",
+  "shown": true
+ },
+ {
+  "id": 566,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=sweep_reclaim;chart=1h;market=NQ (row 83)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "sweep_reclaim",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -1.241285900714977,
+  "text": "-1.24",
+  "shown": true
+ },
+ {
+  "id": 567,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=trend_line;chart=1h;market=NQ (row 95)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "trend_line",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -0.31235756511077867,
+  "text": "-0.31",
+  "shown": true
+ },
+ {
+  "id": 568,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "setup=trend_pullback;chart=1h;market=NQ (row 107)",
+  "column": "sharpe",
+  "op": "cell",
+  "where": {
+   "setup": "trend_pullback",
+   "chart": "1h",
+   "market": "NQ"
+  },
+  "format": "num2",
+  "value": -1.5954658142178473,
+  "text": "-1.60",
+  "shown": true
+ },
+ {
+  "id": 569,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "*",
+  "column": "works",
+  "op": "count",
+  "where": {
+   "works": true
+  },
+  "format": "int",
+  "value": 3,
+  "text": "3",
+  "shown": true
+ },
+ {
+  "id": 570,
+  "page": "setup_judgment",
+  "file": "funnel/setup_judgment.csv",
+  "row": "*",
+  "column": "",
+  "op": "count",
+  "where": {},
+  "format": "int",
+  "value": 116,
+  "text": "116",
+  "shown": true
+ },
+ {
+  "id": 571,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Entry Model (row 0)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Entry Model"
+  },
+  "format": "usd0",
+  "value": 17136.980000000192,
+  "text": "+$17,137",
+  "shown": true
+ },
+ {
+  "id": 572,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Bare Minimum (row 1)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Bare Minimum"
+  },
+  "format": "usd0",
+  "value": -35084.23833305919,
+  "text": "-$35,084",
+  "shown": true
+ },
+ {
+  "id": 573,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Daily Version (row 2)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Daily Version"
+  },
+  "format": "usd0",
+  "value": -21392.55519610417,
+  "text": "-$21,393",
+  "shown": true
+ },
+ {
+  "id": 574,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Zone System (row 3)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Zone System"
+  },
+  "format": "usd0",
+  "value": 2939.567740370614,
+  "text": "+$2,940",
+  "shown": true
+ },
+ {
+  "id": 575,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Sweep System (row 4)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Sweep System"
+  },
+  "format": "usd0",
+  "value": -6373.791998375542,
+  "text": "-$6,374",
+  "shown": true
+ },
+ {
+  "id": 576,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "name=Checklist (row 5)",
+  "column": "nq_net",
+  "op": "cell",
+  "where": {
+   "name": "Checklist"
+  },
+  "format": "usd0",
+  "value": 17620.714462069118,
+  "text": "+$17,621",
+  "shown": true
+ },
+ {
+  "id": 577,
+  "page": "named_funnel",
+  "file": "funnel/named_versions.csv",
+  "row": "*",
+  "column": "candidate",
+  "op": "count",
+  "where": {
+   "candidate": true
+  },
+  "format": "int",
+  "value": 0,
+  "text": "0",
+  "shown": true
+ },
+ {
+  "id": 578,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=entry/confirmation;value=close/either_candle (row 0)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "entry/confirmation",
+   "value": "close/either_candle"
+  },
+  "format": "num2",
+  "value": 0.28297490795572716,
+  "text": "+0.28",
+  "shown": true
+ },
+ {
+  "id": 579,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=stop_ref;value=last_swing (row 1)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "stop_ref",
+   "value": "last_swing"
+  },
+  "format": "num2",
+  "value": 2.8031157985296393,
+  "text": "+2.80",
+  "shown": true
+ },
+ {
+  "id": 580,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=target;value=2R (row 2)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "target",
+   "value": "2R"
+  },
+  "format": "num2",
+  "value": 0.9922002352403002,
+  "text": "+0.99",
+  "shown": true
+ },
+ {
+  "id": 581,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=target;value=3R (row 3)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "target",
+   "value": "3R"
+  },
+  "format": "num2",
+  "value": 1.4516260954229498,
+  "text": "+1.45",
+  "shown": true
+ },
+ {
+  "id": 582,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=target;value=next_swing (row 4)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "target",
+   "value": "next_swing"
+  },
+  "format": "num2",
+  "value": 1.7107840996671733,
+  "text": "+1.71",
+  "shown": true
+ },
+ {
+  "id": 583,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=trend_filter;value=setup_chart (row 5)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "trend_filter",
+   "value": "setup_chart"
+  },
+  "format": "num2",
+  "value": 0.7490984126805076,
+  "text": "+0.75",
+  "shown": true
+ },
+ {
+  "id": 584,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=session;value=ny (row 6)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "session",
+   "value": "ny"
+  },
+  "format": "num2",
+  "value": 1.0404113168529008,
+  "text": "+1.04",
+  "shown": true
+ },
+ {
+  "id": 585,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=news;value=trade (row 7)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "news",
+   "value": "trade"
+  },
+  "format": "num2",
+  "value": -0.46933694560454947,
+  "text": "-0.47",
+  "shown": true
+ },
+ {
+  "id": 586,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=setup_chart;value=1h (row 8)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "setup_chart",
+   "value": "1h"
+  },
+  "format": "num2",
+  "value": 1.6243636776765895,
+  "text": "+1.62",
+  "shown": true
+ },
+ {
+  "id": 587,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=setup_chart;value=1m (row 9)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "setup_chart",
+   "value": "1m"
+  },
+  "format": "num2",
+  "value": -9.506289443295001,
+  "text": "-9.51",
+  "shown": true
+ },
+ {
+  "id": 588,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=setup_chart;value=4h (row 10)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "setup_chart",
+   "value": "4h"
+  },
+  "format": "num2",
+  "value": 0.8619515104117113,
+  "text": "+0.86",
+  "shown": true
+ },
+ {
+  "id": 589,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=setup_chart;value=5m (row 11)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "setup_chart",
+   "value": "5m"
+  },
+  "format": "num2",
+  "value": -2.6822994423381084,
+  "text": "-2.68",
+  "shown": true
+ },
+ {
+  "id": 590,
+  "page": "rule_effects",
+  "file": "funnel/rule_effects.csv",
+  "row": "rule=setup_chart;value=daily (row 12)",
+  "column": "mean_sharpe_change_NQ",
+  "op": "cell",
+  "where": {
+   "rule": "setup_chart",
+   "value": "daily"
+  },
+  "format": "num2",
+  "value": 1.3093096270462388,
+  "text": "+1.31",
+  "shown": true
+ }
+]

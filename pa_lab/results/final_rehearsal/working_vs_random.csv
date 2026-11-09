@@ -1,0 +1,3 @@
+market,setup,setup_chart,versions_used,real_trades,real_net,p_value,twin_mean_net
+NQ,fair_value_gap,daily,3,0,0.0,,
+ES,fair_value_gap,daily,3,0,0.0,,
