@@ -1,0 +1,329 @@
+<title>PA Lab Pine Scripts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* layout: one narrow column, two script cards, code scrolls inside its own box */
+:root {
+  --bg: #f4f6f8; --surface: #ffffff; --fg: #17202a; --muted: #5a6776;
+  --line: #d9e0e7; --accent: #0f7b6c; --accent-fg: #ffffff; --code-bg: #0f1720; --code-fg: #d7e2ec;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0;
+  --line: #243040; --accent: #3cc2ad; --accent-fg: #06221d; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0d1218; --surface: #141b23; --fg: #e3e9ef; --muted: #93a1b0;
+  --line: #243040; --accent: #3cc2ad; --accent-fg: #06221d; --code-bg: #0a0f14; --code-fg: #d7e2ec; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 48px; }
+main { max-width: 860px; margin: 0 auto; display: grid; gap: 28px; }
+h1 { font-size: 1.75rem; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 6px 0 0; max-width: 65ch; }
+.howto { margin: 0; padding-left: 1.2em; color: var(--muted); display: grid; gap: 4px; }
+.script { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 10px; min-width: 0; }
+.script-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.titles { min-width: 0; }
+h2 { font-size: 1.2rem; margin: 0; }
+.setup { margin: 6px 0 0; }
+.chip { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.02em; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; color: var(--muted); }
+.desc { margin: 0; max-width: 65ch; }
+.stats { margin: 0; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+.copy { font: 600 0.95rem var(--sans); background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 8px; padding: 10px 18px; cursor: pointer; min-width: 140px; }
+.copy:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+.codewrap { overflow-x: auto; max-height: 420px; overflow-y: auto; background: var(--code-bg); border-radius: 8px; min-width: 0; }
+pre { margin: 0; padding: 14px 16px; }
+code { font-family: var(--mono); font-size: 0.8rem; color: var(--code-fg); white-space: pre; }
+.note { color: var(--muted); font-size: 0.9rem; margin: 0; max-width: 65ch; }
+</style>
+<main>
+  <header>
+    <h1>PA Lab Pine Scripts</h1>
+    <p class="lede">The two strategies that held up in the lab's final test, in the versions confirmed working in TradingView. Press Copy, then paste into TradingView's Pine Editor and click Add to chart.</p>
+  </header>
+  <ol class="howto">
+    <li>Open NQ1! (or MNQ1! for the micro contract) in TradingView.</li>
+    <li>Set the chart timeframe shown on each card.</li>
+    <li>Pine Editor, paste, Add to chart. Results show in the Strategy Tester tab.</li>
+  </ol>
+  
+<section class="script" aria-labelledby="breakout-h">
+  <header class="script-head">
+    <div class="titles">
+      <h2 id="breakout-h">15-minute level breakout</h2>
+      <p class="setup"><span class="chip">15-minute chart · NQ1! or MNQ1!</span></p>
+    </div>
+    <button class="copy" type="button" id="breakout-btn" data-target="breakout-code">Copy code</button>
+  </header>
+  <p class="desc">Trades the first 15-minute close through a level made of three swing points, long or short, between 8am and 4pm New York time. Stop beyond the last swing, target equal to the risk, out after 96 bars.</p>
+  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 941 trades, Sharpe 0.72 · ES 993 trades, Sharpe 0.59</p>
+  <div class="codewrap"><pre><code id="breakout-code">//@version=6
+// Price Action Lab survivor: C-breakout-00051
+// Survived the lab&#x27;s sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
+// NQ 941 trades, +$112,064, Sharpe 0.72; ES 993 trades, +$45,704, Sharpe 0.59.
+// Dials are fixed by the lab. Changing any value tests a different, untested version.
+// Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
+// Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
+// bar that hits both stop and target it may not assume the stop first (the lab does).
+// Margin is not modelled (one contract, as in the lab).
+// Paper trade before risking money.
+strategy(&quot;PA Lab 15m Level Breakout&quot;, shorttitle=&quot;PALab Breakout&quot;, overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0, max_bars_back=600)
+
+// ---------------------------------------------------------------- dials (from the lab)
+int   SWING     = 3       // swing strength: bars each side
+float TOL_ATR   = 0.25    // swings within this many ATR form one level
+int   TOUCHES   = 3       // swings a level needs
+int   LIFE      = 500     // bars a level lives after its last swing
+float STOP_BUF  = 0.1     // stop buffer beyond the last swing, in ATR
+float TARGET_R  = 1.0     // target in multiples of risk
+int   TIME_BARS = 96      // exit after this many 15m bars
+int   SESS_FROM = 480     // entries only when the bar closes 08:00 ...
+int   SESS_TO   = 960     // ... to 16:00 New York time
+
+if timeframe.period != &quot;15&quot;
+    runtime.error(&quot;Put this strategy on a 15-minute chart (NQ1! or ES1!).&quot;)
+
+float atrPrior = ta.atr(14)[1]          // Wilder ATR through the previous bar only
+
+// ---------------------------------------------------------------- swings (confirmed SWING bars later)
+// The bar SWING bars ago is a swing high when its high beats the SWING highs before it
+// and is at least as high as the SWING highs after it (no loops: built-ins only).
+float maxBefore = ta.highest(high, SWING)[SWING + 1]
+float maxAfter  = ta.highest(high, SWING)
+float minBefore = ta.lowest(low, SWING)[SWING + 1]
+float minAfter  = ta.lowest(low, SWING)
+bool newHigh = bar_index &gt; 2 * SWING and high[SWING] &gt; maxBefore and high[SWING] &gt;= maxAfter
+bool newLow  = bar_index &gt; 2 * SWING and low[SWING] &lt; minBefore and low[SWING] &lt;= minAfter
+var float lastSwingHigh = na
+var float lastSwingLow  = na
+
+// ---------------------------------------------------------------- levels: clusters of swings
+var array&lt;float&gt; clSum  = array.new&lt;float&gt;()
+var array&lt;int&gt;   clN    = array.new&lt;int&gt;()
+var array&lt;int&gt;   clLast = array.new&lt;int&gt;()
+var array&lt;float&gt; lvPrice = array.new&lt;float&gt;()
+var array&lt;int&gt;   lvBorn  = array.new&lt;int&gt;()
+
+var int nSwings = 0
+var int nLevelsMade = 0
+var int nBreaks = 0
+
+// new swings this bar (a bar can confirm a swing high and a swing low)
+array&lt;float&gt; fresh = array.new&lt;float&gt;()
+if newHigh
+    lastSwingHigh := high[SWING]
+    array.push(fresh, high[SWING])
+if newLow
+    lastSwingLow := low[SWING]
+    array.push(fresh, low[SWING])
+
+if array.size(fresh) &gt; 0 and not na(atrPrior)
+    for p in fresh
+        nSwings += 1
+        int best = -1
+        float bestD = 1.0e18
+        int n = array.size(clSum)
+        if n &gt; 0
+            for i = 0 to n - 1
+                if bar_index - array.get(clLast, i) &lt;= LIFE
+                    float d = math.abs(p - array.get(clSum, i) / array.get(clN, i))
+                    if d &lt;= TOL_ATR * atrPrior and d &lt; bestD
+                        best := i
+                        bestD := d
+        if best &lt; 0
+            array.push(clSum, p)
+            array.push(clN, 1)
+            array.push(clLast, bar_index)
+            best := array.size(clSum) - 1
+        else
+            array.set(clSum, best, array.get(clSum, best) + p)
+            array.set(clN, best, array.get(clN, best) + 1)
+            array.set(clLast, best, bar_index)
+        if array.get(clN, best) &gt;= TOUCHES
+            array.push(lvPrice, array.get(clSum, best) / array.get(clN, best))
+            array.push(lvBorn, bar_index)
+            nLevelsMade += 1
+            array.remove(clSum, best)
+            array.remove(clN, best)
+            array.remove(clLast, best)
+        int m = array.size(clSum)
+        if m &gt; 0
+            for i = m - 1 to 0
+                if bar_index - array.get(clLast, i) &gt; LIFE
+                    array.remove(clSum, i)
+                    array.remove(clN, i)
+                    array.remove(clLast, i)
+
+// ---------------------------------------------------------------- breaks: first close through a level
+int breakDir = 0
+float breakLevel = na
+int nl = array.size(lvPrice)
+if nl &gt; 0
+    for i = nl - 1 to 0
+        if bar_index - array.get(lvBorn, i) &gt; LIFE
+            array.remove(lvPrice, i)
+            array.remove(lvBorn, i)
+nl := array.size(lvPrice)
+if nl &gt; 0
+    for i = 0 to nl - 1
+        float lv = array.get(lvPrice, i)
+        if breakDir == 0 and bar_index &gt; array.get(lvBorn, i)
+            if close[1] &lt; lv and close &gt; lv
+                breakDir := 1
+                breakLevel := lv
+            else if close[1] &gt; lv and close &lt; lv
+                breakDir := -1
+                breakLevel := lv
+
+// ---------------------------------------------------------------- entries and exits
+int closeMin = hour(time_close, &quot;America/New_York&quot;) * 60 + minute(time_close, &quot;America/New_York&quot;)
+bool inSession = closeMin &gt;= SESS_FROM and closeMin &lt;= SESS_TO
+var int entryBar = na
+
+if strategy.position_size != 0 and not na(entryBar) and bar_index &gt;= entryBar + TIME_BARS
+    strategy.close_all(comment=&quot;time exit&quot;)
+    entryBar := na
+
+if strategy.position_size == 0 and breakDir != 0 and inSession and not na(atrPrior)
+    if breakDir == 1 and not na(lastSwingLow)
+        float stop = lastSwingLow - STOP_BUF * atrPrior
+        float risk = close - stop
+        if risk &gt;= syminfo.mintick
+            strategy.entry(&quot;Long&quot;, strategy.long)
+            strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, stop=stop, limit=close + TARGET_R * risk)
+            entryBar := bar_index
+    else if breakDir == -1 and not na(lastSwingHigh)
+        float stop = lastSwingHigh + STOP_BUF * atrPrior
+        float risk = stop - close
+        if risk &gt;= syminfo.mintick
+            strategy.entry(&quot;Short&quot;, strategy.short)
+            strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, stop=stop, limit=close - TARGET_R * risk)
+            entryBar := bar_index
+
+if breakDir != 0
+    nBreaks += 1
+
+plotshape(breakDir == 1 and inSession, &quot;Break up&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
+plotshape(breakDir == -1 and inSession, &quot;Break down&quot;, shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.small)
+
+// status label on the last bar: shows where the logic stops if nothing trades
+var label status = na
+if barstate.islast
+    label.delete(status)
+    status := label.new(bar_index, high, &quot;swings &quot; + str.tostring(nSwings) + &quot; | levels made &quot; + str.tostring(nLevelsMade) +
+         &quot; | live levels &quot; + str.tostring(array.size(lvPrice)) + &quot; | breaks &quot; + str.tostring(nBreaks),
+         style=label.style_label_down, color=color.new(color.gray, 20), textcolor=color.white, size=size.small)
+</code></pre></div>
+</section>
+  
+<section class="script" aria-labelledby="fvg-h">
+  <header class="script-head">
+    <div class="titles">
+      <h2 id="fvg-h">Daily fair value gap</h2>
+      <p class="setup"><span class="chip">1-hour chart · NQ1! or MNQ1!</span></p>
+    </div>
+    <button class="copy" type="button" id="fvg-btn" data-target="fvg-code">Copy code</button>
+  </header>
+  <p class="desc">After each daily close, a three-day gap gets a limit order at its near edge, with the stop beyond the far edge and a target of three times the risk. The order lives, and any trade closes, after 96 hourly bars. Gaps formed on CPI, jobs-report or Fed days are skipped.</p>
+  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84</p>
+  <div class="codewrap"><pre><code id="fvg-code">//@version=6
+// Price Action Lab survivor: C-fair_value_gap-00364
+// Survived the lab&#x27;s sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
+// NQ 50 trades, +$100,990, Sharpe 1.01; ES 49 trades, +$39,679, Sharpe 0.84.
+// Dials are fixed by the lab. Changing any value tests a different, untested version.
+// Costs as in the lab: $4 per round trip, 1 tick slippage, limits need 1 tick through.
+// Differences from the lab: TradingView fills on chart bars, not 1-minute bars, and on a
+// bar that hits both stop and target it may not assume the stop first (the lab does).
+// Margin is not modelled (one contract, as in the lab).
+// Paper trade before risking money.
+strategy(&quot;PA Lab Daily Fair Value Gap, 1h&quot;, shorttitle=&quot;PALab Daily FVG&quot;, overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=2.0, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
+
+// ---------------------------------------------------------------- dials (from the lab)
+float MIN_GAP_ATR = 0.1   // smallest daily gap kept, in daily ATR
+float STOP_BUF    = 0.1   // stop beyond the gap&#x27;s far edge, in daily ATR
+float TARGET_R    = 3.0   // target in multiples of risk
+int   TIME_BARS   = 96    // the limit lives, and a trade is closed after, this many 1h bars
+bool  SKIP_NEWS   = true  // no gap formed on a CPI, jobs-report or FOMC day is traded
+
+if timeframe.period != &quot;60&quot;
+    runtime.error(&quot;Put this strategy on a 1-hour chart (NQ1! or ES1!).&quot;)
+
+// News days (CPI, jobs report, FOMC), YYYYMMDD, from the lab&#x27;s verified calendar
+var array&lt;int&gt; NEWS = array.new&lt;int&gt;()
+if barstate.isfirst
+    for s in str.split(&quot;20210903,20210914,20210922,20211008,20211013,20211103,20211105,20211110,20211203,20211210,20211215,20220107,20220112,20220126,20220204,20220210,20220304,20220310,20220316,20220401,20220412,20220504,20220506,20220511,20220603,20220610,20220615,20220708,20220713,20220727,20220805,20220810,20220902,20220913,20220921,20221007,20221013,20221102,20221104,20221110,20221202,20221213,20221214,20230106,20230112,20230201,20230203,20230214,20230310,20230314,20230322,20230407,20230412,20230503,20230505,20230510,20230602,20230613,20230614,20230707,20230712,20230726,20230804,20230810,20230901,20230913,20230920,20231006,20231012,20231101,20231103,20231114,20231208,20231212,20231213,20240105,20240111,20240131,20240202,20240213,20240308,20240312,20240320,20240405,20240410,20240501,20240503,20240515,20240607,20240612,20240705,20240711,20240731,20240802,20240814,20240906,20240911,20240918,20241004,20241010,20241101,20241107,20241113,20241206,20241211,20241218,20250110,20250115,20250129,20250207,20250212,20250307,20250312,20250319,20250404,20250410,20250502,20250507,20250513,20250606,20250611,20250618,20250703,20250715,20250730,20250801,20250812,20250905,20250911,20250917,20251024,20251029,20251120,20251210,20251216,20251218,20260109,20260113,20260128,20260211,20260213,20260306,20260311,20260318,20260403,20260410,20260429,20260508,20260512,20260605,20260610,20260617,20260702,20260714,20260729,20260807,20260812,20260904,20260911,20260916,20261002,20261014,20261028,20261106,20261110,20261204,20261209,20261210,20270108,20270113,20270127,20270205,20270211,20270305,20270310,20270317,20270402,20270413,20270428,20270507,20270512,20270604,20270609,20270610,20270702,20270714,20270728,20270806,20270811,20270903,20270914,20270915,20271008,20271014,20271027,20271105,20271110,20271203,20271208,20271210&quot;, &quot;,&quot;)
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- the last completed daily bar (no repainting)
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(syminfo.tickerid, &quot;D&quot;,
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+bool newDay = ta.change(dDay) != 0     // a daily bar has just completed
+
+// ---------------------------------------------------------------- the strategy state
+var int decisionBar = na     // bar where the current order or trade was decided
+var bool pending = false
+
+if not na(decisionBar) and bar_index &gt;= decisionBar + TIME_BARS
+    if pending
+        strategy.cancel_all()
+        pending := false
+    if strategy.position_size != 0
+        strategy.close_all(comment=&quot;time exit&quot;)
+    decisionBar := na
+if pending and strategy.position_size != 0
+    pending := false
+
+bool placedLong = false
+bool placedShort = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size == 0 and not pending
+    int day = year(dDay, &quot;UTC&quot;) * 10000 + month(dDay, &quot;UTC&quot;) * 100 + dayofmonth(dDay, &quot;UTC&quot;)
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    if not news
+        if dLow &gt; dHigh2 and dLow - dHigh2 &gt;= MIN_GAP_ATR * dAtrPrior and dClose &gt; dLow
+            float near = dLow
+            float stop = dHigh2 - STOP_BUF * dAtrPrior
+            float risk = near - stop
+            strategy.entry(&quot;Long&quot;, strategy.long, limit=near)
+            strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, stop=stop, limit=near + TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
+            placedLong := true
+        else if dHigh &lt; dLow2 and dLow2 - dHigh &gt;= MIN_GAP_ATR * dAtrPrior and dClose &lt; dHigh
+            float near = dHigh
+            float stop = dLow2 + STOP_BUF * dAtrPrior
+            float risk = stop - near
+            strategy.entry(&quot;Short&quot;, strategy.short, limit=near)
+            strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, stop=stop, limit=near - TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
+            placedShort := true
+
+plotshape(placedLong, &quot;Gap: buy limit placed&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
+plotshape(placedShort, &quot;Gap: sell limit placed&quot;, shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
+</code></pre></div>
+</section>
+  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy's Properties.</p>
+</main>
+<script>
+document.querySelectorAll(".copy").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const el = document.getElementById(btn.dataset.target);
+    const text = el.textContent;
+    const done = () => { btn.textContent = "Copied"; setTimeout(() => (btn.textContent = "Copy code"), 1800); };
+    const fallback = () => {
+      const r = document.createRange(); r.selectNodeContents(el);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = "Selected: press Ctrl+C";
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(fallback);
+    } else { fallback(); }
+  });
+});
+</script>
