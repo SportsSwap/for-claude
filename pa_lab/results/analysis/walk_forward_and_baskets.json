@@ -1,0 +1,102 @@
+{
+  "declared": "decisions.md D46",
+  "NQ": {
+    "walk_forward_unseen_2023_to_2026": {
+      "top1": {
+        "net": 65609,
+        "sharpe": 0.55,
+        "max_drawdown": 60957,
+        "exit_days": 417
+      },
+      "top10": {
+        "net": -3277,
+        "sharpe": -0.06,
+        "max_drawdown": 30276,
+        "exit_days": 918
+      },
+      "top10_fast": {
+        "net": -26205,
+        "sharpe": -0.62,
+        "max_drawdown": 38406,
+        "exit_days": 958
+      },
+      "median": {
+        "net": 0,
+        "sharpe": 0.0,
+        "max_drawdown": 0,
+        "exit_days": 0
+      }
+    },
+    "baskets_final_window": {
+      "all_candidates": {
+        "versions": 53,
+        "net": 18616,
+        "sharpe": 0.67,
+        "max_drawdown": 13662,
+        "exit_days": 565,
+        "exits_per_day_across_basket": 12.29
+      },
+      "fast_candidates": {
+        "versions": 13,
+        "net": 14140,
+        "sharpe": 0.21,
+        "max_drawdown": 26425,
+        "exit_days": 549,
+        "exits_per_day_across_basket": 6.32
+      }
+    }
+  },
+  "ES": {
+    "walk_forward_unseen_2023_to_2026": {
+      "top1": {
+        "net": -47747,
+        "sharpe": -0.52,
+        "max_drawdown": 60360,
+        "exit_days": 322
+      },
+      "top10": {
+        "net": -44105,
+        "sharpe": -0.94,
+        "max_drawdown": 48145,
+        "exit_days": 787
+      },
+      "top10_fast": {
+        "net": -23487,
+        "sharpe": -1.2,
+        "max_drawdown": 24359,
+        "exit_days": 926
+      },
+      "median": {
+        "net": 0,
+        "sharpe": 0.0,
+        "max_drawdown": 0,
+        "exit_days": 0
+      }
+    },
+    "baskets_final_window": {
+      "all_candidates": {
+        "versions": 53,
+        "net": -5301,
+        "sharpe": -0.4,
+        "max_drawdown": 10281,
+        "exit_days": 563,
+        "exits_per_day_across_basket": 12.19
+      },
+      "fast_candidates": {
+        "versions": 13,
+        "net": -16001,
+        "sharpe": -0.49,
+        "max_drawdown": 27611,
+        "exit_days": 550,
+        "exits_per_day_across_basket": 6.36
+      }
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-10T05:44:00+00:00"
+}

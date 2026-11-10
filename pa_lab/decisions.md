@@ -632,3 +632,28 @@ unseen months: -3.4% of a $10k account over 19 months (Sharpe -0.19); the top
 10 averaged about zero; about 80% of versions lost money in each unseen
 period. Picking the highest backtest return on TQQQ selects luck. The NQ
 survivors (D41) remain the only versions that held on unseen data.
+
+D46. **"Optimize NQ for more trades", declared before looking.** The user asked
+for a faster, more-trading NQ model found by running thousands of tests. Every
+version's daily P&L is already saved for discovery and the final window, so
+this reads saved results only (no seal). Fixed before any number is seen:
+(a) walk-forward: every 6 months from 2023-01, rank all versions by Sharpe
+over the previous 12 months (at least 30 trading days with an exit... i.e.
+30 exit days), then trade the pick over the next 6 months; picks: top 1,
+top 10 equal weight, and top 10 among setup charts of 15m or less; compared
+with the median version; run on NQ and, independently, on ES.
+(b) baskets chosen on discovery only, measured on the final window: all 53
+candidates equal weight, and the candidates on setup charts of 15m or less.
+No other subsets will be tried.
+
+D47. **Result of D46: optimizing harder and trading faster both fail.**
+Walk-forward 2023-01 to 2026-11 (re-pick every 6 months from the best of the
+previous 12, all ~5,400 versions, unseen months only), per contract:
+NQ top 1 +$65,609 (Sharpe 0.55, drawdown $60,957); NQ top 10 -$3,277
+(Sharpe -0.06); NQ top 10 on charts of 15m or less -$26,205 (Sharpe -0.62);
+ES top 1 -$47,747; ES top 10 -$44,105; ES fast top 10 -$23,487. Baskets on
+the final window: all 53 candidates NQ +$18,616 a contract (Sharpe 0.67),
+ES -$5,301 (-0.40); the 13 fast candidates NQ Sharpe 0.21, ES -0.49.
+Chasing the recent best version does not pay on either market, and the
+faster charts are worse, not better. No new "optimized" version is issued;
+the two D41 survivors stand.
