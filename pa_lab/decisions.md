@@ -657,3 +657,14 @@ ES -$5,301 (-0.40); the 13 fast candidates NQ Sharpe 0.21, ES -0.49.
 Chasing the recent best version does not pay on either market, and the
 faster charts are worse, not better. No new "optimized" version is issued;
 the two D41 survivors stand.
+
+D48. **Clean backward test on 2013-2021, declared before the data is in.**
+Dukascopy has both index CFDs back to about 2013 (nothing for 2010-2011).
+No rule in the lab has touched these years. The two D41 survivors
+(C-breakout-00051, C-fair_value_gap-00364) run UNCHANGED on NQ and ES over
+2013-01 to 2021-09 (December 2012 warms up the detectors), same engine and
+costs, with CPI/jobs/FOMC days extended back to 2013. A version passes when
+NQ made money with a Sharpe of 0.5 or more over the whole period and ES has
+the same sign. Data quality (bars per session by year) is audited first;
+years with thin data are reported separately, not dropped after the fact.
+No other versions will be tried on this data.
