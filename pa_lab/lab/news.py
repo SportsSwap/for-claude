@@ -95,6 +95,51 @@ def parse_fomc(html: str) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=COLS)
 
 
+FED_HIST_URL = "https://www.federalreserve.gov/monetarypolicy/fomchistorical{year}.htm"
+
+
+def parse_fomc_historical(html: str, year: int) -> pd.DataFrame:
+    """Scheduled meetings from a Fed historical-materials page (one page per year, 2020 and
+    earlier). Headings read "January 29-30 Meeting - 2013". Unscheduled meetings, notation
+    votes and cancelled meetings are skipped: none was on the calendar ahead of time (or, if
+    cancelled, held), so a trader could not have stood aside for them in advance."""
+    rows = []
+    for raw in re.findall(r"<h5[^>]*>(.*?)</h5>", html, flags=re.S):
+        head = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", raw)).strip()
+        m = re.fullmatch(rf"([A-Za-z/]+) (\d+(?:-\d+)?) Meeting - {year}", head)
+        if not m:
+            continue
+        mons = [x.strip().lower() for x in m.group(1).split("/")]
+        nums = [int(x) for x in m.group(2).split("-")]
+        pick = mons[-1] if len(nums) > 1 and nums[-1] < nums[0] else mons[0]
+        mon = MONTHS.get(pick) or ABBR.get(pick[:3])
+        rows.append({"date": dt.date(year, mon, nums[-1]), "event": "FOMC", "release_et": RELEASE_ET["FOMC"],
+                     "verified": True, "source": "federalreserve.gov",
+                     "source_url": FED_HIST_URL.format(year=year), "notes": f"meeting {m.group(1)} {m.group(2)}"})
+    return pd.DataFrame(rows, columns=COLS)
+
+
+def build_fomc_history(years=range(2013, 2021), fetch: bool = True) -> pd.DataFrame:
+    """Scheduled FOMC decision days for earlier years, written to data/news/fomc_history.csv.
+    Kept apart from news_calendar.csv, which the main lab reads and the dashboard cites."""
+    frames = []
+    for y in years:
+        name = f"fomchistorical{y}.htm"
+        html = _cached(name)
+        if html is None and fetch:
+            html = _fetch(FED_HIST_URL.format(year=y), "pa-lab/0.1 (research backtest; python-urllib)", name)
+        if html is None:
+            raise RuntimeError(f"no source page for FOMC {y}")
+        df = parse_fomc_historical(html, y)
+        want = 7 if y == 2020 else 8      # March 17-18, 2020 was cancelled two days ahead
+        if len(df) != want:
+            raise RuntimeError(f"FOMC {y}: expected {want} scheduled meetings, parsed {len(df)}")
+        frames.append(df)
+    cal = pd.concat(frames, ignore_index=True).sort_values("date").reset_index(drop=True)
+    io.write_table(cal, P.news() / "fomc_history.csv")
+    return cal
+
+
 def parse_bls_archive(html: str, event: str) -> pd.DataFrame:
     pat = rf"{BLS_PREFIX[event]}_(\d{{2}})(\d{{2}})(\d{{4}})\.htm"
     days = sorted({dt.date(int(y), int(m), int(d)) for m, d, y in re.findall(pat, html)})
@@ -188,9 +233,13 @@ def news_days(events=("CPI", "NFP", "FOMC"), **kw) -> set:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["build"])
+    ap.add_argument("cmd", choices=["build", "fomc-history"])
     ap.add_argument("--offline", action="store_true", help="use cached source pages only")
     a = ap.parse_args(argv)
+    if a.cmd == "fomc-history":
+        cal = build_fomc_history(fetch=not a.offline)
+        print(cal.groupby(cal["date"].map(lambda d: d.year)).size())
+        return 0
     cal = build(fetch=not a.offline)
     print(cal.groupby(["event", "verified"]).size())
     return 0

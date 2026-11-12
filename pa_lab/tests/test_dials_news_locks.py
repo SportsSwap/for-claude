@@ -129,3 +129,17 @@ def test_calendar_refuses_unverified_rows(lab_root, monkeypatch):
         news.load_calendar()
     cal = news.load_calendar(require_verified=False)
     assert set(cal.event) == {"CPI", "NFP", "FOMC"}
+
+
+def test_fomc_historical_pages_keep_scheduled_meetings_only():
+    from lab.news import parse_fomc_historical
+    html = """<h5 class="panel-heading panel-heading--shaded">January 28-29 Meeting - 2020</h5>
+<h5 class="panel-heading">March 2 (unscheduled) Meeting - 2020</h5>
+<h5>March 17-18 (cancelled) Meeting - 2020</h5>
+<h5>March 19 (notation vote) - 2020</h5>
+<h5>October 16 (unscheduled) - 2020</h5>
+<h5>Jan/Feb 31-1 Meeting - 2020</h5>
+<h5>April/May 30-1 Meeting - 2020</h5>
+<h5>December 15-16 Meeting - 2020</h5>"""
+    got = [str(d) for d in parse_fomc_historical(html, 2020)["date"]]
+    assert got == ["2020-01-29", "2020-02-01", "2020-05-01", "2020-12-16"]

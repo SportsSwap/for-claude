@@ -668,3 +668,17 @@ NQ made money with a Sharpe of 0.5 or more over the whole period and ES has
 the same sign. Data quality (bars per session by year) is audited first;
 years with thin data are reported separately, not dropped after the fact.
 No other versions will be tried on this data.
+
+D49. **How the D48 test is carried out, fixed while the data is still downloading.**
+`scripts/run_history_test.py` (dry-run on synthetic data only). (a) FOMC days
+for 2013-2020 come from the Fed's historical pages, scheduled meetings only
+(`data/news/fomc_history.csv`, 63 days): unscheduled meetings, notation votes
+and the cancelled March 17-18, 2020 meeting are left out because nobody could
+have stood aside for them in advance. Kept in its own file so the main lab's
+calendar and dashboard are untouched. (b) Same cleaning, charts, engine and
+costs as the lab; a CFD has no rolls. (c) A year is "thin" when its median
+bars per session is under 80% of the discovery window's median or more than
+5% of its weekday sessions are missing; thin years are flagged in the table,
+none is dropped, and the verdict uses the whole period. (d) "ES same sign"
+means ES net above zero. (e) The script writes the data-quality table before
+any result.
