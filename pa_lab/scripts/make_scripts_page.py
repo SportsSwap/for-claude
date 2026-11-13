@@ -100,7 +100,7 @@ def main():
             '    <li>Set the chart timeframe shown on the card.</li>\n'
             '    <li>Pine Editor, paste, Add to chart. Results show in the Strategy Tester tab.</li>\n  </ol>\n'
             + "".join(card(*c) for c in CARDS)
-            + '\n  <p class="note">Neither futures strategy passed the backward check on 2013 to 2021, years the lab never used: both did well from 2022 on and poorly before 2018. Treat the recent results as unproven.</p>\n  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy\'s Properties. News dates are built in through December 2027.</p>\n</main>\n'
+            + '\n  <p class="note">Neither futures strategy passed the backward check on 2013 to 2021, years the lab never used: both did well from 2022 on and poorly before 2018. Treat the recent results as unproven.</p>\n  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy\'s Properties. News dates are built in from January 2013 through December 2027.</p>\n</main>\n'
             + SCRIPT + "\n")
     (T / "scripts_page.html").write_text(page)
     print("wrote", T / "scripts_page.html", len(page))

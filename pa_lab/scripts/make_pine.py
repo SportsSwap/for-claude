@@ -34,11 +34,23 @@ def version(vid: str) -> dict:
     raise KeyError(vid)
 
 
+NEWS_FROM = "2013-01-01"   # FOMC days start in 2013 (data/news/fomc_history.csv); BLS dates go back further
+
+
 def news_string() -> str:
+    """The Pine lines that fill NEWS. A Pine string holds at most 4,096 characters, so the
+    dates go in several strings."""
     cal = io.read_table(P.news() / "news_calendar.csv")
-    days = {d.replace("-", "") for d in cal.loc[cal.verified.astype(bool) & (cal.date >= "2021-09-01"), "date"]}
+    days = {d.replace("-", "") for d in cal.loc[cal.verified.astype(bool) & (cal.date >= NEWS_FROM), "date"]}
+    hist = io.read_table(P.news() / "fomc_history.csv")
+    days |= {d.replace("-", "") for d in hist["date"].astype(str)}
     days |= {d.replace("-", "") for ds in UPCOMING.values() for d in ds}
-    return ",".join(sorted(days))
+    days = sorted(days)
+    lines = []
+    for i in range(0, len(days), 200):
+        lines.append('    for s in str.split("%s", ",")' % ",".join(days[i:i + 200]))
+        lines.append("        array.push(NEWS, int(str.tonumber(s)))")
+    return "\n".join(lines)
 
 
 HEADER = """//@version=6
@@ -219,11 +231,10 @@ bool  SKIP_NEWS   = {skip_news}  // no gap formed on a CPI, jobs-report or FOMC 
 if timeframe.period != "60"
     runtime.error("Put this strategy on a 1-hour chart (NQ1! or ES1!).")
 
-// News days (CPI, jobs report, FOMC), YYYYMMDD, from the lab's verified calendar
+// News days (CPI, jobs report, scheduled FOMC), YYYYMMDD, January 2013 to December 2027
 var array<int> NEWS = array.new<int>()
 if barstate.isfirst
-    for s in str.split("{news}", ",")
-        array.push(NEWS, int(str.tonumber(s)))
+{news}
 
 // ---------------------------------------------------------------- the last completed daily bar (no repainting)
 [dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(syminfo.tickerid, "D",
@@ -312,8 +323,7 @@ int WANT = LEV > 0 ? 1 : -1                 // which NQ signal this ETF takes
 
 var array<int> NEWS = array.new<int>()
 if barstate.isfirst
-    for s in str.split("{news}", ",")
-        array.push(NEWS, int(str.tonumber(s)))
+{news}
 
 // ---------------------------------------------------------------- NQ: last completed daily bar, and NQ now
 [dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(NQ, "D",
@@ -393,7 +403,7 @@ def main() -> int:
     (out / "palab_daily_fvg_etf_1h.pine").write_text(FVG_ETF.format(
         vid="C-fair_value_gap-00364", min_gap=f["fvg_min_gap_atr"], buf=f["stop_buffer_atr"],
         target=float(f["target"].rstrip("R")), skip_news="true" if f["news"] == "skip" else "false", news=news))
-    print("wrote", [p.name for p in out.glob("*.pine")], "news days:", news.count(",") + 1)
+    print("wrote", [p.name for p in out.glob("*.pine")], "news days:", news.count(",") + news.count("str.split"))
     return 0
 
 
