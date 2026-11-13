@@ -5,12 +5,12 @@ import pathlib
 T = pathlib.Path(__file__).resolve().parent.parent / "tradingview"
 
 CARDS = [
-    ("breakout", "15-minute level breakout", "15-minute chart · NQ1! or MNQ1!", "Tested",
+    ("breakout", "15-minute level breakout", "15-minute chart · NQ1! or MNQ1!", "Failed on 2013–2021",
      "Trades the first 15-minute close through a level made of three swing points, long or short, between 8am and 4pm New York time. Stop beyond the last swing, target equal to the risk, out after 96 bars.",
-     "Lab, Aug 2024 to Nov 2026: NQ 941 trades, Sharpe 0.72 · ES 993 trades, Sharpe 0.59", "palab_breakout_15m.pine"),
-    ("fvg", "Daily fair value gap", "1-hour chart · NQ1! or MNQ1!", "Tested",
+     "Lab, Aug 2024 to Nov 2026: NQ 941 trades, Sharpe 0.72 · ES 993 trades, Sharpe 0.59. Older years, 2013 to Sep 2021: NQ 3,383 trades, Sharpe 0.17 · ES 3,290 trades, Sharpe −0.51 (lost money).", "palab_breakout_15m.pine"),
+    ("fvg", "Daily fair value gap", "1-hour chart · NQ1! or MNQ1!", "Failed on 2013–2021",
      "After each daily close, a three-day gap gets a limit order at its near edge, with the stop beyond the far edge and a target of three times the risk. The order lives, and any trade closes, after 96 hourly bars. Gaps formed on CPI, jobs-report or Fed days are skipped.",
-     "Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84", "palab_daily_fvg_1h.pine"),
+     "Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84. Older years, 2013 to Sep 2021: NQ 175 trades, Sharpe 0.09 · ES 165 trades, Sharpe 0.12 (about break-even; 2020 was the only clearly winning year on NQ).", "palab_daily_fvg_1h.pine"),
     ("fvgetf", "Daily fair value gap on TQQQ / SQQQ", "1-hour chart · TQQQ, SQQQ or QQQ", "Weak in the lab",
      "The same daily gap signals, read from NQ futures in the background, traded in the ETF on your chart. On TQQQ it takes the long signals, on SQQQ the short signals (as a buy of SQQQ). Prices are converted with the ETF's 3x leverage; each trade is $10,000 of the ETF. Gaps seen after NQ's 5pm close are acted on the next morning, when the ETF opens.",
      "Lab, 2022 to Jul 2024, NQ signals traded in rebuilt TQQQ: 41 trades, Sharpe 0.36 (the same signals on NQ: 1.13). Not validated on 2024-26. MNQ is the better route.", "palab_daily_fvg_etf_1h.pine"),
@@ -100,7 +100,7 @@ def main():
             '    <li>Set the chart timeframe shown on the card.</li>\n'
             '    <li>Pine Editor, paste, Add to chart. Results show in the Strategy Tester tab.</li>\n  </ol>\n'
             + "".join(card(*c) for c in CARDS)
-            + '\n  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy\'s Properties. News dates are built in through December 2027.</p>\n</main>\n'
+            + '\n  <p class="note">Neither futures strategy passed the backward check on 2013 to 2021, years the lab never used: both did well from 2022 on and poorly before 2018. Treat the recent results as unproven.</p>\n  <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy\'s Properties. News dates are built in through December 2027.</p>\n</main>\n'
             + SCRIPT + "\n")
     (T / "scripts_page.html").write_text(page)
     print("wrote", T / "scripts_page.html", len(page))

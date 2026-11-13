@@ -1,7 +1,8 @@
 # The two survivors, for TradingView
 
 Both strategies survived the lab's sealed final test (2024-08-01 to
-2026-11-06) on Dukascopy CFD data. Regenerate with `python scripts/make_pine.py`.
+2026-11-06) on Dukascopy CFD data, then failed a backward check on
+2013-2021 (table below). Regenerate with `python scripts/make_pine.py`.
 
 | File | Chart | What it does |
 |---|---|---|
@@ -23,6 +24,14 @@ Both strategies survived the lab's sealed final test (2024-08-01 to
 | Breakout 15m | 2024-08 to 2026-11 (sealed) | 941 trades, +$112,064, Sharpe 0.72 | 993 trades, +$45,704, Sharpe 0.59 |
 | Daily FVG, 1h | 2022-01 to 2024-07 | 59 trades, +$73,394, Sharpe 1.13 | 60 trades, +$13,726, Sharpe 0.40 |
 | Daily FVG, 1h | 2024-08 to 2026-11 (sealed) | 50 trades, +$100,990, Sharpe 1.01 | 49 trades, +$39,679, Sharpe 0.84 |
+| Breakout 15m | 2013-01 to 2021-09 (backward check) | 3,383 trades, +$34,344, Sharpe 0.17 | 3,290 trades, -$65,028, Sharpe -0.51 |
+| Daily FVG, 1h | 2013-01 to 2021-09 (backward check) | 175 trades, +$8,574, Sharpe 0.09 | 165 trades, +$6,710, Sharpe 0.12 |
+
+**Both failed the backward check** (decisions.md D48-D50): unchanged rules on
+2013-2021, years the lab never used, needed NQ Sharpe 0.5 or more with ES
+profitable. Both lost money in most years before 2018. Dukascopy's data for
+2013 and 2015-2017 is incomplete (shorter trading day or missing sessions),
+which may explain part of it, but 2014 has full data and lost too.
 
 TradingView's numbers will differ: it uses CME futures (the lab used CFD
 prices), fills on chart bars instead of 1-minute bars, and does not always

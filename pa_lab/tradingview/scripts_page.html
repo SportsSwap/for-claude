@@ -53,12 +53,12 @@ code { font-family: var(--mono); font-size: 0.8rem; color: var(--code-fg); white
   <header class="script-head">
     <div class="titles">
       <h2 id="breakout-h">15-minute level breakout</h2>
-      <p class="setup"><span class="chip">15-minute chart · NQ1! or MNQ1!</span> <span class="badge ok">Tested</span></p>
+      <p class="setup"><span class="chip">15-minute chart · NQ1! or MNQ1!</span> <span class="badge warn">Failed on 2013–2021</span></p>
     </div>
     <button class="copy" type="button" id="breakout-btn" data-target="breakout-code">Copy code</button>
   </header>
   <p class="desc">Trades the first 15-minute close through a level made of three swing points, long or short, between 8am and 4pm New York time. Stop beyond the last swing, target equal to the risk, out after 96 bars.</p>
-  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 941 trades, Sharpe 0.72 · ES 993 trades, Sharpe 0.59</p>
+  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 941 trades, Sharpe 0.72 · ES 993 trades, Sharpe 0.59. Older years, 2013 to Sep 2021: NQ 3,383 trades, Sharpe 0.17 · ES 3,290 trades, Sharpe −0.51 (lost money).</p>
   <div class="codewrap"><pre><code id="breakout-code">//@version=6
 // Price Action Lab survivor: C-breakout-00051
 // Survived the lab&#x27;s sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
@@ -224,12 +224,12 @@ if barstate.islast
   <header class="script-head">
     <div class="titles">
       <h2 id="fvg-h">Daily fair value gap</h2>
-      <p class="setup"><span class="chip">1-hour chart · NQ1! or MNQ1!</span> <span class="badge ok">Tested</span></p>
+      <p class="setup"><span class="chip">1-hour chart · NQ1! or MNQ1!</span> <span class="badge warn">Failed on 2013–2021</span></p>
     </div>
     <button class="copy" type="button" id="fvg-btn" data-target="fvg-code">Copy code</button>
   </header>
   <p class="desc">After each daily close, a three-day gap gets a limit order at its near edge, with the stop beyond the far edge and a target of three times the risk. The order lives, and any trade closes, after 96 hourly bars. Gaps formed on CPI, jobs-report or Fed days are skipped.</p>
-  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84</p>
+  <p class="stats">Lab, Aug 2024 to Nov 2026: NQ 50 trades, Sharpe 1.01 · ES 49 trades, Sharpe 0.84. Older years, 2013 to Sep 2021: NQ 175 trades, Sharpe 0.09 · ES 165 trades, Sharpe 0.12 (about break-even; 2020 was the only clearly winning year on NQ).</p>
   <div class="codewrap"><pre><code id="fvg-code">//@version=6
 // Price Action Lab survivor: C-fair_value_gap-00364
 // Survived the lab&#x27;s sealed final test (2024-08-01 to 2026-11-06, Dukascopy CFD data):
@@ -417,6 +417,7 @@ if newDay and not na(dAtrPrior) and not na(dHigh2) and not na(nqNow) and strateg
 plotshape(placed, &quot;Buy limit placed&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.small)
 </code></pre></div>
 </section>
+  <p class="note">Neither futures strategy passed the backward check on 2013 to 2021, years the lab never used: both did well from 2022 on and poorly before 2018. Treat the recent results as unproven.</p>
   <p class="note">Paper trade before using real money. On MNQ, set commission to about $0.50 per order in the strategy's Properties. News dates are built in through December 2027.</p>
 </main>
 <script>

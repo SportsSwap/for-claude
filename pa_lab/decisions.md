@@ -682,3 +682,22 @@ bars per session is under 80% of the discovery window's median or more than
 none is dropped, and the verdict uses the whole period. (d) "ES same sign"
 means ES net above zero. (e) The script writes the data-quality table before
 any result.
+
+D50. **Result of D48: both survivors fail on 2013-2021.** Unchanged rules,
+2013-01 to 2021-09-24, one contract after costs. C-breakout-00051: NQ 3,383
+trades, +$34,344, Sharpe 0.17, max drawdown $72,340, 4 of 9 years profitable;
+ES 3,290 trades, -$65,028, Sharpe -0.51. C-fair_value_gap-00364: NQ 175
+trades, +$8,574, Sharpe 0.09, 2 of 9 years profitable (2020 alone made
++$34,468); ES 165 trades, +$6,710, Sharpe 0.12. Neither reaches NQ Sharpe 0.5.
+Data quality, measured first: 2013 misses about a quarter of its sessions, and
+2015-2017 have a median of about 840 bars a session against 1,335 in the
+discovery window (Dukascopy's CFD traded a shorter day then); December 2012,
+the warm-up, has cash hours only. Split as declared (not the verdict): thin
+years (2013, 2015-2017) breakout NQ -$38,861, FVG NQ -$15,481; full-data years
+(2014, 2018-2021) breakout NQ +$73,205 (Sharpe 0.52), ES +$17,991 (0.21); FVG
+NQ +$24,055 (0.35), ES +$18,995 (0.47). The thin data and the early years are
+the same years, so the split cannot say whether the data or the market made
+the difference; 2014 has full data and lost on both versions. What stands:
+both versions made money in 2018 onward and not before, and the edge found on
+2022-2026 is not a stable property of these markets. Files:
+results/history_2013_2021/. No further versions are tried on this data.

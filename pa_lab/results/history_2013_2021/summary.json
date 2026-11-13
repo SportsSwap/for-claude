@@ -1,0 +1,99 @@
+{
+  "rule": "NQ net > 0 and NQ Sharpe >= 0.5 over the whole period, and ES net > 0",
+  "source": "vendor_input/dukascopy_2013_2021",
+  "warmup_end": "2012-12-31",
+  "nq_es_same_sessions": false,
+  "thin_years": {
+    "NQ": [
+      2012,
+      2013,
+      2015,
+      2016,
+      2017
+    ],
+    "ES": [
+      2012,
+      2013,
+      2015,
+      2016,
+      2017
+    ]
+  },
+  "versions": {
+    "NQ:C-breakout-00051": {
+      "trades": 3383,
+      "net": 34344.0,
+      "sharpe": 0.17,
+      "win_rate": 0.498,
+      "max_drawdown": 72340.0,
+      "sessions": 2191,
+      "first": "2013-01-01",
+      "last": "2021-09-24",
+      "years_profitable": 4,
+      "years": 9,
+      "news_days_in_period": 259
+    },
+    "NQ:C-fair_value_gap-00364": {
+      "trades": 175,
+      "net": 8574.0,
+      "sharpe": 0.09,
+      "win_rate": 0.309,
+      "max_drawdown": 28754.0,
+      "sessions": 2191,
+      "first": "2013-01-01",
+      "last": "2021-09-24",
+      "years_profitable": 2,
+      "years": 9,
+      "news_days_in_period": 259
+    },
+    "ES:C-breakout-00051": {
+      "trades": 3290,
+      "net": -65028.0,
+      "sharpe": -0.51,
+      "win_rate": 0.498,
+      "max_drawdown": 110350.0,
+      "sessions": 2177,
+      "first": "2013-01-01",
+      "last": "2021-09-24",
+      "years_profitable": 3,
+      "years": 9,
+      "news_days_in_period": 259
+    },
+    "ES:C-fair_value_gap-00364": {
+      "trades": 165,
+      "net": 6710.0,
+      "sharpe": 0.12,
+      "win_rate": 0.297,
+      "max_drawdown": 18945.0,
+      "sessions": 2177,
+      "first": "2013-01-01",
+      "last": "2021-09-24",
+      "years_profitable": 4,
+      "years": 9,
+      "news_days_in_period": 259
+    }
+  },
+  "verdict": {
+    "C-breakout-00051": {
+      "nq_net": 34344.0,
+      "nq_sharpe": 0.17,
+      "es_net": -65028.0,
+      "es_sharpe": -0.51,
+      "pass": false
+    },
+    "C-fair_value_gap-00364": {
+      "nq_net": 8574.0,
+      "nq_sharpe": 0.09,
+      "es_net": 6710.0,
+      "es_sharpe": 0.12,
+      "pass": false
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-13T01:37:44+00:00"
+}
