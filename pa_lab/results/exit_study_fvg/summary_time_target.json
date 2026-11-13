@@ -1,0 +1,28 @@
+{
+  "versions": 39312,
+  "share_profitable": {
+    "NQ_OLD": 0.182,
+    "ES_OLD": 0.172,
+    "NQ_NEW": 0.845,
+    "ES_NEW": 0.417
+  },
+  "share_profitable_on_all_four": 0.042,
+  "nq_sharpe_0p5_both_periods_and_es_profitable_both": 3,
+  "max_sharpe": {
+    "NQ_OLD": 0.64,
+    "ES_OLD": 0.85,
+    "NQ_NEW": 1.67,
+    "ES_NEW": 1.22
+  },
+  "rank_correlation_old_vs_new": {
+    "NQ": 0.23,
+    "ES": 0.16
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-13T11:29:59+00:00"
+}

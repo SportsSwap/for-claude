@@ -1,0 +1,647 @@
+{
+  "aggregates": {
+    "versions": 39312,
+    "window": [
+      "2024-08-01",
+      "2026-11-06"
+    ],
+    "check_current_nq": {
+      "trades": 50,
+      "net": 100990
+    },
+    "share_profitable": {
+      "NQ_FIN": 0.73,
+      "ES_FIN": 0.874
+    },
+    "sharpe_quantiles": {
+      "NQ_FIN": {
+        "0.1": -0.35,
+        "0.5": 0.31,
+        "0.9": 1.14
+      },
+      "ES_FIN": {
+        "0.1": -0.09,
+        "0.5": 0.62,
+        "0.9": 1.1
+      }
+    },
+    "net_quantiles": {
+      "NQ_FIN": {
+        "0.1": -33772,
+        "0.5": 31599,
+        "0.9": 78428
+      },
+      "ES_FIN": {
+        "0.1": -6045,
+        "0.5": 29289,
+        "0.9": 54406
+      }
+    }
+  },
+  "picks": {
+    "best_on_OLD": {
+      "n": 1,
+      "dials": {
+        "target": "1.5R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.0,
+        "stop_mode": "hard",
+        "time_exit": "bars_960",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.1,
+        "fvg_max_age_bars": 96,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 126.0,
+        "net": 32586,
+        "sharpe": 0.56
+      },
+      "ES_OLD": {
+        "trades": 121.0,
+        "net": 804,
+        "sharpe": 0.02
+      },
+      "NQ_NEW": {
+        "trades": 35.0,
+        "net": 35845,
+        "sharpe": 0.79
+      },
+      "ES_NEW": {
+        "trades": 38.0,
+        "net": 10332,
+        "sharpe": 0.38
+      },
+      "NQ_FIN": {
+        "trades": 38.0,
+        "net": 46292,
+        "sharpe": 0.84,
+        "percentile_in_grid_by_sharpe": 82
+      },
+      "ES_FIN": {
+        "trades": 36.0,
+        "net": 29580,
+        "sharpe": 1.08,
+        "percentile_in_grid_by_sharpe": 89
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -436,
+          "2014": 1122,
+          "2015": -4189,
+          "2016": -878,
+          "2017": -2549,
+          "2018": 9611,
+          "2019": 2598,
+          "2020": 9459,
+          "2021": 17848,
+          "2022": 28012,
+          "2023": 5948,
+          "2024": -3008,
+          "2025": -5971,
+          "2026": 57155
+        },
+        "ES": {
+          "2013": 4343,
+          "2014": -1203,
+          "2015": -7628,
+          "2016": -4470,
+          "2017": -911,
+          "2018": 262,
+          "2019": 4121,
+          "2020": 3384,
+          "2021": 2907,
+          "2022": 6182,
+          "2023": -1532,
+          "2024": 11911,
+          "2025": 9392,
+          "2026": 13959
+        }
+      }
+    },
+    "best_on_OLD_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 132.2,
+        "net": 27899,
+        "sharpe": 0.38
+      },
+      "ES_OLD": {
+        "trades": 130.3,
+        "net": 11257,
+        "sharpe": 0.23
+      },
+      "NQ_NEW": {
+        "trades": 41.8,
+        "net": 44221,
+        "sharpe": 0.77
+      },
+      "ES_NEW": {
+        "trades": 44.2,
+        "net": 14906,
+        "sharpe": 0.44
+      },
+      "NQ_FIN": {
+        "trades": 36.7,
+        "net": 45806,
+        "sharpe": 0.69,
+        "percentile_in_grid_by_sharpe": 75
+      },
+      "ES_FIN": {
+        "trades": 38.4,
+        "net": 26132,
+        "sharpe": 0.84,
+        "percentile_in_grid_by_sharpe": 70
+      },
+      "holds": true
+    },
+    "best_on_NEW": {
+      "n": 1,
+      "dials": {
+        "target": "3R",
+        "stop_ref": "gap_middle",
+        "stop_buffer_atr": 0.0,
+        "stop_mode": "hard",
+        "time_exit": "bars_96",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.25,
+        "fvg_max_age_bars": 24,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 132.0,
+        "net": -7335,
+        "sharpe": -0.07
+      },
+      "ES_OLD": {
+        "trades": 126.0,
+        "net": 3419,
+        "sharpe": 0.06
+      },
+      "NQ_NEW": {
+        "trades": 49.0,
+        "net": 123030,
+        "sharpe": 1.65
+      },
+      "ES_NEW": {
+        "trades": 51.0,
+        "net": 20409,
+        "sharpe": 0.48
+      },
+      "NQ_FIN": {
+        "trades": 33.0,
+        "net": 63727,
+        "sharpe": 0.67,
+        "percentile_in_grid_by_sharpe": 74
+      },
+      "ES_FIN": {
+        "trades": 37.0,
+        "net": 22145,
+        "sharpe": 0.48,
+        "percentile_in_grid_by_sharpe": 38
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -4581,
+          "2014": -3779,
+          "2015": -17212,
+          "2016": -3225,
+          "2017": 1944,
+          "2018": -1462,
+          "2019": 2038,
+          "2020": 24424,
+          "2021": -5482,
+          "2022": 72389,
+          "2023": 47072,
+          "2024": 3452,
+          "2025": 42780,
+          "2026": 21065
+        },
+        "ES": {
+          "2013": -1034,
+          "2014": -983,
+          "2015": -11610,
+          "2016": 886,
+          "2017": 1898,
+          "2018": 9170,
+          "2019": -1949,
+          "2020": 19829,
+          "2021": -12789,
+          "2022": 2358,
+          "2023": 9166,
+          "2024": -581,
+          "2025": 3004,
+          "2026": 28608
+        }
+      }
+    },
+    "best_on_NEW_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 133.0,
+        "net": -11167,
+        "sharpe": -0.12
+      },
+      "ES_OLD": {
+        "trades": 126.3,
+        "net": 5936,
+        "sharpe": 0.1
+      },
+      "NQ_NEW": {
+        "trades": 49.2,
+        "net": 116529,
+        "sharpe": 1.63
+      },
+      "ES_NEW": {
+        "trades": 50.8,
+        "net": 15970,
+        "sharpe": 0.4
+      },
+      "NQ_FIN": {
+        "trades": 33.2,
+        "net": 72835,
+        "sharpe": 0.72,
+        "percentile_in_grid_by_sharpe": 77
+      },
+      "ES_FIN": {
+        "trades": 37.2,
+        "net": 26529,
+        "sharpe": 0.56,
+        "percentile_in_grid_by_sharpe": 44
+      },
+      "holds": true
+    },
+    "steadiest": {
+      "n": 1,
+      "dials": {
+        "target": "1.5R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.0,
+        "stop_mode": "hard",
+        "time_exit": "bars_96",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.25,
+        "fvg_max_age_bars": 96,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 142.0,
+        "net": 25078,
+        "sharpe": 0.42
+      },
+      "ES_OLD": {
+        "trades": 137.0,
+        "net": 16418,
+        "sharpe": 0.38
+      },
+      "NQ_NEW": {
+        "trades": 51.0,
+        "net": 40458,
+        "sharpe": 0.84
+      },
+      "ES_NEW": {
+        "trades": 54.0,
+        "net": 15064,
+        "sharpe": 0.56
+      },
+      "NQ_FIN": {
+        "trades": 35.0,
+        "net": 54965,
+        "sharpe": 0.93,
+        "percentile_in_grid_by_sharpe": 85
+      },
+      "ES_FIN": {
+        "trades": 38.0,
+        "net": 29576,
+        "sharpe": 0.98,
+        "percentile_in_grid_by_sharpe": 80
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -1751,
+          "2014": 623,
+          "2015": -7612,
+          "2016": -348,
+          "2017": 2605,
+          "2018": 3657,
+          "2019": 1615,
+          "2020": 13148,
+          "2021": 13141,
+          "2022": 23752,
+          "2023": 15523,
+          "2024": 2187,
+          "2025": -8480,
+          "2026": 62441
+        },
+        "ES": {
+          "2013": 545,
+          "2014": -745,
+          "2015": -4988,
+          "2016": 4325,
+          "2017": -2259,
+          "2018": 1980,
+          "2019": 2177,
+          "2020": 15642,
+          "2021": -260,
+          "2022": -808,
+          "2023": 8689,
+          "2024": 13956,
+          "2025": 7669,
+          "2026": 15133
+        }
+      }
+    },
+    "steadiest_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 150.4,
+        "net": 19035,
+        "sharpe": 0.27
+      },
+      "ES_OLD": {
+        "trades": 143.0,
+        "net": 18651,
+        "sharpe": 0.39
+      },
+      "NQ_NEW": {
+        "trades": 52.6,
+        "net": 56434,
+        "sharpe": 0.98
+      },
+      "ES_NEW": {
+        "trades": 54.6,
+        "net": 12884,
+        "sharpe": 0.44
+      },
+      "NQ_FIN": {
+        "trades": 38.4,
+        "net": 57727,
+        "sharpe": 0.82,
+        "percentile_in_grid_by_sharpe": 81
+      },
+      "ES_FIN": {
+        "trades": 40.4,
+        "net": 31916,
+        "sharpe": 0.91,
+        "percentile_in_grid_by_sharpe": 75
+      },
+      "holds": true
+    },
+    "current_3x": {
+      "n": 1,
+      "dials": {
+        "target": "3R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.1,
+        "stop_mode": "hard",
+        "time_exit": "bars_96",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.1,
+        "fvg_max_age_bars": 24,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 175.0,
+        "net": 8574,
+        "sharpe": 0.09
+      },
+      "ES_OLD": {
+        "trades": 165.0,
+        "net": 6710,
+        "sharpe": 0.12
+      },
+      "NQ_NEW": {
+        "trades": 59.0,
+        "net": 73394,
+        "sharpe": 1.13
+      },
+      "ES_NEW": {
+        "trades": 60.0,
+        "net": 13726,
+        "sharpe": 0.4
+      },
+      "NQ_FIN": {
+        "trades": 50.0,
+        "net": 100990,
+        "sharpe": 1.01,
+        "percentile_in_grid_by_sharpe": 87
+      },
+      "ES_FIN": {
+        "trades": 49.0,
+        "net": 39679,
+        "sharpe": 0.84,
+        "percentile_in_grid_by_sharpe": 70
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -6334,
+          "2014": -3116,
+          "2015": -6776,
+          "2016": -3428,
+          "2017": 1058,
+          "2018": -66,
+          "2019": -6919,
+          "2020": 34468,
+          "2021": -312,
+          "2022": 43443,
+          "2023": 26641,
+          "2024": 5039,
+          "2025": 18541,
+          "2026": 80720
+        },
+        "ES": {
+          "2013": 407,
+          "2014": -1983,
+          "2015": -4470,
+          "2016": -5227,
+          "2017": -2995,
+          "2018": 5856,
+          "2019": 4145,
+          "2020": 16946,
+          "2021": -5969,
+          "2022": -275,
+          "2023": 11813,
+          "2024": -1251,
+          "2025": 2724,
+          "2026": 40394
+        }
+      }
+    },
+    "current_4x": {
+      "n": 1,
+      "dials": {
+        "target": "4R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.1,
+        "stop_mode": "hard",
+        "time_exit": "bars_96",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.1,
+        "fvg_max_age_bars": 24,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 173.0,
+        "net": 11294,
+        "sharpe": 0.12
+      },
+      "ES_OLD": {
+        "trades": 162.0,
+        "net": 15292,
+        "sharpe": 0.25
+      },
+      "NQ_NEW": {
+        "trades": 58.0,
+        "net": 87489,
+        "sharpe": 1.24
+      },
+      "ES_NEW": {
+        "trades": 59.0,
+        "net": 16559,
+        "sharpe": 0.45
+      },
+      "NQ_FIN": {
+        "trades": 50.0,
+        "net": 62037,
+        "sharpe": 0.65,
+        "percentile_in_grid_by_sharpe": 73
+      },
+      "ES_FIN": {
+        "trades": 49.0,
+        "net": 45524,
+        "sharpe": 0.91,
+        "percentile_in_grid_by_sharpe": 75
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -6334,
+          "2014": -3809,
+          "2015": -7506,
+          "2016": -3596,
+          "2017": -1201,
+          "2018": 186,
+          "2019": -8040,
+          "2020": 41596,
+          "2021": 0,
+          "2022": 53392,
+          "2023": 30787,
+          "2024": -2365,
+          "2025": 18117,
+          "2026": 49595
+        },
+        "ES": {
+          "2013": 407,
+          "2014": -1020,
+          "2015": -3426,
+          "2016": -5439,
+          "2017": -898,
+          "2018": 10142,
+          "2019": 5068,
+          "2020": 15748,
+          "2021": -5290,
+          "2022": 3329,
+          "2023": 12397,
+          "2024": -1807,
+          "2025": 7189,
+          "2026": 40976
+        }
+      }
+    },
+    "current_5x": {
+      "n": 1,
+      "dials": {
+        "target": "5R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.1,
+        "stop_mode": "hard",
+        "time_exit": "bars_96",
+        "management": "hold",
+        "fvg_min_gap_atr": 0.1,
+        "fvg_max_age_bars": 24,
+        "news": "skip"
+      },
+      "NQ_OLD": {
+        "trades": 172.0,
+        "net": 14187,
+        "sharpe": 0.14
+      },
+      "ES_OLD": {
+        "trades": 161.0,
+        "net": 17235,
+        "sharpe": 0.28
+      },
+      "NQ_NEW": {
+        "trades": 58.0,
+        "net": 87901,
+        "sharpe": 1.23
+      },
+      "ES_NEW": {
+        "trades": 59.0,
+        "net": 13604,
+        "sharpe": 0.38
+      },
+      "NQ_FIN": {
+        "trades": 50.0,
+        "net": 63089,
+        "sharpe": 0.63,
+        "percentile_in_grid_by_sharpe": 72
+      },
+      "ES_FIN": {
+        "trades": 48.0,
+        "net": 14958,
+        "sharpe": 0.33,
+        "percentile_in_grid_by_sharpe": 28
+      },
+      "holds": true,
+      "by_year": {
+        "NQ": {
+          "2013": -6334,
+          "2014": -3809,
+          "2015": -6682,
+          "2016": -2898,
+          "2017": -876,
+          "2018": 944,
+          "2019": -7705,
+          "2020": 43017,
+          "2021": -1471,
+          "2022": 50085,
+          "2023": 34507,
+          "2024": -2365,
+          "2025": 11637,
+          "2026": 57126
+        },
+        "ES": {
+          "2013": 407,
+          "2014": -765,
+          "2015": -4601,
+          "2016": -5439,
+          "2017": -32,
+          "2018": 12190,
+          "2019": 4340,
+          "2020": 15748,
+          "2021": -4612,
+          "2022": 4869,
+          "2023": 7901,
+          "2024": -1759,
+          "2025": -5436,
+          "2026": 22986
+        }
+      }
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-13T11:33:06+00:00"
+}

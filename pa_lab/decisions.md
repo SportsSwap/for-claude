@@ -770,3 +770,110 @@ NEW +$89,607 at 6R and +$92,196 for every target from 7R to 20R (identical,
 because no trade gets that far inside the 96-hour limit, so the time limit is
 doing the exiting). No higher target turns 2013-2021 into a working period.
 No change to any script.
+
+D55. **Longer time limits with every take profit, declared before looking.**
+The user asked for thousands more tests with longer holds and wider targets,
+optimized as far as honestly possible, results shown before anything is
+pushed. Side study outside the locked rulebook, sealed window closed.
+(a) Grid on the daily fair value gap entry of C-fair_value_gap-00364: time
+limit 24, 96, 192, 288, 480, 720 or 960 hourly bars (about 1, 4, 8, 12, 20,
+30 and 40 trading days); target 1R, 1.5R, 2R, 3R, 4R, 5R, 6R, 8R, 10R, 15R,
+20R, 30R or none; stop reference (beyond level, last swing, gap middle), stop
+buffer, stop mode, management, minimum gap, gap age, news: 39,312 versions on
+the four sets (NQ and ES, OLD 2013-2021 and NEW 2022 to Jul 2024).
+In this rulebook the time limit runs from the moment the gap is known, and it
+bounds both how long the limit order rests and when an open trade is closed;
+that coupling is kept, so a longer limit also lets older gaps fill.
+(b) Reported: the time-limit x target table (average over matched groups and
+for the current version); walk-forward both ways as in D51(d) (best on OLD
+scored on NEW, best on NEW scored on OLD, top 1 and top 10); rank correlation
+between periods; and one "steadiest" version, the one whose worst Sharpe
+across the four sets is highest (at least 100 OLD and 30 NEW trades on NQ).
+(c) The steadiest version is chosen with all the open data in view, so its
+numbers are hindsight and nothing is left to check it on except the future.
+It can be offered as a try-out copy only. A replacement of the main script
+still needs a pick from each period to pass on the other (NQ Sharpe 0.5 or
+more, ES net above zero), as in D51(e).
+
+D56. **The sealed window is opened a second time, at the user's instruction,
+as a test only. Declared before the D55 results are read.** The user asked
+that the study run "up to now", not only to July 2024. One logged unlock
+reads August 2024 to November 2026 for NQ and ES. Rules fixed first:
+(a) Nothing is picked on the recent window. The picks are made by rule from
+OLD and NEW alone: best on OLD, best on NEW, the steadiest version (highest
+worst-case Sharpe across the four open sets), and the top 10 of each,
+averaged. The current 3R version and its 4x and 5x copies are shown beside
+them.
+(b) The whole grid is run on the recent window, but only summaries are kept
+(share profitable, quantiles, and the time-limit x target averages over
+matched groups) plus the picks' own results. Per-version results for the
+recent window are not written to disk, so the best-looking version there
+cannot be fished out later.
+(c) A pick holds when, on the recent window, NQ makes money with Sharpe 0.5
+or more and ES makes money. Because most versions made money on NQ in this
+window, each pick is also placed against the whole grid (its percentile).
+(d) After this there is no untouched data left; only future trading can test
+anything further.
+
+D57. **Result of D55 and D56: longer holds and wider targets do not help, and
+the steadiest alternative is still flat before 2020.** 39,312 versions.
+Open data: profitable on NQ OLD 18%, NQ NEW 85%, on all four sets 4%; three
+versions reach NQ Sharpe 0.5 in both periods with ES profitable. Averaged
+over matched groups, the 96-hour limit is the best time limit on NQ in both
+OLD (about -0.12, the least bad) and NEW (about 0.95); every longer limit is
+worse, and targets above about 3R change little.
+Second opening of the sealed window (one unlock, 2026-11-13 11:30 UTC,
+logged; the current version reproduced its saved result, 50 trades,
++$100,990). On August 2024 to November 2026, 73% of the grid made money on NQ
+and 87% on ES, so "made money" is a low bar there; the 24-hour limit, the
+worst in OLD and NEW, was the best (mean Sharpe about 1.25 against 0.55 at 96
+hours), so no time limit is stable across periods. Picks, NQ net per contract
+(OLD / NEW / recent): current 3R +$8,574 / +$73,394 / +$100,990 (87th
+percentile of the grid in the recent window); 4R copy +$11,294 / +$87,489 /
++$62,037; 5R copy +$14,187 / +$87,901 / +$63,089, with ES only +$14,958 (28th
+percentile), so the small edge of 4R and 5R on the open data reversed; best
+on OLD (1.5R, 960 hours) +$32,586 / +$35,845 / +$46,292; best on NEW (3R,
+stop at the gap middle) -$7,335 / +$123,030 / +$63,727; steadiest (1.5R,
+gaps of 0.25 ATR or more, no stop buffer, 96 hours) +$25,078 / +$40,458 /
++$54,965 with ES +$16,418 / +$15,064 / +$29,576. Every pick meets the "holds"
+rule, as most of the grid would. The steadiest version's years 2013-2019 sum
+to about -$1,200 on NQ, and 2025 lost $8,480. By D51(e) no replacement is
+issued (the best on NEW fails on OLD). Per-version results for the recent
+window were not saved. No untouched data remains. Nothing in tradingview/
+was changed and this study is not committed or pushed until the user decides.
+
+D58. **Hour-by-hour time limits, declared before looking.** The user asked
+for every time limit from 97 hours upward to 960, at every take profit up to
+15x. `scripts/time_limit_scan_fvg.py`: the current version with only two
+settings changed, time limit 96, 97, 98 ... 960 hourly bars (865 values) and
+target 1R, 1.5R, 2R, 3R ... 15R (16 values): 13,840 versions, on NQ and ES,
+OLD and NEW. The recent window is read once more under the D56 rules (third
+logged unlock): nothing is picked on it, and only the picks' results and
+banded summaries are kept.
+Picks, made on OLD and NEW alone: (i) the best single cell, the highest
+worst-case Sharpe across the four open sets (at least 100 OLD and 30 NEW
+trades on NQ); (ii) the plateau pick, the centre of the best neighbourhood,
+where that worst-case Sharpe is averaged over 12 hours either side and one
+target step either side; (iii) the current 96 hours, 3R.
+Stated beforehand: results that jump around between neighbouring hours are
+noise, since nothing real separates a 130-hour limit from a 131-hour one, so
+the single best cell is expected to flatter itself. A different time limit
+counts as better only if the plateau pick beats the current version's NQ net
+in all three periods with ES profitable in all three.
+
+D59. **Result of D58: no time limit from 97 to 960 hours beats 96.** 13,840
+versions of the current rules (third logged unlock, 2026-11-13 11:38 UTC, for
+the recent window). Share of them with a higher NQ net than the current
+96 hours / 3R: OLD 14.6%, NEW 33.8%, recent 1.0%; in all three periods: none.
+At 3R, mean NQ net by time limit (OLD / NEW / recent): 96 h +$8,574 /
++$73,394 / +$100,990; 97-119 h +$3,236 / +$63,659 / +$103,317; 120-167 h
+-$1,371 / +$54,325 / +$101,683; 168-239 h -$24,785 / +$71,123 / +$96,150;
+240-335 h -$11,811 / +$76,571 / +$93,254; 336-479 h -$4,633 / +$39,962 /
++$74,151; 480-719 h -$25,830 / +$18,390 / +$53,945; 720-960 h -$23,510 /
+-$6,836 / +$54,798. Picks made on the open data: best single cell 168 h at
+1.5R, +$15,610 / +$46,606 / +$29,275; plateau pick 173 h at 1R, +$12,565 /
++$44,703 / +$61,507. Neither beats the current version in NEW or the recent
+window, so by the declared rule no other time limit is better. Rank
+correlation of NQ Sharpe across these versions: OLD vs NEW 0.29, OLD vs
+recent 0.19, NEW vs recent -0.08. Per-version recent results not saved; not
+committed or pushed until the user decides.

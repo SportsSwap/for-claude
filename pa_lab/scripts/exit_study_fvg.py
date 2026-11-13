@@ -37,6 +37,7 @@ GRID = ["target", "stop_ref", "stop_buffer_atr", "stop_mode", "time_exit", "mana
 NEWS_VALUES = ["trade", "skip"]
 SETS = ["NQ_OLD", "ES_OLD", "NQ_NEW", "ES_NEW"]
 _G = {}
+_ACTIVE = list(SETS)
 
 
 def base_version() -> dict:
@@ -47,13 +48,17 @@ def base_version() -> dict:
     raise KeyError(BASE_ID)
 
 
-def grid(targets=None) -> list[dict]:
+def grid(targets=None, times=None) -> list[dict]:
     spec, base = dials.build_spec(), base_version()
     vals = []
     for d in GRID:
         v = NEWS_VALUES if d == "news" else dials.valid_values(spec, base, d)
         if d == "target" and targets:
             v = targets       # D53: targets outside the locked rulebook, side study only
+        if d == "time_exit" and times:
+            v = times         # D55: longer time limits, side study only
+        if d == "stop_ref" and times:
+            v = [x for x in v if x != "touch_wick"]   # identical to beyond_level for a limit entry (D52)
         vals.append(v)
     out = []
     for combo in itertools.product(*vals):
@@ -78,7 +83,7 @@ def load_markets() -> dict:
 def _work(item):
     i, v = item
     row = {"i": i, **{d: v[d] for d in GRID}}
-    for s in SETS:
+    for s in _ACTIVE:
         mk = _G[s]
         try:
             tr = sg.run_version(mk, v)
@@ -98,7 +103,8 @@ def run(a) -> int:
     out = P.results() / "exit_study_fvg"
     out.mkdir(parents=True, exist_ok=True)
     targets = [t.strip() for t in a.targets.split(",")] if a.targets else None
-    vs = grid(targets)
+    times = [f"bars_{int(t)}" for t in a.times.split(",")] if a.times else None
+    vs = grid(targets, times)
     if a.limit:
         vs = vs[:: max(1, len(vs) // a.limit)][: a.limit]
     print(f"{len(vs)} versions x {len(SETS)} sets", flush=True)
@@ -206,12 +212,154 @@ def report(a) -> int:
     return 0
 
 
+# =========================================================================== D55 / D56: time limit x target, and the recent window
+TT = "time_target"
+T_ORDER = ["1R", "1.5R", "2R", "3R", "4R", "5R", "6R", "8R", "10R", "15R", "20R", "30R", "1000R"]
+TIME_ORDER = ["bars_24", "bars_96", "bars_192", "bars_288", "bars_480", "bars_720", "bars_960"]
+CURRENT = {"target": "3R", "stop_ref": "beyond_level", "stop_buffer_atr": 0.1, "stop_mode": "hard", "time_exit": "bars_96",
+           "management": "hold", "fvg_min_gap_atr": 0.1, "fvg_max_age_bars": 24, "news": "skip"}
+
+
+def _match(df, spec):
+    m = np.ones(len(df), bool)
+    for k, x in spec.items():
+        m &= np.asarray(np.isclose(df[k].astype(float), x) if isinstance(x, float) else (df[k] == x))
+    return df[m]
+
+
+def tt_table(df, col, how="mean"):
+    t = df.pivot_table(index="time_exit", columns="target", values=col, aggfunc=how)
+    return t.reindex(index=TIME_ORDER, columns=T_ORDER)
+
+
+def picks(df) -> dict:
+    """Chosen by rule from OLD and NEW only (D55b, D56a)."""
+    old, new = _pick(df, "OLD", 100), _pick(df, "NEW", 30)
+    el = df[(df["NQ_OLD_trades"] >= 100) & (df["NQ_NEW_trades"] >= 30)].copy()
+    el["worst_sharpe"] = el[[f"{s}_sharpe" for s in SETS]].min(axis=1)
+    st = el.sort_values("worst_sharpe", ascending=False)
+    cur = _match(df, CURRENT)
+    return {"best_on_OLD": old.iloc[:1], "best_on_OLD_top10": old.iloc[:10], "best_on_NEW": new.iloc[:1],
+            "best_on_NEW_top10": new.iloc[:10], "steadiest": st.iloc[:1], "steadiest_top10": st.iloc[:10],
+            "current_3x": cur, "current_4x": _match(df, {**CURRENT, "target": "4R"}),
+            "current_5x": _match(df, {**CURRENT, "target": "5R"})}
+
+
+def report_tt(a) -> int:
+    out = P.results() / "exit_study_fvg"
+    df = io.read_table(out / f"all_{TT}.parquet")
+    pd.set_option("display.width", 260)
+    for s in SETS:
+        t = tt_table(df, f"{s}_sharpe").round(2)
+        io.write_table(t.reset_index(), out / f"tt_mean_sharpe_{s}.csv")
+        print(f"\nmean Sharpe over matched groups, {s}\n{t.to_string()}")
+    fam = df
+    for k, x in CURRENT.items():
+        if k not in ("target", "time_exit"):
+            fam = _match(fam, {k: x})
+    for s in SETS:
+        t = tt_table(fam, f"{s}_net", "first").round(0)
+        io.write_table(t.reset_index(), out / f"tt_current_family_net_{s}.csv")
+        print(f"\ncurrent version family, net $, {s}\n{t.to_string()}")
+        if s.startswith("NQ"):
+            print(tt_table(fam, f"{s}_sharpe", "first").round(2).to_string())
+            print(tt_table(fam, f"{s}_trades", "first").to_string())
+    pk = picks(df)
+    cols = GRID + [f"{s}_{m}" for s in SETS for m in ("trades", "net", "sharpe")]
+    for name, g in pk.items():
+        print(f"\n{name}\n{g[cols].round(2).to_string(index=False)}")
+    both = df[(df["NQ_OLD_trades"] >= 100) & (df["NQ_NEW_trades"] >= 30)]
+    summ = {"versions": int(len(df)),
+            "share_profitable": {s: round(float((df[f"{s}_net"] > 0).mean()), 3) for s in SETS},
+            "share_profitable_on_all_four": round(float(np.logical_and.reduce([df[f"{s}_net"] > 0 for s in SETS]).mean()), 3),
+            "nq_sharpe_0p5_both_periods_and_es_profitable_both": int(((df.NQ_OLD_sharpe >= .5) & (df.NQ_NEW_sharpe >= .5) & (df.ES_OLD_net > 0) & (df.ES_NEW_net > 0)).sum()),
+            "max_sharpe": {s: round(float(df[f"{s}_sharpe"].max()), 2) for s in SETS},
+            "rank_correlation_old_vs_new": {m: round(float(both[f"{m}_OLD_sharpe"].rank().corr(both[f"{m}_NEW_sharpe"].rank())), 2) for m in ("NQ", "ES")},
+            **stamp()}
+    io.write_json(summ, out / "summary_time_target.json")
+    print(json.dumps(summ, indent=1))
+    return 0
+
+
+def _year_table(mk, tr):
+    d = engine.daily_pnl(mk, tr)
+    yr = np.array([x.year for x in d.index])
+    return {int(y): round(float(d[yr == y].sum())) for y in sorted(set(yr))}, d
+
+
+def final_tt(a) -> int:
+    """D56: one logged unlock; the grid is scored on Aug 2024 .. Nov 2026, summaries and picks only."""
+    from lab import final_test as ft
+    global _ACTIVE
+    out = P.results() / "exit_study_fvg"
+    df = io.read_table(out / f"all_{TT}.parquet")
+    pk = picks(df)
+    base = base_version()
+    vs = [{**base, **{d: (r[d].item() if hasattr(r[d], "item") else r[d]) for d in GRID}} for _, r in df.iterrows()]
+    t0 = time.time()
+    _G.update(load_markets())
+    loaded = ft.load_frames("final")                      # the unlock happens (and closes) inside
+    _, start, end = ft.window_for("final")
+    for m in ("NQ", "ES"):
+        bars, rolls = loaded["frames"][m]
+        _G[f"{m}_FIN"], _ = ft.build_market(m, bars, rolls, start)
+    print(f"markets loaded, recent window {start} .. {end} ({time.time() - t0:.0f}s)", flush=True)
+    # check: the current version must reproduce the saved final-test result
+    cur_v = vs[int(pk["current_3x"]["i"].iloc[0])]
+    chk = sg.run_version(_G["NQ_FIN"], cur_v)
+    print("check current version on recent NQ:", len(chk), round(float(chk["dollars"].sum())), flush=True)
+    _ACTIVE = ["NQ_FIN", "ES_FIN"]
+    rows = []
+    with mp.get_context("fork").Pool(a.workers) as pool:
+        for k, r in enumerate(pool.imap_unordered(_work, [(int(i), v) for i, v in zip(df["i"], vs)], chunksize=16)):
+            rows.append(r)
+            if k % 5000 == 4999:
+                print(f"  {k + 1}/{len(vs)} ({time.time() - t0:.0f}s)", flush=True)
+    fin = pd.DataFrame(rows).sort_values("i").reset_index(drop=True)      # kept in memory only (D56b)
+    FS = ["NQ_FIN", "ES_FIN"]
+    agg = {"versions": int(len(fin)), "window": [str(start), str(end)],
+           "check_current_nq": {"trades": int(len(chk)), "net": round(float(chk["dollars"].sum()))},
+           "share_profitable": {s: round(float((fin[f"{s}_net"] > 0).mean()), 3) for s in FS},
+           "sharpe_quantiles": {s: {q: round(float(fin[f"{s}_sharpe"].quantile(float(q))), 2) for q in ("0.1", "0.5", "0.9")} for s in FS},
+           "net_quantiles": {s: {q: round(float(fin[f"{s}_net"].quantile(float(q)))) for q in ("0.1", "0.5", "0.9")} for s in FS}}
+    for s in FS:
+        for metric in ("sharpe", "net"):
+            io.write_table(tt_table(fin, f"{s}_{metric}").round(2).reset_index(), out / f"tt_mean_{metric}_{s}.csv")
+    res = {}
+    fin_i = fin.set_index("i")
+    for name, g in pk.items():
+        ids = [int(x) for x in g["i"]]
+        f = fin_i.loc[ids]
+        r = {"n": len(ids), "dials": {d: (g[d].iloc[0].item() if hasattr(g[d].iloc[0], "item") else g[d].iloc[0]) for d in GRID} if len(ids) == 1 else "average of 10"}
+        for s in SETS:
+            r[s] = {"trades": round(float(g[f"{s}_trades"].mean()), 1), "net": round(float(g[f"{s}_net"].mean())), "sharpe": round(float(g[f"{s}_sharpe"].mean()), 2)}
+        for s in FS:
+            r[s] = {"trades": round(float(f[f"{s}_trades"].mean()), 1), "net": round(float(f[f"{s}_net"].mean())), "sharpe": round(float(f[f"{s}_sharpe"].mean()), 2),
+                    "percentile_in_grid_by_sharpe": round(float((fin[f"{s}_sharpe"] < f[f"{s}_sharpe"].mean()).mean()) * 100)}
+        r["holds"] = bool(r["NQ_FIN"]["net"] > 0 and r["NQ_FIN"]["sharpe"] >= 0.5 and r["ES_FIN"]["net"] > 0)
+        if len(ids) == 1:
+            v = vs[int(np.flatnonzero(df["i"].to_numpy() == ids[0])[0])]
+            r["by_year"] = {}
+            for m in ("NQ", "ES"):
+                yy = {}
+                for per in ("OLD", "NEW", "FIN"):
+                    y, _ = _year_table(_G[f"{m}_{per}"], sg.run_version(_G[f"{m}_{per}"], v))
+                    for k2, x in y.items():
+                        yy[k2] = yy.get(k2, 0) + x
+                r["by_year"][m] = yy
+        res[name] = r
+    io.write_json({"aggregates": agg, "picks": res, **stamp()}, out / "recent_window_picks.json")
+    print(json.dumps({"aggregates": agg, "picks": res}, indent=1, default=str))
+    return 0
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["run", "report", "count"])
+    ap.add_argument("cmd", choices=["run", "report", "count", "report_tt", "final_tt"])
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--limit", type=int, default=0, help="pilot: run about this many versions, evenly spaced")
     ap.add_argument("--targets", default="", help="comma list of targets to use instead of the rulebook's, e.g. 6R,7R")
+    ap.add_argument("--times", default="", help="comma list of time limits in trigger bars, e.g. 96,192,480")
     ap.add_argument("--tag", default="", help="suffix for the output file when --targets is used")
     a = ap.parse_args(argv)
     if a.cmd == "count":
@@ -219,6 +367,10 @@ def main(argv=None) -> int:
         spec, base = dials.build_spec(), base_version()
         print(len(vs), {d: (NEWS_VALUES if d == "news" else dials.valid_values(spec, base, d)) for d in GRID})
         return 0
+    if a.cmd == "report_tt":
+        return report_tt(a)
+    if a.cmd == "final_tt":
+        return final_tt(a)
     return run(a) if a.cmd == "run" else report(a)
 
 
