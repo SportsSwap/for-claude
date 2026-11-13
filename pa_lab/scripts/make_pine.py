@@ -400,6 +400,20 @@ def main() -> int:
         min_gap=f["fvg_min_gap_atr"], buf=f["stop_buffer_atr"], target=float(f["target"].rstrip("R")),
         timebars=int(f["time_exit"].split("_")[1]), skip_news="true" if f["news"] == "skip" else "false",
         news=news))
+    # Try-out copies with a different take profit (decisions.md D52). The main script is untouched.
+    main_fvg = (out / "palab_daily_fvg_1h.pine").read_text()
+    for r in (4, 5):
+        v = main_fvg
+        for a, b_ in (
+                ("// Price Action Lab survivor: C-fair_value_gap-00364\n",
+                 f"// TRY-OUT COPY of C-fair_value_gap-00364 with the take profit changed from 3x to {r}x risk.\n"
+                 "// This copy is not the version the lab's final test checked. Numbers below are for the 3x original:\n"),
+                ('strategy("PA Lab Daily Fair Value Gap, 1h", shorttitle="PALab Daily FVG"',
+                 f'strategy("PA Lab Daily Fair Value Gap, 1h, {r}x target", shorttitle="PALab Daily FVG {r}x"'),
+                ("float TARGET_R    = 3.0 ", f"float TARGET_R    = {r}.0 ")):
+            assert v.count(a) == 1, a
+            v = v.replace(a, b_)
+        (out / f"palab_daily_fvg_1h_{r}x.pine").write_text(v)
     (out / "palab_daily_fvg_etf_1h.pine").write_text(FVG_ETF.format(
         vid="C-fair_value_gap-00364", min_gap=f["fvg_min_gap_atr"], buf=f["stop_buffer_atr"],
         target=float(f["target"].rstrip("R")), skip_news="true" if f["news"] == "skip" else "false", news=news))

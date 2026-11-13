@@ -1,0 +1,29 @@
+{
+  "versions": 8064,
+  "sets": [
+    "NQ_OLD",
+    "ES_OLD",
+    "NQ_NEW",
+    "ES_NEW"
+  ],
+  "grid": [
+    "target",
+    "stop_ref",
+    "stop_buffer_atr",
+    "stop_mode",
+    "time_exit",
+    "management",
+    "fvg_min_gap_atr",
+    "fvg_max_age_bars",
+    "news"
+  ],
+  "wall_seconds": 98,
+  "errors": 0,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-13T11:11:18+00:00"
+}

@@ -701,3 +701,72 @@ the difference; 2014 has full data and lost on both versions. What stands:
 both versions made money in 2018 onward and not before, and the edge found on
 2022-2026 is not a stable property of these markets. Files:
 results/history_2013_2021/. No further versions are tried on this data.
+
+D51. **"Is 3R the best take profit? Run thousands of tests", declared before
+looking.** The user asked for it, so the 2013-2021 data is reopened for this
+study; from here on it is no longer a clean check for anything picked from it.
+The sealed window stays closed. `scripts/exit_study_fvg.py`:
+(a) Grid: the daily fair value gap entry of C-fair_value_gap-00364 (daily
+setup, 1h trigger, limit at the gap, both directions) with every valid
+combination of target (1R, 1.5R, 2R, 3R, 4R, 5R, next swing), stop reference,
+stop buffer, stop mode, time exit, management, minimum gap, gap age and news
+(trade / skip): about 8,000 versions.
+(b) Each runs on four sets: NQ and ES, OLD = 2013-01 to 2021-09 and NEW =
+2022-01 to 2024-07 (the discovery window). Same engine and costs.
+(c) The take-profit question: versions are matched so only the target
+differs; each target is scored by average R per trade (scale-free) and by
+Sharpe, per set. A target counts as better than 3R only if it beats 3R in
+both OLD and NEW on NQ and is not worse than 3R on ES in both.
+(d) The "most optimized" question, walk-forward both ways: the best version
+on OLD (highest NQ Sharpe, at least 100 trades, ES net above zero) is scored
+on NEW, and the best on NEW (at least 30 trades, ES net above zero) is scored
+on OLD; the same for the top 10 averaged; plus the rank correlation of NQ
+Sharpe between OLD and NEW across all versions.
+(e) A replacement script is issued only if a pick made on one period has NQ
+Sharpe of 0.5 or more with ES net above zero on the other period, in both
+directions. Otherwise the answer is that tuning does not help, and the
+scripts stay as they are.
+
+D52. **Result of D51: the take profit barely matters, and no setting works in
+both periods.** 8,064 runs per set (about 3,000 truly different versions: gap
+age changes nothing on a daily setup with a 96-hour order, and "touch wick"
+equals "beyond level" for a limit entry). Averaged over 1,152 matched groups,
+every target from 1R to 5R scores within about 0.01 R per trade of the others
+in each set (NQ OLD about -0.19, NQ NEW about -0.03); next swing is clearly
+worse. 5R meets the declared "better than 3R" rule, but by 0.003 to 0.013 R,
+and beats 3R in fewer than half the matched groups. For the current version
+alone, 4R and 5R are a little ahead of 3R in both periods on both markets
+(NQ OLD +$11,294 / +$14,187 vs +$8,574; NQ NEW +$87,489 / +$87,901 vs
++$73,394), and every target leaves 2013-2021 near break-even (Sharpe 0.14 at
+most). Whole grid: profitable on NQ OLD 18%, NQ NEW 60%, on all four sets 3%;
+no version has NQ Sharpe 0.5 or more in both periods with ES profitable; the
+best NQ Sharpe anywhere in OLD is 0.52. Walk-forward: the best on OLD (1.5R,
+gap at least 0.25 ATR, no stop buffer, news skipped; OLD Sharpe 0.42) made
+NQ +$40,458 (Sharpe 0.84) and ES +$15,064 on NEW, so it passes; the best on
+NEW (Sharpe 1.65) made NQ -$7,335 (Sharpe -0.07) on OLD, so it fails. Rank
+correlation of Sharpe between periods: NQ 0.49, ES 0.07. By rule (e) no
+replacement is issued. At the user's instruction nothing in tradingview/ was
+changed and this study is not committed or pushed until the user decides.
+
+D53. **Higher take profits (6R and up), declared before looking.** The user
+asked for targets above 5R. The locked rulebook stops at 5R, so these are
+outside the 592 billion counted versions and are reported as a side study,
+not as lab versions. Same grid as D51 (every other exit and gap setting, both
+news choices) with targets 6R, 7R, 8R, 9R, 10R, 12R, 15R and 20R, on the same
+four sets (NQ and ES, OLD and NEW); the sealed window stays closed. Scored as
+in D51(c) against 3R, matched on every other setting. Expected before
+running: with a 96-hour time limit, far targets are rarely reached, so the
+results should flatten into "exit at the time limit". Try-out Pine copies at
+4x and 5x were issued at the user's request; the main 3R script is unchanged.
+
+D54. **Result of D53: above about 5R the take profit stops mattering.**
+9,216 more runs per set. Averaged over the 1,152 matched groups, every target
+from 3R to 20R gives the same picture: NQ OLD average net -$11,600 to
+-$13,000 (Sharpe -0.17 to -0.20), NQ NEW +$28,700 to +$29,800 (Sharpe 0.36 to
+0.38); no target beats 3R in more than about half the groups on NQ OLD or
+more than 30% on NQ NEW. For the current version alone: NQ OLD +$7,790 (6R)
+to +$14,999 (12R) against +$8,574 at 3R, Sharpe 0.08 to 0.15 throughout; NQ
+NEW +$89,607 at 6R and +$92,196 for every target from 7R to 20R (identical,
+because no trade gets that far inside the 96-hour limit, so the time limit is
+doing the exiting). No higher target turns 2013-2021 into a working period.
+No change to any script.
