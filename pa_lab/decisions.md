@@ -877,3 +877,29 @@ window, so by the declared rule no other time limit is better. Rank
 correlation of NQ Sharpe across these versions: OLD vs NEW 0.29, OLD vs
 recent 0.19, NEW vs recent -0.08. Per-version recent results not saved; not
 committed or pushed until the user decides.
+
+D60. **The 15-minute breakout, thousands of variations, declared before
+looking.** The user asked for the same search as for the daily gap.
+`scripts/breakout_study.py`, around C-breakout-00051 (15m setup and trigger,
+market entry at the close through the level, both directions, no
+confirmation candle; those stay fixed, and long-only or short-only is left
+out on purpose because the index rose through almost all of 2013-2026, so a
+long-only version would look good from drift alone).
+(a) Varied: target (1R, 1.5R, 2R, 3R, 4R, 5R), stop reference, stop buffer,
+stop mode, management, time exit (flat at 16:00, 24, 96 or 192 bars; 192 is
+outside the rulebook), swing strength (2, 3, 5), level touches (2, 3, 4),
+level tolerance, level shape, session, first-break-only, news (trade / skip)
+and trend filter (off, 15m, daily). The full product is about 2.2 million,
+so 30,000 are drawn at random with the lab seed (stream
+"breakout_study"), plus the current version.
+(b) Sets: NQ and ES on OLD (2013-2021) and NEW (2022 to Jul 2024). The
+recent window is read once more under the D56 rules (fourth logged unlock):
+nothing is picked on it; only the picks' results and summaries are kept.
+(c) Picks, made on OLD and NEW alone, with at least 300 OLD and 100 NEW
+trades on NQ: best on OLD and best on NEW (highest NQ Sharpe with ES net
+above zero), the steadiest (highest worst-case Sharpe across the four open
+sets), the top 10 of each averaged, and the current version.
+(d) A replacement is issued only if the best on OLD passes on NEW and the
+best on NEW passes on OLD (NQ Sharpe 0.5 or more, ES net above zero), as in
+D51(e). The steadiest version is hindsight on the open data and can only be
+a try-out copy. The effect of each setting is reported as an average per set.
