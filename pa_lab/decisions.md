@@ -955,3 +955,19 @@ longs in the recent window, so it is not only market drift: pass. (4) The
 volatility gate raises NQ average R in OLD (-0.019 against -0.051) and NEW
 (+0.104 against +0.037) but lowers it in the recent window (+0.015 against
 +0.027), and is mixed on ES: fail. Verdict: the scripts stay as they are.
+
+D63. **Running both survivors together (no settings involved).** Asked for
+any way to raise returns, the one lever that needs no tuning is to trade the
+breakout and the daily gap side by side on NQ, one contract each. From the
+saved daily results: their daily P&L is uncorrelated (-0.09 over all years;
+-0.07, -0.04 and -0.12 by period). Per period, breakout / gap / both, NQ net
+and worst drawdown: 2013-2021 +$34,344 ($72,340) / +$8,574 ($28,754) /
++$42,918 ($79,860); 2022 to Jul 2024 +$160,561 ($69,369) / +$73,394
+($14,167) / +$233,954 ($63,615); Aug 2024 to Nov 2026 +$112,064 ($77,207) /
++$100,990 ($34,888) / +$213,055 ($60,833). All years: +$489,927, Sharpe 0.82
+against 0.57 and 0.59 alone, worst drawdown $79,860. The profit adds up
+while the drawdown stays about the size of the breakout's own, and in the
+two later periods it is smaller. ES adds nothing (both together +$84,664
+with a $122,028 drawdown). The old years stay weak (+$42,918 over nine
+years), and both versions were chosen with the same hindsight, so this is a
+portfolio fact about the past, not new evidence of an edge.
