@@ -1,0 +1,548 @@
+{
+  "versions": 30001,
+  "errors": 0,
+  "recent_window": [
+    "2024-08-01",
+    "2026-11-06"
+  ],
+  "check_current": {
+    "NQ_OLD": {
+      "trades": 3383,
+      "net": 34344,
+      "sharpe": 0.17
+    },
+    "ES_OLD": {
+      "trades": 3290,
+      "net": -65028,
+      "sharpe": -0.51
+    },
+    "NQ_NEW": {
+      "trades": 1086,
+      "net": 160561,
+      "sharpe": 1.27
+    },
+    "ES_NEW": {
+      "trades": 1067,
+      "net": 43873,
+      "sharpe": 0.58
+    },
+    "NQ_FIN": {
+      "trades": 941,
+      "net": 112064,
+      "sharpe": 0.72
+    },
+    "ES_FIN": {
+      "trades": 993,
+      "net": 45704,
+      "sharpe": 0.59
+    }
+  },
+  "eligible_for_picks": 26472,
+  "share_profitable": {
+    "NQ_OLD": 0.388,
+    "ES_OLD": 0.094,
+    "NQ_NEW": 0.748,
+    "ES_NEW": 0.431,
+    "NQ_FIN": 0.563,
+    "ES_FIN": 0.278
+  },
+  "median_sharpe": {
+    "NQ_OLD": -0.14,
+    "ES_OLD": -0.7,
+    "NQ_NEW": 0.39,
+    "ES_NEW": -0.13,
+    "NQ_FIN": 0.1,
+    "ES_FIN": -0.43
+  },
+  "sharpe_p90": {
+    "NQ_OLD": 0.43,
+    "ES_OLD": -0.02,
+    "NQ_NEW": 1.14,
+    "ES_NEW": 0.77,
+    "NQ_FIN": 0.88,
+    "ES_FIN": 0.47
+  },
+  "max_sharpe_open": {
+    "NQ_OLD": 1.2,
+    "ES_OLD": 0.87,
+    "NQ_NEW": 2.45,
+    "ES_NEW": 2.17
+  },
+  "share_profitable_on_all_four_open": 0.0424,
+  "nq_sharpe_0p5_both_open_periods_and_es_profitable_both": 146,
+  "rank_correlation_nq": {
+    "OLD_vs_NEW": 0.27,
+    "OLD_vs_recent": 0.18,
+    "NEW_vs_recent": 0.1
+  },
+  "replacement_rule": {
+    "best_on_OLD_on_NEW": true,
+    "best_on_NEW_on_OLD": false
+  },
+  "replacement_issued": false,
+  "picks": {
+    "current": {
+      "n": 1,
+      "dials": {
+        "target": "1R",
+        "stop_ref": "last_swing",
+        "stop_buffer_atr": 0.1,
+        "stop_mode": "hard",
+        "management": "hold",
+        "time_exit": "bars_96",
+        "swing_strength": 3,
+        "level_min_touches": 3,
+        "level_tol_atr": 0.25,
+        "level_shape": "line",
+        "session": "ny",
+        "fresh_breakouts_only": "off",
+        "news": "trade",
+        "trend_filter": "off"
+      },
+      "NQ_OLD": {
+        "trades": 3383.0,
+        "net": 34344,
+        "sharpe": 0.17
+      },
+      "ES_OLD": {
+        "trades": 3290.0,
+        "net": -65028,
+        "sharpe": -0.51
+      },
+      "NQ_NEW": {
+        "trades": 1086.0,
+        "net": 160561,
+        "sharpe": 1.27
+      },
+      "ES_NEW": {
+        "trades": 1067.0,
+        "net": 43873,
+        "sharpe": 0.58
+      },
+      "NQ_FIN": {
+        "trades": 941.0,
+        "net": 112064,
+        "sharpe": 0.72,
+        "percentile_in_grid_by_sharpe": 85
+      },
+      "ES_FIN": {
+        "trades": 993.0,
+        "net": 45704,
+        "sharpe": 0.59,
+        "percentile_in_grid_by_sharpe": 93
+      },
+      "holds_recent": true,
+      "by_year": {
+        "NQ": {
+          "2013": -17067,
+          "2014": -11197,
+          "2015": -1497,
+          "2016": -19763,
+          "2017": -534,
+          "2018": 24182,
+          "2019": 6414,
+          "2020": 28950,
+          "2021": 24855,
+          "2022": 156698,
+          "2023": -36276,
+          "2024": 36260,
+          "2025": 39258,
+          "2026": 76684
+        },
+        "ES": {
+          "2013": -23046,
+          "2014": -4530,
+          "2015": -12244,
+          "2016": -37878,
+          "2017": -9851,
+          "2018": 5678,
+          "2019": -15952,
+          "2020": 26500,
+          "2021": 6295,
+          "2022": 39288,
+          "2023": 1800,
+          "2024": -10505,
+          "2025": 82943,
+          "2026": -23950
+        }
+      }
+    },
+    "best_on_OLD": {
+      "n": 1,
+      "dials": {
+        "target": "4R",
+        "stop_ref": "touch_wick",
+        "stop_buffer_atr": 0.1,
+        "stop_mode": "hard",
+        "management": "hold",
+        "time_exit": "bars_96",
+        "swing_strength": 3,
+        "level_min_touches": 2,
+        "level_tol_atr": 0.1,
+        "level_shape": "box",
+        "session": "ny",
+        "fresh_breakouts_only": "on",
+        "news": "skip",
+        "trend_filter": "setup_chart"
+      },
+      "NQ_OLD": {
+        "trades": 770.0,
+        "net": 111910,
+        "sharpe": 1.17
+      },
+      "ES_OLD": {
+        "trades": 768.0,
+        "net": 12653,
+        "sharpe": 0.21
+      },
+      "NQ_NEW": {
+        "trades": 252.0,
+        "net": 51085,
+        "sharpe": 0.84
+      },
+      "ES_NEW": {
+        "trades": 271.0,
+        "net": 15958,
+        "sharpe": 0.47
+      },
+      "NQ_FIN": {
+        "trades": 211.0,
+        "net": 5372,
+        "sharpe": 0.08,
+        "percentile_in_grid_by_sharpe": 49
+      },
+      "ES_FIN": {
+        "trades": 234.0,
+        "net": -36795,
+        "sharpe": -1.23,
+        "percentile_in_grid_by_sharpe": 17
+      },
+      "holds_recent": false,
+      "by_year": {
+        "NQ": {
+          "2013": -632,
+          "2014": 6133,
+          "2015": 1232,
+          "2016": -2647,
+          "2017": -1766,
+          "2018": 5428,
+          "2019": 11386,
+          "2020": 68705,
+          "2021": 24071,
+          "2022": 47341,
+          "2023": 7563,
+          "2024": -27323,
+          "2025": 24865,
+          "2026": 4010
+        },
+        "ES": {
+          "2013": 109,
+          "2014": -6876,
+          "2015": -2396,
+          "2016": -5946,
+          "2017": -3183,
+          "2018": 2800,
+          "2019": 8578,
+          "2020": 8688,
+          "2021": 10879,
+          "2022": 17430,
+          "2023": 718,
+          "2024": -10902,
+          "2025": -5959,
+          "2026": -22126
+        }
+      }
+    },
+    "best_on_OLD_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 569.2,
+        "net": 80667,
+        "sharpe": 1.03
+      },
+      "ES_OLD": {
+        "trades": 557.0,
+        "net": 7017,
+        "sharpe": 0.14
+      },
+      "NQ_NEW": {
+        "trades": 182.3,
+        "net": 39562,
+        "sharpe": 0.74
+      },
+      "ES_NEW": {
+        "trades": 185.4,
+        "net": 12299,
+        "sharpe": 0.42
+      },
+      "NQ_FIN": {
+        "trades": 155.4,
+        "net": -5313,
+        "sharpe": -0.13,
+        "percentile_in_grid_by_sharpe": 36
+      },
+      "ES_FIN": {
+        "trades": 177.8,
+        "net": -6913,
+        "sharpe": -0.25,
+        "percentile_in_grid_by_sharpe": 60
+      },
+      "holds_recent": false
+    },
+    "best_on_NEW": {
+      "n": 1,
+      "dials": {
+        "target": "5R",
+        "stop_ref": "beyond_level",
+        "stop_buffer_atr": 0.25,
+        "stop_mode": "hard",
+        "management": "exit_on_choch",
+        "time_exit": "flat_1600",
+        "swing_strength": 5,
+        "level_min_touches": 4,
+        "level_tol_atr": 0.5,
+        "level_shape": "line",
+        "session": "ny",
+        "fresh_breakouts_only": "off",
+        "news": "trade",
+        "trend_filter": "off"
+      },
+      "NQ_OLD": {
+        "trades": 6506.0,
+        "net": 7203,
+        "sharpe": 0.06
+      },
+      "ES_OLD": {
+        "trades": 6382.0,
+        "net": -101144,
+        "sharpe": -1.23
+      },
+      "NQ_NEW": {
+        "trades": 1941.0,
+        "net": 208594,
+        "sharpe": 2.45
+      },
+      "ES_NEW": {
+        "trades": 2170.0,
+        "net": 23521,
+        "sharpe": 0.43
+      },
+      "NQ_FIN": {
+        "trades": 1696.0,
+        "net": -2786,
+        "sharpe": -0.03,
+        "percentile_in_grid_by_sharpe": 42
+      },
+      "ES_FIN": {
+        "trades": 1793.0,
+        "net": -55222,
+        "sharpe": -0.93,
+        "percentile_in_grid_by_sharpe": 27
+      },
+      "holds_recent": false,
+      "by_year": {
+        "NQ": {
+          "2013": -6350,
+          "2014": -595,
+          "2015": -12771,
+          "2016": -7802,
+          "2017": 4477,
+          "2018": -6233,
+          "2019": 6863,
+          "2020": 31381,
+          "2021": -1768,
+          "2022": 124830,
+          "2023": 39126,
+          "2024": 54005,
+          "2025": 48828,
+          "2026": -60979
+        },
+        "ES": {
+          "2013": -6466,
+          "2014": -10943,
+          "2015": -17785,
+          "2016": -21504,
+          "2017": -25872,
+          "2018": -15564,
+          "2019": -12306,
+          "2020": 11297,
+          "2021": -2002,
+          "2022": 50676,
+          "2023": -20289,
+          "2024": 6231,
+          "2025": -16657,
+          "2026": -51662
+        }
+      }
+    },
+    "best_on_NEW_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 3406.5,
+        "net": -2258,
+        "sharpe": -0.05
+      },
+      "ES_OLD": {
+        "trades": 3371.1,
+        "net": -59521,
+        "sharpe": -0.72
+      },
+      "NQ_NEW": {
+        "trades": 1071.5,
+        "net": 172715,
+        "sharpe": 2.34
+      },
+      "ES_NEW": {
+        "trades": 1131.6,
+        "net": 31609,
+        "sharpe": 0.76
+      },
+      "NQ_FIN": {
+        "trades": 931.3,
+        "net": 17549,
+        "sharpe": 0.12,
+        "percentile_in_grid_by_sharpe": 51
+      },
+      "ES_FIN": {
+        "trades": 974.1,
+        "net": -15359,
+        "sharpe": -0.34,
+        "percentile_in_grid_by_sharpe": 54
+      },
+      "holds_recent": false
+    },
+    "steadiest": {
+      "n": 1,
+      "dials": {
+        "target": "2R",
+        "stop_ref": "last_swing",
+        "stop_buffer_atr": 0.0,
+        "stop_mode": "close_based",
+        "management": "hold",
+        "time_exit": "bars_96",
+        "swing_strength": 5,
+        "level_min_touches": 2,
+        "level_tol_atr": 0.1,
+        "level_shape": "box",
+        "session": "ny",
+        "fresh_breakouts_only": "on",
+        "news": "trade",
+        "trend_filter": "setup_chart"
+      },
+      "NQ_OLD": {
+        "trades": 419.0,
+        "net": 61757,
+        "sharpe": 0.61
+      },
+      "ES_OLD": {
+        "trades": 464.0,
+        "net": 45678,
+        "sharpe": 0.57
+      },
+      "NQ_NEW": {
+        "trades": 147.0,
+        "net": 72653,
+        "sharpe": 1.02
+      },
+      "ES_NEW": {
+        "trades": 156.0,
+        "net": 26605,
+        "sharpe": 0.66
+      },
+      "NQ_FIN": {
+        "trades": 130.0,
+        "net": 57189,
+        "sharpe": 0.63,
+        "percentile_in_grid_by_sharpe": 81
+      },
+      "ES_FIN": {
+        "trades": 124.0,
+        "net": -21636,
+        "sharpe": -0.51,
+        "percentile_in_grid_by_sharpe": 45
+      },
+      "holds_recent": false,
+      "by_year": {
+        "NQ": {
+          "2013": -164,
+          "2014": 1337,
+          "2015": -5630,
+          "2016": -12848,
+          "2017": 1430,
+          "2018": 10587,
+          "2019": 4499,
+          "2020": 28256,
+          "2021": 34290,
+          "2022": 50052,
+          "2023": -2076,
+          "2024": 50082,
+          "2025": 21278,
+          "2026": 10506
+        },
+        "ES": {
+          "2013": 3851,
+          "2014": -3278,
+          "2015": 12236,
+          "2016": -5728,
+          "2017": -2889,
+          "2018": 11366,
+          "2019": -3770,
+          "2020": 33593,
+          "2021": 298,
+          "2022": 45476,
+          "2023": -12957,
+          "2024": -16857,
+          "2025": -8705,
+          "2026": -1988
+        }
+      }
+    },
+    "steadiest_top10": {
+      "n": 10,
+      "dials": "average of 10",
+      "NQ_OLD": {
+        "trades": 441.0,
+        "net": 49515,
+        "sharpe": 0.63
+      },
+      "ES_OLD": {
+        "trades": 438.3,
+        "net": 32570,
+        "sharpe": 0.57
+      },
+      "NQ_NEW": {
+        "trades": 141.6,
+        "net": 50971,
+        "sharpe": 0.88
+      },
+      "ES_NEW": {
+        "trades": 136.3,
+        "net": 21960,
+        "sharpe": 0.7
+      },
+      "NQ_FIN": {
+        "trades": 126.8,
+        "net": 14067,
+        "sharpe": 0.17,
+        "percentile_in_grid_by_sharpe": 55
+      },
+      "ES_FIN": {
+        "trades": 134.3,
+        "net": 3260,
+        "sharpe": 0.02,
+        "percentile_in_grid_by_sharpe": 73
+      },
+      "holds_recent": false
+    }
+  },
+  "wall_seconds": 840,
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-16T08:15:11+00:00"
+}

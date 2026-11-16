@@ -903,3 +903,55 @@ sets), the top 10 of each averaged, and the current version.
 best on NEW passes on OLD (NQ Sharpe 0.5 or more, ES net above zero), as in
 D51(e). The steadiest version is hindsight on the open data and can only be
 a try-out copy. The effect of each setting is reported as an average per set.
+
+D61. **Four checks on the current breakout, from the council, declared before
+looking** (and before the D60 results are read). C-breakout-00051 unchanged,
+NQ and ES, three periods (OLD 2013-2021, NEW 2022 to Jul 2024, recent Aug
+2024 to Nov 2026; a fifth logged unlock, one fixed version, no search).
+`scripts/breakout_checks.py`.
+(1) Risk units: per year, trades, total R and average R per trade (R = net
+profit of a trade divided by the money risked on it), beside the dollars.
+(2) Random entries: the lab's twin test (each trade gets 1,000 twins with the
+same direction, time of day, stop and target distances in ATR, holding time
+and costs, entered at random). The levels pass when the real trades beat the
+twins with p below 0.05 on NQ in all three periods.
+(3) Long and short separately. The strategy is more than market drift when
+the shorts have a positive average R on NQ in at least two of the three
+periods.
+(4) One volatility gate, fixed now: take a signal only when the average
+daily range of the previous 20 sessions, as a percent of the close, is above
+its median over the previous 252 sessions (at least 126), using sessions
+before the signal only. It passes when the gated trades have a higher
+average R than the ungated strategy on NQ in all three periods and on ES in
+at least two, and the trades it removes have a lower average R on NQ in all
+three. The council pointed out that the gate idea itself came from looking
+at the yearly results, so a pass is a hypothesis for forward trading, not
+proof.
+
+D62. **Results of D60 and D61: no better breakout, and a thin edge.**
+D60, 30,001 versions (fourth logged unlock). Profitable on NQ: OLD 39%, NEW
+75%, recent 56%; on ES 9%, 43%, 28%. Rank correlation of NQ Sharpe: OLD vs
+NEW 0.27, OLD vs recent 0.18, NEW vs recent 0.10. Picks made on the open
+data, NQ net per contract (OLD / NEW / recent): current +$34,344 / +$160,561
+/ +$112,064 (85th percentile of the grid in the recent window, ES 93rd);
+best on OLD +$111,910 / +$51,085 / +$5,372 with ES recent -$36,795; best on
+NEW +$7,203 / +$208,594 / -$2,786 with ES recent -$55,222; steadiest +$61,757
+/ +$72,653 / +$57,189 with ES recent -$21,636; the top-10 averages are near
+zero or negative in the recent window. No pick holds; no replacement.
+Averaged over the grid, a few settings lean the same way in all six sets:
+stop beyond the last swing (already used), skipping news days, levels of 3
+or 4 touches over 2, and not the shortest swing strength.
+D61, the current version (fifth logged unlock). (1) Average R per trade on
+NQ: OLD -0.060, NEW +0.037, recent +0.027; by year only 2020, 2021, 2022,
+2025 and 2026 are positive in R (2018 and 2019 made dollars with slightly
+negative R). ES total R is negative in all three periods (-295.6, -7.2,
+-19.1) although its dollars are positive in the last two: the money came
+from the trades with the largest risk. (2) Against 1,000 sets of random
+twins the real trades sit above the twins' mean in every set on NQ, with
+p = 0.056 (OLD), 0.001 (NEW), 0.063 (recent); ES 0.51, 0.027, 0.036. The
+declared bar (below 0.05 in all three on NQ) is missed narrowly. (3) NQ
+shorts: average R -0.096, +0.031, +0.041, and shorts made more dollars than
+longs in the recent window, so it is not only market drift: pass. (4) The
+volatility gate raises NQ average R in OLD (-0.019 against -0.051) and NEW
+(+0.104 against +0.037) but lowers it in the recent window (+0.015 against
++0.027), and is mixed on ES: fail. Verdict: the scripts stay as they are.

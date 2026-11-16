@@ -44,3 +44,12 @@
 {"utc": "2026-11-16T08:02:05+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 287, "argv": ["scripts/breakout_study.py", "--n", "30000", "--workers", "4"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
 {"utc": "2026-11-16T08:02:05+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 287, "argv": ["scripts/breakout_study.py", "--n", "30000", "--workers", "4"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
 {"utc": "2026-11-16T08:02:05+00:00", "event": "unlock_close", "step": "final_test", "pid": 287, "argv": ["scripts/breakout_study.py", "--n", "30000", "--workers", "4"]}
+{"utc": "2026-11-16T08:17:07+00:00", "event": "unlock_open", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"]}
+{"utc": "2026-11-16T08:17:07+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-16T08:17:07+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-16T08:17:08+00:00", "event": "unlock_close", "step": "final_test", "pid": 680, "argv": ["scripts/breakout_checks.py"]}

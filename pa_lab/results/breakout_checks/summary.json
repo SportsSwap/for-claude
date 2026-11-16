@@ -1,0 +1,350 @@
+{
+  "version": "C-breakout-00051",
+  "periods": {
+    "OLD": "2013-2021",
+    "NEW": "2022-Jul 2024",
+    "FIN": "Aug 2024-Nov 2026"
+  },
+  "NQ_OLD": {
+    "all": {
+      "trades": 3383,
+      "net": 34344,
+      "total_R": -204.1,
+      "avg_R": -0.0603,
+      "win_rate": 0.498
+    },
+    "twins": {
+      "real_trades": 3000,
+      "distinct_entries": 3000,
+      "real_net": 27295.388,
+      "twin_mean_net": -44600.5969,
+      "twin_p95_net": 30062.3495,
+      "p_value": 0.056,
+      "beats_random": false,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 1605,
+      "net": 77939,
+      "total_R": -32.7,
+      "avg_R": -0.0204,
+      "win_rate": 0.527
+    },
+    "short": {
+      "trades": 1778,
+      "net": -43595,
+      "total_R": -171.4,
+      "avg_R": -0.0964,
+      "win_rate": 0.471
+    },
+    "gate_on": {
+      "trades": 1658,
+      "net": 72301,
+      "total_R": -30.7,
+      "avg_R": -0.0185,
+      "win_rate": 0.516
+    },
+    "gate_off": {
+      "trades": 1605,
+      "net": -21360,
+      "total_R": -132.3,
+      "avg_R": -0.0824,
+      "win_rate": 0.486
+    },
+    "gate_defined": {
+      "trades": 3215,
+      "net": 52068,
+      "total_R": -163.8,
+      "avg_R": -0.0509,
+      "win_rate": 0.501
+    },
+    "share_of_signals_gate_on": 0.483
+  },
+  "NQ_NEW": {
+    "all": {
+      "trades": 1086,
+      "net": 160561,
+      "total_R": 40.1,
+      "avg_R": 0.0369,
+      "win_rate": 0.525
+    },
+    "twins": {
+      "real_trades": 1086,
+      "distinct_entries": 1086,
+      "real_net": 160560.5838,
+      "twin_mean_net": -12304.3624,
+      "twin_p95_net": 90742.0042,
+      "p_value": 0.001,
+      "beats_random": true,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 547,
+      "net": 76401,
+      "total_R": 23.4,
+      "avg_R": 0.0427,
+      "win_rate": 0.537
+    },
+    "short": {
+      "trades": 539,
+      "net": 84159,
+      "total_R": 16.7,
+      "avg_R": 0.031,
+      "win_rate": 0.512
+    },
+    "gate_on": {
+      "trades": 411,
+      "net": 131454,
+      "total_R": 42.8,
+      "avg_R": 0.1042,
+      "win_rate": 0.555
+    },
+    "gate_off": {
+      "trades": 684,
+      "net": 27958,
+      "total_R": -6.7,
+      "avg_R": -0.0097,
+      "win_rate": 0.504
+    },
+    "gate_defined": {
+      "trades": 1086,
+      "net": 160561,
+      "total_R": 40.1,
+      "avg_R": 0.0369,
+      "win_rate": 0.525
+    },
+    "share_of_signals_gate_on": 0.357
+  },
+  "NQ_FIN": {
+    "all": {
+      "trades": 941,
+      "net": 112064,
+      "total_R": 25.0,
+      "avg_R": 0.0266,
+      "win_rate": 0.525
+    },
+    "twins": {
+      "real_trades": 941,
+      "distinct_entries": 941,
+      "real_net": 112064.3321,
+      "twin_mean_net": -16477.3353,
+      "twin_p95_net": 118730.0393,
+      "p_value": 0.063,
+      "beats_random": false,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 481,
+      "net": 37692,
+      "total_R": 6.2,
+      "avg_R": 0.0129,
+      "win_rate": 0.524
+    },
+    "short": {
+      "trades": 460,
+      "net": 74372,
+      "total_R": 18.8,
+      "avg_R": 0.041,
+      "win_rate": 0.526
+    },
+    "gate_on": {
+      "trades": 602,
+      "net": 89927,
+      "total_R": 9.2,
+      "avg_R": 0.0152,
+      "win_rate": 0.522
+    },
+    "gate_off": {
+      "trades": 346,
+      "net": 35065,
+      "total_R": 17.3,
+      "avg_R": 0.05,
+      "win_rate": 0.532
+    },
+    "gate_defined": {
+      "trades": 941,
+      "net": 112064,
+      "total_R": 25.0,
+      "avg_R": 0.0266,
+      "win_rate": 0.525
+    },
+    "share_of_signals_gate_on": 0.595
+  },
+  "ES_OLD": {
+    "all": {
+      "trades": 3290,
+      "net": -65028,
+      "total_R": -295.6,
+      "avg_R": -0.0898,
+      "win_rate": 0.498
+    },
+    "twins": {
+      "real_trades": 3000,
+      "distinct_entries": 3000,
+      "real_net": -78331.3141,
+      "twin_mean_net": -77794.3866,
+      "twin_p95_net": -19634.4007,
+      "p_value": 0.509,
+      "beats_random": false,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 1591,
+      "net": 18056,
+      "total_R": -84.9,
+      "avg_R": -0.0533,
+      "win_rate": 0.523
+    },
+    "short": {
+      "trades": 1699,
+      "net": -83084,
+      "total_R": -210.7,
+      "avg_R": -0.124,
+      "win_rate": 0.476
+    },
+    "gate_on": {
+      "trades": 1424,
+      "net": -15004,
+      "total_R": -128.5,
+      "avg_R": -0.0902,
+      "win_rate": 0.488
+    },
+    "gate_off": {
+      "trades": 1743,
+      "net": -21803,
+      "total_R": -113.1,
+      "avg_R": -0.0649,
+      "win_rate": 0.515
+    },
+    "gate_defined": {
+      "trades": 3133,
+      "net": -40772,
+      "total_R": -244.7,
+      "avg_R": -0.0781,
+      "win_rate": 0.502
+    },
+    "share_of_signals_gate_on": 0.411
+  },
+  "ES_NEW": {
+    "all": {
+      "trades": 1067,
+      "net": 43873,
+      "total_R": -7.2,
+      "avg_R": -0.0068,
+      "win_rate": 0.516
+    },
+    "twins": {
+      "real_trades": 1067,
+      "distinct_entries": 1067,
+      "real_net": 43872.5856,
+      "twin_mean_net": -26126.7663,
+      "twin_p95_net": 33356.5704,
+      "p_value": 0.027,
+      "beats_random": true,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 524,
+      "net": 13471,
+      "total_R": -11.0,
+      "avg_R": -0.0209,
+      "win_rate": 0.517
+    },
+    "short": {
+      "trades": 543,
+      "net": 30401,
+      "total_R": 3.7,
+      "avg_R": 0.0069,
+      "win_rate": 0.516
+    },
+    "gate_on": {
+      "trades": 455,
+      "net": 13578,
+      "total_R": 20.8,
+      "avg_R": 0.0457,
+      "win_rate": 0.543
+    },
+    "gate_off": {
+      "trades": 624,
+      "net": 20617,
+      "total_R": -38.4,
+      "avg_R": -0.0616,
+      "win_rate": 0.489
+    },
+    "gate_defined": {
+      "trades": 1067,
+      "net": 43873,
+      "total_R": -7.2,
+      "avg_R": -0.0068,
+      "win_rate": 0.516
+    },
+    "share_of_signals_gate_on": 0.369
+  },
+  "ES_FIN": {
+    "all": {
+      "trades": 993,
+      "net": 45704,
+      "total_R": -19.1,
+      "avg_R": -0.0192,
+      "win_rate": 0.507
+    },
+    "twins": {
+      "real_trades": 993,
+      "distinct_entries": 993,
+      "real_net": 45704.1626,
+      "twin_mean_net": -26352.3194,
+      "twin_p95_net": 38959.5759,
+      "p_value": 0.036,
+      "beats_random": true,
+      "sets": 1000
+    },
+    "long": {
+      "trades": 492,
+      "net": 21992,
+      "total_R": -27.0,
+      "avg_R": -0.0549,
+      "win_rate": 0.502
+    },
+    "short": {
+      "trades": 501,
+      "net": 23712,
+      "total_R": 7.9,
+      "avg_R": 0.0158,
+      "win_rate": 0.511
+    },
+    "gate_on": {
+      "trades": 573,
+      "net": 48951,
+      "total_R": -8.3,
+      "avg_R": -0.0145,
+      "win_rate": 0.506
+    },
+    "gate_off": {
+      "trades": 431,
+      "net": -5955,
+      "total_R": -12.8,
+      "avg_R": -0.0296,
+      "win_rate": 0.506
+    },
+    "gate_defined": {
+      "trades": 993,
+      "net": 45704,
+      "total_R": -19.1,
+      "avg_R": -0.0192,
+      "win_rate": 0.507
+    },
+    "share_of_signals_gate_on": 0.581
+  },
+  "verdict": {
+    "levels_beat_random_on_NQ_all_three": false,
+    "shorts_positive_avg_R_on_NQ_in_at_least_two": true,
+    "gate_passes": false
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-16T08:17:52+00:00"
+}
