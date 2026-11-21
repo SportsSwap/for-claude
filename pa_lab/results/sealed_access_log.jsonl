@@ -89,3 +89,57 @@
 {"utc": "2026-11-21T20:37:40+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
 {"utc": "2026-11-21T20:37:40+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
 {"utc": "2026-11-21T20:37:40+00:00", "event": "unlock_close", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"]}
+{"utc": "2026-11-21T20:41:44+00:00", "event": "unlock_open", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"]}
+{"utc": "2026-11-21T20:41:44+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:41:45+00:00", "event": "unlock_close", "step": "final_test", "pid": 329, "argv": ["scripts/noise_band_sp500.py"]}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "unlock_open", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"]}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:42:57+00:00", "event": "unlock_close", "step": "final_test", "pid": 379, "argv": ["scripts/noise_band_qqq.py"]}
+{"utc": "2026-11-21T20:43:36+00:00", "event": "unlock_open", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"]}
+{"utc": "2026-11-21T20:43:36+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:43:37+00:00", "event": "unlock_close", "step": "final_test", "pid": 401, "argv": ["scripts/noise_band_search.py"]}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "unlock_open", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"]}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:44:41+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:44:42+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:44:42+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:44:42+00:00", "event": "unlock_close", "step": "final_test", "pid": 429, "argv": ["scripts/noise_band_years.py"]}
+{"utc": "2026-11-21T20:44:49+00:00", "event": "unlock_open", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"]}
+{"utc": "2026-11-21T20:44:49+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:44:49+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:44:50+00:00", "event": "unlock_close", "step": "final_test", "pid": 443, "argv": ["scripts/noise_band_5m_check.py"]}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "unlock_open", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"]}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:44:58+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:44:59+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:44:59+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:44:59+00:00", "event": "unlock_close", "step": "final_test", "pid": 461, "argv": ["scripts/noise_band_sp500.py"]}

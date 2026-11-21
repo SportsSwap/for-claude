@@ -1074,3 +1074,43 @@ closes instead of 1-minute closes. `scripts/noise_band_5m_check.py` measures
 that one difference for both versions on the three periods (an eighth logged
 unlock, two fixed versions, no search); whatever it shows, both chart
 settings stay available.
+
+D69. **Any symbol in TradingView, and one check on the S&P 500, declared
+before looking.** The user asked for the script to work on any stock or
+chart. Changes: the session (open, close, time zone; default 9:30-16:00 New
+York), the 5-day ATR and the previous close are now computed inside the
+script from that session's own bars, and VWAP is anchored to the session
+open, so the numbers match the lab's on any instrument. Check times stay
+"30 minutes after the open until 270 minutes after" and the exit "15 minutes
+before the close". The lab has only one other market, the S&P 500 CFD
+(stand-in for SPY); both versions are run on it unchanged over the three
+periods (a ninth logged unlock, no search). Nothing else was tested, so any
+other stock is untested.
+
+D70. **Correction: every noise-band result so far (D65-D69) exited at 15:15,
+not 15:45.** The exit bar in `scripts/noise_band_qqq.py` was index 344, which
+closes at 15:15; 15:45 is index 374. Found while writing the any-symbol Pine
+script (which has it right). Fixed, and every noise-band script is rerun
+unchanged: the as-written test (D64 rules), the 2,304-version search (D66
+rules, same picks procedure), the year tables, the 5-minute exit check and
+the S&P 500 check (five more logged unlocks, no new choices). The earlier
+numbers stay in this log as they were; the reruns replace them.
+
+D71. **Corrected results (exit at 15:45).** As written, 1,094 trades: QQQ
+move +21.1% / +41.4% / +16.4% (raw, before the 0.02% cost; random-direction
+and random-day tests p < 0.001); 1-day options -$6,674 / -$1,455 / -$4,002 a
+contract, 3-day options -$4,441 / +$1,230 / -$851: still does not hold. On
+QQQ after costs: +7.7% / +36.7% / +12.6%, 57.0% in total, worst drawdown
+11.8%, 9 of 14 years positive. The search (same procedure) again picks, on
+2013-Sep 2021 alone, band 1.25 x 20 days, range +0.15 ATR, 30-minute checks,
+exit on a VWAP cross or 0.5 ATR against; the VWAP entry filter makes no
+difference to it (identical trades with and without; the filter changes
+the trades in only 12 of 1,152 groups of the grid). On QQQ: +30.4% (Sharpe
+0.76) / +21.0% (1.28) / +8.7% (0.63), 60.1% in total, worst drawdown 8.4%,
+13 of 14 years positive. The pick on 2022-Jul 2024 again fails on the other
+two periods. Options: 0% / 25% / 3% of versions profitable with 1-day
+options. With exits judged on 5-minute closes the pick makes +35.1% /
++21.7% / +7.4%. On the S&P 500: as written -18.3% / +15.9% / -3.9%, the pick
+-2.9% / +9.9% / -0.2%. Compounded on QQQ from $10,000: the pick $17,894 at
+1x (4.3%/yr, worst drop 8.2%), $51,159 at 3x (12.5%/yr, 23.2%), $126,268 at
+5x (20.1%/yr, 36.6%); as written $41,105 at 3x with a 34.3% worst drop.

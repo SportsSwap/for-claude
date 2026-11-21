@@ -30,7 +30,7 @@ import run_history_test as ht  # noqa: E402
 RTH = 390                  # 09:30 .. 15:59 bar opens
 OR_END = 15                # bars 09:30 .. 09:44 make the opening range
 CHECKS = np.arange(29, 270, 10)   # closes at 10:00, 10:10, ..., 14:00
-EXIT_BAR = 344             # the bar that closes at 15:45
+EXIT_BAR = 374             # the bar that closes at 15:45 (opens 15:44; was wrongly 344 = 15:15, D70)
 QQQ_RATIO = 41.0           # Nasdaq-100 / QQQ, roughly
 PERIODS = {"2013-Sep 2021": (dt.date(2013, 1, 2), dt.date(2021, 9, 24)),
            "2022-Jul 2024": (dt.date(2022, 1, 3), dt.date(2024, 7, 31)),
@@ -41,12 +41,12 @@ RULES = dict(band_mult=1.25, band_days=20, or_offset_atr=0.3, vwap=True, trail_t
 
 
 # =========================================================================== data
-def load_minutes() -> pd.DataFrame:
-    """All Nasdaq-100 CFD minutes, Dec 2012 .. Nov 2026, one frame (the unlock is logged)."""
-    old, _ = ht.clean_bars(ROOT / "vendor_input" / "dukascopy_2013_2021" / "NQ_1m_backadjusted.parquet")
-    new = io.read_table(P.clean() / "NQ_1m.parquet")
+def load_minutes(market: str = "NQ") -> pd.DataFrame:
+    """All CFD minutes for one market (NQ = Nasdaq-100, ES = S&P 500), Dec 2012 .. Nov 2026 (the unlock is logged)."""
+    old, _ = ht.clean_bars(ROOT / "vendor_input" / "dukascopy_2013_2021" / f"{market}_1m_backadjusted.parquet")
+    new = io.read_table(P.clean() / f"{market}_1m.parquet")
     loaded = ft.load_frames("final")
-    fin = loaded["frames"]["NQ"][0]
+    fin = loaded["frames"][market][0]
     cols = ["ts_event", "open", "high", "low", "close", "volume"]
     m = pd.concat([old[cols], new[cols], fin[cols]], ignore_index=True)
     m["ts_event"] = pd.to_datetime(m["ts_event"], utc=True)

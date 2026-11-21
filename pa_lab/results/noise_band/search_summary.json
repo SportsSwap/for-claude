@@ -2,14 +2,14 @@
   "versions": 2304,
   "qqq": {
     "share_positive": {
-      "OLD": 0.863,
+      "OLD": 0.832,
       "NEW": 1.0,
-      "FIN": 0.891
+      "FIN": 0.913
     },
     "rank_corr_sharpe": {
       "OLD_NEW": -0.26,
-      "OLD_FIN": 0.29,
-      "NEW_FIN": 0.23
+      "OLD_FIN": 0.16,
+      "NEW_FIN": 0.31
     },
     "picks": {
       "as_written": {
@@ -26,25 +26,25 @@
         },
         "OLD": {
           "trades": 670.0,
-          "sum": 11.27,
-          "sharpe": 0.23,
-          "max_dd": 10.46,
+          "sum": 7.67,
+          "sharpe": 0.14,
+          "max_dd": 10.77,
           "win": 0.53
         },
         "NEW": {
           "trades": 236.0,
-          "sum": 36.99,
-          "sharpe": 1.97,
-          "max_dd": 3.89,
+          "sum": 36.71,
+          "sharpe": 1.77,
+          "max_dd": 4.53,
           "win": 0.63
         },
         "FIN": {
           "trades": 188.0,
-          "sum": 8.01,
-          "sharpe": 0.47,
-          "max_dd": 6.12,
-          "win": 0.52,
-          "percentile_by_sharpe": 59
+          "sum": 12.62,
+          "sharpe": 0.71,
+          "max_dd": 6.27,
+          "win": 0.51,
+          "percentile_by_sharpe": 76
         }
       },
       "best_on_OLD": {
@@ -53,7 +53,7 @@
           "band_mult": "1.25",
           "band_days": "20",
           "or_offset_atr": "0.15",
-          "vwap": "False",
+          "vwap": "True",
           "interval": "30",
           "last_check": "14:00",
           "exit": "vwap_cross",
@@ -61,25 +61,25 @@
         },
         "OLD": {
           "trades": 745.0,
-          "sum": 29.53,
+          "sum": 30.44,
           "sharpe": 0.76,
-          "max_dd": 8.73,
-          "win": 0.43
+          "max_dd": 8.42,
+          "win": 0.42
         },
         "NEW": {
           "trades": 264.0,
-          "sum": 19.87,
-          "sharpe": 1.24,
-          "max_dd": 4.88,
+          "sum": 20.95,
+          "sharpe": 1.28,
+          "max_dd": 3.81,
           "win": 0.47
         },
         "FIN": {
           "trades": 208.0,
-          "sum": 7.7,
-          "sharpe": 0.6,
-          "max_dd": 3.98,
-          "win": 0.41,
-          "percentile_by_sharpe": 77
+          "sum": 8.71,
+          "sharpe": 0.63,
+          "max_dd": 3.63,
+          "win": 0.39,
+          "percentile_by_sharpe": 67
         }
       },
       "best_on_NEW": {
@@ -91,30 +91,30 @@
           "vwap": "True",
           "interval": "10",
           "last_check": "14:00",
-          "exit": "trail_1.0",
+          "exit": "trail_0.5",
           "stop_atr": "1.0"
         },
         "OLD": {
           "trades": 453.0,
-          "sum": -8.4,
-          "sharpe": -0.23,
-          "max_dd": 21.23,
-          "win": 0.5
+          "sum": -5.4,
+          "sharpe": -0.14,
+          "max_dd": 17.7,
+          "win": 0.54
         },
         "NEW": {
           "trades": 142.0,
-          "sum": 33.75,
-          "sharpe": 2.48,
+          "sum": 33.33,
+          "sharpe": 2.35,
           "max_dd": 2.88,
-          "win": 0.68
+          "win": 0.7
         },
         "FIN": {
           "trades": 116.0,
-          "sum": 1.14,
-          "sharpe": 0.09,
-          "max_dd": 8.83,
-          "win": 0.47,
-          "percentile_by_sharpe": 17
+          "sum": 1.22,
+          "sharpe": 0.1,
+          "max_dd": 10.16,
+          "win": 0.49,
+          "percentile_by_sharpe": 14
         }
       },
       "steadiest": {
@@ -123,7 +123,7 @@
           "band_mult": "1.25",
           "band_days": "20",
           "or_offset_atr": "0.15",
-          "vwap": "False",
+          "vwap": "True",
           "interval": "30",
           "last_check": "14:00",
           "exit": "vwap_cross",
@@ -131,50 +131,50 @@
         },
         "OLD": {
           "trades": 745.0,
-          "sum": 29.53,
+          "sum": 30.44,
           "sharpe": 0.76,
-          "max_dd": 8.73,
-          "win": 0.43
+          "max_dd": 8.42,
+          "win": 0.42
         },
         "NEW": {
           "trades": 264.0,
-          "sum": 19.87,
-          "sharpe": 1.24,
-          "max_dd": 4.88,
+          "sum": 20.95,
+          "sharpe": 1.28,
+          "max_dd": 3.81,
           "win": 0.47
         },
         "FIN": {
           "trades": 208.0,
-          "sum": 7.7,
-          "sharpe": 0.6,
-          "max_dd": 3.98,
-          "win": 0.41,
-          "percentile_by_sharpe": 77
+          "sum": 8.71,
+          "sharpe": 0.63,
+          "max_dd": 3.63,
+          "win": 0.39,
+          "percentile_by_sharpe": 67
         }
       },
       "steadiest_top10": {
         "n": 10,
         "OLD": {
           "trades": 784.6,
-          "sum": 29.76,
+          "sum": 30.64,
           "sharpe": 0.74,
-          "max_dd": 10.26,
-          "win": 0.42
+          "max_dd": 10.14,
+          "win": 0.41
         },
         "NEW": {
           "trades": 278.8,
-          "sum": 17.56,
-          "sharpe": 1.08,
-          "max_dd": 5.62,
+          "sum": 19.13,
+          "sharpe": 1.15,
+          "max_dd": 5.04,
           "win": 0.44
         },
         "FIN": {
           "trades": 218.0,
-          "sum": 8.55,
-          "sharpe": 0.66,
-          "max_dd": 4.64,
-          "win": 0.4,
-          "percentile_by_sharpe": 83
+          "sum": 9.55,
+          "sharpe": 0.69,
+          "max_dd": 4.48,
+          "win": 0.39,
+          "percentile_by_sharpe": 74
         }
       }
     },
@@ -183,13 +183,13 @@
   "opt1": {
     "share_positive": {
       "OLD": 0.0,
-      "NEW": 0.279,
-      "FIN": 0.051
+      "NEW": 0.251,
+      "FIN": 0.033
     },
     "rank_corr_sharpe": {
-      "OLD_NEW": 0.34,
-      "OLD_FIN": 0.42,
-      "NEW_FIN": 0.79
+      "OLD_NEW": 0.51,
+      "OLD_FIN": 0.45,
+      "NEW_FIN": 0.7
     },
     "picks": {
       "as_written": {
@@ -206,25 +206,25 @@
         },
         "OLD": {
           "trades": 670.0,
-          "sum": -5756.42,
-          "sharpe": -1.21,
-          "max_dd": 5914.81,
-          "win": 0.35
+          "sum": -6673.65,
+          "sharpe": -1.32,
+          "max_dd": 6673.65,
+          "win": 0.34
         },
         "NEW": {
           "trades": 236.0,
-          "sum": -400.99,
-          "sharpe": -0.12,
-          "max_dd": 1828.15,
-          "win": 0.45
+          "sum": -1454.97,
+          "sharpe": -0.41,
+          "max_dd": 1958.86,
+          "win": 0.42
         },
         "FIN": {
           "trades": 188.0,
-          "sum": -3764.78,
-          "sharpe": -0.67,
-          "max_dd": 5819.1,
-          "win": 0.34,
-          "percentile_by_sharpe": 49
+          "sum": -4001.5,
+          "sharpe": -0.65,
+          "max_dd": 6455.37,
+          "win": 0.33,
+          "percentile_by_sharpe": 58
         }
       },
       "best_on_OLD": {
@@ -241,60 +241,60 @@
         },
         "OLD": {
           "trades": 587.0,
-          "sum": -1221.08,
-          "sharpe": -0.32,
-          "max_dd": 2488.79,
-          "win": 0.26
+          "sum": -1884.92,
+          "sharpe": -0.5,
+          "max_dd": 2625.24,
+          "win": 0.25
         },
         "NEW": {
           "trades": 213.0,
-          "sum": -1492.26,
-          "sharpe": -0.59,
-          "max_dd": 2455.6,
-          "win": 0.27
+          "sum": -1390.64,
+          "sharpe": -0.54,
+          "max_dd": 2317.52,
+          "win": 0.25
         },
         "FIN": {
           "trades": 167.0,
-          "sum": -3107.16,
-          "sharpe": -1.17,
-          "max_dd": 3704.12,
+          "sum": -3965.4,
+          "sharpe": -1.5,
+          "max_dd": 4710.84,
           "win": 0.28,
-          "percentile_by_sharpe": 13
+          "percentile_by_sharpe": 6
         }
       },
       "best_on_NEW": {
         "n": 1,
         "settings": {
           "band_mult": "1.0",
-          "band_days": "14",
+          "band_days": "20",
           "or_offset_atr": "0.5",
           "vwap": "True",
           "interval": "10",
           "last_check": "14:00",
-          "exit": "trail_1.0",
-          "stop_atr": "1.0"
+          "exit": "trail_0.5",
+          "stop_atr": "0.5"
         },
         "OLD": {
-          "trades": 453.0,
-          "sum": -5641.05,
-          "sharpe": -1.58,
-          "max_dd": 5776.26,
-          "win": 0.34
+          "trades": 445.0,
+          "sum": -3992.09,
+          "sharpe": -1.16,
+          "max_dd": 4035.5,
+          "win": 0.36
         },
         "NEW": {
-          "trades": 142.0,
-          "sum": 2887.92,
-          "sharpe": 1.25,
-          "max_dd": 694.1,
-          "win": 0.54
+          "trades": 140.0,
+          "sum": 2215.7,
+          "sharpe": 0.92,
+          "max_dd": 661.44,
+          "win": 0.51
         },
         "FIN": {
           "trades": 116.0,
-          "sum": -2474.22,
-          "sharpe": -0.65,
-          "max_dd": 4308.97,
-          "win": 0.4,
-          "percentile_by_sharpe": 51
+          "sum": -3618.52,
+          "sharpe": -1.06,
+          "max_dd": 5026.69,
+          "win": 0.37,
+          "percentile_by_sharpe": 27
         }
       },
       "steadiest": {
@@ -311,50 +311,50 @@
         },
         "OLD": {
           "trades": 581.0,
-          "sum": -1319.69,
-          "sharpe": -0.33,
-          "max_dd": 2297.27,
-          "win": 0.28
+          "sum": -2097.0,
+          "sharpe": -0.53,
+          "max_dd": 2528.0,
+          "win": 0.26
         },
         "NEW": {
           "trades": 198.0,
-          "sum": -541.44,
-          "sharpe": -0.21,
-          "max_dd": 1948.7,
-          "win": 0.33
+          "sum": -645.77,
+          "sharpe": -0.25,
+          "max_dd": 1952.46,
+          "win": 0.32
         },
         "FIN": {
           "trades": 168.0,
-          "sum": -2128.77,
-          "sharpe": -0.67,
-          "max_dd": 3970.73,
+          "sum": -2722.59,
+          "sharpe": -0.85,
+          "max_dd": 4692.45,
           "win": 0.3,
-          "percentile_by_sharpe": 48
+          "percentile_by_sharpe": 41
         }
       },
       "steadiest_top10": {
         "n": 10,
         "OLD": {
-          "trades": 629.6,
-          "sum": -1526.07,
-          "sharpe": -0.37,
-          "max_dd": 2549.53,
-          "win": 0.28
+          "trades": 584.6,
+          "sum": -2004.84,
+          "sharpe": -0.52,
+          "max_dd": 2604.46,
+          "win": 0.25
         },
         "NEW": {
-          "trades": 214.4,
-          "sum": -384.84,
-          "sharpe": -0.15,
-          "max_dd": 1979.74,
-          "win": 0.33
+          "trades": 207.0,
+          "sum": -1094.91,
+          "sharpe": -0.43,
+          "max_dd": 2173.71,
+          "win": 0.28
         },
         "FIN": {
-          "trades": 177.4,
-          "sum": -1712.37,
-          "sharpe": -0.53,
-          "max_dd": 3745.91,
-          "win": 0.31,
-          "percentile_by_sharpe": 61
+          "trades": 167.4,
+          "sum": -3495.97,
+          "sharpe": -1.25,
+          "max_dd": 4731.18,
+          "win": 0.28,
+          "percentile_by_sharpe": 18
         }
       }
     },
@@ -363,13 +363,13 @@
   "opt3": {
     "share_positive": {
       "OLD": 0.0,
-      "NEW": 0.716,
-      "FIN": 0.246
+      "NEW": 0.679,
+      "FIN": 0.218
     },
     "rank_corr_sharpe": {
-      "OLD_NEW": 0.06,
+      "OLD_NEW": 0.21,
       "OLD_FIN": 0.31,
-      "NEW_FIN": 0.69
+      "NEW_FIN": 0.61
     },
     "picks": {
       "as_written": {
@@ -386,60 +386,60 @@
         },
         "OLD": {
           "trades": 670.0,
-          "sum": -3791.11,
-          "sharpe": -0.83,
-          "max_dd": 3952.84,
-          "win": 0.4
+          "sum": -4441.08,
+          "sharpe": -0.91,
+          "max_dd": 4441.08,
+          "win": 0.38
         },
         "NEW": {
           "trades": 236.0,
-          "sum": 1947.6,
-          "sharpe": 0.61,
-          "max_dd": 889.53,
-          "win": 0.5
+          "sum": 1229.73,
+          "sharpe": 0.36,
+          "max_dd": 985.36,
+          "win": 0.49
         },
         "FIN": {
           "trades": 188.0,
-          "sum": -1194.0,
-          "sharpe": -0.23,
-          "max_dd": 3592.0,
+          "sum": -851.24,
+          "sharpe": -0.15,
+          "max_dd": 4510.66,
           "win": 0.37,
-          "percentile_by_sharpe": 52
+          "percentile_by_sharpe": 63
         }
       },
       "best_on_OLD": {
         "n": 1,
         "settings": {
           "band_mult": "1.5",
-          "band_days": "14",
-          "or_offset_atr": "0.15",
+          "band_days": "20",
+          "or_offset_atr": "0.3",
           "vwap": "False",
-          "interval": "10",
+          "interval": "30",
           "last_check": "12:00",
-          "exit": "vwap_cross",
+          "exit": "trail_1.0",
           "stop_atr": "0.5"
         },
         "OLD": {
-          "trades": 581.0,
-          "sum": -404.06,
-          "sharpe": -0.11,
-          "max_dd": 1660.05,
-          "win": 0.3
+          "trades": 375.0,
+          "sum": -871.34,
+          "sharpe": -0.27,
+          "max_dd": 1486.24,
+          "win": 0.39
         },
         "NEW": {
-          "trades": 198.0,
-          "sum": 580.42,
-          "sharpe": 0.24,
-          "max_dd": 1507.59,
-          "win": 0.37
+          "trades": 121.0,
+          "sum": 1056.91,
+          "sharpe": 0.47,
+          "max_dd": 933.79,
+          "win": 0.5
         },
         "FIN": {
-          "trades": 168.0,
-          "sum": -823.03,
-          "sharpe": -0.26,
-          "max_dd": 2756.09,
-          "win": 0.33,
-          "percentile_by_sharpe": 49
+          "trades": 102.0,
+          "sum": -639.04,
+          "sharpe": -0.19,
+          "max_dd": 3290.45,
+          "win": 0.4,
+          "percentile_by_sharpe": 59
         }
       },
       "best_on_NEW": {
@@ -448,93 +448,93 @@
           "band_mult": "1.0",
           "band_days": "14",
           "or_offset_atr": "0.5",
-          "vwap": "False",
+          "vwap": "True",
           "interval": "10",
           "last_check": "14:00",
-          "exit": "trail_1.0",
+          "exit": "trail_0.5",
           "stop_atr": "1.0"
         },
         "OLD": {
           "trades": 453.0,
-          "sum": -4530.36,
-          "sharpe": -1.29,
-          "max_dd": 4661.1,
-          "win": 0.38
+          "sum": -3918.68,
+          "sharpe": -1.09,
+          "max_dd": 3968.53,
+          "win": 0.42
         },
         "NEW": {
           "trades": 142.0,
-          "sum": 3942.42,
-          "sharpe": 1.75,
-          "max_dd": 543.31,
-          "win": 0.61
+          "sum": 3426.41,
+          "sharpe": 1.44,
+          "max_dd": 501.98,
+          "win": 0.58
         },
         "FIN": {
           "trades": 116.0,
-          "sum": -1239.79,
-          "sharpe": -0.34,
-          "max_dd": 3329.37,
-          "win": 0.41,
-          "percentile_by_sharpe": 40
+          "sum": -1719.77,
+          "sharpe": -0.51,
+          "max_dd": 3860.24,
+          "win": 0.42,
+          "percentile_by_sharpe": 28
         }
       },
       "steadiest": {
         "n": 1,
         "settings": {
           "band_mult": "1.5",
-          "band_days": "14",
-          "or_offset_atr": "0.15",
+          "band_days": "20",
+          "or_offset_atr": "0.3",
           "vwap": "False",
-          "interval": "10",
+          "interval": "30",
           "last_check": "12:00",
-          "exit": "vwap_cross",
+          "exit": "trail_1.0",
           "stop_atr": "0.5"
         },
         "OLD": {
-          "trades": 581.0,
-          "sum": -404.06,
-          "sharpe": -0.11,
-          "max_dd": 1660.05,
-          "win": 0.3
+          "trades": 375.0,
+          "sum": -871.34,
+          "sharpe": -0.27,
+          "max_dd": 1486.24,
+          "win": 0.39
         },
         "NEW": {
-          "trades": 198.0,
-          "sum": 580.42,
-          "sharpe": 0.24,
-          "max_dd": 1507.59,
-          "win": 0.37
+          "trades": 121.0,
+          "sum": 1056.91,
+          "sharpe": 0.47,
+          "max_dd": 933.79,
+          "win": 0.5
         },
         "FIN": {
-          "trades": 168.0,
-          "sum": -823.03,
-          "sharpe": -0.26,
-          "max_dd": 2756.09,
-          "win": 0.33,
-          "percentile_by_sharpe": 49
+          "trades": 102.0,
+          "sum": -639.04,
+          "sharpe": -0.19,
+          "max_dd": 3290.45,
+          "win": 0.4,
+          "percentile_by_sharpe": 59
         }
       },
       "steadiest_top10": {
         "n": 10,
         "OLD": {
-          "trades": 629.6,
-          "sum": -551.08,
-          "sharpe": -0.14,
-          "max_dd": 1879.15,
+          "trades": 543.4,
+          "sum": -970.77,
+          "sharpe": -0.27,
+          "max_dd": 1892.0,
           "win": 0.31
         },
         "NEW": {
-          "trades": 214.4,
-          "sum": 754.07,
-          "sharpe": 0.29,
-          "max_dd": 1480.0,
-          "win": 0.37
+          "trades": 191.6,
+          "sum": 100.43,
+          "sharpe": 0.05,
+          "max_dd": 1481.02,
+          "win": 0.35
         },
         "FIN": {
-          "trades": 177.4,
-          "sum": -427.05,
-          "sharpe": -0.15,
-          "max_dd": 2802.71,
-          "win": 0.34,
-          "percentile_by_sharpe": 61
+          "trades": 154.2,
+          "sum": -1786.57,
+          "sharpe": -0.66,
+          "max_dd": 3407.05,
+          "win": 0.33,
+          "percentile_by_sharpe": 18
         }
       }
     },
@@ -581,12 +581,12 @@
     ]
   },
   "qqq_cost_round_trip": 0.0002,
-  "wall_seconds": 59,
+  "wall_seconds": 63,
   "master_seed": 20220103,
   "amendment": 0,
   "locks": {
     "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
     "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
   },
-  "written_utc": "2026-11-21T19:01:05+00:00"
+  "written_utc": "2026-11-21T20:44:35+00:00"
 }

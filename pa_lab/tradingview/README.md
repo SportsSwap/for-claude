@@ -43,18 +43,24 @@ are normal and a sustained loss means stop.
 Not financial advice. A Sharpe of 0.6 to 1.0 is a modest edge, on CFD data,
 from a search over thousands of versions. Paper trade first.
 
-## QQQ noise band (`palab_qqq_noise_band_1m.pine`)
+## Noise band, any symbol (`palab_noise_band.pine`)
 
-The rules from the post the user shared, on a 5-minute QQQ chart (regular
-hours; 1-minute also works if TradingView loads 20 days of 1-minute bars). Version menu: "As written" or "Best from 2013-2021". The lab tested
+The rules from the post the user shared. Works on any symbol on a minute
+chart of 30 minutes or less (5 minutes recommended); set the session in the
+settings if it is not a US stock or ETF (default 9:30-16:00 New York). Version menu: "As written" or "Best from 2013-2021". The lab tested
 it on 2013-2026 with Nasdaq-100 minutes (decisions.md D64-D67):
 
 | Version | 2013-Sep 2021 | 2022-Jul 2024 | Aug 2024-Nov 2026 | Worst drop |
 |---|---|---|---|---|
-| As written, QQQ shares | +11.3% | +37.0% | +8.0% | 10.5% |
-| Best from 2013-2021, QQQ shares | +29.5% | +19.9% | +7.7% | 8.7% |
+| As written, QQQ shares | +7.7% | +36.7% | +12.6% | 11.8% |
+| Best from 2013-2021, QQQ shares | +30.4% | +21.0% | +8.7% | 8.4% |
 
 Simple sums of each trade's QQQ move, no leverage. The call/put direction is
 real (it beats random directions in every test), but buying 1-3 day options
 on it lost money in most years in the lab's Black-Scholes estimate, because
 time decay and the spread cost more than the average move pays.
+
+On the S&P 500 (SPY stand-in) the same rules did not work: as written -18.3% /
++15.9% / -3.9%, best from 2013-2021 -2.9% / +9.9% / -0.2% (D69-D71). All figures
+use the corrected 15:45 exit (D70). Other symbols
+are untested.
