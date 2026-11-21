@@ -1,0 +1,89 @@
+{
+  "as_written:1m_exits": {
+    "2013-Sep 2021": {
+      "trades": 670,
+      "qqq_sum_pct": 11.3,
+      "sharpe": 0.23,
+      "max_dd_pct": 10.5
+    },
+    "2022-Jul 2024": {
+      "trades": 236,
+      "qqq_sum_pct": 37.0,
+      "sharpe": 1.97,
+      "max_dd_pct": 3.9
+    },
+    "Aug 2024-Nov 2026": {
+      "trades": 188,
+      "qqq_sum_pct": 8.0,
+      "sharpe": 0.47,
+      "max_dd_pct": 6.1
+    }
+  },
+  "as_written:5m_exits": {
+    "2013-Sep 2021": {
+      "trades": 670,
+      "qqq_sum_pct": 11.3,
+      "sharpe": 0.23,
+      "max_dd_pct": 10.5
+    },
+    "2022-Jul 2024": {
+      "trades": 236,
+      "qqq_sum_pct": 37.0,
+      "sharpe": 1.97,
+      "max_dd_pct": 3.9
+    },
+    "Aug 2024-Nov 2026": {
+      "trades": 188,
+      "qqq_sum_pct": 8.0,
+      "sharpe": 0.47,
+      "max_dd_pct": 6.1
+    }
+  },
+  "picked_on_2013_2021:1m_exits": {
+    "2013-Sep 2021": {
+      "trades": 745,
+      "qqq_sum_pct": 29.5,
+      "sharpe": 0.76,
+      "max_dd_pct": 8.7
+    },
+    "2022-Jul 2024": {
+      "trades": 264,
+      "qqq_sum_pct": 19.9,
+      "sharpe": 1.24,
+      "max_dd_pct": 4.9
+    },
+    "Aug 2024-Nov 2026": {
+      "trades": 208,
+      "qqq_sum_pct": 7.7,
+      "sharpe": 0.6,
+      "max_dd_pct": 4.0
+    }
+  },
+  "picked_on_2013_2021:5m_exits": {
+    "2013-Sep 2021": {
+      "trades": 745,
+      "qqq_sum_pct": 32.7,
+      "sharpe": 0.82,
+      "max_dd_pct": 6.8
+    },
+    "2022-Jul 2024": {
+      "trades": 264,
+      "qqq_sum_pct": 21.6,
+      "sharpe": 1.31,
+      "max_dd_pct": 5.7
+    },
+    "Aug 2024-Nov 2026": {
+      "trades": 208,
+      "qqq_sum_pct": 6.4,
+      "sharpe": 0.48,
+      "max_dd_pct": 4.3
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-21T20:37:42+00:00"
+}

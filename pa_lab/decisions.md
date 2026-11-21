@@ -1064,3 +1064,13 @@ script. Buying options on either version loses in the lab's estimate; the
 estimate depends on the volatility assumption. For scale: the Nasdaq-100
 itself rose roughly eightfold over the same years, so this intraday
 strategy earns far less than holding the index, with far smaller drawdowns.
+
+D68. **TradingView only loads about 15 days of 1-minute QQQ bars on the
+user's plan, so the 20-day band never fills.** The Pine script is changed to
+run on a 5-minute chart as well. Entries are unchanged (every check time and
+the 15:45 exit are 5-minute closes, and the band at those minutes is the
+same number). Only the VWAP-cross and stop exits are then judged on 5-minute
+closes instead of 1-minute closes. `scripts/noise_band_5m_check.py` measures
+that one difference for both versions on the three periods (an eighth logged
+unlock, two fixed versions, no search); whatever it shows, both chart
+settings stay available.

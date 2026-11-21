@@ -80,3 +80,12 @@
 {"utc": "2026-11-21T19:01:50+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 389, "argv": ["scripts/noise_band_years.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
 {"utc": "2026-11-21T19:01:50+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 389, "argv": ["scripts/noise_band_years.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
 {"utc": "2026-11-21T19:01:50+00:00", "event": "unlock_close", "step": "final_test", "pid": 389, "argv": ["scripts/noise_band_years.py"]}
+{"utc": "2026-11-21T20:37:38+00:00", "event": "unlock_open", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"]}
+{"utc": "2026-11-21T20:37:38+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/MANIFEST.json"}
+{"utc": "2026-11-21T20:37:39+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet"}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/NQ_1m.parquet", "rows": 775717}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/NQ_rolls.parquet"}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet"}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "read_final_window_rows", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "source": "/home/user/for-claude/pa_lab/data/sealed/ES_1m.parquet", "rows": 772739}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "read_sealed_path", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"], "path": "/home/user/for-claude/pa_lab/data/sealed/ES_rolls.parquet"}
+{"utc": "2026-11-21T20:37:40+00:00", "event": "unlock_close", "step": "final_test", "pid": 200, "argv": ["scripts/noise_band_5m_check.py"]}

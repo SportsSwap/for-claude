@@ -45,8 +45,8 @@ from a search over thousands of versions. Paper trade first.
 
 ## QQQ noise band (`palab_qqq_noise_band_1m.pine`)
 
-The rules from the post the user shared, on a 1-minute QQQ chart (regular
-hours). Version menu: "As written" or "Best from 2013-2021". The lab tested
+The rules from the post the user shared, on a 5-minute QQQ chart (regular
+hours; 1-minute also works if TradingView loads 20 days of 1-minute bars). Version menu: "As written" or "Best from 2013-2021". The lab tested
 it on 2013-2026 with Nasdaq-100 minutes (decisions.md D64-D67):
 
 | Version | 2013-Sep 2021 | 2022-Jul 2024 | Aug 2024-Nov 2026 | Worst drop |
