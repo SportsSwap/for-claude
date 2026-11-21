@@ -64,3 +64,8 @@ On the S&P 500 (SPY stand-in) the same rules did not work: as written -18.3% /
 +15.9% / -3.9%, best from 2013-2021 -2.9% / +9.9% / -0.2% (D69-D71). All figures
 use the corrected 15:45 exit (D70). Other symbols
 are untested.
+
+On futures (NQ1!, MNQ1!, ES1!) the script trades a fixed number of contracts
+(setting "Contracts per trade on futures", default 1): 100% of equity buys less
+than one NQ contract and TradingView rounds the order to zero. Set Properties >
+Commission to about $2 a contract (NQ) or $0.50 (MNQ) for futures.
