@@ -1,0 +1,47 @@
+{
+  "as_written": {
+    "trades": 1094,
+    "qqq_sum_pct": 56.3,
+    "sharpe": 0.66,
+    "max_drawdown_pct": 10.5,
+    "years_positive": 9,
+    "years": 14
+  },
+  "picked_on_2013_2021": {
+    "trades": 1217,
+    "qqq_sum_pct": 57.1,
+    "sharpe": 0.84,
+    "max_drawdown_pct": 8.7,
+    "years_positive": 12,
+    "years": 14
+  },
+  "versions": {
+    "as_written": {
+      "band_mult": 1.25,
+      "band_days": 20,
+      "or_offset_atr": 0.3,
+      "vwap": true,
+      "interval": 10,
+      "last_check": "14:00",
+      "exit": "hold",
+      "stop_atr": null
+    },
+    "picked_on_2013_2021": {
+      "band_mult": 1.25,
+      "band_days": 20,
+      "or_offset_atr": 0.15,
+      "vwap": false,
+      "interval": 30,
+      "last_check": "14:00",
+      "exit": "vwap_cross",
+      "stop_atr": 0.5
+    }
+  },
+  "master_seed": 20220103,
+  "amendment": 0,
+  "locks": {
+    "config/thresholds.json": "1668080849f616d0d27474d0927df3c23da355a9e6357c73aa9a26fd97e66f05",
+    "rulebook_spec.json": "d33b0eea5948f28d57978984fdd307770eadf156a2fbe1b579407afeb2072078"
+  },
+  "written_utc": "2026-11-21T19:01:53+00:00"
+}

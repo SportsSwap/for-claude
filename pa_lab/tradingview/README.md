@@ -42,3 +42,19 @@ are normal and a sustained loss means stop.
 
 Not financial advice. A Sharpe of 0.6 to 1.0 is a modest edge, on CFD data,
 from a search over thousands of versions. Paper trade first.
+
+## QQQ noise band (`palab_qqq_noise_band_1m.pine`)
+
+The rules from the post the user shared, on a 1-minute QQQ chart (regular
+hours). Version menu: "As written" or "Best from 2013-2021". The lab tested
+it on 2013-2026 with Nasdaq-100 minutes (decisions.md D64-D67):
+
+| Version | 2013-Sep 2021 | 2022-Jul 2024 | Aug 2024-Nov 2026 | Worst drop |
+|---|---|---|---|---|
+| As written, QQQ shares | +11.3% | +37.0% | +8.0% | 10.5% |
+| Best from 2013-2021, QQQ shares | +29.5% | +19.9% | +7.7% | 8.7% |
+
+Simple sums of each trade's QQQ move, no leverage. The call/put direction is
+real (it beats random directions in every test), but buying 1-3 day options
+on it lost money in most years in the lab's Black-Scholes estimate, because
+time decay and the spread cost more than the average move pays.

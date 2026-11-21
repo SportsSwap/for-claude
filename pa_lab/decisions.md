@@ -971,3 +971,96 @@ two later periods it is smaller. ES adds nothing (both together +$84,664
 with a $122,028 drawdown). The old years stay weak (+$42,918 over nine
 years), and both versions were chosen with the same hindsight, so this is a
 portfolio fact about the past, not new evidence of an edge.
+
+## QQQ noise-band options strategy (user's rules)
+
+D64. **The user's QQQ noise-band rules, tested as written, declared before
+looking.** Rules from the user's screenshots: opening range 9:30-9:45 ET; a
+noise band from the last 20 days' average distance from the open at each
+minute, times 1.25 (base max/min of today's open and yesterday's close for
+the upper/lower band); a 5-day ATR; checks every 10 minutes from 10:00 to
+14:00 on the 1-minute close; calls when the close is above the opening-range
+high + 0.3 ATR, above the upper band and above VWAP; puts mirrored; one trade
+a day; an at-the-money option 1 to 3 days out at the mid; exits on QQQ's
+1-minute closes: after a favourable move of 4 ATR, sell when half of the best
+move is given back; stop at 10 ATR against; otherwise sell at 15:45.
+How it is tested (`scripts/noise_band_qqq.py`):
+(a) QQQ is replaced by the Nasdaq-100 CFD minutes (the same index; QQQ is
+about 1/41 of it), regular hours only. VWAP uses the CFD's tick volume, a
+stand-in for QQQ's share volume.
+(b) "5-day ATR" is ambiguous: with the daily ATR the 4 ATR and 10 ATR exits
+are moves of roughly 6% and 15% in one afternoon, which almost never happen;
+with the ATR of 1-minute bars over the last 5 days they are small. Both are
+run and reported: A = daily ATR (simple mean of the last 5 daily true
+ranges), B = mean 1-minute true range over the last 5 sessions. A is the
+literal reading.
+(c) There is no free options history, so option results are estimated with
+Black-Scholes: strike = nearest $1 to QQQ at entry, expiry the next day's
+close (1 day; 3 days as a check), implied volatility = 1.1 x the last 20
+days' realised volatility (at least 10%), unchanged during the trade, fills
+at mid + $0.01 to buy and mid - $0.01 to sell, $0.65 commission per
+contract each way. The QQQ move itself is reported beside it and is the
+harder number.
+(d) Three periods as before: 2013 to Sep 2021, 2022 to Jul 2024, and Aug 2024
+to Nov 2026 (a sixth logged unlock; one fixed rule set, no search).
+(e) Null test: 1,000 sets of the same trades with the direction flipped at
+random (does the call/put choice add anything?) and 1,000 sets on random
+days, random check times and random directions with the same number of
+trades (does the timing add anything?).
+(f) It "holds" when the estimated option P&L is positive in all three
+periods and the random-direction test gives p < 0.05 over 2013-2026.
+
+D65. **Result of D64: the direction call is real; the options as written
+lose.** 1,094 trades over 2013 to Nov 2026 (sixth logged unlock). Reading A
+(daily ATR, the literal one): the 4 ATR and 10 ATR exits never trigger, so
+every trade is held to 15:45. QQQ's move in the trade's direction summed
++24.7% (2013-Sep 2021, 670 trades), +41.7% (2022-Jul 2024, 236), +11.8% (Aug
+2024-Nov 2026, 188); against 1,000 sets with the direction flipped at random
+(mean +1.1%, 95th percentile +38.1%) and 1,000 sets on random days and times
+(mean -0.7%) the real result is above every set: p < 0.001 for both. By year
+the move is negative only in 2013, 2019 and 2021. The estimated option
+result for one 1-day contract is -$5,756, -$401 and -$3,765 (win rate
+34-45%, median trade -5% to -16% of the premium): the option's time decay and
+spread cost more than the average move pays. With 3-day options: -$3,791,
++$1,948, -$1,194. Reading B (1-minute ATR) has fewer and weaker moves (p =
+0.006) and loses on the options in all three periods. By D64(f) the rules as
+written do not hold. The option figures depend on the volatility estimate
+(1.1 x realised); the QQQ move does not.
+
+D66. **Search for the best version of the noise-band signal, declared
+before looking.** `scripts/noise_band_search.py`. Because the edge shows in
+QQQ's own move and the options give it back, every version is scored three
+ways: QQQ (or MNQ) itself, 1-day options and 3-day options, all with the
+D64 cost and option assumptions; for QQQ itself, cost 0.02% a round trip.
+Grid: band multiplier 1.0 / 1.25 / 1.5; band lookback 14 / 20 days; opening-
+range offset 0 / 0.15 / 0.3 / 0.5 daily ATR; VWAP filter on / off; checks
+every 10 or 30 minutes; last check 12:00 or 14:00; exit: hold to 15:45, exit
+when a 1-minute close crosses back through VWAP, or a trailing exit after a
+0.5 or 1.0 daily-ATR gain giving back half; plus no stop, or a stop at 0.5 or
+1.0 daily ATR against. 2,304 versions, three periods as before (one logged
+unlock for the run, the seventh).
+Picks on 2013-Sep 2021 alone, on 2022-Jul 2024 alone, and the steadiest
+(highest worst-case Sharpe over those two), each scored on Aug 2024-Nov
+2026; recent per-version results are not saved. A version replaces the
+rules as written only if the picks made on each earlier period hold on both
+other periods with Sharpe 0.5 or more on the same instrument.
+
+D67. **Result of D66.** On QQQ itself the signal is broad: 86% of the 2,304
+versions made money in 2013-Sep 2021, all of them in 2022-Jul 2024 and 89%
+in Aug 2024-Nov 2026 (after 0.02% a round trip). On options almost none did:
+1-day options 0% / 28% / 5% of versions profitable, 3-day options 0% / 72% /
+25%. The pick made on 2013-Sep 2021 alone (band 1.25 x 20 days, range +0.15
+ATR, no VWAP entry filter, 30-minute checks, exit on a 1-minute close back
+through VWAP or 0.5 daily ATR against, otherwise 15:45) is also the
+steadiest; on QQQ: +29.5% (Sharpe 0.76) / +19.9% (1.24) / +7.7% (0.60), worst
+drawdown 8.7% / 4.9% / 4.0%, 12 of 14 years positive, 1,217 trades, 57.1%
+in total (simple sum, no leverage, no compounding). The pick made on
+2022-Jul 2024 alone failed on 2013-2021 (-8.4%) and on the recent window
+(+1.1%). The rules as written on QQQ: +11.3% / +37.0% / +8.0%, 56.3% in total,
+worst drawdown 10.5%, 9 of 14 years positive. By D66 no replacement is
+declared (the pick from 2022-2024 fails), but the pick from 2013-2021 held on
+both later periods and is issued as the second version of the TradingView
+script. Buying options on either version loses in the lab's estimate; the
+estimate depends on the volatility assumption. For scale: the Nasdaq-100
+itself rose roughly eightfold over the same years, so this intraday
+strategy earns far less than holding the index, with far smaller drawdowns.

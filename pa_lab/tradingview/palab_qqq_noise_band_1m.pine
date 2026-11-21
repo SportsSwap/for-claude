@@ -1,0 +1,153 @@
+//@version=6
+// PA Lab: QQQ noise band (the user's rules, decisions.md D64-D67)
+// Chart: QQQ, 1-minute, regular trading hours.
+//
+// Two versions:
+//   "As written"            the rules from the post: 10-minute checks, VWAP filter, ORH + 0.3 ATR,
+//                           out at 15:45 (the 4 ATR / 10 ATR exits almost never trigger).
+//   "Best from 2013-2021"   picked on 2013-Sep 2021 only, then held on 2022-Jul 2024 and
+//                           Aug 2024-Nov 2026: 30-minute checks, ORH + 0.15 ATR, no VWAP entry
+//                           filter, exit when a 1-minute close crosses back through VWAP or
+//                           0.5 daily ATR against, otherwise 15:45.
+// The lab traded QQQ itself (this strategy buys or shorts QQQ shares with the whole account).
+// Buying 1-3 day options on these signals LOST money in the lab's estimate in most years:
+// the alerts still name the at-the-money strike if you want to paper trade options.
+// The noise band needs 20 days of 1-minute history before the first signal.
+strategy("PA Lab QQQ Noise Band", shorttitle="QQQ Noise Band", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.01,
+     slippage=1, margin_long=0, margin_short=0)
+
+preset = input.string("Best from 2013-2021", "Version", options=["As written", "Best from 2013-2021"])
+bool isW = preset == "As written"
+
+// ---------------------------------------------------------------- settings (from the lab)
+float BAND_MULT  = 1.25
+int   LOOK       = 20
+float OR_OFF     = isW ? 0.3 : 0.15
+bool  USE_VWAP   = isW
+int   INTERVAL   = isW ? 10 : 30
+int   LAST_IDX   = 269          // the bar that closes at 14:00
+float TRAIL_TRIG = isW ? 4.0 : 0.0
+float GIVEBACK   = 0.5
+float STOP_ATR   = isW ? 10.0 : 0.5
+bool  VWAP_EXIT  = not isW
+int   EXIT_IDX   = 344          // the bar that closes at 15:45
+string TZ = "America/New_York"
+
+if timeframe.period != "1"
+    runtime.error("Put this strategy on a 1-minute QQQ chart.")
+
+// ---------------------------------------------------------------- clock
+int mIdx = hour(time, TZ) * 60 + minute(time, TZ) - 570
+bool rth = mIdx >= 0 and mIdx < 390
+bool dayChanged = dayofmonth(time, TZ) != dayofmonth(nz(time[1], time), TZ)
+bool firstBar = rth and (mIdx == 0 or dayChanged)
+
+// previous completed day: 5-day ATR (simple mean of true range) and close
+[atrD, prevC] = request.security(syminfo.tickerid, "D", [ta.sma(ta.tr(true), 5)[1], close[1]], lookahead = barmerge.lookahead_on)
+float vw = ta.vwap(hlc3)
+
+// ---------------------------------------------------------------- state
+var matrix<float> dist = matrix.new<float>(LOOK + 1, 390, na)
+var int dayNum = 0
+var float dayOpen = na
+var float orH = na
+var float orL = na
+var bool traded = false
+var int side = 0
+var float entryPx = na
+var float entryAtr = na
+var float best = 0.0
+
+if firstBar
+    dayNum += 1
+    dayOpen := open
+    orH := high
+    orL := low
+    traded := false
+    int r0 = dayNum % (LOOK + 1)
+    for c = 0 to 389
+        dist.set(r0, c, na)
+else if rth and mIdx < 15
+    orH := math.max(orH, high)
+    orL := math.min(orL, low)
+
+// ---------------------------------------------------------------- noise band: previous LOOK days at this minute
+float sig = na
+if rth and not na(dayOpen)
+    int cur = dayNum % (LOOK + 1)
+    float total = 0.0
+    int cnt = 0
+    for r = 0 to LOOK
+        if r != cur
+            float v = dist.get(r, mIdx)
+            if not na(v)
+                total += v
+                cnt += 1
+    sig := cnt == LOOK ? total / LOOK : na
+    dist.set(cur, mIdx, math.abs(close / dayOpen - 1))
+
+float ub = na
+float lb = na
+if not na(sig) and not na(prevC)
+    ub := math.max(dayOpen, prevC) * (1 + BAND_MULT * sig)
+    lb := math.min(dayOpen, prevC) * (1 - BAND_MULT * sig)
+
+// ---------------------------------------------------------------- exits (judged on 1-minute closes)
+if strategy.position_size != 0 and rth
+    float mv = side * (close - entryPx)
+    best := math.max(best, mv)
+    string reason = ""
+    if TRAIL_TRIG > 0 and best >= TRAIL_TRIG * entryAtr and mv <= (1 - GIVEBACK) * best
+        reason := "gave back half"
+    if STOP_ATR > 0 and mv <= -STOP_ATR * entryAtr
+        reason := "stop"
+    if VWAP_EXIT and side * (close - vw) < 0
+        reason := "crossed VWAP"
+    if mIdx >= EXIT_IDX
+        reason := "15:45"
+    if reason != ""
+        strategy.close_all(comment = reason)
+        alert("QQQ noise band: SELL (" + reason + "), QQQ " + str.tostring(close, "#.##"), alert.freq_once_per_bar_close)
+
+// ---------------------------------------------------------------- entries
+bool isCheck = rth and mIdx >= 29 and mIdx <= LAST_IDX and (mIdx - 29) % INTERVAL == 0
+bool ready = not na(ub) and not na(atrD) and not na(orH)
+bool longSig = ready and close > orH + OR_OFF * atrD and close > ub and (not USE_VWAP or close > vw)
+bool shortSig = ready and close < orL - OR_OFF * atrD and close < lb and (not USE_VWAP or close < vw)
+if isCheck and not traded and strategy.position_size == 0
+    if longSig
+        strategy.entry("Long", strategy.long)
+        traded := true
+        side := 1
+        entryPx := close
+        entryAtr := atrD
+        best := 0.0
+        alert("QQQ noise band: BUY (calls), QQQ " + str.tostring(close, "#.##") + ", nearest strike " + str.tostring(math.round(close)), alert.freq_once_per_bar_close)
+    else if shortSig
+        strategy.entry("Short", strategy.short)
+        traded := true
+        side := -1
+        entryPx := close
+        entryAtr := atrD
+        best := 0.0
+        alert("QQQ noise band: SELL SHORT (puts), QQQ " + str.tostring(close, "#.##") + ", nearest strike " + str.tostring(math.round(close)), alert.freq_once_per_bar_close)
+
+// ---------------------------------------------------------------- drawing
+plot(rth ? ub : na, "Upper band", color.new(color.purple, 0), style = plot.style_linebr)
+plot(rth ? lb : na, "Lower band", color.new(color.purple, 0), style = plot.style_linebr)
+plot(rth ? vw : na, "VWAP", color.new(color.orange, 0), style = plot.style_linebr)
+plot(rth and mIdx >= 15 ? orH + OR_OFF * nz(atrD) : na, "Range high + room", color.new(color.teal, 30), style = plot.style_linebr)
+plot(rth and mIdx >= 15 ? orL - OR_OFF * nz(atrD) : na, "Range low - room", color.new(color.red, 30), style = plot.style_linebr)
+plotshape(isCheck and not traded, "Check", shape.circle, location.bottom, color.new(color.gray, 60), size = size.tiny)
+
+var label status = na
+if barstate.islast
+    label.delete(status)
+    int have = 0
+    for r = 0 to LOOK
+        if not na(dist.get(r, 29))
+            have += 1
+    status := label.new(bar_index, high, preset + " | band history " + str.tostring(math.min(have, LOOK)) + "/" + str.tostring(LOOK) + " days" + (na(sig) ? " (waiting)" : ""),
+         style = label.style_label_down, color = color.new(color.gray, 20), textcolor = color.white, size = size.small)
