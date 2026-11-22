@@ -12,9 +12,7 @@
 // Tested in the lab on the Nasdaq-100 (QQQ): it made money in all three periods.
 // On the S&P 500 (SPY) the same rules were about flat or losing. Any other symbol is untested.
 // Buying 1-3 day options on these signals lost money in the lab's estimate in most years.
-// It starts once it has 14 days of history and uses up to 20 (the lab's setting; 14 days was
-// also tested and did a little worse). The label on the last bar shows what it has.
-// Missing bars (minutes with no trades) and half-day sessions are handled.
+// It needs 20 days of history before the first signal (the label on the last bar shows it).
 // Futures (NQ1!, MNQ1!, ES1!...): it trades a fixed number of contracts (setting below), because
 // 100% of equity is less than one NQ contract and TradingView would round the order to zero.
 // For futures also set Properties > Commission to about $2 per contract (NQ) or $0.50 (MNQ):
@@ -39,7 +37,6 @@ string TZ = tzIn == "Exchange" ? syminfo.timezone : tzIn
 // ---------------------------------------------------------------- settings (from the lab)
 float BAND_MULT  = 1.25
 int   LOOK       = 20
-int   MIN_DAYS   = 14           // start once this many past days are in the band
 int   OR_MIN     = 15           // opening range: the first 15 minutes
 float OR_OFF     = isW ? 0.3 : 0.15
 bool  USE_VWAP   = isW
@@ -85,9 +82,6 @@ var float cumV = 0.0
 var float cumP = 0.0
 var int cumN = 0
 var bool traded = false
-var int lastIdx = -1
-var float lastDist = na
-var int barsToday = 0
 var int side = 0
 var float entryPx = na
 var float entryAtr = na
@@ -112,8 +106,6 @@ if firstBar
     cumP := 0.0
     cumN := 0
     traded := false
-    lastIdx := -1
-    barsToday := 0
     int r0 = dayNum % (LOOK + 1)
     for c = 0 to SESS_LEN - 1
         dist.set(r0, c, na)
@@ -124,7 +116,6 @@ else if rth
         orH := math.max(orH, high)
         orL := math.min(orL, low)
 if rth
-    barsToday += 1
     sesC := close
     cumPV += hlc3 * nz(volume)
     cumV += nz(volume)
@@ -136,7 +127,6 @@ float vw = rth ? (cumV > 0 ? cumPV / cumV : cumP / cumN) : na
 
 // ---------------------------------------------------------------- noise band: previous LOOK days at this minute
 float sig = na
-int bandDays = 0
 if rth and not na(dayOpen) and cIdx < SESS_LEN
     int cur = dayNum % (LOOK + 1)
     float total = 0.0
@@ -147,16 +137,8 @@ if rth and not na(dayOpen) and cIdx < SESS_LEN
             if not na(v)
                 total += v
                 cnt += 1
-    sig := cnt >= MIN_DAYS ? total / cnt : na
-    bandDays := cnt
-    float d = math.abs(close / dayOpen - 1)
-    // a minute with no bar keeps the last distance (as the lab did)
-    if lastIdx >= 0 and cIdx - lastIdx > 1
-        for c = lastIdx + 1 to cIdx - 1
-            dist.set(cur, c, lastDist)
-    dist.set(cur, cIdx, d)
-    lastIdx := cIdx
-    lastDist := d
+    sig := cnt == LOOK ? total / LOOK : na
+    dist.set(cur, cIdx, math.abs(close / dayOpen - 1))
 
 float ub = na
 float lb = na
@@ -182,9 +164,7 @@ if strategy.position_size != 0 and rth
         alert(syminfo.ticker + " noise band: SELL (" + reason + "), price " + str.tostring(close, format.mintick), alert.freq_once_per_bar_close)
 
 // ---------------------------------------------------------------- entries
-// a check happens on the bar that contains the check minute, so any chart timeframe works
-int nextCheck = FIRST_IDX + int(math.ceil(float(math.max(0, mIdx - FIRST_IDX)) / INTERVAL)) * INTERVAL
-bool isCheck = rth and nextCheck <= cIdx and nextCheck <= LAST_IDX
+bool isCheck = rth and cIdx >= FIRST_IDX and cIdx <= LAST_IDX and (cIdx - FIRST_IDX) % INTERVAL == 0
 bool ready = not na(ub) and not na(atrD) and not na(orH)
 bool longSig = ready and close > orH + OR_OFF * atrD and close > ub and (not USE_VWAP or close > vw)
 bool shortSig = ready and close < orL - OR_OFF * atrD and close < lb and (not USE_VWAP or close < vw)
@@ -215,21 +195,14 @@ plot(rth and cIdx >= OR_MIN ? orL - OR_OFF * nz(atrD) : na, "Range low - room", 
 plotshape(isCheck and not traded, "Check", shape.circle, location.bottom, color.new(color.gray, 60), size = size.tiny)
 
 var label status = na
-var int lastBandDays = 0
-if rth and bandDays > 0
-    lastBandDays := bandDays
 if barstate.islast
     label.delete(status)
-    int pastDays = math.max(dayNum - 1, 0)
-    string msg = preset + " | " + (isFut ? str.tostring(futQty) + " contract(s)" : "100% of equity")
-    msg += " | past days loaded " + str.tostring(pastDays) + " | band uses " + str.tostring(math.min(lastBandDays, LOOK)) + " days"
-    if dayNum == 0
-        msg += " | NO BARS INSIDE THE SESSION: check the session settings and time zone"
-    else if pastDays < MIN_DAYS
-        msg += " | WAITING: needs " + str.tostring(MIN_DAYS) + " past days (use a 5-minute chart or regular hours)"
-    else if na(atrD)
-        msg += " | WAITING: ATR needs 5 days"
-    else
-        msg += " | ready"
-    status := label.new(bar_index, high, msg, style = label.style_label_down, color = color.new(color.gray, 20),
-         textcolor = color.white, size = size.small)
+    int have = 0
+    for r = 0 to LOOK
+        if not na(dist.get(r, FIRST_IDX))
+            have += 1
+    string msg = preset + " | " + (isFut ? str.tostring(futQty) + " contract(s)" : "100% of equity") + " | band history " + str.tostring(math.min(have, LOOK)) + "/" + str.tostring(LOOK) + " days"
+    msg += na(atrD) ? " | ATR needs 5 days" : ""
+    msg += dayNum == 0 ? " | no bars inside the session: check the session settings" : ""
+    status := label.new(bar_index, high, msg + (na(sig) ? " (waiting)" : ""),
+         style = label.style_label_down, color = color.new(color.gray, 20), textcolor = color.white, size = size.small)
