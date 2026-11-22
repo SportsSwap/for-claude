@@ -1,0 +1,235 @@
+//@version=6
+// PA Lab: noise band, NEW TEST VERSION (not yet tested by the user). Works on any symbol.
+// Chart: 5-minute (recommended) or any minute chart up to 30 minutes.
+// Set the session below if the symbol is not a US stock/ETF (default 9:30-16:00 New York).
+//
+// Two versions:
+//   "As written"            the rules from the post: checks every 10 minutes, VWAP filter, opening
+//                           range + 0.3 ATR, out 15 minutes before the close.
+//   "Best from 2013-2021"   picked on 2013-Sep 2021 only (Nasdaq-100): checks every 30 minutes,
+//                           range + 0.15 ATR, no VWAP entry filter (it changed nothing), out when price closes back
+//                           through VWAP or 0.5 ATR against, otherwise 15 minutes before the close.
+// Tested in the lab on the Nasdaq-100 (QQQ): it made money in all three periods.
+// On the S&P 500 (SPY) the same rules were about flat or losing. Any other symbol is untested.
+// Buying 1-3 day options on these signals lost money in the lab's estimate in most years.
+// It starts once it has 14 days of history and uses up to 20 (the lab's setting; 14 days was
+// also tested and did a little worse). The label on the last bar shows what it has.
+// Missing bars (minutes with no trades) and half-day sessions are handled.
+// Futures (NQ1!, MNQ1!, ES1!...): it trades a fixed number of contracts (setting below), because
+// 100% of equity is less than one NQ contract and TradingView would round the order to zero.
+// For futures also set Properties > Commission to about $2 per contract (NQ) or $0.50 (MNQ):
+// the default 0.01% of trade value is right for stocks but far too high for futures.
+strategy("PA Lab Noise Band TEST", shorttitle="Noise Band TEST", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.01,
+     slippage=1, margin_long=0, margin_short=0)
+
+preset = input.string("Best from 2013-2021", "Version", options=["As written", "Best from 2013-2021"])
+tzIn   = input.string("America/New_York", "Time zone of the session", options=["America/New_York", "America/Chicago", "Europe/London", "Europe/Berlin", "Asia/Tokyo", "Asia/Hong_Kong", "Australia/Sydney", "UTC", "Exchange"], group = "Session")
+openH  = input.int(9, "Session opens: hour", minval = 0, maxval = 23, group = "Session")
+openM  = input.int(30, "Session opens: minute", minval = 0, maxval = 59, group = "Session")
+closeH = input.int(16, "Session closes: hour", minval = 0, maxval = 23, group = "Session")
+closeM = input.int(0, "Session closes: minute", minval = 0, maxval = 59, group = "Session")
+futQty = input.int(1, "Contracts per trade on futures", minval = 1, group = "Size")
+bool isW = preset == "As written"
+bool isFut = syminfo.type == "futures"
+float qtyNow = isFut ? futQty : na     // na = the strategy's default size (100% of equity)
+string TZ = tzIn == "Exchange" ? syminfo.timezone : tzIn
+
+// ---------------------------------------------------------------- settings (from the lab)
+float BAND_MULT  = 1.25
+int   LOOK       = 20
+int   MIN_DAYS   = 14           // start once this many past days are in the band
+int   OR_MIN     = 15           // opening range: the first 15 minutes
+float OR_OFF     = isW ? 0.3 : 0.15
+bool  USE_VWAP   = isW
+int   INTERVAL   = isW ? 10 : 30
+float TRAIL_TRIG = isW ? 4.0 : 0.0
+float GIVEBACK   = 0.5
+float STOP_ATR   = isW ? 10.0 : 0.5
+bool  VWAP_EXIT  = not isW
+int   SESS_LEN   = closeH * 60 + closeM - (openH * 60 + openM)
+int   FIRST_IDX  = 29                       // the bar that closes 30 minutes after the open
+int   LAST_IDX   = math.min(269, SESS_LEN - 31)   // 270 minutes after the open (14:00 for US stocks)
+int   EXIT_IDX   = SESS_LEN - 16            // the bar that closes 15 minutes before the close
+
+if not timeframe.isminutes or timeframe.multiplier > 30
+    runtime.error("Use a minute chart of 30 minutes or less (5 minutes recommended).")
+if SESS_LEN < 120
+    runtime.error("The session must be at least 2 hours long and close after it opens on the same day.")
+
+// ---------------------------------------------------------------- clock
+int step = timeframe.multiplier
+int mIdx = hour(time, TZ) * 60 + minute(time, TZ) - (openH * 60 + openM)   // minute the bar opens
+int cIdx = mIdx + step - 1                                                   // last minute inside the bar
+bool rth = mIdx >= 0 and mIdx < SESS_LEN
+int dayKey = year(time, TZ) * 10000 + month(time, TZ) * 100 + dayofmonth(time, TZ)
+var int lastKey = 0
+bool firstBar = rth and dayKey != lastKey
+if rth
+    lastKey := dayKey
+
+// ---------------------------------------------------------------- state
+var matrix<float> dist = matrix.new<float>(LOOK + 1, SESS_LEN, na)
+var array<float> trs = array.new<float>()
+var int dayNum = 0
+var float dayOpen = na
+var float prevC = na
+var float sesH = na
+var float sesL = na
+var float sesC = na
+var float orH = na
+var float orL = na
+var float cumPV = 0.0
+var float cumV = 0.0
+var float cumP = 0.0
+var int cumN = 0
+var bool traded = false
+var int lastIdx = -1
+var float lastDist = na
+var int barsToday = 0
+var int side = 0
+var float entryPx = na
+var float entryAtr = na
+var float best = 0.0
+
+if firstBar
+    // close out yesterday: its true range goes into the 5-day ATR, its close becomes the previous close
+    if not na(sesC)
+        float tr = na(prevC) ? sesH - sesL : math.max(sesH, prevC) - math.min(sesL, prevC)
+        trs.push(tr)
+        if trs.size() > 5
+            trs.shift()
+        prevC := sesC
+    dayNum += 1
+    dayOpen := open
+    sesH := high
+    sesL := low
+    orH := high
+    orL := low
+    cumPV := 0.0
+    cumV := 0.0
+    cumP := 0.0
+    cumN := 0
+    traded := false
+    lastIdx := -1
+    barsToday := 0
+    int r0 = dayNum % (LOOK + 1)
+    for c = 0 to SESS_LEN - 1
+        dist.set(r0, c, na)
+else if rth
+    sesH := math.max(sesH, high)
+    sesL := math.min(sesL, low)
+    if cIdx < OR_MIN
+        orH := math.max(orH, high)
+        orL := math.min(orL, low)
+if rth
+    barsToday += 1
+    sesC := close
+    cumPV += hlc3 * nz(volume)
+    cumV += nz(volume)
+    cumP += hlc3
+    cumN += 1
+
+float atrD = trs.size() == 5 ? trs.avg() : na
+float vw = rth ? (cumV > 0 ? cumPV / cumV : cumP / cumN) : na
+
+// ---------------------------------------------------------------- noise band: previous LOOK days at this minute
+float sig = na
+int bandDays = 0
+if rth and not na(dayOpen) and cIdx < SESS_LEN
+    int cur = dayNum % (LOOK + 1)
+    float total = 0.0
+    int cnt = 0
+    for r = 0 to LOOK
+        if r != cur
+            float v = dist.get(r, cIdx)
+            if not na(v)
+                total += v
+                cnt += 1
+    sig := cnt >= MIN_DAYS ? total / cnt : na
+    bandDays := cnt
+    float d = math.abs(close / dayOpen - 1)
+    // a minute with no bar keeps the last distance (as the lab did)
+    if lastIdx >= 0 and cIdx - lastIdx > 1
+        for c = lastIdx + 1 to cIdx - 1
+            dist.set(cur, c, lastDist)
+    dist.set(cur, cIdx, d)
+    lastIdx := cIdx
+    lastDist := d
+
+float ub = na
+float lb = na
+if not na(sig) and not na(prevC)
+    ub := math.max(dayOpen, prevC) * (1 + BAND_MULT * sig)
+    lb := math.min(dayOpen, prevC) * (1 - BAND_MULT * sig)
+
+// ---------------------------------------------------------------- exits
+if strategy.position_size != 0 and rth
+    float mv = side * (close - entryPx)
+    best := math.max(best, mv)
+    string reason = ""
+    if TRAIL_TRIG > 0 and best >= TRAIL_TRIG * entryAtr and mv <= (1 - GIVEBACK) * best
+        reason := "gave back half"
+    if STOP_ATR > 0 and mv <= -STOP_ATR * entryAtr
+        reason := "stop"
+    if VWAP_EXIT and side * (close - vw) < 0
+        reason := "crossed VWAP"
+    if cIdx >= EXIT_IDX
+        reason := "15 min before close"
+    if reason != ""
+        strategy.close_all(comment = reason)
+        alert(syminfo.ticker + " noise band: SELL (" + reason + "), price " + str.tostring(close, format.mintick), alert.freq_once_per_bar_close)
+
+// ---------------------------------------------------------------- entries
+// a check happens on the bar that contains the check minute, so any chart timeframe works
+int nextCheck = FIRST_IDX + int(math.ceil(float(math.max(0, mIdx - FIRST_IDX)) / INTERVAL)) * INTERVAL
+bool isCheck = rth and nextCheck <= cIdx and nextCheck <= LAST_IDX
+bool ready = not na(ub) and not na(atrD) and not na(orH)
+bool longSig = ready and close > orH + OR_OFF * atrD and close > ub and (not USE_VWAP or close > vw)
+bool shortSig = ready and close < orL - OR_OFF * atrD and close < lb and (not USE_VWAP or close < vw)
+if isCheck and not traded and strategy.position_size == 0
+    if longSig
+        strategy.entry("Long", strategy.long, qty = qtyNow)
+        traded := true
+        side := 1
+        entryPx := close
+        entryAtr := atrD
+        best := 0.0
+        alert(syminfo.ticker + " noise band: BUY (calls), price " + str.tostring(close, format.mintick) + ", use the strike nearest this price", alert.freq_once_per_bar_close)
+    else if shortSig
+        strategy.entry("Short", strategy.short, qty = qtyNow)
+        traded := true
+        side := -1
+        entryPx := close
+        entryAtr := atrD
+        best := 0.0
+        alert(syminfo.ticker + " noise band: SELL SHORT (puts), price " + str.tostring(close, format.mintick) + ", use the strike nearest this price", alert.freq_once_per_bar_close)
+
+// ---------------------------------------------------------------- drawing
+plot(rth ? ub : na, "Upper band", color.new(color.purple, 0), style = plot.style_linebr)
+plot(rth ? lb : na, "Lower band", color.new(color.purple, 0), style = plot.style_linebr)
+plot(rth ? vw : na, "VWAP", color.new(color.orange, 0), style = plot.style_linebr)
+plot(rth and cIdx >= OR_MIN ? orH + OR_OFF * nz(atrD) : na, "Range high + room", color.new(color.teal, 30), style = plot.style_linebr)
+plot(rth and cIdx >= OR_MIN ? orL - OR_OFF * nz(atrD) : na, "Range low - room", color.new(color.red, 30), style = plot.style_linebr)
+plotshape(isCheck and not traded, "Check", shape.circle, location.bottom, color.new(color.gray, 60), size = size.tiny)
+
+var label status = na
+var int lastBandDays = 0
+if rth and bandDays > 0
+    lastBandDays := bandDays
+if barstate.islast
+    label.delete(status)
+    int pastDays = math.max(dayNum - 1, 0)
+    string msg = preset + " | " + (isFut ? str.tostring(futQty) + " contract(s)" : "100% of equity")
+    msg += " | past days loaded " + str.tostring(pastDays) + " | band uses " + str.tostring(math.min(lastBandDays, LOOK)) + " days"
+    if dayNum == 0
+        msg += " | NO BARS INSIDE THE SESSION: check the session settings and time zone"
+    else if pastDays < MIN_DAYS
+        msg += " | WAITING: needs " + str.tostring(MIN_DAYS) + " past days (use a 5-minute chart or regular hours)"
+    else if na(atrD)
+        msg += " | WAITING: ATR needs 5 days"
+    else
+        msg += " | ready"
+    status := label.new(bar_index, high, msg, style = label.style_label_down, color = color.new(color.gray, 20),
+         textcolor = color.white, size = size.small)
