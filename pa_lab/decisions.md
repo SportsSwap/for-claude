@@ -1114,3 +1114,14 @@ options. With exits judged on 5-minute closes the pick makes +35.1% /
 -2.9% / +9.9% / -0.2%. Compounded on QQQ from $10,000: the pick $17,894 at
 1x (4.3%/yr, worst drop 8.2%), $51,159 at 3x (12.5%/yr, 23.2%), $126,268 at
 5x (20.1%/yr, 36.6%); as written $41,105 at 3x with a 34.3% worst drop.
+
+D72. **Pine script made universal.** The user reported it traded on QQQ but
+not on futures or other stocks. Changes, none of which alter a trade where
+the old script did trade: (a) a minute with no bar keeps the last distance
+from the open (the lab forward-filled the same way), so thin stocks and
+half-day sessions no longer leave holes that blocked the band for 20 days;
+(b) the band starts once 14 past days are loaded and uses up to 20 (the lab
+tested 14 days: the 2013-2021 pick made +19.6% / +21.3% on the two earlier
+periods against +30.4% / +21.0% with 20); (c) a check fires on the bar that
+contains the check minute, so 4-, 15- or 20-minute charts no longer skip
+checks; (d) the label on the last bar says what it is waiting for.
