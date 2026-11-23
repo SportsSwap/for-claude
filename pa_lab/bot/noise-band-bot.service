@@ -1,0 +1,18 @@
+# systemd service: keeps the bot running and restarts it after a disconnect or a reboot.
+# Install (on the cloud computer, as root):
+#   cp noise-band-bot.service /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now noise-band-bot
+# Watch it:  journalctl -u noise-band-bot -f
+[Unit]
+Description=PA Lab noise-band bot
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/pa-bot
+ExecStart=/opt/pa-bot/.venv/bin/python /opt/pa-bot/noise_band_bot.py --config /opt/pa-bot/config.toml
+Restart=always
+RestartSec=60
+User=trader
+
+[Install]
+WantedBy=multi-user.target

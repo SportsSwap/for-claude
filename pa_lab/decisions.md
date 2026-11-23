@@ -1114,3 +1114,17 @@ options. With exits judged on 5-minute closes the pick makes +35.1% /
 -2.9% / +9.9% / -0.2%. Compounded on QQQ from $10,000: the pick $17,894 at
 1x (4.3%/yr, worst drop 8.2%), $51,159 at 3x (12.5%/yr, 23.2%), $126,268 at
 5x (20.1%/yr, 36.6%); as written $41,105 at 3x with a 34.3% worst drop.
+
+D73. **Python bot for Interactive Brokers (noise band, MNQ).** `bot/`. The
+strategy code is written bar by bar and checked against the lab:
+replaying 2013 to Jul 2024 (open data only) gives exactly the lab's trades,
+1,028 of 1,028 for the version picked on 2013-2021 and 926 of 926 for the
+rules as written (`scripts/bot_replay_check.py`). One small difference the
+bot cannot copy: the lab dropped days with fewer than 370 one-minute bars
+before trading them; the bot only learns that at the end of the day, so it
+may trade such a day (they are rare). The broker code is tested offline
+only (helpers and a dry run against a fake broker, `tests/test_bot.py`);
+orders, fills, the live feed and rolls get checked in dry-run and paper
+trading. Contract rolls add one more difference: the first day after a roll
+uses the old contract's close as the previous close, so its band base and
+one day of ATR carry the price gap between the two contracts.

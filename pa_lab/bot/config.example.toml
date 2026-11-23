@@ -1,0 +1,27 @@
+# Copy this file to config.toml and edit it. Start with dry_run = true.
+
+[broker]
+host = "127.0.0.1"
+port = 4002          # IB Gateway: 4002 = paper, 4001 = live.  TWS: 7497 = paper, 7496 = live.
+client_id = 11       # any number; give every bot its own
+account = ""         # your account number (paper accounts start with DU); blank = the default account
+
+[market]
+symbol = "MNQ"       # micro Nasdaq-100 futures (the lab's tested market)
+exchange = "CME"
+currency = "USD"
+roll_days_before_expiry = 8   # switch to the next contract this many days before expiry
+
+[strategy]
+version = "best"     # "best" (picked on 2013-2021, held on later years) or "as_written" (the post's rules)
+contracts = 1
+
+[safety]
+dry_run = true                 # true: log signals only, never send an order
+max_contracts = 2              # refuses to start if contracts is above this
+emergency_stop_atr = 1.0       # broker-side stop, in daily ATR (the strategy's own stop is 0.5 ATR)
+max_drawdown_pct = 20          # no new trades once the account is this far below its high
+
+[files]
+log_dir = "logs"
+state_file = "state.json"
