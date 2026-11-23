@@ -1128,3 +1128,31 @@ orders, fills, the live feed and rolls get checked in dry-run and paper
 trading. Contract rolls add one more difference: the first day after a roll
 uses the old contract's close as the previous close, so its band base and
 one day of ATR carry the price gap between the two contracts.
+
+D74. **Longs and shorts apart, and a long-only search, declared before
+looking.** The user saw most of the noise band's profit come from shorts in
+TradingView and asked for an equally good long version.
+(a) The two issued versions (as written, picked on 2013-2021) are split into
+long and short trades on all three periods (a logged unlock; no choices).
+(b) Long-only search: the D66 grid (2,304 versions), but each day takes only
+the first LONG signal (and, as a mirror check, a short-only run). Scored on
+QQQ itself after 0.02% a round trip. Pick on 2013-Sep 2021 alone (best
+Sharpe, at least 150 trades), then score on 2022-Jul 2024 and Aug 2024-Nov
+2026; also the steadiest (best worst-case Sharpe over the two earlier
+periods). A long-only version is issued only if the pick made on 2013-2021
+has Sharpe 0.5 or more on both later periods. Recent-window results are kept
+for the picks only.
+
+D75. **Result of D74: which side pays has changed over the years.** The
+2013-2021 pick, trades split (QQQ after costs, simple sums): longs +29.0%
+(Sharpe 1.29) / +10.2% (0.96) / -0.4% (-0.04); shorts +1.4% (0.04) / +10.8%
+(0.86) / +9.1% (0.90). As written: longs +17.0% / +21.4% / +5.5%; shorts
+-9.4% / +15.3% / +7.1%. So since Aug 2024 the profit came from shorts, as the
+user saw, but in 2013-2021 it came from longs. Long-only search: 99% / 100%
+of versions profitable in the two earlier periods but only 55% since Aug
+2024; the long-only pick made on 2013-2021 is the issued version's long side
+(-0.4% recently), the steadiest long-only version -2.5%: no long-only version
+issued. Short-only mirror: 13% of versions profitable in 2013-2021, 99% in
+the two later periods; its 2013-2021 pick (band 1.5, 10-minute checks to
+12:00, trailing exit, 0.5 ATR stop) made +8.7% (0.22) / +8.8% (0.60) /
++7.6% (0.67). Keeping both sides is what made money in all three periods.
