@@ -1,0 +1,130 @@
+//@version=6
+// PA Lab: First Candle Rule (from the_quant_room's video). 1-minute chart. NEEDS MORE BACKTESTING.
+//  1. The 09:30-09:35 New York candle (= the first five 1-minute bars) gives the day's high and low.
+//  2. On 1-minute bars after 09:35: wait for a fair value gap that forms as price breaks one of them
+//     (short: high of bar 3 below the low of bar 1, bar 3 closing below the first-candle low).
+//  3. Wait for price to come back into the gap, then an engulfing candle in the trade's direction:
+//     enter at its close. Stop 1 tick beyond that candle and the one before it; target 3 x risk.
+//  One setup a day, entries until 12:00, anything open closes at 15:55. The setup is cancelled if a
+//  bar closes beyond the far side of the gap first.
+// LAB RESULT (Nasdaq-100 minutes 2013-2026, one NQ contract after costs): -$25,327 (2013-Sep 2021),
+// +$8,033 (2022-Jul 2024), -$4,385 (Aug 2024-Nov 2026); win rate 19-26%; direction no better than
+// random. On the S&P 500 it lost in all three periods. For testing only.
+strategy("PA Lab First Candle Rule TEST", shorttitle="First Candle TEST", overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100, commission_type=strategy.commission.percent, commission_value=0.01,
+     slippage=1, margin_long=0, margin_short=0, max_labels_count=500, max_lines_count=500, max_boxes_count=500)
+
+tzIn   = input.string("America/New_York", "Time zone", options=["America/New_York", "America/Chicago", "Europe/London", "Europe/Berlin", "Asia/Tokyo", "Australia/Sydney", "UTC"], group = "Session")
+openH  = input.int(9, "Open: hour", minval = 0, maxval = 23, group = "Session")
+openM  = input.int(30, "Open: minute", minval = 0, maxval = 59, group = "Session")
+lastEntryMin = input.int(150, "Last entry, minutes after the open (150 = 12:00)", minval = 10, group = "Session")
+exitMin = input.int(385, "Close everything, minutes after the open (385 = 15:55)", minval = 20, group = "Session")
+rr     = input.float(3.0, "Target, x risk", minval = 0.5, step = 0.5)
+futQty = input.int(1, "Contracts per trade on futures", minval = 1, group = "Size")
+bool isFut = syminfo.type == "futures"
+float qtyNow = isFut ? futQty : na
+
+if not timeframe.isminutes or timeframe.multiplier != 1
+    runtime.error("Put this strategy on a 1-minute chart.")
+
+// ---------------------------------------------------------------- clock
+int OPEN_MIN = openH * 60 + openM
+int mIdx = (hour(time, tzIn) * 60 + minute(time, tzIn) - OPEN_MIN + 1440) % 1440   // minutes since the open
+int dayKey = year(time - mIdx * 60000, tzIn) * 10000 + month(time - mIdx * 60000, tzIn) * 100 + dayofmonth(time - mIdx * 60000, tzIn)
+bool inDay = mIdx < exitMin + 5
+var int lastKey = 0
+bool newDay = inDay and dayKey != lastKey and mIdx < 5
+if newDay
+    lastKey := dayKey
+
+// ---------------------------------------------------------------- state
+var float fh = na
+var float fl = na
+var int stage = 0          // 0 building first candle, 1 waiting for the gap, 2 waiting for retest + engulfing, 3 done
+var int side = 0
+var float gapLo = na
+var float gapHi = na
+var bool retested = false
+var box gapBox = na
+bool retestNow = false
+if newDay
+    fh := high
+    fl := low
+    stage := 0
+    side := 0
+    retested := false
+else if mIdx < 5 and stage == 0
+    fh := math.max(fh, high)
+    fl := math.min(fl, low)
+if mIdx == 4 and stage == 0
+    stage := 1
+
+// ---------------------------------------------------------------- the setup (1-minute bars after 09:35)
+bool canEnter = mIdx < lastEntryMin and strategy.position_size == 0
+if stage == 1 and mIdx >= 7 and canEnter
+    if high < low[2] and close < fl
+        stage := 2
+        side := -1
+        gapLo := high
+        gapHi := low[2]
+        gapBox := box.new(bar_index - 2, gapHi, bar_index + 20, gapLo, border_color = color.new(color.red, 60), bgcolor = color.new(color.red, 85))
+        label.new(bar_index, high, "gap (break down)", style = label.style_label_down, color = color.new(color.red, 30), textcolor = color.white, size = size.tiny)
+    else if low > high[2] and close > fh
+        stage := 2
+        side := 1
+        gapLo := high[2]
+        gapHi := low
+        gapBox := box.new(bar_index - 2, gapHi, bar_index + 20, gapLo, border_color = color.new(color.teal, 60), bgcolor = color.new(color.teal, 85))
+        label.new(bar_index, low, "gap (break up)", style = label.style_label_up, color = color.new(color.teal, 30), textcolor = color.white, size = size.tiny)
+else if stage == 2
+    if not canEnter and strategy.position_size == 0
+        stage := 3                                            // past 12:00: no entry today
+    else if side == -1
+        if close > gapHi
+            stage := 3                                        // closed beyond the far side: cancelled
+        else
+            if high >= gapLo and not retested
+                retested := true
+                retestNow := true
+            bool eng = close[1] > open[1] and close < open and open >= close[1] and close <= open[1]
+            if retested and eng
+                float stopPx = math.max(high, high[1]) + syminfo.mintick
+                float risk = stopPx - close
+                if risk >= syminfo.mintick
+                    strategy.entry("Short", strategy.short, qty = qtyNow)
+                    strategy.exit("Short exit", "Short", stop = stopPx, limit = close - rr * risk)
+                    line.new(bar_index, stopPx, bar_index + 30, stopPx, color = color.red, width = 2)
+                    line.new(bar_index, close - rr * risk, bar_index + 30, close - rr * risk, color = color.green, width = 2)
+                    label.new(bar_index, stopPx, "ENGULFING: SELL " + str.tostring(close, format.mintick) + "\nstop " + str.tostring(stopPx, format.mintick) + "  target " + str.tostring(close - rr * risk, format.mintick), style = label.style_label_down, color = color.new(color.red, 10), textcolor = color.white, size = size.small)
+                    alert(syminfo.ticker + " first candle: SELL, stop " + str.tostring(stopPx, format.mintick) + ", target " + str.tostring(close - rr * risk, format.mintick), alert.freq_once_per_bar_close)
+                stage := 3
+    else
+        if close < gapLo
+            stage := 3
+        else
+            if low <= gapHi and not retested
+                retested := true
+                retestNow := true
+            bool eng = close[1] < open[1] and close > open and open <= close[1] and close >= open[1]
+            if retested and eng
+                float stopPx = math.min(low, low[1]) - syminfo.mintick
+                float risk = close - stopPx
+                if risk >= syminfo.mintick
+                    strategy.entry("Long", strategy.long, qty = qtyNow)
+                    strategy.exit("Long exit", "Long", stop = stopPx, limit = close + rr * risk)
+                    line.new(bar_index, stopPx, bar_index + 30, stopPx, color = color.red, width = 2)
+                    line.new(bar_index, close + rr * risk, bar_index + 30, close + rr * risk, color = color.green, width = 2)
+                    label.new(bar_index, stopPx, "ENGULFING: BUY " + str.tostring(close, format.mintick) + "\nstop " + str.tostring(stopPx, format.mintick) + "  target " + str.tostring(close + rr * risk, format.mintick), style = label.style_label_up, color = color.new(color.teal, 10), textcolor = color.white, size = size.small)
+                    alert(syminfo.ticker + " first candle: BUY, stop " + str.tostring(stopPx, format.mintick) + ", target " + str.tostring(close + rr * risk, format.mintick), alert.freq_once_per_bar_close)
+                stage := 3
+
+// out by the end of the day
+if strategy.position_size != 0 and mIdx >= exitMin - 1 and mIdx < exitMin + 5
+    strategy.close_all(comment = "end of day")
+
+// ---------------------------------------------------------------- drawing
+plot(inDay and mIdx >= 5 ? fh : na, "First candle high", color.new(color.blue, 0), style = plot.style_linebr)
+plot(inDay and mIdx >= 5 ? fl : na, "First candle low", color.new(color.blue, 0), style = plot.style_linebr)
+bgcolor(mIdx < 5 ? color.new(color.blue, 85) : na, title = "First candle")
+plotshape(retestNow, "Retest of the gap", shape.circle, location.abovebar, color.new(color.orange, 0), size = size.tiny, text = "retest", textcolor = color.orange)

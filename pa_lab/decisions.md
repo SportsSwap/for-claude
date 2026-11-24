@@ -1156,3 +1156,27 @@ issued. Short-only mirror: 13% of versions profitable in 2013-2021, 99% in
 the two later periods; its 2013-2021 pick (band 1.5, 10-minute checks to
 12:00, trailing exit, 0.5 ATR stop) made +8.7% (0.22) / +8.8% (0.60) /
 +7.6% (0.67). Keeping both sides is what made money in all three periods.
+
+## First Candle Rule (video from the_quant_room)
+
+D76. **First Candle Rule, tested as the video states it** (rules declared
+before looking: results/first_candle_rule/declaration.md;
+`scripts/first_candle_rule.py`). The 09:30-09:35 candle's high and low; on
+1-minute bars a fair value gap as price breaks one of them, a retest of the
+gap, an engulfing candle, entry at its close, 3R target. The video does not
+say where the stop goes, when entries end, when to give up on a setup or what
+happens to an open trade at the end of the day; the choices (stop just beyond
+the engulfing candle and the one before it, entries until 12:00, cancel on a
+close beyond the far side of the gap, out at 15:55) were fixed first and then
+each changed in a robustness check. One NQ contract after costs: -$25,327
+(2013-Sep 2021, 624 trades, 19% winners) / +$8,033 (2022-Jul 2024) / -$4,385
+(Aug 2024-Nov 2026); random directions did as well (p = 0.70); ES lost in all
+three periods. Every robustness variant also lost in 2013-2021 and since Aug
+2024. Added to the TradingView scripts at the user's request, marked "needs
+more backtesting".
+
+(Also run in this period, outside the project at the user's request and not
+issued: the noise band on the night session (no edge, p = 0.67), an
+overnight hold after down days (positive in all three periods but below the
+declared bar in 2022-Jul 2024), and buy-at-close / sell-at-open test scripts.
+The seal's access log records those reads.)

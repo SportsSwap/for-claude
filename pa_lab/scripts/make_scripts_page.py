@@ -17,6 +17,9 @@ CARDS = [
     ("noisebandtest", "Noise band, any symbol: NEW TEST VERSION", "5-minute chart · any stock, ETF or future", "Not tested yet",
      "Same rules as the card above, with fixes for other symbols: minutes with no trades and half-day sessions no longer block the band, it starts once 14 days are loaded (uses up to 20), checks work on any minute chart up to 30 minutes, and the label on the last bar says 'ready' or what it is waiting for. Shows up in TradingView as 'PA Lab Noise Band TEST', so you can compare it with the version above.",
      "Being tested by you before it replaces the version above. Where the version above trades, this one takes the same trades; the lab tested a 14-day band too (best version +19.6% · +21.3% on the two earlier periods against +30.4% · +21.0% with 20 days).", "palab_noise_band_test.pine"),
+    ("firstcandle", "First Candle Rule (from the post's video)", "1-minute chart · stocks or MNQ1!", "Needs more backtesting",
+     "NEEDS TO BE BACKTESTED MORE before any real money. The 09:30-09:35 New York candle sets the day's high and low; on 1-minute bars, wait for a fair value gap as price breaks one of them, a retest of the gap and an engulfing candle; enter at its close, stop just beyond the engulfing candle, target 3 x risk. One setup a day, entries until 12:00, out by 15:55. The chart marks every step (gap, retest, entry, stop and target lines) so each trade can be checked.",
+     "Lab, one NQ contract after costs: 2013-Sep 2021 -$25,327 · 2022-Jul 2024 +$8,033 · Aug 2024-Nov 2026 -$4,385; win rate 19-26%; on the S&P 500 it lost in all three periods. Looked reasonable in the user's own TradingView test; more testing needed.", "palab_first_candle_rule.pine"),
 ]
 
 
