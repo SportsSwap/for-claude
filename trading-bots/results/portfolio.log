@@ -1,0 +1,51 @@
+B  01 Faber GTAA trend
+A  02 Time series momentum
+C  03 Keller VAA dual momentum
+B  04 Crypto Donchian trend BTC
+F  05 VIX term structure SVXY
+F  06 Connors RSI2 index ETFs
+A  07 IBS mean reversion
+A  08 Overnight after down days
+B  09 Turn of the month SPY
+C  10 Sector momentum rotation
+F  11 FX trend majors
+A  12 Lower band IBS SPY QQQ
+A  13 Your MACD 12-144-9 dip rule
+A  14 Keller HAA
+B  15 Volatility Edge VIX
+F  16 Connors Double 7s
+A  17 Crypto trend top coins
+
+Members: ['01 Faber GTAA trend', '02 Time series momentum', '04 Crypto Donchian trend BTC', '07 IBS mean reversion', '08 Overnight after down days', '09 Turn of the month SPY', '12 Lower band IBS SPY QQQ', '14 Keller HAA', '15 Volatility Edge VIX']
+
+OOS correlation of daily returns:
+                              01 Faber GTAA trend  02 Time series momentum  04 Crypto Donchian trend BTC  07 IBS mean reversion  08 Overnight after down days  09 Turn of the month SPY  12 Lower band IBS SPY QQQ  14 Keller HAA  15 Volatility Edge VIX
+01 Faber GTAA trend                          1.00                     0.74                          0.16                   0.43                          0.15                      0.38                       0.24           0.78                    0.49
+02 Time series momentum                      0.74                     1.00                          0.10                   0.30                          0.11                      0.24                       0.15           0.69                    0.28
+04 Crypto Donchian trend BTC                 0.16                     0.10                          1.00                   0.13                          0.03                      0.09                       0.04           0.16                    0.16
+07 IBS mean reversion                        0.43                     0.30                          0.13                   1.00                          0.14                      0.36                       0.54           0.39                    0.39
+08 Overnight after down days                 0.15                     0.11                          0.03                   0.14                          1.00                      0.06                       0.09           0.15                    0.12
+09 Turn of the month SPY                     0.38                     0.24                          0.09                   0.36                          0.06                      1.00                       0.27           0.33                    0.34
+12 Lower band IBS SPY QQQ                    0.24                     0.15                          0.04                   0.54                          0.09                      0.27                       1.00           0.19                    0.16
+14 Keller HAA                                0.78                     0.69                          0.16                   0.39                          0.15                      0.33                       0.19           1.00                    0.46
+15 Volatility Edge VIX                       0.49                     0.28                          0.16                   0.39                          0.12                      0.34                       0.16           0.46                    1.00
+
+2015-2026 without crypto | unlevered   avg gross exposure 0.46x (max 1.00x)
+   portfolio CAGR 6.2% Sharpe 1.44 maxDD -5.4% worst yr -1.3% yrs up 92%
+   SPY       CAGR 13.3% Sharpe 0.79 maxDD -33.7%
+   yearly {2015: -1.3, 2016: 3.3, 2017: 6.8, 2018: 0.5, 2019: 7.1, 2020: 12.3, 2021: 10.1, 2022: 0.0, 2023: 8.3, 2024: 6.2, 2025: 7.8, 2026: 9.8}
+
+2015-2026 without crypto | stacked to 10% vol (margin)   avg gross exposure 0.91x (max 2.00x)
+   portfolio CAGR 10.0% Sharpe 1.19 maxDD -10.9% worst yr -2.7% yrs up 75%
+   SPY       CAGR 13.3% Sharpe 0.79 maxDD -33.7%
+   yearly {2015: -2.7, 2016: 6.3, 2017: 13.3, 2018: -0.7, 2019: 12.7, 2020: 22.9, 2021: 19.1, 2022: -1.7, 2023: 11.9, 2024: 7.4, 2025: 10.9, 2026: 16.4}
+
+2020-2026 all members | unlevered   avg gross exposure 0.46x (max 0.90x)
+   portfolio CAGR 8.1% Sharpe 1.75 maxDD -5.4% worst yr -1.1% yrs up 86%
+   SPY       CAGR 14.8% Sharpe 0.90 maxDD -24.5%
+   yearly {2020: 8.0, 2021: 10.8, 2022: -1.1, 2023: 10.0, 2024: 7.2, 2025: 7.1, 2026: 9.4}
+
+2020-2026 all members | stacked to 10% vol (margin)   avg gross exposure 0.90x (max 1.80x)
+   portfolio CAGR 13.2% Sharpe 1.44 maxDD -11.0% worst yr -3.8% yrs up 86%
+   SPY       CAGR 14.8% Sharpe 0.90 maxDD -24.5%
+   yearly {2020: 16.3, 2021: 22.0, 2022: -3.8, 2023: 15.4, 2024: 9.6, 2025: 9.6, 2026: 15.7}

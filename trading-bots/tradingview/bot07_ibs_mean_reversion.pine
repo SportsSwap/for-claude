@@ -1,0 +1,25 @@
+//@version=6
+// Bot 07 - IBS mean reversion (Pagonidis 2013; Quantified Strategies)
+// Validated in Python on SPY QQQ IWM DIA, 1993-2026: settings picked on data
+// up to 2012, then 2013-2026 out of sample: CAGR 11.8%, Sharpe 0.91, max DD -20%
+// for the 4-ETF basket at 2 bps per side. Use on a DAILY chart of an index ETF.
+// Fills at the bar's close (process_orders_on_close) = a market-on-close order.
+// Not compiled here: paste into the Pine Editor and check it before relying on it.
+strategy("Bot 07 IBS mean reversion", overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02,
+     initial_capital = 10000)
+
+buyBelow  = input.float(0.15, "Buy when IBS is below", step = 0.05)
+sellAbove = input.float(0.80, "Sell when IBS is above", step = 0.05)
+useTrend  = input.bool(false, "Only buy above the 200-day SMA")
+
+ibs     = high != low ? (close - low) / (high - low) : 0.5
+trendOk = not useTrend or close > ta.sma(close, 200)
+
+if strategy.position_size == 0 and ibs < buyBelow and trendOk
+    strategy.entry("Long", strategy.long)
+if strategy.position_size > 0 and (close > high[1] or ibs > sellAbove)
+    strategy.close("Long")
+
+plotshape(strategy.position_size == 0 and ibs < buyBelow and trendOk, "Buy signal", shape.triangleup, location.belowbar, color.green, size = size.tiny)

@@ -1,0 +1,27 @@
+//@version=6
+// Bot 12 - Lower band + IBS mean reversion (quantitativo.substack.com, 2024)
+// Validated in Python on SPY + QQQ: settings picked on data up to 2012, then
+// 2013-2026 out of sample: CAGR 8.6%, Sharpe 0.88, max DD -14.5%, in the market
+// only ~11% of days. The paper's settings were N=10, k=2.5; the plateau pick was N=5, k=3.
+// Use on a DAILY chart. Fills at the bar's close (market-on-close).
+// Not compiled here: paste into the Pine Editor and check it before relying on it.
+strategy("Bot 12 Lower band IBS", overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02,
+     initial_capital = 10000)
+
+n      = input.int(5, "Lookback for the high (days)")
+k      = input.float(3.0, "Band = high minus k x average range", step = 0.25)
+rngLen = input.int(25, "Average range length (days)")
+ibsMax = input.float(0.3, "Buy only when IBS is below", step = 0.05)
+
+avgRange = ta.sma(high - low, rngLen)
+band     = ta.highest(high, n) - k * avgRange
+ibs      = high != low ? (close - low) / (high - low) : 0.5
+
+if strategy.position_size == 0 and close < band and ibs < ibsMax
+    strategy.entry("Long", strategy.long)
+if strategy.position_size > 0 and close > high[1]
+    strategy.close("Long")
+
+plot(band, "Lower band", color.orange)
