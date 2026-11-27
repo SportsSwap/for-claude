@@ -1,0 +1,37 @@
+{
+ "members": [
+  "F06 IBS dip buy NQ",
+  "F07 Lower band IBS NQ",
+  "F12 Turnaround Tuesday NQ"
+ ],
+ "usd_per_year": 11142.293453239436,
+ "net_usd": 54148.038,
+ "max_dd_usd": -5361.256000000019,
+ "sharpe": 1.7384011209533101,
+ "yearly_usd": {
+  "2022": 5600,
+  "2023": 11969,
+  "2024": 12110,
+  "2025": 11374,
+  "2026": 13095
+ },
+ "max_contracts_open": 3,
+ "avg_contracts_open": 0.8488188976377953,
+ "corr": {
+  "F06 IBS dip buy NQ": {
+   "F06 IBS dip buy NQ": 1.0,
+   "F07 Lower band IBS NQ": 0.15,
+   "F12 Turnaround Tuesday NQ": -0.01
+  },
+  "F07 Lower band IBS NQ": {
+   "F06 IBS dip buy NQ": 0.15,
+   "F07 Lower band IBS NQ": 1.0,
+   "F12 Turnaround Tuesday NQ": 0.02
+  },
+  "F12 Turnaround Tuesday NQ": {
+   "F06 IBS dip buy NQ": -0.01,
+   "F07 Lower band IBS NQ": 0.02,
+   "F12 Turnaround Tuesday NQ": 1.0
+  }
+ }
+}

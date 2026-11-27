@@ -1,0 +1,65 @@
+//@version=6
+// Bot 03 - Keller & Keuning Vigilant Asset Allocation, G4 (2017)
+// Score 13612W = 12 x 1m + 4 x 3m + 2 x 6m + 12m return (months ~ 21 trading days).
+// Month end: if all of SPY EFA EEM AGG score above 0, hold the top N of them; if any is
+// negative, hold 100% of the best of LQD IEF SHY. Trades at the next open.
+// Put this on a chart of any of the 7 tickers: the tester trades that ticker whenever the bot
+// holds it; the table shows the whole allocation. Validated 2015-2026: 4.5%/yr, Sharpe 0.51,
+// worst fall -23%. Grade C (decayed after publication; bot 14 HAA did better).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 03 Keller VAA", overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.04)
+
+topN = input.int(2, "Offensive assets to hold", minval = 1, maxval = 4)
+
+score() => 12 * (close / close[21] - 1) + 4 * (close / close[63] - 1) + 2 * (close / close[126] - 1) + (close / close[252] - 1)
+float sSPY = request.security("SPY", "D", score())
+float sEFA = request.security("EFA", "D", score())
+float sEEM = request.security("EEM", "D", score())
+float sAGG = request.security("AGG", "D", score())
+float sLQD = request.security("LQD", "D", score())
+float sIEF = request.security("IEF", "D", score())
+float sSHY = request.security("SHY", "D", score())
+
+off = array.from(sSPY, sEFA, sEEM, sAGG)
+offNames = array.from("SPY", "EFA", "EEM", "AGG")
+defs = array.from(sLQD, sIEF, sSHY)
+defNames = array.from("LQD", "IEF", "SHY")
+
+rankOf(array<float> a, int i) =>
+    int r = 0
+    for j = 0 to a.size() - 1
+        if a.get(j) > a.get(i)
+            r += 1
+    r
+
+float w = 0.0
+bool defensive = sSPY <= 0 or sEFA <= 0 or sEEM <= 0 or sAGG <= 0
+if not na(sSPY) and not na(sEEM) and not na(sAGG) and not na(sSHY)
+    if defensive
+        for i = 0 to 2
+            if rankOf(defs, i) == 0 and defNames.get(i) == syminfo.ticker
+                w := 1.0
+    else
+        for i = 0 to 3
+            if rankOf(off, i) < topN and offNames.get(i) == syminfo.ticker
+                w := 1.0 / topN
+
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+if monthEnd and not na(sSHY)
+    float diff = w * strategy.equity / close - strategy.position_size
+    if math.abs(diff) * close > 0.01 * strategy.equity
+        strategy.order("rebalance", diff > 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, "Weight of this ticker (%)", color.teal, style = plot.style_stepline)
+var table tb = table.new(position.top_right, 2, 9, border_width = 1)
+if barstate.islast
+    table.cell(tb, 0, 0, defensive ? "Mode: DEFENSIVE" : "Mode: offensive", bgcolor = defensive ? color.new(color.red, 70) : color.new(color.green, 70))
+    table.cell(tb, 1, 0, "13612W score")
+    for i = 0 to 3
+        table.cell(tb, 0, i + 1, offNames.get(i))
+        table.cell(tb, 1, i + 1, str.tostring(off.get(i), "#.##"))
+    for i = 0 to 2
+        table.cell(tb, 0, i + 5, defNames.get(i))
+        table.cell(tb, 1, i + 5, str.tostring(defs.get(i), "#.##"))

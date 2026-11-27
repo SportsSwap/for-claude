@@ -1,0 +1,18 @@
+//@version=6
+// Bot 06 - Connors RSI(2) (Connors & Alvarez 2008). Daily chart of SPY, QQQ, IWM or DIA.
+// Buy at the close when RSI(2) < X and the close is above the 200-day average; sell at the
+// close when RSI(2) > 70. Validated 2013-2026 out of sample (4-ETF basket): 3.7%/yr,
+// Sharpe 0.36, worst fall -41%. Grade F (decayed since the book).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 06 Connors RSI2", overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+entryBelow = input.int(10, "Buy when RSI(2) is below")
+exitAbove  = input.int(70, "Sell when RSI(2) is above")
+r = ta.rsi(close, 2)
+trendOk = close > ta.sma(close, 200)
+if strategy.position_size == 0 and r < entryBelow and trendOk
+    strategy.entry("Long", strategy.long)
+if strategy.position_size > 0 and r > exitAbove
+    strategy.close("Long")

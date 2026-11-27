@@ -1,0 +1,20 @@
+//@version=6
+// Bot 05 - VIX term structure on SVXY (Simon & Campasano 2014). Put it on an SVXY daily chart.
+// Hold SVXY while VIX / VIX3M is below the threshold (contango), else cash; trades at the next open.
+// Validated 2017-2026 out of sample: 6.5%/yr, Sharpe 0.36, worst fall -50%. Grade F: do not run
+// this one with real money; it is here so you can see why. Bot 15 is the better version.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 05 VIX term structure SVXY", overlay = false, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, initial_capital = 10000, commission_type = strategy.commission.percent,
+     commission_value = 0.08)
+
+thr = input.float(0.95, "Hold when VIX / VIX3M is below", step = 0.01)
+float vix = request.security("CBOE:VIX", "D", close)
+float vix3m = request.security("CBOE:VIX3M", "D", close)
+float ratio = vix / vix3m
+if ratio < thr and strategy.position_size == 0
+    strategy.entry("Long", strategy.long)
+if ratio >= thr and strategy.position_size > 0
+    strategy.close("Long")
+plot(ratio, "VIX / VIX3M", color.purple)
+hline(1.0, "Backwardation line")

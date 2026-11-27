@@ -1,0 +1,17 @@
+//@version=6
+// Bot 16 - Connors Double 7s (Connors & Alvarez 2008). Daily chart of SPY, QQQ, IWM or DIA.
+// Buy at the close on an N-day closing low (optionally only above the 200-day average); sell at
+// the close on an N-day closing high. Validated 2013-2026 out of sample: 6.5%/yr, Sharpe 0.47,
+// worst fall -36%, walk-forward Sharpe 0.28. Grade F (decayed).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 16 Connors Double 7s", overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+n = input.int(5, "N-day closing low / high")
+useTrend = input.bool(false, "Only above the 200-day average")
+bool entry = close <= ta.lowest(close, n) and (not useTrend or close > ta.sma(close, 200))
+if strategy.position_size == 0 and entry
+    strategy.entry("Long", strategy.long)
+if strategy.position_size > 0 and close >= ta.highest(close, n)
+    strategy.close("Long")

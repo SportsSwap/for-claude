@@ -1,0 +1,39 @@
+//@version=6
+// F08 - Opening gap fade / go on index futures. Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-5 minutes.
+// At 09:30, if the open is at least k x ATR(14) away from yesterday's 16:00 close: "fade" trades back
+// toward that close (target = that close, stop = the same distance the other way); "go" trades with
+// the gap (stop = yesterday's close). Out at 16:00.
+// Validated on 1-minute data, 1 MNQ: 2022-2026 lost (-$2,026/yr for the plateau setting). Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F08 Opening gap", overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k = input.float(0.25, "Smallest gap (x ATR)", step = 0.05)
+mode = input.string("fade", "Mode", options = ["fade", "go"])
+string TZ = "America/New_York"
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+bool firstBar = hour(time, TZ) == 9 and minute(time, TZ) == 30
+float atrD = request.security(syminfo.tickerid, "D", ta.atr(14)[1], lookahead = barmerge.lookahead_on)
+var float lastClose = na
+if firstBar and not na(lastClose) and strategy.position_size == 0
+    float g = open - lastClose
+    if math.abs(g) >= k * atrD
+        if mode == "fade"
+            if g > 0
+                strategy.entry("Short", strategy.short)
+                strategy.exit("Short exit", "Short", limit = lastClose, stop = open + math.abs(g))
+            else
+                strategy.entry("Long", strategy.long)
+                strategy.exit("Long exit", "Long", limit = lastClose, stop = open - math.abs(g))
+        else
+            if g > 0
+                strategy.entry("Long", strategy.long)
+                strategy.exit("Long exit", "Long", stop = lastClose)
+            else
+                strategy.entry("Short", strategy.short)
+                strategy.exit("Short exit", "Short", stop = lastClose)
+if hm >= 959 and hm <= 960 and strategy.position_size != 0
+    strategy.close_all(comment = "16:00")
+if hm == 960
+    lastClose := close

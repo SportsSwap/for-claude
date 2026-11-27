@@ -1,0 +1,48 @@
+//@version=6
+// F02 - Opening range breakout (Zarattini, Barbon & Aziz 2023, "Can Day Trading Really Be Profitable?").
+// Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ/TQQQ) on 1 or 5 minutes.
+// Trade in the direction of the first N-minute candle (no trade on a doji) at the next bar's open.
+// Stop: the opening range's other side, or 10% of the 14-day ATR. Target: R x risk, else out at 16:00.
+// Validated on Nasdaq-100 1-minute data, 1 MNQ (5-minute range, 10R, ATR stop): 2011-2021 lost
+// -$459/yr; 2022-2026 +$1,131/yr (profit factor 1.08). On ES it lost in both. Grade F: the paper's
+// results do not survive realistic costs on futures, which matches independent tests.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F02 Opening range breakout", overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+orMin    = input.int(5, "Opening range (minutes)", options = [5, 15, 30])
+targetR  = input.float(10, "Target in R (0 = hold to 16:00)", step = 1)
+stopMode = input.string("ATR 10%", "Stop", options = ["Opening range", "ATR 10%"])
+
+string TZ = "America/New_York"
+bool inSess = not na(time(timeframe.period, "0930-1600", TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570
+float atrD = request.security(syminfo.tickerid, "D", ta.atr(14)[1], lookahead = barmerge.lookahead_on)
+
+var float dayOpen = na
+var float orHi = na
+var float orLo = na
+if newDay
+    dayOpen := open
+    orHi := high
+    orLo := low
+else if inSess and cm <= orMin
+    orHi := math.max(orHi, high)
+    orLo := math.min(orLo, low)
+
+if inSess and cm == orMin and strategy.position_size == 0 and close != dayOpen
+    int dir = close > dayOpen ? 1 : -1
+    float stop = stopMode == "Opening range" ? (dir > 0 ? orLo : orHi) : close - dir * 0.1 * atrD
+    float risk = math.abs(close - stop)
+    if risk > 0
+        float tgt = targetR > 0 ? close + dir * targetR * risk : na
+        if dir > 0
+            strategy.entry("Long", strategy.long)
+            strategy.exit("Long exit", "Long", stop = stop, limit = tgt)
+        else
+            strategy.entry("Short", strategy.short)
+            strategy.exit("Short exit", "Short", stop = stop, limit = tgt)
+if inSess and cm >= 389 and strategy.position_size != 0
+    strategy.close_all(comment = "16:00")

@@ -1,0 +1,1630 @@
+<title>Trading Bot Pine Scripts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column of script cards under a sticky filter bar; code folds away until needed. */
+:root {
+  --bg: #f5f6f4; --panel: #ffffff; --ink: #1d2321; --muted: #5d6763; --line: #dde2de;
+  --accent: #0f6e5c; --accent-ink: #ffffff; --code-bg: #f0f3f1;
+  --ok: #157347; --info: #2f5d8a; --warn: #9a6400; --bad: #b3362d;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121615; --panel: #1a201e; --ink: #e6ebe8; --muted: #9aa5a0; --line: #2c3431;
+  --accent: #3fb59b; --accent-ink: #0d1412; --code-bg: #0e1211;
+  --ok: #4cc38a; --info: #7aa7d6; --warn: #e0a53f; --bad: #ef7a6f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121615; --panel: #1a201e; --ink: #e6ebe8; --muted: #9aa5a0; --line: #2c3431;
+  --accent: #3fb59b; --accent-ink: #0d1412; --code-bg: #0e1211;
+  --ok: #4cc38a; --info: #7aa7d6; --warn: #e0a53f; --bad: #ef7a6f; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 920px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-size: 1.9rem; font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0 0 14px; color: var(--muted); max-width: 66ch; }
+.steps { margin: 0 0 18px; padding-left: 1.2em; max-width: 70ch; }
+.steps li { margin: 2px 0; }
+kbd { font-family: var(--mono); font-size: 0.85em; background: var(--code-bg); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; margin-bottom: 12px;
+  border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { font: inherit; font-size: 0.9rem; background: var(--panel); color: var(--ink); border: 0; padding: 6px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.search { flex: 1 1 180px; min-width: 0; font: inherit; font-size: 0.9rem; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--ink); }
+.toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 0.9rem; color: var(--muted); }
+.count { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.list { display: flex; flex-direction: column; gap: 12px; }
+.bot { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; }
+.bot-head { display: flex; align-items: center; gap: 10px; }
+.bot h3 { margin: 0; font-size: 1.05rem; font-weight: 600; flex: 1; min-width: 0; }
+.chip { font-family: var(--mono); font-weight: 500; font-size: 0.85rem; min-width: 1.9em; text-align: center; padding: 1px 6px; border-radius: 6px; border: 1.5px solid currentColor; }
+.gA { color: var(--ok); } .gB { color: var(--info); } .gC { color: var(--warn); } .gF { color: var(--bad); }
+.copy { font: inherit; font-size: 0.88rem; font-weight: 500; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 7px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.copy.done { background: var(--ok); }
+button:focus-visible, .search:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rule { margin: 8px 0 6px; }
+.facts { display: grid; grid-template-columns: 1fr; gap: 4px; margin: 0 0 8px; font-size: 0.9rem; }
+.facts div { display: grid; grid-template-columns: 7.5em 1fr; gap: 8px; }
+.facts dt { color: var(--muted); } .facts dd { margin: 0; min-width: 0; }
+details summary { cursor: pointer; font-size: 0.9rem; color: var(--accent); }
+.lines { color: var(--muted); font-family: var(--mono); font-size: 0.8rem; margin-left: 6px; }
+pre { margin: 8px 0 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px; overflow: auto; max-height: 460px; font-family: var(--mono); font-size: 12.5px; line-height: 1.45; }
+.foot { margin-top: 28px; color: var(--muted); font-size: 0.88rem; max-width: 72ch; }
+.foot p { margin: 6px 0; }
+@media (max-width: 520px) { .bot-head { flex-wrap: wrap; } .facts div { grid-template-columns: 1fr; gap: 0; } }
+</style>
+
+<div class="wrap">
+  <h1>Trading Bot Pine Scripts</h1>
+  <p class="lede">27 TradingView strategies: 12 futures bots for Nasdaq-100 and S&amp;P 500 contracts, and 15 systematic bots for ETFs, crypto and forex. Each one was backtested in Python first; the result line is what that test found, after costs, on years it never saw.</p>
+  <ol class="steps">
+    <li>Press <b>Copy code</b> on a bot.</li>
+    <li>In TradingView open the chart it names, then <kbd>Pine Editor</kbd> → select all → paste → <kbd>Add to chart</kbd>.</li>
+    <li>Read the <kbd>Strategy Tester</kbd> tab, then paper trade before any real money.</li>
+  </ol>
+  <div class="bar" role="toolbar" aria-label="Filter scripts">
+    <div class="seg" id="group-filter">
+      <button type="button" id="g-all" data-group="all" aria-pressed="true">All</button>
+      <button type="button" id="g-fut" data-group="Futures" aria-pressed="false">Futures</button>
+      <button type="button" id="g-sys" data-group="Systematic" aria-pressed="false">Systematic</button>
+    </div>
+    <label class="toggle"><input type="checkbox" id="passed-only"> Passed only (A, B)</label>
+    <input class="search" id="search" type="search" placeholder="Search: IBS, FVG, QQQ…" aria-label="Search scripts">
+    <span class="count" id="count"></span>
+  </div>
+  <div class="list" id="list">
+
+    <article class="bot" data-group="Futures" data-grade="A" data-search="f07 lower band ibs buy the 16:00 close when price is below (20-day high − 3 × average range) and ibs &lt; 0.3; sell a close above yesterday&#x27;s high. mnq1! / nq1! · 5 or 15 min · extended hours on">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>F07 Lower band IBS</h3>
+        <button class="copy" type="button" data-target="code-0" id="btn-0">Copy code</button>
+      </div>
+      <p class="rule">Buy the 16:00 close when price is below (20-day high − 3 × average range) and IBS &lt; 0.3; sell a close above yesterday&#x27;s high.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 5 or 15 min · extended hours on</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$4,571/yr, profit factor 2.43, 72% winners, all 5 years up. ES: +$1,325/yr per MES.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">54 lines · f07_lower_band_ibs.pine</span></summary>
+        <pre id="code-0"><code>//@version=6
+// F07 - Lower band + IBS on index futures (quantitativo.substack.com, bot 12 in contracts).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! on 5 or 15 minutes, extended hours ON.
+// Regular-session (09:30-16:00) bars are built on the chart. At the 16:00 bar: band = highest
+// session high of the last N days - k x the 25-day average session range. Buy 1 contract when
+// the close is below the band and IBS &lt; 0.3; sell at a 16:00 close above the previous session&#x27;s high.
+// Validated on Nasdaq-100 1-minute data, 1 MNQ (N = 20, k = 3): 2011-2021 +$1,671/yr, 11 of 11 years
+// up; 2022-2026 +$4,571/yr, profit factor 2.43, 72% winners, 5 of 5 years up. Best futures bot. Grade A.
+// ES (N = 5, k = 2): +$1,325/yr.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F07 Lower band IBS&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+n = input.int(20, &quot;Days for the highest high&quot;)
+k = input.float(3.0, &quot;Band = high minus k x average range&quot;, step = 0.25)
+ibsMax = input.float(0.3, &quot;Buy only when IBS is below&quot;, step = 0.05)
+
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+bool atClose = inSess and hour(time_close, TZ) == 16 and minute(time_close, TZ) == 0
+
+var float hi = na
+var float lo = na
+var float prevHi = na
+var array&lt;float&gt; highs = array.new&lt;float&gt;()
+var array&lt;float&gt; ranges = array.new&lt;float&gt;()
+if newDay
+    hi := high
+    lo := low
+else if inSess
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+
+if atClose and not na(hi)
+    highs.push(hi)
+    ranges.push(hi - lo)
+    if highs.size() &gt; 60
+        highs.shift()
+    if ranges.size() &gt; 60
+        ranges.shift()
+    if highs.size() &gt;= math.max(n, 25)
+        float hh = array.max(highs.slice(highs.size() - n, highs.size()))
+        float ar = array.avg(ranges.slice(ranges.size() - 25, ranges.size()))
+        float band = hh - k * ar
+        float ibs = hi != lo ? (close - lo) / (hi - lo) : 0.5
+        if strategy.position_size &gt; 0 and not na(prevHi) and close &gt; prevHi
+            strategy.close(&quot;Long&quot;)
+        else if strategy.position_size == 0 and close &lt; band and ibs &lt; ibsMax
+            strategy.entry(&quot;Long&quot;, strategy.long)
+    prevHi := hi
+if timeframe.isdaily
+    runtime.error(&quot;Use a 5 or 15 minute chart with extended hours on.&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="B" data-search="f06 ibs dip buy buy the 16:00 close when ibs &lt; 0.25; sell a close above yesterday&#x27;s high or ibs &gt; 0.8. mnq1! / nq1! · 5 or 15 min · extended hours on">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>F06 IBS dip buy</h3>
+        <button class="copy" type="button" data-target="code-1" id="btn-1">Copy code</button>
+      </div>
+      <p class="rule">Buy the 16:00 close when IBS &lt; 0.25; sell a close above yesterday&#x27;s high or IBS &gt; 0.8.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 5 or 15 min · extended hours on</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$4,705/yr, profit factor 1.60, 72% winners. ES: +$1,337/yr per MES.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">40 lines · f06_ibs_dip_buy.pine</span></summary>
+        <pre id="code-1"><code>//@version=6
+// F06 - IBS dip buy on index futures (Pagonidis 2013 IBS effect, bot 07 in contracts).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! on 5 or 15 minutes, extended hours ON.
+// The regular session (09:30-16:00) high, low and close are tracked on the chart. At the 16:00 bar:
+// IBS = (close - low) / (high - low). Buy 1 contract when IBS &lt; X; sell at a 16:00 close above the
+// previous session&#x27;s high or with IBS &gt; 0.8. Held overnight (futures trade through the night).
+// Validated on Nasdaq-100 1-minute data, 1 MNQ (X = 0.25): 2011-2021 +$2,120/yr; 2022-2026
+// +$4,705/yr, profit factor 1.60, 72% winners, worst fall -$4,957. ES (X = 0.2): +$1,337/yr. Grade A on NQ.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F06 IBS dip buy&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+buyBelow = input.float(0.25, &quot;Buy when IBS is below&quot;, step = 0.05)
+sellAbove = input.float(0.80, &quot;Sell when IBS is above&quot;, step = 0.05)
+
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+bool atClose = inSess and hour(time_close, TZ) == 16 and minute(time_close, TZ) == 0
+
+var float hi = na
+var float lo = na
+var float prevHi = na
+if newDay
+    hi := high
+    lo := low
+else if inSess
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+
+if atClose and not na(hi)
+    float ibs = hi != lo ? (close - lo) / (hi - lo) : 0.5
+    if strategy.position_size &gt; 0 and ((not na(prevHi) and close &gt; prevHi) or ibs &gt; sellAbove)
+        strategy.close(&quot;Long&quot;)
+    else if strategy.position_size == 0 and ibs &lt; buyBelow
+        strategy.entry(&quot;Long&quot;, strategy.long)
+    prevHi := hi
+if timeframe.isdaily
+    runtime.error(&quot;Use a 5 or 15 minute chart with extended hours on.&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="B" data-search="f12 turnaround tuesday after monday falls 1.5% or more, buy monday&#x27;s close and sell two days later. mnq1! / nq1! · daily">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>F12 Turnaround Tuesday</h3>
+        <button class="copy" type="button" data-target="code-2" id="btn-2">Copy code</button>
+      </div>
+      <p class="rule">After Monday falls 1.5% or more, buy Monday&#x27;s close and sell two days later.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · daily</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$2,011/yr, 82% winners, but only 17 trades.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">22 lines · f12_turnaround_tuesday.pine</span></summary>
+        <pre id="code-2"><code>//@version=6
+// F12 - Turnaround Tuesday on index futures. Daily chart of MNQ1!/NQ1! or MES1!/ES1!.
+// Buy 1 contract at Monday&#x27;s close when Monday fell at least X% from Friday&#x27;s close; sell at the
+// close H trading days later. (TradingView&#x27;s daily futures close is the 17:00 settlement; the
+// Python test used 16:00, so expect small differences.)
+// Validated on Nasdaq-100 data, 1 MNQ (X = 1.5%, hold 2 days): 2011-2021 +$537/yr, 43 trades;
+// 2022-2026 +$2,011/yr, 17 trades, 82% winners. Few trades, so treat the edge as uncertain.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F12 Turnaround Tuesday&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+dropPct = input.float(1.5, &quot;Monday drop at least (%)&quot;, step = 0.5)
+holdDays = input.int(2, &quot;Hold for (trading days)&quot;, minval = 1)
+var int heldFor = 0
+if strategy.position_size &gt; 0
+    heldFor += 1
+    if heldFor &gt;= holdDays
+        strategy.close(&quot;Long&quot;)
+if strategy.position_size == 0 and dayofweek == dayofweek.monday and close &lt;= close[1] * (1 - dropPct / 100)
+    strategy.entry(&quot;Long&quot;, strategy.long)
+    heldFor := 0
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="C" data-search="f05 daily fair value gap your pa lab daily fair value gap: limit at the gap edge, stop beyond the far edge, 4r target, 48-hour limit. mnq1! / nq1! · 1 hour">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>F05 Daily fair value gap</h3>
+        <button class="copy" type="button" data-target="code-3" id="btn-3">Copy code</button>
+      </div>
+      <p class="rule">Your PA Lab daily fair value gap: limit at the gap edge, stop beyond the far edge, 4R target, 48-hour limit.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1 hour</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$1,637/yr, profit factor 1.57, all 5 years up. Your lab setting (3R, 96h): +$2,776/yr. ES about flat.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">89 lines · f05_daily_fvg.pine</span></summary>
+        <pre id="code-3"><code>//@version=6
+// F05 - Daily fair value gap, your PA Lab bot (C-fair_value_gap-00364), with its dials as inputs.
+// Chart: NQ1!/MNQ1! or ES1!/MES1! on 1 hour. At each daily close (17:00 ET) a three-day fair value
+// gap of at least `min gap` x daily ATR gets a limit order at the gap&#x27;s near edge (long under price,
+// short above). Stop beyond the far edge + 0.1 ATR, target R x risk. The order lives, and a trade is
+// closed after, the time limit in hourly bars. Gaps formed on CPI, jobs-report or FOMC days are skipped.
+// Re-tested here on HistData 1-minute data, 1 MNQ:
+//   plateau setting (4R, 48h): 2011-2021 +$284/yr; 2022-2026 +$1,637/yr, profit factor 1.57, 5 of 5 years up.
+//   your lab setting (3R, 96h): 2022-2026 +$2,776/yr. On ES it was about flat after 2022.
+// Costs: $0.62 per contract per side (micro), 1 tick slippage, limits need 1 tick through.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F05 Daily fair value gap&quot;, shorttitle=&quot;F05 Daily FVG&quot;, overlay=true,
+     process_orders_on_close=true, pyramiding=0, default_qty_type=strategy.fixed, default_qty_value=1,
+     commission_type=strategy.commission.cash_per_contract, commission_value=0.62, slippage=1,
+     backtest_fill_limits_assumption=1, margin_long=0, margin_short=0)
+
+float MIN_GAP_ATR = input.float(0.1, &quot;Smallest gap (daily ATR)&quot;, step = 0.05)
+float STOP_BUF    = input.float(0.1, &quot;Stop beyond the far edge (daily ATR)&quot;, step = 0.05)
+float TARGET_R    = input.float(4.0, &quot;Target (R)&quot;, step = 0.5)
+int   TIME_BARS   = input.int(48, &quot;Order and trade time limit (1h bars)&quot;)
+bool  SKIP_NEWS   = input.bool(true, &quot;Skip gaps formed on CPI / jobs / FOMC days&quot;)
+
+if timeframe.period != &quot;60&quot;
+    runtime.error(&quot;Put this strategy on a 1-hour chart (NQ1! or ES1!).&quot;)
+
+// News days (CPI, jobs report, scheduled FOMC), YYYYMMDD, January 2013 to December 2027
+var array&lt;int&gt; NEWS = array.new&lt;int&gt;()
+if barstate.isfirst
+    for s in str.split(&quot;20130104,20130116,20130130,20130201,20130221,20130308,20130315,20130320,20130405,20130416,20130501,20130503,20130516,20130607,20130618,20130619,20130705,20130716,20130731,20130802,20130815,20130906,20130917,20130918,20131022,20131030,20131108,20131120,20131206,20131217,20131218,20140110,20140116,20140129,20140207,20140220,20140307,20140318,20140319,20140404,20140415,20140430,20140502,20140515,20140606,20140617,20140618,20140703,20140722,20140730,20140801,20140819,20140905,20140917,20141003,20141022,20141029,20141107,20141120,20141205,20141217,20150109,20150116,20150128,20150206,20150226,20150306,20150318,20150324,20150403,20150417,20150429,20150508,20150522,20150605,20150617,20150618,20150702,20150717,20150729,20150807,20150819,20150904,20150916,20150917,20151002,20151015,20151028,20151106,20151117,20151204,20151215,20151216,20160108,20160120,20160127,20160205,20160219,20160304,20160316,20160401,20160414,20160427,20160506,20160517,20160603,20160615,20160616,20160708,20160715,20160727,20160805,20160816,20160902,20160916,20160921,20161007,20161018,20161102,20161104,20161117,20161202,20161214,20161215,20170106,20170118,20170201,20170203,20170215,20170310,20170315,20170407,20170414,20170503,20170505,20170512,20170602,20170614,20170707,20170714,20170726,20170804,20170811,20170901,20170914,20170920,20171006,20171013,20171101,20171103,20171115,20171208,20171213,20180105,20180112,20180131,20180202,20180214,20180309,20180313,20180321,20180406,20180411,20180502,20180504,20180510,20180601,20180612,20180613,20180706,20180712,20180801,20180803,20180810,20180907,20180913,20180926,20181005,20181011,20181102,20181108,20181114,20181207,20181212,20181219,20190104,20190111,20190130,20190201,20190213,20190308,20190312,20190320,20190405,20190410,20190501,20190503,20190510,20190607,20190612&quot;, &quot;,&quot;)
+        array.push(NEWS, int(str.tonumber(s)))
+    for s in str.split(&quot;20190619,20190705,20190711,20190731,20190802,20190813,20190906,20190912,20190918,20191004,20191010,20191030,20191101,20191113,20191206,20191211,20200110,20200114,20200129,20200207,20200213,20200306,20200311,20200403,20200410,20200429,20200508,20200512,20200605,20200610,20200702,20200714,20200729,20200807,20200812,20200904,20200911,20200916,20201002,20201013,20201105,20201106,20201112,20201204,20201210,20201216,20210108,20210113,20210127,20210205,20210210,20210305,20210310,20210317,20210402,20210413,20210428,20210507,20210512,20210604,20210610,20210616,20210702,20210713,20210728,20210806,20210811,20210903,20210914,20210922,20211008,20211013,20211103,20211105,20211110,20211203,20211210,20211215,20220107,20220112,20220126,20220204,20220210,20220304,20220310,20220316,20220401,20220412,20220504,20220506,20220511,20220603,20220610,20220615,20220708,20220713,20220727,20220805,20220810,20220902,20220913,20220921,20221007,20221013,20221102,20221104,20221110,20221202,20221213,20221214,20230106,20230112,20230201,20230203,20230214,20230310,20230314,20230322,20230407,20230412,20230503,20230505,20230510,20230602,20230613,20230614,20230707,20230712,20230726,20230804,20230810,20230901,20230913,20230920,20231006,20231012,20231101,20231103,20231114,20231208,20231212,20231213,20240105,20240111,20240131,20240202,20240213,20240308,20240312,20240320,20240405,20240410,20240501,20240503,20240515,20240607,20240612,20240705,20240711,20240731,20240802,20240814,20240906,20240911,20240918,20241004,20241010,20241101,20241107,20241113,20241206,20241211,20241218,20250110,20250115,20250129,20250207,20250212,20250307,20250312,20250319,20250404,20250410,20250502,20250507,20250513,20250606,20250611,20250618,20250703,20250715,20250730,20250801,20250812,20250905,20250911,20250917,20251024,20251029,20251120&quot;, &quot;,&quot;)
+        array.push(NEWS, int(str.tonumber(s)))
+    for s in str.split(&quot;20251210,20251216,20251218,20260109,20260113,20260128,20260211,20260213,20260306,20260311,20260318,20260403,20260410,20260429,20260508,20260512,20260605,20260610,20260617,20260702,20260714,20260729,20260807,20260812,20260904,20260911,20260916,20261002,20261014,20261028,20261106,20261110,20261204,20261209,20261210,20270108,20270113,20270127,20270205,20270211,20270305,20270310,20270317,20270402,20270413,20270428,20270507,20270512,20270604,20270609,20270610,20270702,20270714,20270728,20270806,20270811,20270903,20270914,20270915,20271008,20271014,20271027,20271105,20271110,20271203,20271208,20271210&quot;, &quot;,&quot;)
+        array.push(NEWS, int(str.tonumber(s)))
+
+// ---------------------------------------------------------------- the last completed daily bar (no repainting)
+[dHigh, dLow, dClose, dHigh2, dLow2, dAtrPrior, dDay] = request.security(syminfo.tickerid, &quot;D&quot;,
+     [high[1], low[1], close[1], high[3], low[3], ta.atr(14)[2], time_tradingday[1]], lookahead=barmerge.lookahead_on)
+bool newDay = ta.change(dDay) != 0     // a daily bar has just completed
+
+// ---------------------------------------------------------------- the strategy state
+var int decisionBar = na     // bar where the current order or trade was decided
+var bool pending = false
+
+if not na(decisionBar) and bar_index &gt;= decisionBar + TIME_BARS
+    if pending
+        strategy.cancel_all()
+        pending := false
+        alert(&quot;F05 FVG &quot; + syminfo.ticker + &quot;: time is up, CANCEL the unfilled limit order&quot;, alert.freq_once_per_bar_close)
+    if strategy.position_size != 0
+        strategy.close_all(comment=&quot;time exit&quot;)
+        alert(&quot;F05 FVG &quot; + syminfo.ticker + &quot;: time is up, CLOSE the open trade at market&quot;, alert.freq_once_per_bar_close)
+    decisionBar := na
+if pending and strategy.position_size != 0
+    pending := false
+
+bool placedLong = false
+bool placedShort = false
+if newDay and not na(dAtrPrior) and not na(dHigh2) and strategy.position_size == 0 and not pending
+    int day = year(dDay, &quot;UTC&quot;) * 10000 + month(dDay, &quot;UTC&quot;) * 100 + dayofmonth(dDay, &quot;UTC&quot;)
+    bool news = SKIP_NEWS and array.includes(NEWS, day)
+    if not news
+        if dLow &gt; dHigh2 and dLow - dHigh2 &gt;= MIN_GAP_ATR * dAtrPrior and dClose &gt; dLow
+            float near = dLow
+            float stop = dHigh2 - STOP_BUF * dAtrPrior
+            float risk = near - stop
+            strategy.entry(&quot;Long&quot;, strategy.long, limit=near)
+            strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, stop=stop, limit=near + TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
+            placedLong := true
+            alert(&quot;F05 FVG &quot; + syminfo.ticker + &quot;: BUY LIMIT 1 at &quot; + str.tostring(near, format.mintick) +
+                 &quot; | stop &quot; + str.tostring(stop, format.mintick) + &quot; | target &quot; + str.tostring(near + TARGET_R * risk, format.mintick) +
+                 &quot; | cancel or close after the time limit&quot;, alert.freq_once_per_bar_close)
+        else if dHigh &lt; dLow2 and dLow2 - dHigh &gt;= MIN_GAP_ATR * dAtrPrior and dClose &lt; dHigh
+            float near = dHigh
+            float stop = dLow2 + STOP_BUF * dAtrPrior
+            float risk = stop - near
+            strategy.entry(&quot;Short&quot;, strategy.short, limit=near)
+            strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, stop=stop, limit=near - TARGET_R * risk)
+            pending := true
+            decisionBar := bar_index
+            placedShort := true
+            alert(&quot;F05 FVG &quot; + syminfo.ticker + &quot;: SELL LIMIT 1 at &quot; + str.tostring(near, format.mintick) +
+                 &quot; | stop &quot; + str.tostring(stop, format.mintick) + &quot; | target &quot; + str.tostring(near - TARGET_R * risk, format.mintick) +
+                 &quot; | cancel or close after the time limit&quot;, alert.freq_once_per_bar_close)
+
+plotshape(placedLong, &quot;Gap: buy limit placed&quot;, shape.triangleup, location.belowbar, color.new(color.teal, 0), size=size.tiny)
+plotshape(placedShort, &quot;Gap: sell limit placed&quot;, shape.triangledown, location.abovebar, color.new(color.red, 0), size=size.tiny)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="C" data-search="f04 overnight drift buy the 16:00 close when above the 200-day average; sell at 09:30. mnq1! / nq1! · 1–15 min · extended hours on">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>F04 Overnight drift</h3>
+        <button class="copy" type="button" data-target="code-4" id="btn-4">Copy code</button>
+      </div>
+      <p class="rule">Buy the 16:00 close when above the 200-day average; sell at 09:30.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1–15 min · extended hours on</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$3,259/yr, profit factor 1.17, 4 of 5 years up. ES: +$356/yr.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">28 lines · f04_overnight_drift.pine</span></summary>
+        <pre id="code-4"><code>//@version=6
+// F04 - Overnight drift in index futures (Boyarchenko, Larsen &amp; Whelan 2023 and the overnight-return
+// literature). Chart: MNQ1!/NQ1! (or MES1!/ES1!) on 1-15 minutes WITH extended hours on.
+// Buy at the 16:00 bar&#x27;s close when the close is above its 200-day average (and, optionally, after a
+// down day); sell at the close of the 09:30-09:31 bar next morning (on a 1-minute chart = the open).
+// Validated on Nasdaq-100 data, 1 MNQ with the trend filter: 2011-2021 +$695/yr; 2022-2026
+// +$3,259/yr (profit factor 1.17, 4 of 5 years up). ES was weaker (+$356/yr). Grade B on NQ.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F04 Overnight drift&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+useTrend = input.bool(true, &quot;Only above the 200-day average&quot;)
+onlyDown = input.bool(false, &quot;Only after a down day&quot;)
+
+string TZ = &quot;America/New_York&quot;
+bool atClose = hour(time_close, TZ) == 16 and minute(time_close, TZ) == 0
+bool atOpen = hour(time, TZ) == 9 and minute(time, TZ) == 30
+float sma200 = request.security(syminfo.tickerid, &quot;D&quot;, ta.sma(close, 200)[1], lookahead = barmerge.lookahead_on)
+var float lastRthClose = na
+
+if atOpen and strategy.position_size &gt; 0
+    strategy.close(&quot;Overnight&quot;, comment = &quot;09:30&quot;)
+if atClose
+    bool ok = (not useTrend or close &gt; sma200) and (not onlyDown or (not na(lastRthClose) and close &lt; lastRthClose))
+    if ok and strategy.position_size == 0
+        strategy.entry(&quot;Overnight&quot;, strategy.long)
+    lastRthClose := close
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="C" data-search="f01 noise band zarattini noise band: trade breaks of the intraday noise area at set check times, trail with vwap, flat at 16:00. mnq1! / nq1! · 1, 5, 15 or 30 min">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>F01 Noise band</h3>
+        <button class="copy" type="button" data-target="code-5" id="btn-5">Copy code</button>
+      </div>
+      <p class="rule">Zarattini noise band: trade breaks of the intraday noise area at set check times, trail with VWAP, flat at 16:00.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1, 5, 15 or 30 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$1,398/yr, profit factor 1.18, but −$149/yr since Aug 2024. ES about flat.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">83 lines · f01_noise_band.pine</span></summary>
+        <pre id="code-5"><code>//@version=6
+// F01 - Noise band, intraday momentum (Zarattini, Aziz &amp; Barbon 2024, &quot;Beat the Market&quot;).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ/SPY) on 1, 5, 15 or 30 minutes.
+// sigma(t) = average over the last N days of |price at time t / 09:30 open - 1|.
+// Upper band = max(open, yesterday&#x27;s 16:00 close) x (1 + k sigma); lower = min(...) x (1 - k sigma).
+// At every check time from 10:00: long above the upper band, short below the lower; a long exits
+// when price is below max(upper band, VWAP) at a check (mirror for shorts). Flat at 16:00.
+// Validated on Nasdaq-100 1-minute data (2011-2021 in-sample, 2022-2026 out of sample), 1 MNQ:
+// out of sample +$1,398/yr, profit factor 1.18, but -$149/yr since Aug 2024. On ES it was flat.
+// The Python test used a time-weighted price instead of VWAP (the data had no volume); here VWAP is real.
+// Commission is per contract per side: 0.62 for micros, 2.25 for E-minis.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F01 Noise band&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k          = input.float(1.5, &quot;Band width k&quot;, step = 0.25)
+N          = input.int(20, &quot;Days in the average&quot;, minval = 5, maxval = 60)
+checkEvery = input.int(60, &quot;Check every (minutes, multiple of the chart)&quot;, options = [15, 30, 60])
+
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570   // minutes since 09:30 at this bar&#x27;s close
+
+var matrix&lt;float&gt; moves = matrix.new&lt;float&gt;(61, 391, na)
+var int row = 0
+var float dayOpen = na
+var float prevClose = na
+var float lastClose = na
+var float sumTP = 0.0
+var int nTP = 0
+
+if newDay
+    prevClose := lastClose
+    dayOpen := open
+    row := (row + 1) % (N + 1)
+    for c = 0 to 390
+        moves.set(row, c, na)
+    sumTP := 0.0
+    nTP := 0
+
+float upper = na
+float lower = na
+if inSess and not na(dayOpen) and cm &gt;= 1 and cm &lt;= 390
+    moves.set(row, cm, math.abs(close / dayOpen - 1))
+    sumTP += hlc3
+    nTP += 1
+    lastClose := close
+    float s = 0.0
+    int cnt = 0
+    for r = 0 to N
+        if r != row
+            float v = moves.get(r, cm)
+            if not na(v)
+                s += v
+                cnt += 1
+    if cnt &gt;= N and not na(prevClose)
+        float sigma = s / cnt
+        upper := math.max(dayOpen, prevClose) * (1 + k * sigma)
+        lower := math.min(dayOpen, prevClose) * (1 - k * sigma)
+
+float vwap = nTP &gt; 0 ? sumTP / nTP : na
+bool check = inSess and cm &gt;= 30 and cm &lt; 390 and cm % checkEvery == 0 and not na(upper)
+if check
+    bool flatNow = strategy.position_size == 0
+    if strategy.position_size &gt; 0 and close &lt; math.max(upper, vwap)
+        strategy.close(&quot;Long&quot;)
+        flatNow := true
+    if strategy.position_size &lt; 0 and close &gt; math.min(lower, vwap)
+        strategy.close(&quot;Short&quot;)
+        flatNow := true
+    if flatNow
+        if close &gt; upper
+            strategy.entry(&quot;Long&quot;, strategy.long)
+        else if close &lt; lower
+            strategy.entry(&quot;Short&quot;, strategy.short)
+if inSess and cm &gt;= 390 and strategy.position_size != 0
+    strategy.close_all(comment = &quot;16:00&quot;)
+
+plot(upper, &quot;Upper band&quot;, color.green, style = plot.style_linebr)
+plot(lower, &quot;Lower band&quot;, color.red, style = plot.style_linebr)
+plot(inSess ? vwap : na, &quot;VWAP&quot;, color.orange, style = plot.style_linebr)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="C" data-search="f02 opening range breakout trade the direction of the first 5-minute candle, stop 10% of atr, 10r target or 16:00. mnq1! / nq1! · 1 or 5 min">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>F02 Opening range breakout</h3>
+        <button class="copy" type="button" data-target="code-6" id="btn-6">Copy code</button>
+      </div>
+      <p class="rule">Trade the direction of the first 5-minute candle, stop 10% of ATR, 10R target or 16:00.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1 or 5 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ: lost 2011–21 (−$459/yr), +$1,131/yr 2022–26. ES lost in both.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">48 lines · f02_opening_range_breakout.pine</span></summary>
+        <pre id="code-6"><code>//@version=6
+// F02 - Opening range breakout (Zarattini, Barbon &amp; Aziz 2023, &quot;Can Day Trading Really Be Profitable?&quot;).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ/TQQQ) on 1 or 5 minutes.
+// Trade in the direction of the first N-minute candle (no trade on a doji) at the next bar&#x27;s open.
+// Stop: the opening range&#x27;s other side, or 10% of the 14-day ATR. Target: R x risk, else out at 16:00.
+// Validated on Nasdaq-100 1-minute data, 1 MNQ (5-minute range, 10R, ATR stop): 2011-2021 lost
+// -$459/yr; 2022-2026 +$1,131/yr (profit factor 1.08). On ES it lost in both. Grade F: the paper&#x27;s
+// results do not survive realistic costs on futures, which matches independent tests.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F02 Opening range breakout&quot;, overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+orMin    = input.int(5, &quot;Opening range (minutes)&quot;, options = [5, 15, 30])
+targetR  = input.float(10, &quot;Target in R (0 = hold to 16:00)&quot;, step = 1)
+stopMode = input.string(&quot;ATR 10%&quot;, &quot;Stop&quot;, options = [&quot;Opening range&quot;, &quot;ATR 10%&quot;])
+
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570
+float atrD = request.security(syminfo.tickerid, &quot;D&quot;, ta.atr(14)[1], lookahead = barmerge.lookahead_on)
+
+var float dayOpen = na
+var float orHi = na
+var float orLo = na
+if newDay
+    dayOpen := open
+    orHi := high
+    orLo := low
+else if inSess and cm &lt;= orMin
+    orHi := math.max(orHi, high)
+    orLo := math.min(orLo, low)
+
+if inSess and cm == orMin and strategy.position_size == 0 and close != dayOpen
+    int dir = close &gt; dayOpen ? 1 : -1
+    float stop = stopMode == &quot;Opening range&quot; ? (dir &gt; 0 ? orLo : orHi) : close - dir * 0.1 * atrD
+    float risk = math.abs(close - stop)
+    if risk &gt; 0
+        float tgt = targetR &gt; 0 ? close + dir * targetR * risk : na
+        if dir &gt; 0
+            strategy.entry(&quot;Long&quot;, strategy.long)
+            strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, stop = stop, limit = tgt)
+        else
+            strategy.entry(&quot;Short&quot;, strategy.short)
+            strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, stop = stop, limit = tgt)
+if inSess and cm &gt;= 389 and strategy.position_size != 0
+    strategy.close_all(comment = &quot;16:00&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="F" data-search="f09 turn of the month long from 5 trading days before month end to day 4 of the new month. mnq1! / nq1! · daily">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>F09 Turn of the month</h3>
+        <button class="copy" type="button" data-target="code-7" id="btn-7">Copy code</button>
+      </div>
+      <p class="rule">Long from 5 trading days before month end to day 4 of the new month.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · daily</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$1,709/yr, but +$74/yr since Aug 2024; failed the overfitting checks.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">34 lines · f09_turn_of_month.pine</span></summary>
+        <pre id="code-7"><code>//@version=6
+// F09 - Turn of the month on index futures (Lakonishok &amp; Smidt 1988; McConnell &amp; Xu 2008).
+// Daily chart of MNQ1!/NQ1! or MES1!/ES1!. Buy 1 contract at the close N trading days before month end,
+// sell at the close of trading day M of the new month. Weekends are skipped; exchange holidays are not.
+// Futures test, 1 MNQ (5 days before, out on day 4): 2011-2021 +$1,303/yr; 2022-2026 +$1,709/yr,
+// but only +$74/yr since Aug 2024. Grade C on futures. Use on a daily chart of MNQ1!/NQ1!/MES1!/ES1!.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F09 Turn of the month&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+before = input.int(5, &quot;Enter N trading days before month end&quot;, minval = 1)
+after  = input.int(4, &quot;Exit at the close of trading day M&quot;, minval = 1)
+
+int y = year(time)
+int mo = month(time)
+int d = dayofmonth(time)
+int dim = mo == 2 ? (y % 4 == 0 ? 29 : 28) : (mo == 4 or mo == 6 or mo == 9 or mo == 11) ? 30 : 31
+int left = 0
+if d &lt; dim
+    for k = d + 1 to dim
+        int wd = dayofweek(timestamp(y, mo, k))
+        if wd != dayofweek.saturday and wd != dayofweek.sunday
+            left += 1
+
+var int fwd = 0
+fwd := month(time) != month(time[1]) ? 1 : fwd + 1
+bool hold = left &lt;= before - 1 or fwd &lt; after
+
+if hold and strategy.position_size == 0
+    strategy.entry(&quot;TOM&quot;, strategy.long)
+if not hold and strategy.position_size &gt; 0
+    strategy.close(&quot;TOM&quot;)
+bgcolor(hold ? color.new(color.green, 88) : na)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="F" data-search="f11 vwap trend long while price holds above vwap from 10:00, switch after 15 closes on the other side. mnq1! / nq1! or qqq · 1 min">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>F11 VWAP trend</h3>
+        <button class="copy" type="button" data-target="code-8" id="btn-8">Copy code</button>
+      </div>
+      <p class="rule">Long while price holds above VWAP from 10:00, switch after 15 closes on the other side.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! or QQQ · 1 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$1,045/yr, −$667/yr since Aug 2024; the paper&#x27;s version lost after costs.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">35 lines · f11_vwap_trend.pine</span></summary>
+        <pre id="code-8"><code>//@version=6
+// F11 - VWAP trend (Zarattini &amp; Aziz 2023). Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ) on 1 minute.
+// From the start time, long while the 1-minute close is above the session VWAP (short below if
+// shorts are on); switch only after `confirm` closes in a row on the other side; flat at 16:00.
+// Validated on 1-minute data with a time-weighted price in place of VWAP (no volume in the data),
+// 1 MNQ (start 10:00, 15-minute confirm, longs only): 2022-2026 +$1,045/yr but -$667/yr since
+// Aug 2024; the paper&#x27;s flip-on-every-cross version lost heavily after costs. Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F11 VWAP trend&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+confirm = input.int(15, &quot;Closes in a row before switching&quot;, minval = 1)
+startMin = input.int(30, &quot;Start (minutes after 09:30)&quot;)
+longOnly = input.bool(true, &quot;Longs only&quot;)
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570
+float vw = ta.vwap(hlc3)
+var int run = 0
+if inSess and cm &gt; startMin and cm &lt; 389
+    int want = close &gt; vw ? 1 : (longOnly ? 0 : -1)
+    int pos = strategy.position_size &gt; 0 ? 1 : strategy.position_size &lt; 0 ? -1 : 0
+    run := want == pos ? 0 : run + 1
+    if run &gt;= confirm
+        run := 0
+        if want == 1
+            strategy.entry(&quot;Long&quot;, strategy.long)
+        else if want == -1
+            strategy.entry(&quot;Short&quot;, strategy.short)
+        else
+            strategy.close_all()
+if inSess and cm &gt;= 389 and strategy.position_size != 0
+    strategy.close_all(comment = &quot;16:00&quot;)
+plot(inSess ? vw : na, &quot;VWAP&quot;, color.orange, style = plot.style_linebr)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="F" data-search="f10 volatility breakout larry williams: buy stop at open + 1 × yesterday&#x27;s range, stop at the open, out at 16:00. mnq1! / nq1! · 1–5 min">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>F10 Volatility breakout</h3>
+        <button class="copy" type="button" data-target="code-9" id="btn-9">Copy code</button>
+      </div>
+      <p class="rule">Larry Williams: buy stop at open + 1 × yesterday&#x27;s range, stop at the open, out at 16:00.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1–5 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: +$292/yr. ES lost.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">45 lines · f10_volatility_breakout.pine</span></summary>
+        <pre id="code-9"><code>//@version=6
+// F10 - Larry Williams volatility breakout. Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-5 minutes.
+// At 09:30 place a buy stop at open + k x yesterday&#x27;s session range (and a sell stop at open - k x
+// range if shorts are on); the first one hit is the trade, optionally stopped at the open; out at 16:00.
+// Validated on 1-minute data, 1 MNQ (k = 1, longs only, stop at the open): 2022-2026 +$292/yr and
+// -$270/yr since Aug 2024. Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F10 Volatility breakout&quot;, overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k = input.float(1.0, &quot;k x yesterday&#x27;s range&quot;, step = 0.25)
+longOnly = input.bool(true, &quot;Longs only&quot;)
+stopAtOpen = input.bool(true, &quot;Stop at the day&#x27;s open&quot;)
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+var float hi = na
+var float lo = na
+var float prevRange = na
+var float dayOpen = na
+var bool traded = false
+if newDay
+    prevRange := hi - lo
+    hi := high
+    lo := low
+    dayOpen := open
+    traded := false
+    if not na(prevRange)
+        strategy.entry(&quot;Long&quot;, strategy.long, stop = dayOpen + k * prevRange)
+        if not longOnly
+            strategy.entry(&quot;Short&quot;, strategy.short, stop = dayOpen - k * prevRange)
+else if inSess
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+if strategy.position_size != 0 and not traded
+    traded := true
+    strategy.cancel_all()
+    if stopAtOpen
+        strategy.exit(&quot;Stop&quot;, stop = dayOpen)
+if inSess and hm &gt;= 959
+    strategy.cancel_all()
+    if strategy.position_size != 0
+        strategy.close_all(comment = &quot;16:00&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="F" data-search="f03 intraday momentum trade the last half hour in the direction of the prev-close-to-10:00 move. mnq1! / nq1! · 1–30 min">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>F03 Intraday momentum</h3>
+        <button class="copy" type="button" data-target="code-10" id="btn-10">Copy code</button>
+      </div>
+      <p class="rule">Trade the last half hour in the direction of the prev-close-to-10:00 move.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1–30 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: −$73/yr. The effect has faded.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">36 lines · f03_intraday_momentum.pine</span></summary>
+        <pre id="code-10"><code>//@version=6
+// F03 - Market intraday momentum (Gao, Han, Li &amp; Zhou 2018; Baltussen et al 2021).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-30 minutes. At 15:30, go long if the move from yesterday&#x27;s
+// 16:00 close to 10:00 today was up (short if down), optionally only if the 15:00-15:30 move agrees
+// and the first move was at least X%. Out at 16:00.
+// Validated on 1-minute data, 1 MNQ: 2022-2026 -$73/yr. Grade F: the effect has faded, as later
+// studies also found. Here so you can check it yourself.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F03 Intraday momentum&quot;, overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+agree = input.bool(true, &quot;15:00-15:30 move must agree&quot;)
+minMove = input.float(0.5, &quot;Smallest first move (%)&quot;, step = 0.25)
+string TZ = &quot;America/New_York&quot;
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+var float lastClose = na
+var float prevClose = na
+var float p10 = na
+var float p15 = na
+if hm == 571 or (hour(time, TZ) == 9 and minute(time, TZ) == 30)
+    prevClose := lastClose
+if hm == 600
+    p10 := close
+if hm == 900
+    p15 := close
+if hm == 930 and not na(prevClose) and not na(p10) and not na(p15) and strategy.position_size == 0
+    float r1 = p10 / prevClose - 1
+    int dir = r1 &gt; 0 ? 1 : -1
+    bool ok = math.abs(r1) * 100 &gt;= minMove and (not agree or math.sign(close - p15) == dir)
+    if ok
+        strategy.entry(dir &gt; 0 ? &quot;Long&quot; : &quot;Short&quot;, dir &gt; 0 ? strategy.long : strategy.short)
+if hm == 960
+    if strategy.position_size != 0
+        strategy.close_all(comment = &quot;16:00&quot;)
+    lastClose := close
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Futures" data-grade="F" data-search="f08 opening gap fade or follow opening gaps bigger than k × atr. mnq1! / nq1! · 1–5 min">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>F08 Opening gap</h3>
+        <button class="copy" type="button" data-target="code-11" id="btn-11">Copy code</button>
+      </div>
+      <p class="rule">Fade or follow opening gaps bigger than k × ATR.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>MNQ1! / NQ1! · 1–5 min</dd></div>
+        <div><dt>Tested result</dt><dd>1 MNQ, 2022–26: −$2,026/yr.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">39 lines · f08_opening_gap.pine</span></summary>
+        <pre id="code-11"><code>//@version=6
+// F08 - Opening gap fade / go on index futures. Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-5 minutes.
+// At 09:30, if the open is at least k x ATR(14) away from yesterday&#x27;s 16:00 close: &quot;fade&quot; trades back
+// toward that close (target = that close, stop = the same distance the other way); &quot;go&quot; trades with
+// the gap (stop = yesterday&#x27;s close). Out at 16:00.
+// Validated on 1-minute data, 1 MNQ: 2022-2026 lost (-$2,026/yr for the plateau setting). Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;F08 Opening gap&quot;, overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k = input.float(0.25, &quot;Smallest gap (x ATR)&quot;, step = 0.05)
+mode = input.string(&quot;fade&quot;, &quot;Mode&quot;, options = [&quot;fade&quot;, &quot;go&quot;])
+string TZ = &quot;America/New_York&quot;
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+bool firstBar = hour(time, TZ) == 9 and minute(time, TZ) == 30
+float atrD = request.security(syminfo.tickerid, &quot;D&quot;, ta.atr(14)[1], lookahead = barmerge.lookahead_on)
+var float lastClose = na
+if firstBar and not na(lastClose) and strategy.position_size == 0
+    float g = open - lastClose
+    if math.abs(g) &gt;= k * atrD
+        if mode == &quot;fade&quot;
+            if g &gt; 0
+                strategy.entry(&quot;Short&quot;, strategy.short)
+                strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, limit = lastClose, stop = open + math.abs(g))
+            else
+                strategy.entry(&quot;Long&quot;, strategy.long)
+                strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, limit = lastClose, stop = open - math.abs(g))
+        else
+            if g &gt; 0
+                strategy.entry(&quot;Long&quot;, strategy.long)
+                strategy.exit(&quot;Long exit&quot;, &quot;Long&quot;, stop = lastClose)
+            else
+                strategy.entry(&quot;Short&quot;, strategy.short)
+                strategy.exit(&quot;Short exit&quot;, &quot;Short&quot;, stop = lastClose)
+if hm &gt;= 959 and hm &lt;= 960 and strategy.position_size != 0
+    strategy.close_all(comment = &quot;16:00&quot;)
+if hm == 960
+    lastClose := close
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="A" data-search="bot 14 keller haa keller haa: tip canary, top 4 of 8 etfs by momentum, else ief or cash. monthly. any of spy iwm efa eem vnq dbc ief tlt shy · daily">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>Bot 14 Keller HAA</h3>
+        <button class="copy" type="button" data-target="code-12" id="btn-12">Copy code</button>
+      </div>
+      <p class="rule">Keller HAA: TIP canary, top 4 of 8 ETFs by momentum, else IEF or cash. Monthly.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>Any of SPY IWM EFA EEM VNQ DBC IEF TLT SHY · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2015–26: 10.0%/yr, Sharpe 0.98, worst fall −13% (SPY −34%).</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">57 lines · s14_keller_haa.pine</span></summary>
+        <pre id="code-12"><code>//@version=6
+// Bot 14 - Keller Hybrid Asset Allocation (Keller 2023). Rules as published on allocatesmartly.com.
+// Momentum = average of the 1, 3, 6 and 12-month returns (21/63/126/252 trading days).
+// Month end: if TIP&#x27;s momentum is negative, hold 100% of the better of IEF and cash (SHY).
+// Otherwise hold the top N of SPY IWM EFA EEM VNQ DBC IEF TLT at 1/N each; a pick with negative
+// momentum is swapped for the better of IEF / cash. Trades at the next open.
+// Put it on a chart of any of those tickers (or SHY): the tester trades that ticker&#x27;s share of the
+// bot; the table shows the allocation. Validated 2015-2026 out of sample: 10.0%/yr, Sharpe 0.98,
+// worst fall -13%, and the published setting (top 4) was also the best plateau. Grade A.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 14 Keller HAA&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.04)
+
+topN = input.int(4, &quot;Offensive assets to hold&quot;, minval = 1, maxval = 8)
+mom() =&gt; ((close / close[21] - 1) + (close / close[63] - 1) + (close / close[126] - 1) + (close / close[252] - 1)) / 4
+names = array.from(&quot;SPY&quot;, &quot;IWM&quot;, &quot;EFA&quot;, &quot;EEM&quot;, &quot;VNQ&quot;, &quot;DBC&quot;, &quot;IEF&quot;, &quot;TLT&quot;)
+m = array.from(request.security(&quot;SPY&quot;, &quot;D&quot;, mom()), request.security(&quot;IWM&quot;, &quot;D&quot;, mom()), request.security(&quot;EFA&quot;, &quot;D&quot;, mom()),
+     request.security(&quot;EEM&quot;, &quot;D&quot;, mom()), request.security(&quot;VNQ&quot;, &quot;D&quot;, mom()), request.security(&quot;DBC&quot;, &quot;D&quot;, mom()),
+     request.security(&quot;IEF&quot;, &quot;D&quot;, mom()), request.security(&quot;TLT&quot;, &quot;D&quot;, mom()))
+float mTIP = request.security(&quot;TIP&quot;, &quot;D&quot;, mom())
+float mIEF = m.get(6)
+float mSHY = request.security(&quot;SHY&quot;, &quot;D&quot;, mom())
+string safe = mIEF &gt; mSHY ? &quot;IEF&quot; : &quot;SHY&quot;
+
+float w = 0.0
+bool ready = not na(mTIP) and not na(mSHY) and not na(m.get(5))
+if ready
+    if mTIP &lt;= 0
+        w := syminfo.ticker == safe ? 1.0 : 0.0
+    else
+        for i = 0 to 7
+            int r = 0
+            for j = 0 to 7
+                if m.get(j) &gt; m.get(i)
+                    r += 1
+            if r &lt; topN
+                string pick = m.get(i) &gt; 0 ? names.get(i) : safe
+                if pick == syminfo.ticker
+                    w += 1.0 / topN
+
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+if monthEnd and ready
+    float diff = w * strategy.equity / close - strategy.position_size
+    if math.abs(diff) * close &gt; 0.01 * strategy.equity
+        strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, &quot;Weight of this ticker (%)&quot;, color.teal, style = plot.style_stepline)
+var table tb = table.new(position.top_right, 2, 11, border_width = 1)
+if barstate.islast
+    table.cell(tb, 0, 0, mTIP &lt;= 0 ? &quot;TIP canary negative: all in &quot; + safe : &quot;Offensive (TIP &gt; 0)&quot;)
+    table.cell(tb, 1, 0, &quot;Momentum&quot;)
+    for i = 0 to 7
+        table.cell(tb, 0, i + 1, names.get(i))
+        table.cell(tb, 1, i + 1, str.tostring(m.get(i) * 100, &quot;#.#&quot;) + &quot;%&quot;)
+    table.cell(tb, 0, 9, &quot;TIP&quot;)
+    table.cell(tb, 1, 9, str.tostring(mTIP * 100, &quot;#.#&quot;) + &quot;%&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="A" data-search="bot 07 ibs mean reversion buy the close when ibs &lt; 0.15; sell a close above yesterday&#x27;s high or ibs &gt; 0.8. spy, qqq, iwm or dia · daily">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>Bot 07 IBS mean reversion</h3>
+        <button class="copy" type="button" data-target="code-13" id="btn-13">Copy code</button>
+      </div>
+      <p class="rule">Buy the close when IBS &lt; 0.15; sell a close above yesterday&#x27;s high or IBS &gt; 0.8.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY, QQQ, IWM or DIA · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26, 4 ETFs: 11.8%/yr, Sharpe 0.91, in the market 43% of days. QQQ alone: Sharpe 1.14.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">25 lines · s07_ibs_mean_reversion.pine</span></summary>
+        <pre id="code-13"><code>//@version=6
+// Bot 07 - IBS mean reversion (Pagonidis 2013; Quantified Strategies)
+// Validated in Python on SPY QQQ IWM DIA, 1993-2026: settings picked on data
+// up to 2012, then 2013-2026 out of sample: CAGR 11.8%, Sharpe 0.91, max DD -20%
+// for the 4-ETF basket at 2 bps per side. Use on a DAILY chart of an index ETF.
+// Fills at the bar&#x27;s close (process_orders_on_close) = a market-on-close order.
+// Not compiled here: paste into the Pine Editor and check it before relying on it.
+strategy(&quot;Bot 07 IBS mean reversion&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02,
+     initial_capital = 10000)
+
+buyBelow  = input.float(0.15, &quot;Buy when IBS is below&quot;, step = 0.05)
+sellAbove = input.float(0.80, &quot;Sell when IBS is above&quot;, step = 0.05)
+useTrend  = input.bool(false, &quot;Only buy above the 200-day SMA&quot;)
+
+ibs     = high != low ? (close - low) / (high - low) : 0.5
+trendOk = not useTrend or close &gt; ta.sma(close, 200)
+
+if strategy.position_size == 0 and ibs &lt; buyBelow and trendOk
+    strategy.entry(&quot;Long&quot;, strategy.long)
+if strategy.position_size &gt; 0 and (close &gt; high[1] or ibs &gt; sellAbove)
+    strategy.close(&quot;Long&quot;)
+
+plotshape(strategy.position_size == 0 and ibs &lt; buyBelow and trendOk, &quot;Buy signal&quot;, shape.triangleup, location.belowbar, color.green, size = size.tiny)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="A" data-search="bot 12 lower band ibs buy the close below (5-day high − 3 × 25-day range) with ibs &lt; 0.3; sell above yesterday&#x27;s high. spy or qqq · daily">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>Bot 12 Lower band IBS</h3>
+        <button class="copy" type="button" data-target="code-14" id="btn-14">Copy code</button>
+      </div>
+      <p class="rule">Buy the close below (5-day high − 3 × 25-day range) with IBS &lt; 0.3; sell above yesterday&#x27;s high.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY or QQQ · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 8.6%/yr, Sharpe 0.88, in the market 11% of days.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">27 lines · s12_lower_band_ibs.pine</span></summary>
+        <pre id="code-14"><code>//@version=6
+// Bot 12 - Lower band + IBS mean reversion (quantitativo.substack.com, 2024)
+// Validated in Python on SPY + QQQ: settings picked on data up to 2012, then
+// 2013-2026 out of sample: CAGR 8.6%, Sharpe 0.88, max DD -14.5%, in the market
+// only ~11% of days. The paper&#x27;s settings were N=10, k=2.5; the plateau pick was N=5, k=3.
+// Use on a DAILY chart. Fills at the bar&#x27;s close (market-on-close).
+// Not compiled here: paste into the Pine Editor and check it before relying on it.
+strategy(&quot;Bot 12 Lower band IBS&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02,
+     initial_capital = 10000)
+
+n      = input.int(5, &quot;Lookback for the high (days)&quot;)
+k      = input.float(3.0, &quot;Band = high minus k x average range&quot;, step = 0.25)
+rngLen = input.int(25, &quot;Average range length (days)&quot;)
+ibsMax = input.float(0.3, &quot;Buy only when IBS is below&quot;, step = 0.05)
+
+avgRange = ta.sma(high - low, rngLen)
+band     = ta.highest(high, n) - k * avgRange
+ibs      = high != low ? (close - low) / (high - low) : 0.5
+
+if strategy.position_size == 0 and close &lt; band and ibs &lt; ibsMax
+    strategy.entry(&quot;Long&quot;, strategy.long)
+if strategy.position_size &gt; 0 and close &gt; high[1]
+    strategy.close(&quot;Long&quot;)
+
+plot(band, &quot;Lower band&quot;, color.orange)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="A" data-search="bot 02 time-series momentum hold each asset while its 63-day return is positive, sized by volatility. monthly. spy efa eem ief tlt lqd gld dbc vnq · daily">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>Bot 02 Time-series momentum</h3>
+        <button class="copy" type="button" data-target="code-15" id="btn-15">Copy code</button>
+      </div>
+      <p class="rule">Hold each asset while its 63-day return is positive, sized by volatility. Monthly.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY EFA EEM IEF TLT LQD GLD DBC VNQ · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2015–26, 9 ETFs: 3.6%/yr, Sharpe 0.78, worst fall −8%.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">29 lines · s02_time_series_momentum.pine</span></summary>
+        <pre id="code-15"><code>//@version=6
+// Bot 02 - Time-series momentum (Moskowitz, Ooi &amp; Pedersen 2012; Hurst, Ooi &amp; Pedersen 2017)
+// Rule: on the last trading day of each month, hold this asset if its return over the last N
+// trading days is positive, sized so the asset&#x27;s expected volatility is (target / number of
+// assets); the rest stays in cash. Trades at the next open.
+// The full bot runs on SPY, EFA, EEM, IEF, TLT, LQD, GLD, DBC, VNQ (9 assets). Validated
+// 2015-2026 out of sample: 3.6%/yr, Sharpe 0.78, worst fall -8%. Grade A.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 02 Time-series momentum&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.04)
+
+lookback  = input.int(63, &quot;Momentum lookback (trading days)&quot;)
+targetVol = input.float(0.10, &quot;Portfolio volatility target&quot;, step = 0.01)
+nAssets   = input.int(9, &quot;Assets in the full bot&quot;)
+
+ret  = close / close[lookback] - 1
+lr   = math.log(close / close[1])
+vol  = ta.stdev(lr, 120) * math.sqrt(252)
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+float w = ret &gt; 0 and vol &gt; 0 ? math.min(1.0, (targetVol / nAssets) / vol) : 0.0
+
+if monthEnd and not na(vol)
+    float target = w * strategy.equity / close
+    float diff = target - strategy.position_size
+    if math.abs(diff) * close &gt; 0.01 * strategy.equity
+        strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, &quot;Weight of this asset (%)&quot;, color.teal, style = plot.style_stepline)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="A" data-search="bot 08 overnight after down days after 3 down closes above the 200-day average, hold from the close to the next open. spy or qqq · 1–15 min">
+      <div class="bot-head">
+        <span class="chip gA" title="Passed every test">A</span>
+        <h3>Bot 08 Overnight after down days</h3>
+        <button class="copy" type="button" data-target="code-16" id="btn-16">Copy code</button>
+      </div>
+      <p class="rule">After 3 down closes above the 200-day average, hold from the close to the next open.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY or QQQ · 1–15 min</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 2.4%/yr, Sharpe 0.82, worst fall −7%.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">34 lines · s08_overnight_after_down_days.pine</span></summary>
+        <pre id="code-16"><code>//@version=6
+// Bot 08 - Overnight hold after down days (overnight-return research: Cooper, Cliff &amp; Gulen 2008;
+// Lou, Polk &amp; Skouras 2019). Use an INTRADAY chart (1 to 15 minutes, regular hours only) of SPY or QQQ.
+// At the 16:00 close, after N down closes in a row and with price above the 200-day average,
+// buy market-on-close; sell at the close of the first bar next morning (1-minute chart = the open).
+// Validated 2013-2026 out of sample (SPY + QQQ): 2.4%/yr, Sharpe 0.82, worst fall -7%, in the
+// market overnight only ~8% of nights. Grade A (small but clean).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 08 Overnight after down days&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+downDays = input.int(3, &quot;Down closes in a row&quot;)
+useTrend = input.bool(true, &quot;Only above the 200-day average&quot;)
+
+string TZ = &quot;America/New_York&quot;
+bool inSess = not na(time(timeframe.period, &quot;0930-1600&quot;, TZ))
+int closeMin = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+bool lastBar = inSess and closeMin &gt;= 960
+bool firstBar = inSess and (na(time(timeframe.period, &quot;0930-1600&quot;, TZ)[1]) or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+float sma200 = request.security(syminfo.tickerid, &quot;D&quot;, ta.sma(close, 200)[1], lookahead = barmerge.lookahead_on)
+
+var float prevClose = na
+var int streak = 0
+if firstBar and strategy.position_size &gt; 0
+    strategy.close(&quot;Overnight&quot;)
+if lastBar
+    streak := not na(prevClose) and close &lt; prevClose ? streak + 1 : 0
+    prevClose := close
+    if streak &gt;= downDays and (not useTrend or close &gt; sma200) and strategy.position_size == 0
+        strategy.entry(&quot;Overnight&quot;, strategy.long)
+
+if timeframe.isdaily or timeframe.isweekly
+    runtime.error(&quot;Use an intraday chart (1-15 minutes) for this strategy.&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="B" data-search="bot 04 crypto donchian trend average of donchian breakout states (5–60 days), sized to 40% volatility. btcusd (or eth and other large coins) · daily">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>Bot 04 Crypto Donchian trend</h3>
+        <button class="copy" type="button" data-target="code-17" id="btn-17">Copy code</button>
+      </div>
+      <p class="rule">Average of Donchian breakout states (5–60 days), sized to 40% volatility.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>BTCUSD (or ETH and other large coins) · daily</dd></div>
+        <div><dt>Tested result</dt><dd>BTC 2020–26: 19.9%/yr, Sharpe 0.88, worst fall −34% (holding BTC: −77%).</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">33 lines · s04_crypto_donchian_trend.pine</span></summary>
+        <pre id="code-17"><code>//@version=6
+// Bot 04 (and 17) - Crypto Donchian trend ensemble (after Zarattini, Pagani &amp; Barbon 2025,
+// &quot;Catching Crypto Trends&quot;). For each lookback N: go long when the close breaks above the
+// highest high of the last N days; leave when it closes below the lowest low of the last N/2 days.
+// Position = average of the N states x min(1, target vol / 90-day realised vol). Daily chart,
+// trades at the next open. Validated on BTC 2020-2026 out of sample: 19.9%/yr, Sharpe 0.88,
+// worst fall -34% (holding BTC: -77%). Grade B. Bot 17 = the same on several large coins.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 04 Crypto Donchian trend&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.2)
+
+targetVol = input.float(0.40, &quot;Volatility target (0 = always full size)&quot;, step = 0.05)
+
+dState(int n) =&gt;
+    var float st = 0.0
+    float hi = ta.highest(high, n)[1]
+    float lo = ta.lowest(low, math.max(2, int(n / 2)))[1]
+    if st == 0 and close &gt; hi
+        st := 1.0
+    else if st == 1 and close &lt; lo
+        st := 0.0
+    st
+
+float sig = (dState(5) + dState(10) + dState(20) + dState(30) + dState(60)) / 5
+float vol = ta.stdev(math.log(close / close[1]), 90) * math.sqrt(365)
+float size = targetVol &gt; 0 ? math.min(1.0, targetVol / vol) : 1.0
+float w = math.round(sig * size * 50) / 50
+
+float diff = w * strategy.equity / close - strategy.position_size
+if not na(vol) and math.abs(diff) * close &gt; 0.02 * strategy.equity
+    strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, &quot;Position (% of equity)&quot;, color.orange, style = plot.style_stepline)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="B" data-search="bot 01 faber trend hold each asset above its 6-month average, else cash. monthly. spy, efa, ief, vnq or dbc · daily">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>Bot 01 Faber trend</h3>
+        <button class="copy" type="button" data-target="code-18" id="btn-18">Copy code</button>
+      </div>
+      <p class="rule">Hold each asset above its 6-month average, else cash. Monthly.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY, EFA, IEF, VNQ or DBC · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2015–26, 5 ETFs: 4.1%/yr, Sharpe 0.62, worst fall −11%.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">25 lines · s01_faber_trend.pine</span></summary>
+        <pre id="code-18"><code>//@version=6
+// Bot 01 - Faber trend timing (Faber 2007/2013, &quot;A Quantitative Approach to Tactical Asset Allocation&quot;)
+// Rule: on the last trading day of each month, hold this asset if its close is above its N-month
+// average (21 x N daily closes); otherwise hold cash. Trades at the next open.
+// The full bot runs this on SPY, EFA, IEF, VNQ and DBC at 20% each (the rest in SHY): open each
+// chart and the strategy tester shows that leg. Validated (Python, 2015-2026 out of sample, 5 ETFs):
+// 4.1%/yr, Sharpe 0.62, worst fall -11%. Grade B.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 01 Faber trend&quot;, overlay = true, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, commission_type = strategy.commission.percent, commission_value = 0.04,
+     initial_capital = 10000)
+
+months = input.int(6, &quot;Average length (months)&quot;, minval = 2)
+avg = ta.sma(close, 21 * months)
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+bool hold = close &gt; avg
+
+if monthEnd and not na(avg)
+    if hold and strategy.position_size == 0
+        strategy.entry(&quot;Long&quot;, strategy.long)
+    else if not hold and strategy.position_size &gt; 0
+        strategy.close(&quot;Long&quot;)
+
+plot(avg, &quot;N-month average&quot;, color.orange)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="B" data-search="bot 09 turn of the month long from 5 trading days before month end to day 3 of the new month. spy · daily">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>Bot 09 Turn of the month</h3>
+        <button class="copy" type="button" data-target="code-19" id="btn-19">Copy code</button>
+      </div>
+      <p class="rule">Long from 5 trading days before month end to day 3 of the new month.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 5.9%/yr, Sharpe 0.66, 63% winning months.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">34 lines · s09_turn_of_month.pine</span></summary>
+        <pre id="code-19"><code>//@version=6
+// Bot 09 - Turn of the month (Lakonishok &amp; Smidt 1988; McConnell &amp; Xu 2008). Daily chart of SPY
+// (or ES1!/NQ1!). Buy at the close N trading days before month end, sell at the close of trading
+// day M of the new month. Weekends are skipped; exchange holidays are not, so a holiday can shift
+// the entry by a day. Validated 2013-2026 out of sample on SPY: 5.9%/yr, Sharpe 0.66, worst fall
+// -16%, 63% winning months, in the market a third of the time. Grade B.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 09 Turn of the month&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+before = input.int(5, &quot;Enter N trading days before month end&quot;, minval = 1)
+after  = input.int(3, &quot;Exit at the close of trading day M&quot;, minval = 1)
+
+int y = year(time)
+int mo = month(time)
+int d = dayofmonth(time)
+int dim = mo == 2 ? (y % 4 == 0 ? 29 : 28) : (mo == 4 or mo == 6 or mo == 9 or mo == 11) ? 30 : 31
+int left = 0
+if d &lt; dim
+    for k = d + 1 to dim
+        int wd = dayofweek(timestamp(y, mo, k))
+        if wd != dayofweek.saturday and wd != dayofweek.sunday
+            left += 1
+
+var int fwd = 0
+fwd := month(time) != month(time[1]) ? 1 : fwd + 1
+bool hold = left &lt;= before - 1 or fwd &lt; after
+
+if hold and strategy.position_size == 0
+    strategy.entry(&quot;TOM&quot;, strategy.long)
+if not hold and strategy.position_size &gt; 0
+    strategy.close(&quot;TOM&quot;)
+bgcolor(hold ? color.new(color.green, 88) : na)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="B" data-search="bot 15 volatility edge zarattini volatility edge: svxy sized vix/100 in contango when vix is above realised vol. svxy · daily">
+      <div class="bot-head">
+        <span class="chip gB" title="Passed">B</span>
+        <h3>Bot 15 Volatility Edge</h3>
+        <button class="copy" type="button" data-target="code-20" id="btn-20">Copy code</button>
+      </div>
+      <p class="rule">Zarattini Volatility Edge: SVXY sized VIX/100 in contango when VIX is above realised vol.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SVXY · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2017–26: 3.9%/yr, Sharpe 0.67, worst fall −8%.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">27 lines · s15_volatility_edge.pine</span></summary>
+        <pre id="code-20"><code>//@version=6
+// Bot 15 - &quot;The Volatility Edge&quot; Strategy 4 (Zarattini, Aziz &amp; Mele 2025), short-vol leg only.
+// Put it on an SVXY daily chart. eRV = SPY&#x27;s realised volatility over N days (annualised, x100),
+// eVRP = VIX - eRV. In contango (VIX &lt; VIX3M): hold SVXY at VIX/100 of equity if eVRP &gt; 0, half
+// that if eVRP &lt;= 0; in backwardation hold nothing. SVXY was -1x VIX futures until 27 Feb 2018 and
+// -0.5x after, so the weight is halved before that date. Trades at the next open.
+// Validated 2017-2026 out of sample: 3.9%/yr, Sharpe 0.67, worst fall -8%. Grade B. The paper&#x27;s
+// long-VIX leg made it worse here (Sharpe 0.54, -30%), so it is left out.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 15 Volatility Edge&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.08)
+
+rvLen = input.int(20, &quot;Realised volatility days&quot;)
+float vix = request.security(&quot;CBOE:VIX&quot;, &quot;D&quot;, close)
+float vix3m = request.security(&quot;CBOE:VIX3M&quot;, &quot;D&quot;, close)
+float erv = request.security(&quot;SPY&quot;, &quot;D&quot;, ta.stdev(close / close[1] - 1, rvLen) * math.sqrt(252) * 100)
+float vrp = vix - erv
+bool contango = vix &lt; vix3m
+float w = contango ? (vrp &gt; 0 ? vix / 100 : 0.5 * vix / 100) : 0.0
+if time &lt; timestamp(2018, 2, 28)
+    w := w * 0.5
+w := math.round(w * 1000) / 1000
+
+float diff = w * strategy.equity / close - strategy.position_size
+if not na(erv) and math.abs(diff) * close &gt; 0.02 * strategy.equity
+    strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+plot(w * 100, &quot;SVXY weight (%)&quot;, color.purple, style = plot.style_stepline)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="C" data-search="bot 10 sector rotation top 3 sectors by 3-month return; ief when spy is below its 200-day average. monthly. any spdr sector etf or ief · daily">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>Bot 10 Sector rotation</h3>
+        <button class="copy" type="button" data-target="code-21" id="btn-21">Copy code</button>
+      </div>
+      <p class="rule">Top 3 sectors by 3-month return; IEF when SPY is below its 200-day average. Monthly.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>Any SPDR sector ETF or IEF · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 8.7%/yr, Sharpe 0.69; could be luck.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">51 lines · s10_sector_rotation.pine</span></summary>
+        <pre id="code-21"><code>//@version=6
+// Bot 10 - Sector momentum rotation (Moskowitz &amp; Grinblatt 1999). Put it on any of the 9 SPDR
+// sector ETFs (XLB XLE XLF XLI XLK XLP XLU XLV XLY) or IEF. Month end: hold the top K sectors by
+// N-month return, equal weight; if SPY is below its 200-day average, hold IEF instead. Trades at the
+// next open. The tester shows the leg for the chart&#x27;s ticker; the table shows all of them.
+// Validated 2013-2026 out of sample: 8.7%/yr, Sharpe 0.69, worst fall -23%. Grade C (could be luck).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 10 Sector rotation&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.04)
+
+months = input.int(3, &quot;Momentum months&quot;)
+topK   = input.int(3, &quot;Sectors to hold&quot;, minval = 1, maxval = 9)
+useFilter = input.bool(true, &quot;IEF when SPY is below its 200-day average&quot;)
+int L = 21 * months
+mom() =&gt; close / close[L] - 1
+names = array.from(&quot;XLB&quot;, &quot;XLE&quot;, &quot;XLF&quot;, &quot;XLI&quot;, &quot;XLK&quot;, &quot;XLP&quot;, &quot;XLU&quot;, &quot;XLV&quot;, &quot;XLY&quot;)
+m = array.from(request.security(&quot;XLB&quot;, &quot;D&quot;, mom()), request.security(&quot;XLE&quot;, &quot;D&quot;, mom()), request.security(&quot;XLF&quot;, &quot;D&quot;, mom()),
+     request.security(&quot;XLI&quot;, &quot;D&quot;, mom()), request.security(&quot;XLK&quot;, &quot;D&quot;, mom()), request.security(&quot;XLP&quot;, &quot;D&quot;, mom()),
+     request.security(&quot;XLU&quot;, &quot;D&quot;, mom()), request.security(&quot;XLV&quot;, &quot;D&quot;, mom()), request.security(&quot;XLY&quot;, &quot;D&quot;, mom()))
+[spyC, spyS] = request.security(&quot;SPY&quot;, &quot;D&quot;, [close, ta.sma(close, 200)])
+bool riskOff = useFilter and spyC &lt; spyS
+
+float w = 0.0
+bool ready = not na(m.get(0)) and not na(m.get(8)) and not na(spyS)
+if ready
+    if riskOff
+        w := syminfo.ticker == &quot;IEF&quot; ? 1.0 : 0.0
+    else
+        for i = 0 to 8
+            int r = 0
+            for j = 0 to 8
+                if m.get(j) &gt; m.get(i)
+                    r += 1
+            if r &lt; topK and names.get(i) == syminfo.ticker
+                w := 1.0 / topK
+
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+if monthEnd and ready
+    float diff = w * strategy.equity / close - strategy.position_size
+    if math.abs(diff) * close &gt; 0.01 * strategy.equity
+        strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, &quot;Weight of this ticker (%)&quot;, color.teal, style = plot.style_stepline)
+var table tb = table.new(position.top_right, 2, 11, border_width = 1)
+if barstate.islast
+    table.cell(tb, 0, 0, riskOff ? &quot;SPY &lt; 200d: hold IEF&quot; : &quot;Risk on&quot;)
+    table.cell(tb, 1, 0, str.tostring(months) + &quot;m return&quot;)
+    for i = 0 to 8
+        table.cell(tb, 0, i + 1, names.get(i))
+        table.cell(tb, 1, i + 1, str.tostring(m.get(i) * 100, &quot;#.#&quot;) + &quot;%&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="C" data-search="bot 03 keller vaa keller vaa-g4: top 2 offensive etfs, or the best defensive one if any score is negative. any of spy efa eem agg lqd ief shy · daily">
+      <div class="bot-head">
+        <span class="chip gC" title="Promising, not proven">C</span>
+        <h3>Bot 03 Keller VAA</h3>
+        <button class="copy" type="button" data-target="code-22" id="btn-22">Copy code</button>
+      </div>
+      <p class="rule">Keller VAA-G4: top 2 offensive ETFs, or the best defensive one if any score is negative.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>Any of SPY EFA EEM AGG LQD IEF SHY · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2015–26: 4.5%/yr, Sharpe 0.51, worst fall −23%.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">65 lines · s03_keller_vaa.pine</span></summary>
+        <pre id="code-22"><code>//@version=6
+// Bot 03 - Keller &amp; Keuning Vigilant Asset Allocation, G4 (2017)
+// Score 13612W = 12 x 1m + 4 x 3m + 2 x 6m + 12m return (months ~ 21 trading days).
+// Month end: if all of SPY EFA EEM AGG score above 0, hold the top N of them; if any is
+// negative, hold 100% of the best of LQD IEF SHY. Trades at the next open.
+// Put this on a chart of any of the 7 tickers: the tester trades that ticker whenever the bot
+// holds it; the table shows the whole allocation. Validated 2015-2026: 4.5%/yr, Sharpe 0.51,
+// worst fall -23%. Grade C (decayed after publication; bot 14 HAA did better).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 03 Keller VAA&quot;, overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.04)
+
+topN = input.int(2, &quot;Offensive assets to hold&quot;, minval = 1, maxval = 4)
+
+score() =&gt; 12 * (close / close[21] - 1) + 4 * (close / close[63] - 1) + 2 * (close / close[126] - 1) + (close / close[252] - 1)
+float sSPY = request.security(&quot;SPY&quot;, &quot;D&quot;, score())
+float sEFA = request.security(&quot;EFA&quot;, &quot;D&quot;, score())
+float sEEM = request.security(&quot;EEM&quot;, &quot;D&quot;, score())
+float sAGG = request.security(&quot;AGG&quot;, &quot;D&quot;, score())
+float sLQD = request.security(&quot;LQD&quot;, &quot;D&quot;, score())
+float sIEF = request.security(&quot;IEF&quot;, &quot;D&quot;, score())
+float sSHY = request.security(&quot;SHY&quot;, &quot;D&quot;, score())
+
+off = array.from(sSPY, sEFA, sEEM, sAGG)
+offNames = array.from(&quot;SPY&quot;, &quot;EFA&quot;, &quot;EEM&quot;, &quot;AGG&quot;)
+defs = array.from(sLQD, sIEF, sSHY)
+defNames = array.from(&quot;LQD&quot;, &quot;IEF&quot;, &quot;SHY&quot;)
+
+rankOf(array&lt;float&gt; a, int i) =&gt;
+    int r = 0
+    for j = 0 to a.size() - 1
+        if a.get(j) &gt; a.get(i)
+            r += 1
+    r
+
+float w = 0.0
+bool defensive = sSPY &lt;= 0 or sEFA &lt;= 0 or sEEM &lt;= 0 or sAGG &lt;= 0
+if not na(sSPY) and not na(sEEM) and not na(sAGG) and not na(sSHY)
+    if defensive
+        for i = 0 to 2
+            if rankOf(defs, i) == 0 and defNames.get(i) == syminfo.ticker
+                w := 1.0
+    else
+        for i = 0 to 3
+            if rankOf(off, i) &lt; topN and offNames.get(i) == syminfo.ticker
+                w := 1.0 / topN
+
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+if monthEnd and not na(sSHY)
+    float diff = w * strategy.equity / close - strategy.position_size
+    if math.abs(diff) * close &gt; 0.01 * strategy.equity
+        strategy.order(&quot;rebalance&quot;, diff &gt; 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+
+plot(w * 100, &quot;Weight of this ticker (%)&quot;, color.teal, style = plot.style_stepline)
+var table tb = table.new(position.top_right, 2, 9, border_width = 1)
+if barstate.islast
+    table.cell(tb, 0, 0, defensive ? &quot;Mode: DEFENSIVE&quot; : &quot;Mode: offensive&quot;, bgcolor = defensive ? color.new(color.red, 70) : color.new(color.green, 70))
+    table.cell(tb, 1, 0, &quot;13612W score&quot;)
+    for i = 0 to 3
+        table.cell(tb, 0, i + 1, offNames.get(i))
+        table.cell(tb, 1, i + 1, str.tostring(off.get(i), &quot;#.##&quot;))
+    for i = 0 to 2
+        table.cell(tb, 0, i + 5, defNames.get(i))
+        table.cell(tb, 1, i + 5, str.tostring(defs.get(i), &quot;#.##&quot;))
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="F" data-search="bot 16 connors double 7s buy a 5-day closing low, sell a 5-day closing high. spy, qqq, iwm or dia · daily">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>Bot 16 Connors Double 7s</h3>
+        <button class="copy" type="button" data-target="code-23" id="btn-23">Copy code</button>
+      </div>
+      <p class="rule">Buy a 5-day closing low, sell a 5-day closing high.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY, QQQ, IWM or DIA · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 6.5%/yr, worst fall −36%; decayed.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">17 lines · s16_connors_double7.pine</span></summary>
+        <pre id="code-23"><code>//@version=6
+// Bot 16 - Connors Double 7s (Connors &amp; Alvarez 2008). Daily chart of SPY, QQQ, IWM or DIA.
+// Buy at the close on an N-day closing low (optionally only above the 200-day average); sell at
+// the close on an N-day closing high. Validated 2013-2026 out of sample: 6.5%/yr, Sharpe 0.47,
+// worst fall -36%, walk-forward Sharpe 0.28. Grade F (decayed).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 16 Connors Double 7s&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+n = input.int(5, &quot;N-day closing low / high&quot;)
+useTrend = input.bool(false, &quot;Only above the 200-day average&quot;)
+bool entry = close &lt;= ta.lowest(close, n) and (not useTrend or close &gt; ta.sma(close, 200))
+if strategy.position_size == 0 and entry
+    strategy.entry(&quot;Long&quot;, strategy.long)
+if strategy.position_size &gt; 0 and close &gt;= ta.highest(close, n)
+    strategy.close(&quot;Long&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="F" data-search="bot 06 connors rsi2 buy rsi(2) &lt; 10 above the 200-day average, sell rsi(2) &gt; 70. spy, qqq, iwm or dia · daily">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>Bot 06 Connors RSI2</h3>
+        <button class="copy" type="button" data-target="code-24" id="btn-24">Copy code</button>
+      </div>
+      <p class="rule">Buy RSI(2) &lt; 10 above the 200-day average, sell RSI(2) &gt; 70.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SPY, QQQ, IWM or DIA · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2013–26: 3.7%/yr, worst fall −41%; decayed.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">18 lines · s06_connors_rsi2.pine</span></summary>
+        <pre id="code-24"><code>//@version=6
+// Bot 06 - Connors RSI(2) (Connors &amp; Alvarez 2008). Daily chart of SPY, QQQ, IWM or DIA.
+// Buy at the close when RSI(2) &lt; X and the close is above the 200-day average; sell at the
+// close when RSI(2) &gt; 70. Validated 2013-2026 out of sample (4-ETF basket): 3.7%/yr,
+// Sharpe 0.36, worst fall -41%. Grade F (decayed since the book).
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 06 Connors RSI2&quot;, overlay = true, process_orders_on_close = true,
+     default_qty_type = strategy.percent_of_equity, default_qty_value = 100,
+     commission_type = strategy.commission.percent, commission_value = 0.02, initial_capital = 10000)
+
+entryBelow = input.int(10, &quot;Buy when RSI(2) is below&quot;)
+exitAbove  = input.int(70, &quot;Sell when RSI(2) is above&quot;)
+r = ta.rsi(close, 2)
+trendOk = close &gt; ta.sma(close, 200)
+if strategy.position_size == 0 and r &lt; entryBelow and trendOk
+    strategy.entry(&quot;Long&quot;, strategy.long)
+if strategy.position_size &gt; 0 and r &gt; exitAbove
+    strategy.close(&quot;Long&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="F" data-search="bot 05 vix term structure svxy hold svxy while vix / vix3m &lt; 0.95. svxy · daily">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>Bot 05 VIX term structure SVXY</h3>
+        <button class="copy" type="button" data-target="code-25" id="btn-25">Copy code</button>
+      </div>
+      <p class="rule">Hold SVXY while VIX / VIX3M &lt; 0.95.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>SVXY · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2017–26: 6.5%/yr, worst fall −50%. Do not run it.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">20 lines · s05_vix_term_structure.pine</span></summary>
+        <pre id="code-25"><code>//@version=6
+// Bot 05 - VIX term structure on SVXY (Simon &amp; Campasano 2014). Put it on an SVXY daily chart.
+// Hold SVXY while VIX / VIX3M is below the threshold (contango), else cash; trades at the next open.
+// Validated 2017-2026 out of sample: 6.5%/yr, Sharpe 0.36, worst fall -50%. Grade F: do not run
+// this one with real money; it is here so you can see why. Bot 15 is the better version.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 05 VIX term structure SVXY&quot;, overlay = false, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, initial_capital = 10000, commission_type = strategy.commission.percent,
+     commission_value = 0.08)
+
+thr = input.float(0.95, &quot;Hold when VIX / VIX3M is below&quot;, step = 0.01)
+float vix = request.security(&quot;CBOE:VIX&quot;, &quot;D&quot;, close)
+float vix3m = request.security(&quot;CBOE:VIX3M&quot;, &quot;D&quot;, close)
+float ratio = vix / vix3m
+if ratio &lt; thr and strategy.position_size == 0
+    strategy.entry(&quot;Long&quot;, strategy.long)
+if ratio &gt;= thr and strategy.position_size &gt; 0
+    strategy.close(&quot;Long&quot;)
+plot(ratio, &quot;VIX / VIX3M&quot;, color.purple)
+hline(1.0, &quot;Backwardation line&quot;)
+</code></pre>
+      </details>
+    </article>
+
+    <article class="bot" data-group="Systematic" data-grade="F" data-search="bot 11 fx trend long above, short below the 100-day average, weekly. eurusd and other majors · daily">
+      <div class="bot-head">
+        <span class="chip gF" title="Failed">F</span>
+        <h3>Bot 11 FX trend</h3>
+        <button class="copy" type="button" data-target="code-26" id="btn-26">Copy code</button>
+      </div>
+      <p class="rule">Long above, short below the 100-day average, weekly.</p>
+      <dl class="facts">
+        <div><dt>Chart</dt><dd>EURUSD and other majors · daily</dd></div>
+        <div><dt>Tested result</dt><dd>2015–26: −3.0%/yr.</dd></div>
+      </dl>
+      <details>
+        <summary>Show code <span class="lines">21 lines · s11_fx_trend.pine</span></summary>
+        <pre id="code-26"><code>//@version=6
+// Bot 11 - FX trend on majors. Daily chart of EURUSD, GBPUSD, AUDUSD, NZDUSD, USDJPY, USDCAD or USDCHF.
+// Every Friday close: long if the close is above its N-day average, short if below (or flat if
+// shorts are off). Trades at the next open. Validated 2015-2026 out of sample (7 pairs, spot only,
+// carry not included): -3.0%/yr. Grade F: here only to show it does not work now.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy(&quot;Bot 11 FX trend&quot;, overlay = true, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, initial_capital = 10000)
+
+len = input.int(100, &quot;Average length (days)&quot;)
+allowShort = input.bool(true, &quot;Allow shorts&quot;)
+avg = ta.sma(close, len)
+if dayofweek == dayofweek.friday and not na(avg)
+    if close &gt; avg and strategy.position_size &lt;= 0
+        strategy.entry(&quot;Long&quot;, strategy.long)
+    else if close &lt; avg and strategy.position_size &gt;= 0
+        if allowShort
+            strategy.entry(&quot;Short&quot;, strategy.short)
+        else
+            strategy.close(&quot;Long&quot;)
+plot(avg, &quot;Average&quot;, color.orange)
+</code></pre>
+      </details>
+    </article>
+  </div>
+  <div class="foot">
+    <p><b>Grades.</b> A: passed every out-of-sample test. B: passed a looser version. C: made money out of sample but could be luck. F: failed. The failed ones are here so you can check them yourself.</p>
+    <p><b>Futures numbers</b> are for 1 micro contract (MNQ = $2 a point, MES = $5). One full-size NQ or ES is 10 times the dollars and the drawdowns. Costs used: $0.62 per contract per side plus 1 tick of slippage. The tests used index quotes, not CME futures, so TradingView's numbers will differ somewhat.</p>
+    <p>These scripts were written without a Pine compiler. If TradingView shows an error, send me the line and message and I will fix it. Research and education, not financial advice.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  var group = "all";
+  var bots = Array.prototype.slice.call(document.querySelectorAll(".bot"));
+  var search = document.getElementById("search");
+  var passed = document.getElementById("passed-only");
+  var count = document.getElementById("count");
+  function apply() {
+    var q = (search.value || "").trim().toLowerCase();
+    var shown = 0;
+    bots.forEach(function (b) {
+      var ok = (group === "all" || b.dataset.group === group) &&
+               (!passed.checked || b.dataset.grade === "A" || b.dataset.grade === "B") &&
+               (!q || b.dataset.search.indexOf(q) !== -1);
+      b.hidden = !ok;
+      if (ok) shown++;
+    });
+    count.textContent = shown + " of " + bots.length;
+  }
+  document.querySelectorAll("#group-filter button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      group = btn.dataset.group;
+      document.querySelectorAll("#group-filter button").forEach(function (o) { o.setAttribute("aria-pressed", String(o === btn)); });
+      apply();
+    });
+  });
+  search.addEventListener("input", apply);
+  passed.addEventListener("change", apply);
+  document.querySelectorAll(".copy").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var pre = document.getElementById(btn.dataset.target);
+      var text = pre.textContent;
+      function done(label) { btn.textContent = label; btn.classList.add("done");
+        setTimeout(function () { btn.textContent = "Copy code"; btn.classList.remove("done"); }, 1800); }
+      function fallback() {
+        var d = pre.closest("details"); if (d) d.open = true;
+        var r = document.createRange(); r.selectNodeContents(pre);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        done("Selected: press Ctrl+C");
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { done("Copied"); }, fallback);
+      } else { fallback(); }
+    });
+  });
+  apply();
+})();
+</script>

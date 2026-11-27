@@ -1,0 +1,22 @@
+//@version=6
+// F12 - Turnaround Tuesday on index futures. Daily chart of MNQ1!/NQ1! or MES1!/ES1!.
+// Buy 1 contract at Monday's close when Monday fell at least X% from Friday's close; sell at the
+// close H trading days later. (TradingView's daily futures close is the 17:00 settlement; the
+// Python test used 16:00, so expect small differences.)
+// Validated on Nasdaq-100 data, 1 MNQ (X = 1.5%, hold 2 days): 2011-2021 +$537/yr, 43 trades;
+// 2022-2026 +$2,011/yr, 17 trades, 82% winners. Few trades, so treat the edge as uncertain.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F12 Turnaround Tuesday", overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+dropPct = input.float(1.5, "Monday drop at least (%)", step = 0.5)
+holdDays = input.int(2, "Hold for (trading days)", minval = 1)
+var int heldFor = 0
+if strategy.position_size > 0
+    heldFor += 1
+    if heldFor >= holdDays
+        strategy.close("Long")
+if strategy.position_size == 0 and dayofweek == dayofweek.monday and close <= close[1] * (1 - dropPct / 100)
+    strategy.entry("Long", strategy.long)
+    heldFor := 0

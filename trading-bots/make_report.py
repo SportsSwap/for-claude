@@ -136,7 +136,8 @@ ETFs can lose most of their value in a crash; size them small.
 - `engine/` — data cache, backtester, metrics (deflated Sharpe, PBO), validation.
 - `run_all.py` — reruns every test. `portfolio.py` — the combined portfolio.
 - `signals.py` — today's target positions for the passing bots (never places orders).
-- `tradingview/` — Pine Script v6 versions of bots 07 and 12 (not compiled here; check in the Pine Editor).
+- `tradingview/` — Pine Script v6 for every bot except #13 (`systematic/`, `futures/`), and `index.html`, a page with a copy button per script. Not compiled here; check in the Pine Editor.
+- `FUTURES_RESULTS.md` — the 12 futures bots (NQ/MNQ, ES/MES) tested on 1-minute data, in dollars per contract.
 - `reports/Retail systematic trading strategies.md` — the research report.
 - `research_notes/` — the raw research notes with sources.
 - `results/` — every number, equity curve and trade list.

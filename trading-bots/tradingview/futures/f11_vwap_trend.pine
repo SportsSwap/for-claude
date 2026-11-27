@@ -1,0 +1,35 @@
+//@version=6
+// F11 - VWAP trend (Zarattini & Aziz 2023). Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ) on 1 minute.
+// From the start time, long while the 1-minute close is above the session VWAP (short below if
+// shorts are on); switch only after `confirm` closes in a row on the other side; flat at 16:00.
+// Validated on 1-minute data with a time-weighted price in place of VWAP (no volume in the data),
+// 1 MNQ (start 10:00, 15-minute confirm, longs only): 2022-2026 +$1,045/yr but -$667/yr since
+// Aug 2024; the paper's flip-on-every-cross version lost heavily after costs. Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F11 VWAP trend", overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+confirm = input.int(15, "Closes in a row before switching", minval = 1)
+startMin = input.int(30, "Start (minutes after 09:30)")
+longOnly = input.bool(true, "Longs only")
+string TZ = "America/New_York"
+bool inSess = not na(time(timeframe.period, "0930-1600", TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570
+float vw = ta.vwap(hlc3)
+var int run = 0
+if inSess and cm > startMin and cm < 389
+    int want = close > vw ? 1 : (longOnly ? 0 : -1)
+    int pos = strategy.position_size > 0 ? 1 : strategy.position_size < 0 ? -1 : 0
+    run := want == pos ? 0 : run + 1
+    if run >= confirm
+        run := 0
+        if want == 1
+            strategy.entry("Long", strategy.long)
+        else if want == -1
+            strategy.entry("Short", strategy.short)
+        else
+            strategy.close_all()
+if inSess and cm >= 389 and strategy.position_size != 0
+    strategy.close_all(comment = "16:00")
+plot(inSess ? vw : na, "VWAP", color.orange, style = plot.style_linebr)

@@ -1,0 +1,84 @@
+== F06 IBS dip buy NQ  chosen [thr=0.25,trend=False]  default [thr=0.2,trend=False]  grid 10  (4s)
+   IS 2011-2021         MNQ trades   375  $   2,120/yr  net $   23,312  win 71%  PF 2.21  maxDD $-1,953  Sharpe 1.29  yrs up 10/12
+   NEW 2022-Jul 2024    MNQ trades    98  $   3,811/yr  net $    9,829  win 71%  PF 1.53  maxDD $-3,554  Sharpe 0.98  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades    78  $   5,725/yr  net $   13,009  win 72%  PF 1.67  maxDD $-4,957  Sharpe 1.14  yrs up 3/3
+   OOS 2022-2026        MNQ trades   176  $   4,705/yr  net $   22,838  win 72%  PF 1.60  maxDD $-4,957  Sharpe 1.06  yrs up 4/5
+   OOS at 2x costs $4,624/yr | default setting OOS $3,637/yr | DSR 0.91 PBO 0.36 WF Sharpe 0.93 | TQQQ (~3x) CAGR 42.5%
+== F06 IBS dip buy ES  chosen [thr=0.2,trend=False]  default [thr=0.2,trend=False]  grid 10  (3s)
+   IS 2011-2021         MES trades   322  $     928/yr  net $   10,210  win 68%  PF 1.72  maxDD $-2,489  Sharpe 0.83  yrs up 10/12
+   NEW 2022-Jul 2024    MES trades    87  $   1,693/yr  net $    4,366  win 69%  PF 1.44  maxDD $-3,364  Sharpe 0.76  yrs up 3/3
+   FIN Aug 2024-2026    MES trades    53  $     934/yr  net $    2,123  win 55%  PF 1.27  maxDD $-1,537  Sharpe 0.47  yrs up 2/3
+   OOS 2022-2026        MES trades   140  $   1,337/yr  net $    6,489  win 64%  PF 1.37  maxDD $-3,364  Sharpe 0.63  yrs up 5/5
+   OOS at 2x costs $1,229/yr | default setting OOS $1,337/yr | DSR 0.80 PBO 0.40 WF Sharpe 0.67 | UPRO (~3x) CAGR 15.1%
+== F07 Lower band IBS NQ  chosen [n=20,k=3.0]  default [n=10,k=2.5]  grid 9  (2s)
+   IS 2011-2021         MNQ trades   144  $   1,671/yr  net $   18,372  win 78%  PF 3.36  maxDD $-1,262  Sharpe 1.34  yrs up 11/11
+   NEW 2022-Jul 2024    MNQ trades    43  $   3,241/yr  net $    8,358  win 67%  PF 2.02  maxDD $-2,125  Sharpe 1.09  yrs up 3/3
+   FIN Aug 2024-2026    MNQ trades    31  $   6,087/yr  net $   13,832  win 77%  PF 2.90  maxDD $-4,622  Sharpe 1.41  yrs up 3/3
+   OOS 2022-2026        MNQ trades    74  $   4,571/yr  net $   22,190  win 72%  PF 2.43  maxDD $-4,622  Sharpe 1.25  yrs up 5/5
+   OOS at 2x costs $4,537/yr | default setting OOS $4,557/yr | DSR 0.99 PBO 0.38 WF Sharpe 1.03 | TQQQ (~3x) CAGR 39.6%
+== F07 Lower band IBS ES  chosen [n=5,k=2.0]  default [n=10,k=2.5]  grid 9  (3s)
+   IS 2011-2021         MES trades   153  $     761/yr  net $    8,373  win 74%  PF 1.98  maxDD $-2,552  Sharpe 0.76  yrs up 10/11
+   NEW 2022-Jul 2024    MES trades    33  $     279/yr  net $      719  win 64%  PF 1.15  maxDD $-1,533  Sharpe 0.20  yrs up 3/3
+   FIN Aug 2024-2026    MES trades    32  $   2,513/yr  net $    5,710  win 84%  PF 2.21  maxDD $-3,161  Sharpe 1.09  yrs up 3/3
+   OOS 2022-2026        MES trades    65  $   1,325/yr  net $    6,430  win 74%  PF 1.67  maxDD $-3,161  Sharpe 0.70  yrs up 5/5
+   OOS at 2x costs $1,275/yr | default setting OOS $1,445/yr | DSR 0.83 PBO 0.87 WF Sharpe 0.60 | UPRO (~3x) CAGR 10.9%
+== F08 Opening gap NQ  chosen [k=0.5,mode=go]  default [k=0.25,mode=fade]  grid 6  (3s)
+   IS 2011-2021         MNQ trades   627  $     152/yr  net $    1,672  win 49%  PF 1.06  maxDD $-3,738  Sharpe 0.13  yrs up 6/11
+   NEW 2022-Jul 2024    MNQ trades   120  $    -699/yr  net $   -1,802  win 52%  PF 0.90  maxDD $-3,591  Sharpe -0.31  yrs up 1/3
+   FIN Aug 2024-2026    MNQ trades   162  $  -3,530/yr  net $   -8,051  win 44%  PF 0.78  maxDD $-12,805  Sharpe -0.77  yrs up 1/3
+   OOS 2022-2026        MNQ trades   282  $  -2,026/yr  net $   -9,853  win 48%  PF 0.82  maxDD $-13,620  Sharpe -0.58  yrs up 1/5
+   OOS at 2x costs $-2,156/yr | default setting OOS $1,563/yr | DSR 0.01 PBO 0.97 WF Sharpe -0.62 | TQQQ (~3x) CAGR -17.4%
+== F08 Opening gap ES  chosen [k=0.25,mode=go]  default [k=0.25,mode=fade]  grid 6  (3s)
+   IS 2011-2021         MES trades  1516  $     -72/yr  net $     -794  win 43%  PF 0.98  maxDD $-3,542  Sharpe -0.07  yrs up 4/11
+   NEW 2022-Jul 2024    MES trades   321  $  -2,612/yr  net $   -6,737  win 38%  PF 0.73  maxDD $-7,194  Sharpe -1.44  yrs up 0/3
+   FIN Aug 2024-2026    MES trades   302  $  -3,070/yr  net $   -7,001  win 41%  PF 0.75  maxDD $-8,925  Sharpe -1.28  yrs up 0/3
+   OOS 2022-2026        MES trades   623  $  -2,825/yr  net $  -13,738  win 40%  PF 0.74  maxDD $-15,159  Sharpe -1.34  yrs up 0/5
+   OOS at 2x costs $-3,304/yr | default setting OOS $815/yr | DSR 0.00 PBO 0.29 WF Sharpe -1.39 | UPRO (~3x) CAGR -31.0%
+== F09 Turn of the month NQ  chosen [before=5,after=4]  default [before=1,after=3]  grid 25  (5s)
+   IS 2011-2021         MNQ trades   132  $   1,303/yr  net $   14,330  win 67%  PF 2.05  maxDD $-1,514  Sharpe 0.86  yrs up 9/12
+   NEW 2022-Jul 2024    MNQ trades    31  $   3,157/yr  net $    8,143  win 61%  PF 1.86  maxDD $-3,343  Sharpe 0.98  yrs up 3/3
+   FIN Aug 2024-2026    MNQ trades    28  $      74/yr  net $      170  win 71%  PF 1.01  maxDD $-8,240  Sharpe 0.01  yrs up 1/3
+   OOS 2022-2026        MNQ trades    59  $   1,709/yr  net $    8,313  win 66%  PF 1.27  maxDD $-9,626  Sharpe 0.30  yrs up 4/5
+   OOS at 2x costs $1,681/yr | default setting OOS $1,934/yr | DSR 0.35 PBO 0.34 WF Sharpe 0.32 | TQQQ (~3x) CAGR 4.4%
+== F09 Turn of the month ES  chosen [before=5,after=5]  default [before=1,after=3]  grid 25  (5s)
+   IS 2011-2021         MES trades   132  $   1,118/yr  net $   12,294  win 68%  PF 2.31  maxDD $-1,286  Sharpe 0.96  yrs up 10/12
+   NEW 2022-Jul 2024    MES trades    30  $   1,454/yr  net $    3,750  win 57%  PF 1.68  maxDD $-1,752  Sharpe 0.97  yrs up 2/3
+   FIN Aug 2024-2026    MES trades    28  $      72/yr  net $      164  win 57%  PF 1.02  maxDD $-5,272  Sharpe 0.02  yrs up 2/3
+   OOS 2022-2026        MES trades    58  $     804/yr  net $    3,914  win 57%  PF 1.25  maxDD $-5,994  Sharpe 0.28  yrs up 3/5
+   OOS at 2x costs $760/yr | default setting OOS $748/yr | DSR 0.23 PBO 0.23 WF Sharpe 0.11 | UPRO (~3x) CAGR 3.9%
+== F10 Volatility breakout NQ  chosen [k=1.0,side=long,stop_at_open=True]  default [k=0.5,side=both,stop_at_open=False]  grid 16  (5s)
+   IS 2011-2021         MNQ trades   375  $     258/yr  net $    2,842  win 52%  PF 1.49  maxDD $-621  Sharpe 0.67  yrs up 7/11
+   NEW 2022-Jul 2024    MNQ trades    90  $     790/yr  net $    2,038  win 59%  PF 1.42  maxDD $-1,648  Sharpe 0.69  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades    79  $    -270/yr  net $     -616  win 43%  PF 0.93  maxDD $-3,368  Sharpe -0.13  yrs up 1/3
+   OOS 2022-2026        MNQ trades   169  $     292/yr  net $    1,422  win 51%  PF 1.11  maxDD $-3,368  Sharpe 0.18  yrs up 3/5
+   OOS at 2x costs $215/yr | default setting OOS $6,285/yr | DSR 0.43 PBO 0.82 WF Sharpe 0.57 | TQQQ (~3x) CAGR 3.0%
+== F10 Volatility breakout ES  chosen [k=0.25,side=long,stop_at_open=False]  default [k=0.5,side=both,stop_at_open=False]  grid 16  (5s)
+   IS 2011-2021         MES trades  1898  $     -72/yr  net $     -797  win 52%  PF 0.98  maxDD $-2,773  Sharpe -0.07  yrs up 5/11
+   NEW 2022-Jul 2024    MES trades   419  $    -467/yr  net $   -1,205  win 52%  PF 0.96  maxDD $-2,491  Sharpe -0.20  yrs up 1/3
+   FIN Aug 2024-2026    MES trades   394  $    -298/yr  net $     -679  win 53%  PF 0.98  maxDD $-4,174  Sharpe -0.10  yrs up 1/3
+   OOS 2022-2026        MES trades   813  $    -388/yr  net $   -1,884  win 52%  PF 0.97  maxDD $-4,174  Sharpe -0.15  yrs up 2/5
+   OOS at 2x costs $-1,013/yr | default setting OOS $536/yr | DSR 0.17 PBO 0.76 WF Sharpe -0.07 | UPRO (~3x) CAGR -6.0%
+== F11 VWAP trend NQ  chosen [confirm=15,start=30,side=long]  default [confirm=1,start=1,side=both]  grid 12  (11s)
+   IS 2011-2021         MNQ trades  3827  $     507/yr  net $    5,572  win 37%  PF 1.07  maxDD $-3,555  Sharpe 0.37  yrs up 4/11
+   NEW 2022-Jul 2024    MNQ trades   803  $   2,561/yr  net $    6,604  win 38%  PF 1.13  maxDD $-3,306  Sharpe 0.75  yrs up 3/3
+   FIN Aug 2024-2026    MNQ trades   786  $    -667/yr  net $   -1,522  win 39%  PF 0.98  maxDD $-7,628  Sharpe -0.14  yrs up 2/3
+   OOS 2022-2026        MNQ trades  1589  $   1,045/yr  net $    5,082  win 39%  PF 1.04  maxDD $-7,628  Sharpe 0.26  yrs up 4/5
+   OOS at 2x costs $313/yr | default setting OOS $-3,555/yr | DSR 0.00 PBO 0.00 WF Sharpe 0.50 | TQQQ (~3x) CAGR 12.2%
+== F11 VWAP trend ES  chosen [confirm=15,start=30,side=long]  default [confirm=1,start=1,side=both]  grid 12  (11s)
+   IS 2011-2021         MES trades  3889  $    -455/yr  net $   -5,009  win 35%  PF 0.92  maxDD $-7,105  Sharpe -0.48  yrs up 2/11
+   NEW 2022-Jul 2024    MES trades   853  $   1,066/yr  net $    2,749  win 35%  PF 1.09  maxDD $-1,661  Sharpe 0.54  yrs up 3/3
+   FIN Aug 2024-2026    MES trades   781  $    -161/yr  net $     -368  win 36%  PF 0.99  maxDD $-3,828  Sharpe -0.07  yrs up 2/3
+   OOS 2022-2026        MES trades  1634  $     489/yr  net $    2,381  win 36%  PF 1.04  maxDD $-3,828  Sharpe 0.22  yrs up 4/5
+   OOS at 2x costs $-767/yr | default setting OOS $-12,457/yr | DSR 0.00 PBO 0.00 WF Sharpe 0.39 | UPRO (~3x) CAGR 7.1%
+== F12 Turnaround Tuesday NQ  chosen [drop=1.5,hold=2]  default [drop=0.0,hold=1]  grid 8  (2s)
+   IS 2011-2021         MNQ trades    43  $     537/yr  net $    5,911  win 74%  PF 4.05  maxDD $-696  Sharpe 0.83  yrs up 11/11
+   NEW 2022-Jul 2024    MNQ trades    10  $   1,595/yr  net $    4,115  win 70%  PF 4.32  maxDD $-774  Sharpe 0.96  yrs up 2/2
+   FIN Aug 2024-2026    MNQ trades     7  $   2,564/yr  net $    5,005  win 100%  PF inf  maxDD $0  Sharpe 1.34  yrs up 3/3
+   OOS 2022-2026        MNQ trades    17  $   2,011/yr  net $    9,120  win 82%  PF 8.36  maxDD $-774  Sharpe 1.14  yrs up 5/5
+   OOS at 2x costs $2,003/yr | default setting OOS $1,056/yr | DSR 1.00 PBO 0.60 WF Sharpe 1.23 | TQQQ (~3x) CAGR 17.5%
+== F12 Turnaround Tuesday ES  chosen [drop=0.5,hold=1]  default [drop=0.0,hold=1]  grid 8  (3s)
+   IS 2011-2021         MES trades   104  $     554/yr  net $    6,094  win 58%  PF 2.49  maxDD $-491  Sharpe 0.81  yrs up 8/11
+   NEW 2022-Jul 2024    MES trades    20  $     -47/yr  net $     -122  win 35%  PF 0.93  maxDD $-1,150  Sharpe -0.07  yrs up 2/3
+   FIN Aug 2024-2026    MES trades    16  $     936/yr  net $    1,824  win 62%  PF 2.56  maxDD $-679  Sharpe 0.95  yrs up 3/3
+   OOS 2022-2026        MES trades    36  $     376/yr  net $    1,702  win 47%  PF 1.56  maxDD $-1,150  Sharpe 0.46  yrs up 4/5
+   OOS at 2x costs $346/yr | default setting OOS $761/yr | DSR 0.70 PBO 0.71 WF Sharpe 0.67 | UPRO (~3x) CAGR 3.1%

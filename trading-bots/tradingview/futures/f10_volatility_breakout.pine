@@ -1,0 +1,45 @@
+//@version=6
+// F10 - Larry Williams volatility breakout. Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-5 minutes.
+// At 09:30 place a buy stop at open + k x yesterday's session range (and a sell stop at open - k x
+// range if shorts are on); the first one hit is the trade, optionally stopped at the open; out at 16:00.
+// Validated on 1-minute data, 1 MNQ (k = 1, longs only, stop at the open): 2022-2026 +$292/yr and
+// -$270/yr since Aug 2024. Grade F.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F10 Volatility breakout", overlay = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k = input.float(1.0, "k x yesterday's range", step = 0.25)
+longOnly = input.bool(true, "Longs only")
+stopAtOpen = input.bool(true, "Stop at the day's open")
+string TZ = "America/New_York"
+bool inSess = not na(time(timeframe.period, "0930-1600", TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+var float hi = na
+var float lo = na
+var float prevRange = na
+var float dayOpen = na
+var bool traded = false
+if newDay
+    prevRange := hi - lo
+    hi := high
+    lo := low
+    dayOpen := open
+    traded := false
+    if not na(prevRange)
+        strategy.entry("Long", strategy.long, stop = dayOpen + k * prevRange)
+        if not longOnly
+            strategy.entry("Short", strategy.short, stop = dayOpen - k * prevRange)
+else if inSess
+    hi := math.max(hi, high)
+    lo := math.min(lo, low)
+if strategy.position_size != 0 and not traded
+    traded := true
+    strategy.cancel_all()
+    if stopAtOpen
+        strategy.exit("Stop", stop = dayOpen)
+if inSess and hm >= 959
+    strategy.cancel_all()
+    if strategy.position_size != 0
+        strategy.close_all(comment = "16:00")

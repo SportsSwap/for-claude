@@ -1,0 +1,83 @@
+//@version=6
+// F01 - Noise band, intraday momentum (Zarattini, Aziz & Barbon 2024, "Beat the Market").
+// Chart: MNQ1!/NQ1! or MES1!/ES1! (or QQQ/SPY) on 1, 5, 15 or 30 minutes.
+// sigma(t) = average over the last N days of |price at time t / 09:30 open - 1|.
+// Upper band = max(open, yesterday's 16:00 close) x (1 + k sigma); lower = min(...) x (1 - k sigma).
+// At every check time from 10:00: long above the upper band, short below the lower; a long exits
+// when price is below max(upper band, VWAP) at a check (mirror for shorts). Flat at 16:00.
+// Validated on Nasdaq-100 1-minute data (2011-2021 in-sample, 2022-2026 out of sample), 1 MNQ:
+// out of sample +$1,398/yr, profit factor 1.18, but -$149/yr since Aug 2024. On ES it was flat.
+// The Python test used a time-weighted price instead of VWAP (the data had no volume); here VWAP is real.
+// Commission is per contract per side: 0.62 for micros, 2.25 for E-minis.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F01 Noise band", overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+k          = input.float(1.5, "Band width k", step = 0.25)
+N          = input.int(20, "Days in the average", minval = 5, maxval = 60)
+checkEvery = input.int(60, "Check every (minutes, multiple of the chart)", options = [15, 30, 60])
+
+string TZ = "America/New_York"
+bool inSess = not na(time(timeframe.period, "0930-1600", TZ))
+bool newDay = inSess and (not inSess[1] or dayofmonth(time, TZ) != dayofmonth(time[1], TZ))
+int cm = hour(time_close, TZ) * 60 + minute(time_close, TZ) - 570   // minutes since 09:30 at this bar's close
+
+var matrix<float> moves = matrix.new<float>(61, 391, na)
+var int row = 0
+var float dayOpen = na
+var float prevClose = na
+var float lastClose = na
+var float sumTP = 0.0
+var int nTP = 0
+
+if newDay
+    prevClose := lastClose
+    dayOpen := open
+    row := (row + 1) % (N + 1)
+    for c = 0 to 390
+        moves.set(row, c, na)
+    sumTP := 0.0
+    nTP := 0
+
+float upper = na
+float lower = na
+if inSess and not na(dayOpen) and cm >= 1 and cm <= 390
+    moves.set(row, cm, math.abs(close / dayOpen - 1))
+    sumTP += hlc3
+    nTP += 1
+    lastClose := close
+    float s = 0.0
+    int cnt = 0
+    for r = 0 to N
+        if r != row
+            float v = moves.get(r, cm)
+            if not na(v)
+                s += v
+                cnt += 1
+    if cnt >= N and not na(prevClose)
+        float sigma = s / cnt
+        upper := math.max(dayOpen, prevClose) * (1 + k * sigma)
+        lower := math.min(dayOpen, prevClose) * (1 - k * sigma)
+
+float vwap = nTP > 0 ? sumTP / nTP : na
+bool check = inSess and cm >= 30 and cm < 390 and cm % checkEvery == 0 and not na(upper)
+if check
+    bool flatNow = strategy.position_size == 0
+    if strategy.position_size > 0 and close < math.max(upper, vwap)
+        strategy.close("Long")
+        flatNow := true
+    if strategy.position_size < 0 and close > math.min(lower, vwap)
+        strategy.close("Short")
+        flatNow := true
+    if flatNow
+        if close > upper
+            strategy.entry("Long", strategy.long)
+        else if close < lower
+            strategy.entry("Short", strategy.short)
+if inSess and cm >= 390 and strategy.position_size != 0
+    strategy.close_all(comment = "16:00")
+
+plot(upper, "Upper band", color.green, style = plot.style_linebr)
+plot(lower, "Lower band", color.red, style = plot.style_linebr)
+plot(inSess ? vwap : na, "VWAP", color.orange, style = plot.style_linebr)

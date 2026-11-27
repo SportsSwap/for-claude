@@ -1,0 +1,27 @@
+//@version=6
+// Bot 15 - "The Volatility Edge" Strategy 4 (Zarattini, Aziz & Mele 2025), short-vol leg only.
+// Put it on an SVXY daily chart. eRV = SPY's realised volatility over N days (annualised, x100),
+// eVRP = VIX - eRV. In contango (VIX < VIX3M): hold SVXY at VIX/100 of equity if eVRP > 0, half
+// that if eVRP <= 0; in backwardation hold nothing. SVXY was -1x VIX futures until 27 Feb 2018 and
+// -0.5x after, so the weight is halved before that date. Trades at the next open.
+// Validated 2017-2026 out of sample: 3.9%/yr, Sharpe 0.67, worst fall -8%. Grade B. The paper's
+// long-VIX leg made it worse here (Sharpe 0.54, -30%), so it is left out.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 15 Volatility Edge", overlay = false, initial_capital = 10000,
+     commission_type = strategy.commission.percent, commission_value = 0.08)
+
+rvLen = input.int(20, "Realised volatility days")
+float vix = request.security("CBOE:VIX", "D", close)
+float vix3m = request.security("CBOE:VIX3M", "D", close)
+float erv = request.security("SPY", "D", ta.stdev(close / close[1] - 1, rvLen) * math.sqrt(252) * 100)
+float vrp = vix - erv
+bool contango = vix < vix3m
+float w = contango ? (vrp > 0 ? vix / 100 : 0.5 * vix / 100) : 0.0
+if time < timestamp(2018, 2, 28)
+    w := w * 0.5
+w := math.round(w * 1000) / 1000
+
+float diff = w * strategy.equity / close - strategy.position_size
+if not na(erv) and math.abs(diff) * close > 0.02 * strategy.equity
+    strategy.order("rebalance", diff > 0 ? strategy.long : strategy.short, qty = math.abs(diff))
+plot(w * 100, "SVXY weight (%)", color.purple, style = plot.style_stepline)

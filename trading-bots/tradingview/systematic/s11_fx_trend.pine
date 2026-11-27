@@ -1,0 +1,21 @@
+//@version=6
+// Bot 11 - FX trend on majors. Daily chart of EURUSD, GBPUSD, AUDUSD, NZDUSD, USDJPY, USDCAD or USDCHF.
+// Every Friday close: long if the close is above its N-day average, short if below (or flat if
+// shorts are off). Trades at the next open. Validated 2015-2026 out of sample (7 pairs, spot only,
+// carry not included): -3.0%/yr. Grade F: here only to show it does not work now.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 11 FX trend", overlay = true, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, initial_capital = 10000)
+
+len = input.int(100, "Average length (days)")
+allowShort = input.bool(true, "Allow shorts")
+avg = ta.sma(close, len)
+if dayofweek == dayofweek.friday and not na(avg)
+    if close > avg and strategy.position_size <= 0
+        strategy.entry("Long", strategy.long)
+    else if close < avg and strategy.position_size >= 0
+        if allowShort
+            strategy.entry("Short", strategy.short)
+        else
+            strategy.close("Long")
+plot(avg, "Average", color.orange)

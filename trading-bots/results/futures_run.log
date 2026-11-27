@@ -1,0 +1,77 @@
+== F01 Noise band NQ  chosen [k=1.5,lookback=20,check=60,side=both]  default [k=1.0,lookback=14,check=30,side=both]  grid 36  (14s)
+   IS 2011-2021         MNQ trades  1198  $     491/yr  net $    5,401  win 42%  PF 1.23  maxDD $-1,124  Sharpe 0.59  yrs up 7/11
+   NEW 2022-Jul 2024    MNQ trades   246  $   2,768/yr  net $    7,139  win 48%  PF 1.52  maxDD $-934  Sharpe 1.50  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades   241  $    -149/yr  net $     -340  win 41%  PF 0.99  maxDD $-3,817  Sharpe -0.05  yrs up 1/3
+   OOS 2022-2026        MNQ trades   487  $   1,398/yr  net $    6,799  win 45%  PF 1.18  maxDD $-3,817  Sharpe 0.56  yrs up 2/5
+   OOS at 2x costs $1,173/yr | default setting OOS $1,913/yr | DSR 0.65 PBO 0.38 WF Sharpe 0.68 | TQQQ (~3x) CAGR 12.0%
+== F01 Noise band ES  chosen [k=1.5,lookback=10,check=60,side=both]  default [k=1.0,lookback=14,check=30,side=both]  grid 36  (15s)
+   IS 2011-2021         MES trades  1214  $      60/yr  net $      662  win 41%  PF 1.03  maxDD $-2,424  Sharpe 0.10  yrs up 4/11
+   NEW 2022-Jul 2024    MES trades   296  $   1,067/yr  net $    2,752  win 50%  PF 1.30  maxDD $-807  Sharpe 0.97  yrs up 3/3
+   FIN Aug 2024-2026    MES trades   255  $    -609/yr  net $   -1,391  win 45%  PF 0.90  maxDD $-3,443  Sharpe -0.37  yrs up 1/3
+   OOS 2022-2026        MES trades   551  $     280/yr  net $    1,361  win 48%  PF 1.06  maxDD $-3,443  Sharpe 0.20  yrs up 3/5
+   OOS at 2x costs $-144/yr | default setting OOS $-142/yr | DSR 0.11 PBO 0.02 WF Sharpe 0.33 | UPRO (~3x) CAGR 4.0%
+== F02 Opening range breakout NQ  chosen [minutes=5,R=10,stop=atr10,side=both]  default [minutes=5,R=10,stop=range,side=both]  grid 30  (11s)
+   IS 2011-2021         MNQ trades  2690  $    -459/yr  net $   -5,043  win 16%  PF 0.89  maxDD $-6,052  Sharpe -0.48  yrs up 3/11
+   NEW 2022-Jul 2024    MNQ trades   577  $   1,971/yr  net $    5,084  win 16%  PF 1.18  maxDD $-1,656  Sharpe 0.75  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades   574  $     183/yr  net $      419  win 17%  PF 1.01  maxDD $-7,241  Sharpe 0.05  yrs up 2/3
+   OOS 2022-2026        MNQ trades  1151  $   1,131/yr  net $    5,503  win 17%  PF 1.08  maxDD $-7,241  Sharpe 0.38  yrs up 3/5
+   OOS at 2x costs $606/yr | default setting OOS $536/yr | DSR 0.13 PBO 0.04 WF Sharpe 0.80 | TQQQ (~3x) CAGR 11.3%
+== F02 Opening range breakout ES  chosen [minutes=5,R=5,stop=range,side=both]  default [minutes=5,R=10,stop=range,side=both]  grid 30  (11s)
+   IS 2011-2021         MES trades  2473  $    -846/yr  net $   -9,308  win 18%  PF 0.71  maxDD $-9,520  Sharpe -1.49  yrs up 0/11
+   NEW 2022-Jul 2024    MES trades   587  $  -1,799/yr  net $   -4,641  win 19%  PF 0.74  maxDD $-4,761  Sharpe -1.41  yrs up 0/3
+   FIN Aug 2024-2026    MES trades   575  $     536/yr  net $    1,223  win 21%  PF 1.07  maxDD $-2,397  Sharpe 0.33  yrs up 2/3
+   OOS 2022-2026        MES trades  1162  $    -702/yr  net $   -3,418  win 20%  PF 0.90  maxDD $-6,162  Sharpe -0.48  yrs up 1/5
+   OOS at 2x costs $-1,555/yr | default setting OOS $-745/yr | DSR 0.00 PBO 0.44 WF Sharpe -0.30 | UPRO (~3x) CAGR -11.5%
+== F03 Intraday momentum NQ  chosen [signal=first30_agree,min_move=0.5]  default [signal=first30,min_move=0.0]  grid 12  (4s)
+   IS 2011-2021         MNQ trades   521  $     128/yr  net $    1,413  win 48%  PF 1.20  maxDD $-918  Sharpe 0.26  yrs up 3/11
+   NEW 2022-Jul 2024    MNQ trades   157  $      55/yr  net $      141  win 51%  PF 1.03  maxDD $-1,555  Sharpe 0.07  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades   154  $    -217/yr  net $     -495  win 45%  PF 0.91  maxDD $-1,054  Sharpe -0.27  yrs up 1/3
+   OOS 2022-2026        MNQ trades   311  $     -73/yr  net $     -354  win 48%  PF 0.97  maxDD $-2,053  Sharpe -0.09  yrs up 2/5
+   OOS at 2x costs $-216/yr | default setting OOS $-874/yr | DSR 0.18 PBO 0.58 WF Sharpe 0.23 | TQQQ (~3x) CAGR -0.1%
+== F03 Intraday momentum ES  chosen [signal=first30_agree,min_move=0.5]  default [signal=first30,min_move=0.0]  grid 12  (4s)
+   IS 2011-2021         MES trades   418  $      57/yr  net $      627  win 45%  PF 1.12  maxDD $-786  Sharpe 0.16  yrs up 3/11
+   NEW 2022-Jul 2024    MES trades   127  $     102/yr  net $      262  win 52%  PF 1.10  maxDD $-626  Sharpe 0.25  yrs up 2/3
+   FIN Aug 2024-2026    MES trades   108  $    -129/yr  net $     -294  win 43%  PF 0.86  maxDD $-567  Sharpe -0.36  yrs up 1/3
+   OOS 2022-2026        MES trades   235  $      -7/yr  net $      -32  win 48%  PF 0.99  maxDD $-876  Sharpe -0.02  yrs up 3/5
+   OOS at 2x costs $-188/yr | default setting OOS $-895/yr | DSR 0.06 PBO 0.02 WF Sharpe 0.11 | UPRO (~3x) CAGR 0.4%
+== F04 Overnight drift NQ  chosen [down=False,trend=True,exit=09:30]  default [down=False,trend=False,exit=09:30]  grid 8  (3s)
+   IS 2011-2021         MNQ trades  2293  $     695/yr  net $    7,644  win 56%  PF 1.12  maxDD $-4,166  Sharpe 0.43  yrs up 8/12
+   NEW 2022-Jul 2024    MNQ trades   339  $   1,863/yr  net $    4,804  win 53%  PF 1.19  maxDD $-4,441  Sharpe 0.66  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades   512  $   4,839/yr  net $   11,049  win 58%  PF 1.17  maxDD $-4,799  Sharpe 0.82  yrs up 3/3
+   OOS 2022-2026        MNQ trades   851  $   3,259/yr  net $   15,853  win 56%  PF 1.17  maxDD $-4,799  Sharpe 0.73  yrs up 4/5
+   OOS at 2x costs $2,867/yr | default setting OOS $3,794/yr | DSR 0.90 PBO 0.68 WF Sharpe 0.48 | TQQQ (~3x) CAGR 20.3%
+== F04 Overnight drift ES  chosen [down=True,trend=True,exit=09:30]  default [down=False,trend=False,exit=09:30]  grid 8  (3s)
+   IS 2011-2021         MES trades   978  $     179/yr  net $    1,969  win 55%  PF 1.09  maxDD $-1,808  Sharpe 0.23  yrs up 7/12
+   NEW 2022-Jul 2024    MES trades   170  $    -311/yr  net $     -803  win 44%  PF 0.91  maxDD $-2,376  Sharpe -0.30  yrs up 1/3
+   FIN Aug 2024-2026    MES trades   217  $   1,110/yr  net $    2,534  win 60%  PF 1.18  maxDD $-2,208  Sharpe 0.58  yrs up 3/3
+   OOS 2022-2026        MES trades   387  $     356/yr  net $    1,731  win 53%  PF 1.08  maxDD $-2,376  Sharpe 0.24  yrs up 3/5
+   OOS at 2x costs $58/yr | default setting OOS $1,445/yr | DSR 0.20 PBO 0.26 WF Sharpe 0.12 | UPRO (~3x) CAGR 0.7%
+== F05 Daily fair value gap NQ  chosen [R=4.0,hours=48,min_gap=0.1,skip_news=True]  default [R=3.0,hours=96,min_gap=0.1,skip_news=True]  grid 24  (13s)
+   IS 2011-2021         MNQ trades   186  $     284/yr  net $    3,127  win 41%  PF 1.40  maxDD $-1,456  Sharpe 0.40  yrs up 7/11
+   NEW 2022-Jul 2024    MNQ trades    51  $     834/yr  net $    2,150  win 39%  PF 1.38  maxDD $-1,685  Sharpe 0.51  yrs up 2/3
+   FIN Aug 2024-2026    MNQ trades    42  $   2,557/yr  net $    5,775  win 43%  PF 1.70  maxDD $-2,422  Sharpe 0.80  yrs up 3/3
+   OOS 2022-2026        MNQ trades    93  $   1,637/yr  net $    7,925  win 41%  PF 1.57  maxDD $-2,422  Sharpe 0.66  yrs up 5/5
+   OOS at 2x costs $1,604/yr | default setting OOS $2,776/yr | DSR 0.83 PBO 0.34 WF Sharpe 0.71 | TQQQ (~3x) CAGR 12.5%
+== F05 Daily fair value gap ES  chosen [R=4.0,hours=48,min_gap=0.25,skip_news=True]  default [R=3.0,hours=96,min_gap=0.1,skip_news=True]  grid 24  (13s)
+   IS 2011-2021         MES trades   127  $     139/yr  net $    1,524  win 52%  PF 1.33  maxDD $-1,002  Sharpe 0.32  yrs up 8/11
+   NEW 2022-Jul 2024    MES trades    45  $     382/yr  net $      984  win 49%  PF 1.28  maxDD $-673  Sharpe 0.38  yrs up 2/3
+   FIN Aug 2024-2026    MES trades    29  $    -309/yr  net $     -682  win 34%  PF 0.85  maxDD $-2,275  Sharpe -0.22  yrs up 2/3
+   OOS 2022-2026        MES trades    74  $      63/yr  net $      302  win 43%  PF 1.04  maxDD $-2,275  Sharpe 0.05  yrs up 4/5
+   OOS at 2x costs $25/yr | default setting OOS $1,067/yr | DSR 0.41 PBO 0.84 WF Sharpe -0.16 | UPRO (~3x) CAGR 1.8%
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/for-claude/trading-bots/futures/run.py", line 114, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/for-claude/trading-bots/futures/run.py", line 59, in main
+    out = V.study(name, fn, spec["space"], spec["default"], IS_END, benchmark=bench, notes=spec["notes"])
+  File "/home/user/for-claude/trading-bots/engine/validate.py", line 67, in study
+    runs = {_key(p): fn(p, 1.0) for p in grid}
+                     ~~^^^^^^^^
+  File "/home/user/for-claude/trading-bots/futures/run.py", line 55, in <lambda>
+    fn = lambda p, cm, f=spec["fn"], s=sym: f(p, cm, s)
+                                            ~^^^^^^^^^^
+  File "/home/user/for-claude/trading-bots/futures/bots.py", line 291, in ibs
+    entry &= (d["close"] > d["close"].rolling(200).mean()).values
+ValueError: output array is read-only

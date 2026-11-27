@@ -1,0 +1,36 @@
+//@version=6
+// F03 - Market intraday momentum (Gao, Han, Li & Zhou 2018; Baltussen et al 2021).
+// Chart: MNQ1!/NQ1! or MES1!/ES1! on 1-30 minutes. At 15:30, go long if the move from yesterday's
+// 16:00 close to 10:00 today was up (short if down), optionally only if the 15:00-15:30 move agrees
+// and the first move was at least X%. Out at 16:00.
+// Validated on 1-minute data, 1 MNQ: 2022-2026 -$73/yr. Grade F: the effect has faded, as later
+// studies also found. Here so you can check it yourself.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("F03 Intraday momentum", overlay = true, process_orders_on_close = true, pyramiding = 0,
+     default_qty_type = strategy.fixed, default_qty_value = 1,
+     commission_type = strategy.commission.cash_per_contract, commission_value = 0.62, slippage = 1)
+
+agree = input.bool(true, "15:00-15:30 move must agree")
+minMove = input.float(0.5, "Smallest first move (%)", step = 0.25)
+string TZ = "America/New_York"
+int hm = hour(time_close, TZ) * 60 + minute(time_close, TZ)
+var float lastClose = na
+var float prevClose = na
+var float p10 = na
+var float p15 = na
+if hm == 571 or (hour(time, TZ) == 9 and minute(time, TZ) == 30)
+    prevClose := lastClose
+if hm == 600
+    p10 := close
+if hm == 900
+    p15 := close
+if hm == 930 and not na(prevClose) and not na(p10) and not na(p15) and strategy.position_size == 0
+    float r1 = p10 / prevClose - 1
+    int dir = r1 > 0 ? 1 : -1
+    bool ok = math.abs(r1) * 100 >= minMove and (not agree or math.sign(close - p15) == dir)
+    if ok
+        strategy.entry(dir > 0 ? "Long" : "Short", dir > 0 ? strategy.long : strategy.short)
+if hm == 960
+    if strategy.position_size != 0
+        strategy.close_all(comment = "16:00")
+    lastClose := close

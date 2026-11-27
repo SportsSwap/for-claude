@@ -1,0 +1,25 @@
+//@version=6
+// Bot 01 - Faber trend timing (Faber 2007/2013, "A Quantitative Approach to Tactical Asset Allocation")
+// Rule: on the last trading day of each month, hold this asset if its close is above its N-month
+// average (21 x N daily closes); otherwise hold cash. Trades at the next open.
+// The full bot runs this on SPY, EFA, IEF, VNQ and DBC at 20% each (the rest in SHY): open each
+// chart and the strategy tester shows that leg. Validated (Python, 2015-2026 out of sample, 5 ETFs):
+// 4.1%/yr, Sharpe 0.62, worst fall -11%. Grade B.
+// Not compiled here: paste into the Pine Editor and check it before relying on it. Not financial advice.
+strategy("Bot 01 Faber trend", overlay = true, default_qty_type = strategy.percent_of_equity,
+     default_qty_value = 100, commission_type = strategy.commission.percent, commission_value = 0.04,
+     initial_capital = 10000)
+
+months = input.int(6, "Average length (months)", minval = 2)
+avg = ta.sma(close, 21 * months)
+nextDay = time + (dayofweek == dayofweek.friday ? 3 : 1) * 86400000
+bool monthEnd = month(nextDay) != month(time)
+bool hold = close > avg
+
+if monthEnd and not na(avg)
+    if hold and strategy.position_size == 0
+        strategy.entry("Long", strategy.long)
+    else if not hold and strategy.position_size > 0
+        strategy.close("Long")
+
+plot(avg, "N-month average", color.orange)
